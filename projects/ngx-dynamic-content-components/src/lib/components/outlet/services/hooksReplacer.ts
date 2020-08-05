@@ -83,7 +83,7 @@ export class HooksReplacer {
       selectorReplaceInstructions.push({
         startIndex: pr.hookPosition.openingTagStartIndex,
         endIndex: pr.hookPosition.openingTagEndIndex,
-        replacement: '@@@hook-lt@@@dynamic-component-placeholder hookid=@@@hook-dq@@@' + hookCount + '@@@hook-dq@@@ parsetoken=@@@hook-dq@@@' + token + '@@@hook-dq@@@ parser=@@@hook-dq@@@' + pr.parser.name + '@@@hook-dq@@@@@@hook-gt@@@'
+        replacement: '@@@hook-lt@@@dynamic-component-placeholder hookid=@@@hook-dq@@@' + hookCount + '@@@hook-dq@@@ parsetoken=@@@hook-dq@@@' + token + '@@@hook-dq@@@ ' + (pr.parser.name ? 'parser=@@@hook-dq@@@' + pr.parser.name + '@@@hook-dq@@@' : '') + '@@@hook-gt@@@'
       });
       selectorReplaceInstructions.push({
         startIndex: isMultiTag ? pr.hookPosition.closingTagStartIndex : pr.hookPosition.openingTagEndIndex,

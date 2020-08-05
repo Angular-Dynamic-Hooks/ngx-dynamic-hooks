@@ -1,15 +1,13 @@
 import { isDevMode, Injectable, Injector } from '@angular/core';
 import { HookParser } from '../../../interfacesPublic';
-import { GenericSelectorParser } from '../../../parsers/genericSelector/GenericSelectorParser';
+import { GenericSelectorParser } from '../../../parsers/genericSelector/genericSelectorParser';
 import { GenericSelectorFinder } from '../../../parsers/genericSelector/services/genericSelectorFinder';
 import { BindingStateManager } from '../../../parsers/genericSelector/services/bindingStateManager';
 import { ParserConfigResolver } from '../../../parsers/genericSelector/config/parserConfigResolver';
 import { HookParserEntry } from './parserEntry';
 import { GenericSelectorParserConfig } from '../../../parsers/genericSelector/config/parserConfig';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class ParserEntryResolver {
 
   constructor(private injector: Injector, private parserConfigResolver: ParserConfigResolver, private genericSelectorFinder: GenericSelectorFinder, private bindingStateManager: BindingStateManager) {
@@ -41,11 +39,13 @@ export class ParserEntryResolver {
     // Filter parsers
     const filteredParsers = [];
     for (const parser of parsers) {
-      if (blacklist && blacklist.includes(parser.name)) {
-        continue;
-      }
-      if (whitelist && !whitelist.includes(parser.name)) {
-        continue;
+      if (parser.hasOwnProperty('name') && typeof parser.name === 'string') {
+        if (blacklist && blacklist.includes(parser.name)) {
+          continue;
+        }
+        if (whitelist && !whitelist.includes(parser.name)) {
+          continue;
+        }
       }
       filteredParsers.push(parser);
     }
@@ -106,12 +106,12 @@ export class ParserEntryResolver {
    * @param whitelist - The whitelist in question
    */
   validateBlackAndWhitelist(parsers: Array<HookParser>, blacklist?: Array<string>, whitelist?: Array<string>): void {
-    const globalParserNames = parsers.map(entry => entry.name);
+    const globalParserNames = parsers.map(entry => entry.name).filter(entry => entry !== undefined);
     if (blacklist) {
       for (const blacklistedParser of blacklist) {
         if (!globalParserNames.includes(blacklistedParser)) {
           if (isDevMode()) {
-            console.warn('DynCompHooks: Blacklisted parser "' + blacklistedParser + '" does not exist in the list of global parsers.');
+            console.warn('DynCompHooks: Blacklisted parser name "' + blacklistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.');
           }
         }
       }
@@ -120,7 +120,7 @@ export class ParserEntryResolver {
       for (const whitelistedParser of whitelist) {
         if (!globalParserNames.includes(whitelistedParser)) {
           if (isDevMode()) {
-            console.warn('DynCompHooks: Whitelisted parser "' + whitelistedParser + '" does not exist in the list of global parsers.');
+            console.warn('DynCompHooks: Whitelisted parser name "' + whitelistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.');
           }
         }
       }

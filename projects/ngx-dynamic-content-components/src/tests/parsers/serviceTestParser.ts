@@ -1,7 +1,6 @@
-import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../../lib/interfacesPublic';
-import { GenericSelectorFinder } from '../../lib/parsers/genericSelector/services/genericSelectorFinder';
-import { NgContentTestComponent } from '../components/ngContentTest/ngContentTest.c';
 import { ComponentFactoryResolver, Injectable } from '@angular/core';
+import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../testing-api';
+import { GenericSelectorFinder } from '../testing-api';
 import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
 
 /**

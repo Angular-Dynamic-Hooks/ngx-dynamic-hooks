@@ -2,7 +2,8 @@
   "name": "ngx-dynamic-content-components",
   "version": "1.0.0",
   "peerDependencies": {
-    "@angular/core": "^10.0.4"
+    "@angular/core": "6 - 10",
+    "rxjs": "~6"
   },
   "dependencies": {
     "tslib": "^2.0.0"

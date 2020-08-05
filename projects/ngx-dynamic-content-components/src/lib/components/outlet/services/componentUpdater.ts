@@ -21,16 +21,16 @@ export class ComponentUpdater {
   refresh(hookIndex: HookIndex, context: {[key: string]: any}, options: OutletOptions, triggerOnDynamicChanges: boolean) {
 
     for (const [hookId, hook] of Object.entries(hookIndex)) {
-      // Save bindings from previous HookData
+      // Save previous bindings
       hook.previousBindings = {
         inputs: this.savePreviousBindings(hook, 'inputs', options.compareInputsByValue, options.compareByValueDepth),
         outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth)
       };
 
-      // Refresh bindings
+      // Get new bindings from parser
       hook.bindings = hook.parser.updateBindings(hook.id, hook.value, context);
 
-      // Update bindings
+      // Update component with new bindings
       this.updateComponentWithNewOutputs(hook, context, options);
       this.updateComponentWithNewInputs(hook, options);
     }

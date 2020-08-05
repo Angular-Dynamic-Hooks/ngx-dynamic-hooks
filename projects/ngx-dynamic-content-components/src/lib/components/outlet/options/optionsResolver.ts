@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OutletOptions, outletOptionDefaults } from './options';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class OptionsResolver {
 
   constructor() {

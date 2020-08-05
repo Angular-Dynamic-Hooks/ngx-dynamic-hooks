@@ -1,9 +1,6 @@
-import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../../lib/interfacesPublic';
-import { GenericSelectorFinder } from '../../lib/parsers/genericSelector/services/genericSelectorFinder';
-import { NgContentTestComponent } from '../components/ngContentTest/ngContentTest.c';
-import { ComponentFactoryResolver, Injectable } from '@angular/core';
+import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../testing-api';
+import { matchAll } from '../testing-api';
 import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
-import { matchAll } from '../../lib/polyfills/matchAll';
 
 /**
  * This parsers serves to test configuring parsers that are classes or instances

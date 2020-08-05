@@ -1,5 +1,5 @@
-import { Component, ViewChild, ViewChildren, OnInit, AfterViewInit, OnDestroy, Input, HostBinding, ElementRef, OnChanges, ChangeDetectorRef, QueryList, Output, EventEmitter, Inject, ContentChild, ContentChildren, DoCheck } from '@angular/core';
-import { OnDynamicMount, OnDynamicChanges, OnDynamicData, DynamicContentChildren } from '../../../lib/interfacesPublic';
+import { Component, OnInit, AfterViewInit, OnDestroy, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
+import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 import { TestService } from '../../services/testService';
 
 

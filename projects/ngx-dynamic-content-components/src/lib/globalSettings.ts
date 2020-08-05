@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
-import { HookParserEntry } from './components/dynamicHooks/options/parserEntry';
-import { OutletOptions } from './components/dynamicHooks/options/options';
+import { HookParserEntry } from './components/outlet/options/parserEntry';
+import { OutletOptions } from './components/outlet/options/options';
 
 // Create a custom injector token that will be used to create a global settings provider
 // when DynamicContentComponentsModule.forRoot() is call in the root module.

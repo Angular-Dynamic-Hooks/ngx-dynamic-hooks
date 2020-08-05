@@ -164,11 +164,23 @@ export class DataTypeParser {
    * @param callbackFn - A callback fn that returns what you want to replace them with
    */
   replaceValuesInJSONString(JSONString: string, valueRegex: string, callbackFn: (match: string) => string): string {
-    const regex = '(?:' +
-      '(?<=:\\s*)' + valueRegex + '(?=\\s*[,}])' + '|' +    // Value in object: ':' followed by value followed by ',' or '}'
-      '(?<=[\\[,]\\s*)' + valueRegex + '(?=\\s*[\\],])' +   // Value in array: '[' or ',' followed by value followed by ',' or ']'
+    // With lookbehinds (too new for some browsers)
+    const withLookBehindsRegex = '(?:' +
+      '(?<=:\\s*)' + valueRegex + '(?=\\s*[,}])' + '|' +
+      '(?<=[\\[,]\\s*)' + valueRegex + '(?=\\s*[\\],])' +
     ')';
-    return JSONString.replace(new RegExp(regex, 'gm'), callbackFn);
+
+    // Without lookbehinds (make sure to keep the lookaheads, though. This way, the same comma can be the end of one regex and the beginning of the next)
+    const regex = '(?:' +
+      '(:\\s*)(' + valueRegex + ')(?=\\s*[,}])' + '|' +    // Value in object: ':' followed by value followed by ',' or '}'
+      '([\\[,]\\s*)(' + valueRegex + ')(?=\\s*[\\],])' +   // Value in array: '[' or ',' followed by value followed by ',' or ']'
+    ')';
+
+    return JSONString.replace(new RegExp(regex, 'gm'), (full, p1, p2, p3, p4) => {
+      const startPart = p1 ? p1 : p3;
+      const value = p2 ? p2 : p4;
+      return startPart + callbackFn(value);
+    });
   }
 
   decodeJSONStrings(jsonLevel: any, unescapeStrings: boolean = true): void {

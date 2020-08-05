@@ -1,6 +1,6 @@
 import { ComponentFactoryResolver, ComponentRef, Injector, ApplicationRef, SimpleChange, isDevMode, Injectable, ChangeDetectorRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { Observable, combineLatest, ReplaySubject, Subject, of } from 'rxjs';
-import { map, first, mergeMap, tap, catchError } from 'rxjs/operators';
+import { combineLatest, ReplaySubject, of } from 'rxjs';
+import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
 import { Hook, HookIndex } from '../../../interfaces';
 import { DynamicContentChildren, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
@@ -11,9 +11,6 @@ import { ComponentUpdater } from './componentUpdater';
 @Injectable()
 export class ComponentCreator {
   private renderer: Renderer2;
-
-  // Component creation
-  // ----------------------------------------------------------------------------------------------------------------
 
   constructor(private injector: Injector, private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater) {
     this.renderer = this.rendererFactory.createRenderer(null, null);
@@ -36,7 +33,7 @@ export class ComponentCreator {
     const componentLoadSubjects = [];
     const hookPlaceholders = {};
 
-    // Get HookData and create content slots
+    // Get HookData and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       const placeholderElement = hostElement.querySelector('[parsetoken="' + token + '"][hookid="' + hookId + '"]');
       if (placeholderElement) {
@@ -53,20 +50,21 @@ export class ComponentCreator {
       }
     }
 
-    // Load all components in hookIndex from HookData
+    // Load all components in hookIndex into the component placeholders
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       const placeholderElement = hookPlaceholders[hookId];
 
-      componentLoadSubjects.push(of(true) // To have the obs stream handle errors from loadComponentClass as well
-        // 1. Load component class first (might be lazy-loaded)
+      // Start with of(true) to catch errors from loadComponentClass in the obs stream as well
+      componentLoadSubjects.push(of(true)
+        // Load component class first (might be lazy-loaded)
         .pipe(mergeMap(() => this.loadComponentClass(hook.data.component, context, placeholderElement, options)))
-        // 2. Replace placeholder
-        .pipe(map((compClass) => {
-          return {c: compClass, e: this.replacePlaceholderElement(compClass, placeholderElement)};
-        }))
-        // 3. Instantiate component
-        .pipe(tap(({c: compClass, e: componentHostElement}) => {
-          this.createComponent(hook, context, componentHostElement, options, compClass, token);
+        .pipe(tap((compClass) => {
+          // Replace placeholder with actual component selector element
+          const componentHostElement = this.replacePlaceholderElement(compClass, placeholderElement);
+          // Get projectableNodes from content slots
+          const projectableNodes = this.getContentSlotElements(componentHostElement, token);
+          // Instantiate component
+          this.createComponent(hook, context, componentHostElement, projectableNodes, options, compClass, token);
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
@@ -86,7 +84,6 @@ export class ComponentCreator {
 
     // Once all normal and lazy components have loaded
     combineLatest(...componentLoadSubjects).pipe(first()).subscribe(() => {
-      console.log(hookIndex);
 
       // Call dynamic lifecycle methods for all created components
       for (const hook of Object.values(hookIndex)) {
@@ -123,10 +120,17 @@ export class ComponentCreator {
     return allComponentsLoaded;
   }
 
+  /**
+   * Creates a content slot dom element for each ng-content outlet of the dynamically loaded component
+   *
+   * @param placeholderElement - The dom element to create the content slots in
+   * @param hook - The hook of the component
+   * @param token - The current parse token
+   */
   createContentSlotElements(placeholderElement: Element, hook: Hook, token: string): void {
     let content;
 
-    // If content is defined, overwrite child nodes
+    // If content property is defined, use the defits content slots
     if (hook.data.hasOwnProperty('content') && Array.isArray(hook.data.content)) {
       content = hook.data.content;
     // Otherwise just wrap existing content into single content slot
@@ -155,35 +159,25 @@ export class ComponentCreator {
   }
 
   /**
-   * Find all components that would be the ContentChildren of a dynamic component from a HTML node downwards and returns them in a hierarchical tree object
-   * Important: This function depends on the component selector attributes 'parsetoken' and 'hookid' not being removed yet
+   * Returns all previously created content slots for a component element as a projectableNodes[][] array
    *
-   * @param node - The HTML node to parse
-   * @param treeLevel - The current tree level of DynamicContentChildren (for recursiveness)
-   * @param dynamicComponentIndex - An index of all potential components that can be found
+   * @param componentHostElement - The dom element with the content slots
+   * @param token - The current parse token
    */
-  findContentChildren(node: Node, treeLevel: Array<DynamicContentChildren> = [], hookIndex: HookIndex): void {
-    if (node['childNodes'] !== undefined && node.childNodes.length > 0) {
-      node.childNodes.forEach((childNode, key) => {
-        let componentFound = false;
-        // If element has a parsetoken and hookid, it is a dynamic component
-        if (childNode['attributes'] !== undefined && childNode['hasAttribute']('parsetoken') && childNode['hasAttribute']('hookid')) {
-          const hookId = parseInt(childNode['getAttribute']('hookid'), 10);
-          if (hookIndex.hasOwnProperty(hookId)) {
-            treeLevel.push({
-              name: hookIndex[hookId].componentRef.instance.constructor.name,
-              componentRef: hookIndex[hookId].componentRef,
-              contentChildren: []
-            });
-            componentFound = true;
-          }
-        }
+  getContentSlotElements(componentHostElement: Element, token: string): Array<Array<Element>> {
+    // Resolve ng-content from content slots
+    const projectableNodes = [];
+    const contentSlotElements = Array.prototype.slice.call(componentHostElement.childNodes)
+      .filter(entry => entry.tagName === 'DYNAMIC-COMPONENT-PLACEHOLDER-CONTENTSLOT' && entry.getAttribute('parsetoken') === token);
 
-        const treeLevelForChildren = componentFound ? treeLevel[treeLevel.length - 1].contentChildren : treeLevel;
-        this.findContentChildren(childNode, treeLevelForChildren, hookIndex);
-      });
+    for (const contentSlotElement of contentSlotElements) {
+      const slotIndex = contentSlotElement.getAttribute('slotIndex');
+      projectableNodes[slotIndex] = Array.prototype.slice.call(contentSlotElement.childNodes);
     }
+
+    return projectableNodes;
   }
+
 
   // Component creation
   // ----------------------------------------------------------------------------------------------------------------
@@ -251,31 +245,23 @@ export class ComponentCreator {
     }
 
     this.renderer.insertBefore(placeholderElement.parentNode, componentElement, placeholderElement);
-    this.renderer.removeChild(placeholderElement.parentNode, placeholderElement);
+    // Note: renderer.removeChild() once again does not reliably work here. Fallback on native method.
+    placeholderElement.parentNode.removeChild(placeholderElement);
 
     return componentElement;
   }
 
   /**
-   * Dynamically creates a component in the specified hostElement
+   * Dynamically creates a component in the specified componentHostElement
    *
    * @param hook - The hook for this component
    * @param context - The current context
    * @param componentHostElement - The hostElement for the component
+   * @param projectableNodes - The nodes to inject as ng-content
    * @param options - The current HookComponentOptions
    * @param compClass - The component's class
    */
-  createComponent(hook: Hook, context: any, componentHostElement: Element, options: OutletOptions, compClass: new(...args: any[]) => any, token: string): void {
-
-    // Resolve ng-content from content slots
-    const projectableNodes = [];
-    const contentSlotElements = Array.prototype.slice.call(componentHostElement.childNodes)
-      .filter(entry => entry.tagName === 'DYNAMIC-COMPONENT-PLACEHOLDER-CONTENTSLOT' && entry.getAttribute('parsetoken') === token);
-
-    for (const contentSlotElement of contentSlotElements) {
-      const slotIndex = contentSlotElement.getAttribute('slotIndex');
-      projectableNodes[slotIndex] = Array.prototype.slice.call(contentSlotElement.childNodes);
-    }
+  createComponent(hook: Hook, context: any, componentHostElement: Element, projectableNodes: Array<Array<Element>>, options: OutletOptions, compClass: new(...args: any[]) => any, token: string): void {
 
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
@@ -284,13 +270,10 @@ export class ComponentCreator {
     const injector = hook.data.injector ? hook.data.injector : this.injector;
     const dynamicComponentRef = dynamicComponentFactory.create(injector, projectableNodes, componentHostElement);
 
-    // Activate change detection
-    this.appRef.attachView(dynamicComponentRef.hostView);
-
     // Track component
     hook.componentRef = dynamicComponentRef;
 
-    // Update bindings
+    // Set initial bindings
     hook.bindings = hook.parser.updateBindings(hook.id, hook.value, context);
     this.componentUpdater.updateComponentWithNewOutputs(hook, context, options);
     this.componentUpdater.updateComponentWithNewInputs(hook, options);
@@ -298,6 +281,45 @@ export class ComponentCreator {
     // Call initial OnDynamicChanges with context (if not undefined)
     if (typeof hook.componentRef.instance['onDynamicChanges'] === 'function' && context !== undefined) {
       hook.componentRef.instance['onDynamicChanges']({context});
+    }
+
+    // Activate change detection
+    this.appRef.attachView(dynamicComponentRef.hostView);
+    dynamicComponentRef.changeDetectorRef.detectChanges();  // Initial cd call, otherwise ExpressionHasChangedError in Angular<8
+  }
+
+  // After component creation
+  // ----------------------------------------------------------------------------------------------------------------
+
+  /**
+   * Find all components that would be the ContentChildren of a dynamic component from a HTML node downwards and returns them in a hierarchical tree object
+   * Important: This function depends on the component selector attributes 'parsetoken' and 'hookid' not being removed yet
+   *
+   * @param node - The HTML node to parse
+   * @param treeLevel - The current tree level of DynamicContentChildren (for recursiveness)
+   * @param dynamicComponentIndex - An index of all potential components that can be found
+   */
+  findContentChildren(node: Node, treeLevel: Array<DynamicContentChildren> = [], hookIndex: HookIndex): void {
+    if (node['childNodes'] !== undefined && node.childNodes.length > 0) {
+      node.childNodes.forEach((childNode, key) => {
+        let componentFound = false;
+        // If element has a parsetoken and hookid, it is a dynamic component
+        if (childNode['attributes'] !== undefined && childNode['hasAttribute']('parsetoken') && childNode['hasAttribute']('hookid')) {
+          const hookId = parseInt(childNode['getAttribute']('hookid'), 10);
+          if (hookIndex.hasOwnProperty(hookId)) {
+            treeLevel.push({
+              componentRef: hookIndex[hookId].componentRef,
+              componentSelector: childNode['tagName'].toLowerCase(),
+              contentChildren: [],
+              hookValue: hookIndex[hookId].value
+            });
+            componentFound = true;
+          }
+        }
+
+        const treeLevelForChildren = componentFound ? treeLevel[treeLevel.length - 1].contentChildren : treeLevel;
+        this.findContentChildren(childNode, treeLevelForChildren, hookIndex);
+      });
     }
   }
 

@@ -7,7 +7,7 @@ import { DYNAMICCONTENTCOMPONENTS_GLOBALSETTINGS, DynamicContentComponentsGlobal
 import { HooksReplacer } from './services/hooksReplacer';
 import { ComponentCreator } from './services/componentCreator';
 import { ParserEntryResolver } from './options/parserEntryResolver';
-import { first, skip } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { HookParserEntry } from './options/parserEntry';
 import { OptionsResolver } from './options/optionsResolver';
 import { ComponentUpdater } from './services/componentUpdater';
@@ -199,7 +199,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     .subscribe((allComponentsLoaded: boolean) => {
       this.initialized = true;
       this.componentsLoaded.emit(true);
-      // console.log('HookIndex:', this.hookIndex);
+      console.log('HookIndex:', this.hookIndex);
     });
   }
 }

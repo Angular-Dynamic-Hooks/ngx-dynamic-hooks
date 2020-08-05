@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
  * The baseline properties that each parser must have
  */
 export interface HookParser {
-    name: string;
+    name?: string;
     findHooks(text: string, context: {[key: string]: any}): Array<HookPosition>;
     loadHook(hookId: number, hookValue: HookValue, context: {[key: string]: any}, childNodes: Array<Element>): HookData;
     updateBindings(hookId: number, hookValue: HookValue, context: {[key: string]: any}): HookBindings;
@@ -66,7 +66,8 @@ export interface OnDynamicData {
 }
 
 export interface DynamicContentChildren {
-    name: string;
     componentRef: ComponentRef<any>;
+    componentSelector: string;
     contentChildren: Array<DynamicContentChildren>;
+    hookValue: HookValue;
 }

@@ -26,10 +26,10 @@ export class DataTypeEncoder {
    * @param text - The text to parse for substrings
    */
   encodeSubstrings(text: string) {
-    // Get a list of all quotes
-    const singleQuotes: any = matchAll(text, /(?<!\\)'/gm);
-    const doubleQuotes: any = matchAll(text, /(?<!\\)"/gm);
-    const graveQuotes: any = matchAll(text, /(?<!\\)`/gm);
+    // Get a list of all quotes (that are not preceded by an escaping backslash)
+    const singleQuotes: any = matchAll(text, /'/gm).filter(match => match.index === 0 || text[match.index - 1] !== '\\');
+    const doubleQuotes: any = matchAll(text, /"/gm).filter(match => match.index === 0 || text[match.index - 1] !== '\\');
+    const graveQuotes: any = matchAll(text, /`/gm).filter(match => match.index === 0 || text[match.index - 1] !== '\\');
     const allQuotes = [...singleQuotes, ...doubleQuotes, ...graveQuotes];
     allQuotes.sort((a, b) => a['index'] - b['index']);
 

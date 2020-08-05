@@ -1,5 +1,5 @@
-import { Component, ViewChild, ViewChildren, OnInit, AfterViewInit, OnDestroy, Input, HostBinding, ElementRef, OnChanges, ChangeDetectorRef, QueryList, Output, EventEmitter, Inject, ContentChild, ContentChildren, DoCheck } from '@angular/core';
-import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../lib/interfacesPublic';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
+import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 
 @Component({
   selector: 'dynhooks-lazytest',

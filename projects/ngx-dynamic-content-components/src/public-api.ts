@@ -8,9 +8,9 @@ export * from './lib/interfacesPublic';
 export * from './lib/globalSettings';
 
 // Main component
-export * from './lib/components/dynamicHooks/outletComponent.c';
-export * from './lib/components/dynamicHooks/options/options';
-export * from './lib/components/dynamicHooks/options/parserEntry';
+export * from './lib/components/outlet/outletComponent.c';
+export * from './lib/components/outlet/options/options';
+export * from './lib/components/outlet/options/parserEntry';
 
 // GenericSelectorParser
 export * from './lib/parsers/genericSelector/genericSelectorParser';
@@ -22,4 +22,7 @@ export * from './lib/utils/dataTypeParser';
 export * from './lib/utils/deepComparer';
 export * from './lib/utils/hookFinder';
 export * from './lib/utils/regexes';
+
+// Testing
+// export * from './tests/testing-api';
 
