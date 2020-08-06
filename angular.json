@@ -3,38 +3,38 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngx-dynamic-content-components": {
+    "ngx-dynamic-component-hooks": {
       "projectType": "library",
-      "root": "projects/ngx-dynamic-content-components",
-      "sourceRoot": "projects/ngx-dynamic-content-components/src",
+      "root": "projects/ngx-dynamic-component-hooks",
+      "sourceRoot": "projects/ngx-dynamic-component-hooks/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/ngx-dynamic-content-components/tsconfig.lib.json",
-            "project": "projects/ngx-dynamic-content-components/ng-package.json"
+            "tsConfig": "projects/ngx-dynamic-component-hooks/tsconfig.lib.json",
+            "project": "projects/ngx-dynamic-component-hooks/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ngx-dynamic-content-components/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-dynamic-component-hooks/tsconfig.lib.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngx-dynamic-content-components/src/test.ts",
-            "tsConfig": "projects/ngx-dynamic-content-components/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-dynamic-content-components/karma.conf.js"
+            "main": "projects/ngx-dynamic-component-hooks/src/test.ts",
+            "tsConfig": "projects/ngx-dynamic-component-hooks/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-dynamic-component-hooks/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/ngx-dynamic-content-components/tsconfig.lib.json",
-              "projects/ngx-dynamic-content-components/tsconfig.spec.json"
+              "projects/ngx-dynamic-component-hooks/tsconfig.lib.json",
+              "projects/ngx-dynamic-component-hooks/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -46,5 +46,5 @@
   "cli": {
     "analytics": false
   },
-  "defaultProject": "ngx-dynamic-content-components"
+  "defaultProject": "ngx-dynamic-component-hooks"
 }

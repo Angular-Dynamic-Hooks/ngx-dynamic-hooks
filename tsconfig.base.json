@@ -16,8 +16,8 @@
       "dom"
     ],
     "paths": {
-      "ngx-dynamic-content-components": [
-        "dist/ngx-dynamic-content-components"
+      "ngx-dynamic-component-hooks": [
+        "dist/ngx-dynamic-component-hooks"
       ]
     }
   }

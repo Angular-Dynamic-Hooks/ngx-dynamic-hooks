@@ -8,10 +8,10 @@
   "files": [],
   "references": [
     {
-      "path": "./projects/ngx-dynamic-content-components/tsconfig.lib.json"
+      "path": "./projects/ngx-dynamic-component-hooks/tsconfig.lib.json"
     },
     {
-      "path": "./projects/ngx-dynamic-content-components/tsconfig.spec.json"
+      "path": "./projects/ngx-dynamic-component-hooks/tsconfig.spec.json"
     }
   ],
 }

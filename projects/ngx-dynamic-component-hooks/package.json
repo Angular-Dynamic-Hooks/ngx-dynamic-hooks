@@ -1,0 +1,11 @@
+{
+  "name": "ngx-dynamic-component-hooks",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/core": "6 - 10",
+    "rxjs": "~6"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  }
+}
