@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
-import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
+import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 
 @Component({
   selector: 'dynhooks-inlinetest',
@@ -11,9 +11,9 @@ export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, Do
   @Input() nr: number;
   @Input() config: any;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChildren>;
+  mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChildren>;
+  changesContentChildren: Array<DynamicContentChild>;
 
   constructor (private cd: ChangeDetectorRef) {
   }

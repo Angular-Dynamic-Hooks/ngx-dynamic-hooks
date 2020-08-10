@@ -1,10 +1,13 @@
-import { ComponentFactoryResolver, ApplicationRef, SimpleChange, isDevMode, Injectable} from '@angular/core';
+import { ComponentFactoryResolver, SimpleChange, isDevMode, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Hook, HookIndex, PreviousHookBinding, DetailedStringifyResult } from '../../../interfaces';
+import { Hook, HookIndex, PreviousHookBinding } from '../../../interfaces';
 import { OutletOptions } from '../options/options';
-import { DeepComparer } from '../../../utils/deepComparer';
+import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepComparer';
 
+/**
+ * The service responsible for updating dynamically created components
+ */
 @Injectable()
 export class ComponentUpdater {
 
@@ -12,13 +15,14 @@ export class ComponentUpdater {
   }
 
   /**
-   * Invoked when the inputs/outputs should be checked for updates, such as when
-   * the context object of DynamicHooksComponent has changed.
+   * Invoked when the inputs/outputs should be checked for updates
    *
    * @param hookIndex - The current hookIndex
    * @param context - The new context object
+   * @param options - The current OutletOptions
+   * @param triggerOnDynamicChanges - Whether to trigger the OnDynamicChanges method of dynamically loaded components
    */
-  refresh(hookIndex: HookIndex, context: {[key: string]: any}, options: OutletOptions, triggerOnDynamicChanges: boolean) {
+  refresh(hookIndex: HookIndex, context: {[key: string]: any}, options: OutletOptions, triggerOnDynamicChanges: boolean): void {
 
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       // Save previous bindings
@@ -27,7 +31,7 @@ export class ComponentUpdater {
         outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth)
       };
 
-      // Get new bindings from parser
+      // Request new bindings from parser
       hook.bindings = hook.parser.updateBindings(hook.id, hook.value, context);
 
       // Update component with new bindings
@@ -51,14 +55,15 @@ export class ComponentUpdater {
    * @param hook - The hook to check
    * @param type - The type of bindings that should be saved
    * @param saveStringified - Whether to save the stringified value in addition to the reference
+   * @param stringifyDepth - How many levels deep to stringify the previous bindings
    */
-  savePreviousBindings(hook: Hook, type: 'inputs'|'outputs', saveStringified: boolean, compareDepth: number): {[key: string]: PreviousHookBinding} {
+  savePreviousBindings(hook: Hook, type: 'inputs'|'outputs', saveStringified: boolean, stringifyDepth: number): {[key: string]: PreviousHookBinding} {
     const result: {[key: string]: PreviousHookBinding} = {};
     if (hook.bindings.hasOwnProperty(type)) {
       for (const [bindingName, bindingValue] of Object.entries(hook.bindings[type])) {
         result[bindingName] = {
           reference: bindingValue,
-          stringified: saveStringified ? this.deepComparer.detailedStringify(bindingValue, compareDepth) : null // To compare by value
+          stringified: saveStringified ? this.deepComparer.detailedStringify(bindingValue, stringifyDepth) : null // To compare by value
         };
       }
     }
@@ -72,11 +77,10 @@ export class ComponentUpdater {
    * Processes a hook object and (re)subscribes the outputs of a dynamic component where required
    *
    * @param hook - The hook in question
+   * @param context - The current context object
    * @param options - The current HookComponentOptions
    */
-  updateComponentWithNewOutputs(hook: Hook, context: {[key: string]: any}, options: OutletOptions) {
-    const component = hook.componentRef.instance;
-
+  updateComponentWithNewOutputs(hook: Hook, context: {[key: string]: any}, options: OutletOptions): void {
     // Find out which outputs have changed
     const changedOutputs: {[key: string]: (e, c) => any} = this.getChangedBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth);
 
@@ -84,7 +88,7 @@ export class ComponentUpdater {
     const existingOutputs: {[key: string]: (e, c) => any} = {};
     if (options.acceptOutputsForAnyObservable) {
       for (const [outputName, outputValue] of Object.entries(changedOutputs)) {
-        if (component[outputName] instanceof Observable) {
+        if (hook.componentRef.instance[outputName] instanceof Observable) {
           existingOutputs[outputName] = outputValue;
         }
       }
@@ -113,9 +117,7 @@ export class ComponentUpdater {
    * @param hook - The hook in question
    * @param options - The current HookComponentOptions
    */
-  updateComponentWithNewInputs(hook: Hook, options: OutletOptions) {
-    const component = hook.componentRef.instance;
-
+  updateComponentWithNewInputs(hook: Hook, options: OutletOptions): void {
     // Find out which inputs have changed
     const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue, options.compareByValueDepth);
 
@@ -163,8 +165,8 @@ export class ComponentUpdater {
    * @param type - What kind of binding to check
    * @param compareByValue - Whether to compare by reference or value
    */
-  getChangedBindings(hook: Hook, type: 'inputs'|'outputs', compareByValue: boolean, compareDepth: number) {
-    const changedBindings = {};
+  getChangedBindings(hook: Hook, type: 'inputs'|'outputs', compareByValue: boolean, compareDepth: number): {[key: string]: any} {
+    const changedBindings: {[key: string]: any} = {};
     if (hook.bindings.hasOwnProperty(type)) {
       for (const [key, binding] of Object.entries(hook.bindings[type])) {
         // If output did not exist in previous hook data, input is considered changed
@@ -182,7 +184,7 @@ export class ComponentUpdater {
         // b) By value
         } else {
           const stringifiedBinding = this.deepComparer.detailedStringify(binding, compareDepth);
-          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef.componentType.name, compareDepth, hook.previousBindings[type][key].stringified, hook.previousBindings[type][key].reference, stringifiedBinding, binding);
+          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef.componentType.name, compareDepth, hook.previousBindings[type][key].stringified, stringifiedBinding);
 
           if (canBeComparedByValue) {
             if (stringifiedBinding.result !== hook.previousBindings[type][key].stringified.result) {
@@ -201,17 +203,15 @@ export class ComponentUpdater {
   }
 
   /**
-   *  Checks whether two detailedStringifiedResults can be compared and throws lots of errors and warnings on the way if not
+   * Checks whether two detailedStringifiedResults can be compared and throws lots of errors and warnings if not
    *
    * @param bindingName - The binding in question
    * @param componentName - The component in question
    * @param compareDepth - The current compareDepth
    * @param oldResult - The detailedStringifiedResult for the old value
-   * @param oldBinding - The old value
    * @param newResult - The detailedStringifiedResult for the new value
-   * @param newBinding - The new value
    */
-  checkDetailedStringifyResultPair(bindingName: string, componentName: string, compareDepth: number, oldResult: DetailedStringifyResult, oldBinding: any, newResult: DetailedStringifyResult, newBinding: any): boolean {
+  checkDetailedStringifyResultPair(bindingName: string, componentName: string, compareDepth: number, oldResult: DetailedStringifyResult, newResult: DetailedStringifyResult): boolean {
     // Stringify successful?
     if (oldResult.result === null && newResult.result === null) {
       if (isDevMode()) {
@@ -233,24 +233,24 @@ export class ComponentUpdater {
     }
 
     // Max depth reached?
-    if (oldResult.compareDepthReachedCount > 0 && newResult.compareDepthReachedCount > 0) {
+    if (oldResult.depthReachedCount > 0 && newResult.depthReachedCount > 0) {
       if (isDevMode()) {
         console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.compareDepthReachedCount + ' time(s) for new value and ' + oldResult.compareDepthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value and ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
           'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.'
         );
       }
-    } else if (oldResult.compareDepthReachedCount > 0) {
+    } else if (oldResult.depthReachedCount > 0) {
       if (isDevMode()) {
         console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + oldResult.compareDepthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
           'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
         );
       }
-    } else if (newResult.compareDepthReachedCount > 0) {
+    } else if (newResult.depthReachedCount > 0) {
       if (isDevMode()) {
         console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.compareDepthReachedCount + ' time(s) for new value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
           'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
         );
       }

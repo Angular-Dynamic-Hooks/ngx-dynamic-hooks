@@ -1,4 +1,4 @@
-import { isDevMode, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { HookPosition } from '../../../interfacesPublic';
 import { regexes } from '../../../utils/regexes';
@@ -6,7 +6,7 @@ import { HookFinder } from '../../../utils/hookFinder';
 
 
 /**
- * Functions for finding, parsing and analyzing generic hooks
+ * A service for GenericSelectorParser, responsible for finding Angular component selectors in the content
  */
 @Injectable()
 export class GenericSelectorFinder {
@@ -14,29 +14,45 @@ export class GenericSelectorFinder {
   constructor(private hookFinder: HookFinder) {
   }
 
-  findSingleTagSelectors(dynamicText: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  /**
+   * Finds standalone Angular component selectors
+   *
+   * @param content - The content to parse
+   * @param selector - The Angular selector to find
+   * @param bracketStyle - What bracket style to use
+   */
+  findSingleTagSelectors(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.findStandaloneHooks(dynamicText, openingTagRegex);
+    return this.hookFinder.findStandaloneHooks(content, openingTagRegex);
   }
 
-  findMultiTagSelectors(dynamicText: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, includeNested: boolean = true): Array<HookPosition> {
+  /**
+   * Finds enclosing Angular component selectors
+   *
+   * @param content - The content to parse
+   * @param selector - The Angular selector to find
+   * @param bracketStyle - What bracket style to use
+   */
+  findMultiTagSelectors(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
     // Create opening and closing tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
     const closingTagRegex =  this.generateClosingTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.findEnclosingHooks(dynamicText, openingTagRegex, closingTagRegex, includeNested);
+    return this.hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex, true);
   }
 
   // Hook regex helper
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
   /**
-   * Generates the opening tag regex for a standard hook
-   * @param selector - The selector of the hook
+   * Generates the opening tag regex for a standard Angular component selector
+   *
+   * @param selector - The selector name
+   * @param bracketStyle - What bracket style to use
    */
-  private generateOpeningTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}) {
+  private generateOpeningTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): RegExp {
     // Find opening tag of hook lazily
     // Examples for this regex: https://regex101.com/r/17x3cc/13
     // Features: Ignores redundant whitespace & line-breaks, supports n attributes, both normal and []-attribute-name-syntax, both ' and " as attribute-value delimiters
@@ -57,9 +73,11 @@ export class GenericSelectorFinder {
 
   /**
    * Generates the opening tag regex for a standard hook
+   *
    * @param selector - The selector of the hook
+   * @param bracketStyle - What bracket style to use
    */
-  private generateClosingTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}) {
+  private generateClosingTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): RegExp {
     const openingArrow = this.escapeRegex(bracketStyle.opening) + '\/';
     const selectorName = this.escapeRegex(selector);
     const closingArrow = this.escapeRegex(bracketStyle.closing);
@@ -73,9 +91,10 @@ export class GenericSelectorFinder {
 
   /**
    * Safely escapes a string for use in regex
+   *
    * @param text - The string to escape
    */
-  escapeRegex(text: string) {
+  escapeRegex(text: string): string {
     return text.replace(new RegExp('[-\\/\\\\^$*+?.()|[\\]{}]', 'g'), '\\$&');
   }
 

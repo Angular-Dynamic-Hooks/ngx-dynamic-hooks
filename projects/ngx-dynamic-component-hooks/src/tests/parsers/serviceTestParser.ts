@@ -1,5 +1,5 @@
 import { ComponentFactoryResolver, Injectable } from '@angular/core';
-import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../testing-api';
+import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../testing-api';
 import { GenericSelectorFinder } from '../testing-api';
 import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
 
@@ -19,7 +19,7 @@ export class ServiceTestParser implements HookParser {
     return this.genericSelectorFinder.findSingleTagSelectors(text, selector);
   }
 
-  public loadHook(hookId: number, hookValue: HookValue, context: {[key: string]: any}, childNodes: Array<Element>): HookData {
+  public loadHook(hookId: number, hookValue: HookValue, context: {[key: string]: any}, childNodes: Array<Element>): HookComponentData {
     return {
       component: this.component,
       injector: undefined

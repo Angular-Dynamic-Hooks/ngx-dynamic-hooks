@@ -1,11 +1,11 @@
 /**
- * Several options for the DynamicHooksComponent
+ * Several options for the OutletComponent
  */
 export interface OutletOptions {
     sanitize?: boolean;
     convertHTMLEntities?: boolean;
     fixParagraphArtifacts?: boolean;
-    changeDetectionStrategy?: string;
+    updateOnPushOnly?: boolean;
     compareInputsByValue?: boolean;
     compareOutputsByValue?: boolean;
     compareByValueDepth?: number;
@@ -16,13 +16,13 @@ export interface OutletOptions {
 }
 
 /**
- * The default values for the DynamicHooksComponentOptions
+ * The default values for the OutletOptions
  */
 export const outletOptionDefaults: OutletOptions = {
     sanitize: true,
     convertHTMLEntities: true,
     fixParagraphArtifacts: true,
-    changeDetectionStrategy: 'default',
+    updateOnPushOnly: false,
     compareInputsByValue: false,
     compareOutputsByValue: false,
     compareByValueDepth: 5,

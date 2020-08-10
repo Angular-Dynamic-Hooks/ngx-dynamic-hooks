@@ -1,4 +1,4 @@
-import { isDevMode, Injectable, Injector } from '@angular/core';
+import { isDevMode, Injectable } from '@angular/core';
 
 import { regexes } from '../../../utils/regexes';
 import { DataTypeParser } from '../../../utils/dataTypeParser';
@@ -6,8 +6,10 @@ import { GenericSelectorParserConfig } from '../config/parserConfig';
 import { RichBindingData } from '../../../interfaces';
 import { matchAll } from '../../../polyfills/matchAll';
 
+
 /**
- * Functions for finding, parsing and analyzing generic hooks
+ * A service for GenericSelectorParser, responsible for creating @Input()/@Output() bindings from opening tags and updating them,
+ * keeping all previous references, if possible
  */
 @Injectable()
 export class BindingStateManager {
@@ -18,6 +20,14 @@ export class BindingStateManager {
   // 1. Inputs
   // -------------------------------------------------------------------------------------
 
+  /**
+   * Creates or updates the current input bindings
+   *
+   * @param openingTag - The opening tag to analyze
+   * @param context - The current context object
+   * @param parserConfig - The parser config
+   * @param currentInputBindings - The previous @Input() bindings, if existing
+   */
   getCurrentInputBindings(openingTag: string, context: {[key: string]: any}, parserConfig: GenericSelectorParserConfig, currentInputBindings: {[key: string]: RichBindingData}): {[key: string]: RichBindingData} {
     // If this is initial evaluation, create bindings object
     if (currentInputBindings === undefined) {
@@ -33,8 +43,9 @@ export class BindingStateManager {
   /**
    * Creates the input bindings object on the first evaluation of a hook
    *
+   * @param openingTag - The opening tag to analyze
    * @param context - The current context object
-   * @param parserConfig - The current parserConfig
+   * @param parserConfig - The current parser config
    */
   private createInputBindings(openingTag: string, context: {[key: string]: any}, parserConfig: GenericSelectorParserConfig): {[key: string]: RichBindingData} {
     // Read inputs from opening tag
@@ -55,7 +66,7 @@ export class BindingStateManager {
       return inputBindings;
     }
 
-    // Should the input strings be evaluated as proper variables?
+    // Parse input strings and track all bound context variables
     for (const [inputName, inputBinding] of Object.entries(inputBindings)) {
       try {
         inputBindings[inputName].value = this.dataTypeParser.evaluateDataTypeFromString(
@@ -94,9 +105,9 @@ export class BindingStateManager {
    * simply replace the reference bound to 'prop', but recreates the whole object literal and passes a new reference into the
    * input, triggering ngOnChanges.
    *
-   * @param inputs - An object with the input names as keys and their content as values
+   * @param currentInputBindings - The previous @Input() bindings
    * @param context - The current context object
-   * @param parserConfig - The current parserConfig
+   * @param parserConfig - The current parser config
    */
   private updateInputBindings(currentInputBindings: {[key: string]: RichBindingData}, context: {[key: string]: any}, parserConfig: GenericSelectorParserConfig): void {
 
@@ -132,11 +143,18 @@ export class BindingStateManager {
   // 2. Outputs
   // -------------------------------------------------------------------------------------
 
+  /**
+   * Creates the current output bindings
+   *
+   * @param openingTag - The opening tag to analyze
+   * @param parserConfig - The parser config
+   * @param currentOutputBindings - The previous @Output() bindings, if existing
+   */
   getCurrentOutputBindings(openingTag: string, parserConfig: GenericSelectorParserConfig, currentOutputBindings: {[key: string]: RichBindingData}): {[key: string]: RichBindingData} {
-    // As opposed to inputs, outputs only need to be processed once by a parser, as this process only
-    // consists of wrapping the data type evaluation into an outer function so it can be executed later
-    // when the output triggers, in which case the data type will always be evaluated fresh.
-    // There is no need to replace this outer function on updates.
+    // As opposed to inputs, outputs only need to be created once by the parser, never updated, as this process only
+    // consists of wrapping the data type evaluation into an outer function so it can be executed later when the
+    // output triggers, in which case the data type will always be evaluated fresh. There is no need to replace
+    // this outer function on updates.
     if (currentOutputBindings === undefined) {
       currentOutputBindings = this.createOutputBindings(openingTag, parserConfig);
     }
@@ -149,6 +167,7 @@ export class BindingStateManager {
    * Takes a standard hook opening tag and parses Angular-style inputs from it
    *
    * @param openingTag - The hook opening tag to parse
+   * @param parserConfig - The current parser config
    */
   private createOutputBindings(openingTag: string, parserConfig: GenericSelectorParserConfig): {[key: string]: RichBindingData} {
     const rawOutputs = this.getBindingsFromOpeningTag('outputs', openingTag, parserConfig.outputsBlacklist, parserConfig.outputsWhitelist);
@@ -163,9 +182,9 @@ export class BindingStateManager {
       };
     }
 
-    // Should the input strings be evaluated as proper variables?
+    // Create output callback functions
     for (const [outputName, outputBinding] of Object.entries(outputBindings)) {
-      // Simply wrap evaluateDataTypeFromString() into outer function that will be called when the corresponding event emits
+      // Simply wrap evaluateDataTypeFromString() into outer function that will be called when the corresponding event emits.
       // If the dataTypeString contains a function, it will therefore be evaluated and executed "just-in-time".
       // If it contains a variable, nothing will happen as the the evaluated dataTypeString is not assigned anywhere and simply discarded.
       outputBindings[outputName].value = (event, context) => {
@@ -194,10 +213,12 @@ export class BindingStateManager {
   // -------------------------------------------------------------------------------------
 
   /**
-   * Takes a standard hook opening tag and parses Angular-style inputs from it
+   * Takes a standard hook opening tag and parses Angular-style bindings from it
    *
-   * @param openingTag - The hook opening tag to parse
-   * @param parserConfig - The current parserConfig
+   * @param type - What kind of bindings to extract
+   * @param openingTag - The opening tag to analyze
+   * @param blacklist - What bindings to exlude
+   * @param whitelist - What bindings to exclusively include
    */
   private getBindingsFromOpeningTag(type: 'inputs'|'outputs', openingTag: string, blacklist: string[], whitelist: string[]): {[key: string]: any} {
     const bindings = {};

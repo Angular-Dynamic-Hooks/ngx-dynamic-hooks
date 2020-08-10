@@ -1,25 +1,28 @@
 import { Injectable } from '@angular/core';
 import { OutletOptions, outletOptionDefaults } from './options';
 
+/**
+ * A helper class for resolving OutletOptions
+ */
 @Injectable()
 export class OptionsResolver {
 
   constructor() {
   }
 
+  /**
+   * Overwrites the default options with a (partial) OutletOptions object and returns the result
+   *
+   * @param uo - The (partial) OutletOptions object
+   */
   resolve(uo: OutletOptions): OutletOptions {
-    const newOptions = JSON.parse(JSON.stringify(outletOptionDefaults));
+    const newOptions: OutletOptions = JSON.parse(JSON.stringify(outletOptionDefaults));
     if (uo) {
       for (const [optionName, optionValue] of Object.entries(uo)) {
         if (optionName === 'sanitize' && typeof optionValue === 'boolean') { newOptions.sanitize = optionValue; }
         else if (optionName === 'convertHTMLEntities' && typeof optionValue === 'boolean') { newOptions.convertHTMLEntities = optionValue; }
         else if (optionName === 'fixParagraphArtifacts' && typeof optionValue === 'boolean') { newOptions.fixParagraphArtifacts = optionValue; }
-        else if (optionName === 'changeDetectionStrategy' && typeof optionValue === 'string') {
-          const lower = optionValue.toLowerCase();
-          if (lower === 'default' || lower === 'onpush') {
-            newOptions.changeDetectionStrategy = optionValue;
-          }
-        }
+        else if (optionName === 'updateOnPushOnly' && typeof optionValue === 'boolean') { newOptions.updateOnPushOnly = optionValue; }
         else if (optionName === 'compareInputsByValue' && typeof optionValue === 'boolean') { newOptions.compareInputsByValue = optionValue; }
         else if (optionName === 'compareOutputsByValue' && typeof optionValue === 'boolean') { newOptions.compareOutputsByValue = optionValue; }
         else if (optionName === 'compareByValueDepth' && typeof optionValue === 'number') { newOptions.compareByValueDepth = optionValue; }

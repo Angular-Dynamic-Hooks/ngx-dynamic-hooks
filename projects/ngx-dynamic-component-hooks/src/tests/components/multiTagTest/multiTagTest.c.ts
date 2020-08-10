@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
-import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
+import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 import { TestService } from '../../services/testService';
 
 
@@ -13,9 +13,9 @@ export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, 
   @Input() nr: number;
   @Input() fonts: Array<string>;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChildren>;
+  mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChildren>;
+  changesContentChildren: Array<DynamicContentChild>;
 
   constructor(private cd: ChangeDetectorRef, private testService: TestService) {
   }

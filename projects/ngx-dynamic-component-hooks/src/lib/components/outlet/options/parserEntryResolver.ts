@@ -7,6 +7,9 @@ import { ParserConfigResolver } from '../../../parsers/genericSelector/config/pa
 import { HookParserEntry } from './parserEntry';
 import { GenericSelectorParserConfig } from '../../../parsers/genericSelector/config/parserConfig';
 
+/**
+ * A helper class for resolving HookParserEntries
+ */
 @Injectable()
 export class ParserEntryResolver {
 
@@ -54,7 +57,7 @@ export class ParserEntryResolver {
   }
 
   /**
-   * Figures out what kind of config object (out of all possible ones) the HookParserEntry is and loads it appropriately.
+   * Figures out what kind of config object (out of all possible types) the HookParserEntry is and loads it appropriately.
    *
    * The potential types are:
    * - a service
@@ -62,7 +65,7 @@ export class ParserEntryResolver {
    * - an instance
    * - an object literal to configure GenericSelectorParser with
    *
-   * @param parserEntry - THe HookParserEntry to process
+   * @param parserEntry - The HookParserEntry to process
    */
   resolveEntry(parserEntry: HookParserEntry): HookParser {
     // Check if class

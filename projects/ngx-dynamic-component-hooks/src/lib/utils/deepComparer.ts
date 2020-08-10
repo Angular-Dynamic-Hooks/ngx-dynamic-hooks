@@ -1,6 +1,18 @@
 import { isDevMode, Injectable } from '@angular/core';
-import { DetailedStringifyResult } from '../interfaces';
 
+
+/**
+ * The object returned by the detailedStringify function in DeepComparer.
+ * Contains the stringified value as well as the number of times the maximum stringify depth was reached.
+ */
+export interface DetailedStringifyResult {
+  result: string;
+  depthReachedCount: number;
+}
+
+/**
+ * This services can be used to compare two variables by value instead of reference
+ */
 @Injectable()
 export class DeepComparer {
 
@@ -15,6 +27,7 @@ export class DeepComparer {
    *
    * @param a - The first object
    * @param b - The second object
+   * @param compareDepth - How many levels deep to compare
    */
   isEqual(a, b, compareDepth?: number): boolean {
     const aStringified = this.detailedStringify(a, compareDepth);
@@ -40,12 +53,13 @@ export class DeepComparer {
    * If obj can't be stringified for whatever reason, returns null.
    *
    * @param obj - The object to stringify
+   * @param depth - How many levels deep to stringify
    */
-  detailedStringify(obj, compareDepth?: number): DetailedStringifyResult {
+  detailedStringify(obj, depth?: number): DetailedStringifyResult {
     try {
       // Null cyclic paths
-      const compareDepthReached = {count: 0};
-      const decylcedObj = this.decycle(obj, [], compareDepth, compareDepthReached);
+      const depthReached = {count: 0};
+      const decylcedObj = this.decycle(obj, [], depth, depthReached);
 
       const stringified = JSON.stringify(decylcedObj, (key, value) => {
         // If undefined
@@ -63,9 +77,9 @@ export class DeepComparer {
         return value;
       });
 
-      return {result: stringified, compareDepthReachedCount: compareDepthReached.count};
+      return {result: stringified, depthReachedCount: depthReached.count};
     } catch (e) {
-      return {result: null, compareDepthReachedCount: 0};
+      return {result: null, depthReachedCount: 0};
     }
   }
 
@@ -74,10 +88,12 @@ export class DeepComparer {
    *
    * @param obj - The object to travel
    * @param stack - To keep track of already travelled objects
+   * @param depth - How many levels deep to decycle
+   * @param depthReached - An object to track the number of times the max depth was reached
    */
-  decycle(obj, stack = [], compareDepth: number = 5, compareDepthReached: { count: number; }) {
-    if (stack.length > compareDepth) {
-      compareDepthReached.count++;
+  decycle(obj, stack = [], depth: number = 5, depthReached: { count: number; }): any {
+    if (stack.length > depth) {
+      depthReached.count++;
       return null;
     }
 
@@ -87,15 +103,17 @@ export class DeepComparer {
 
     // Check if cyclical and we've traveled this obj already
     //
-    // Test this not by object reference, but by object PROPERTY reference/equality. If an object has identical properties,
+    // Note: Test this not by object reference, but by object PROPERTY reference/equality. If an object has identical properties,
     // the object is to be considered identical even if it has a different reference itself.
     //
-    // This is to prevent a sneaky bug where you would return an object as the input (or part of an input) that contains a reference to
-    // the object holding it (like returning the context object that contains a reference to the parent component holding the context object).
-    // In the example, when the context object changes by reference, the old input will be compared with the new input. However, as the old input still references
+    // Explanation: This is to prevent a sneaky bug when comparing by value and a parser returns an object as an input that contains a reference to the object holding it
+    // (like returning the context object that contains a reference to the parent component holding the context object).
+    // In this example, when the context object changes by reference, the old input will be compared with the new input. However, as the old input consists of
     // the old context object that now (through the parent component) contains a reference to the new context object, while the new input references the new context
-    // object exclusively, the decycle function would produce different results for them if it only checked cyclical paths by reference, even if the context object remained identical in value.
-    // The way to prevent this bug is by checking cyclical paths via object properties rather than the object itself.
+    // object exclusively, the decycle function would produce different results for them if it only checked cyclical paths by reference (even if the context object
+    // remained identical in value!)
+    //
+    // Though an unlikely scenario, checking cyclical paths via object properties rather than the object reference itself solves this problem.
     for (const stackObj of stack) {
       if (this.objEqualsProperties(obj, stackObj)) {
         return null;
@@ -107,13 +125,13 @@ export class DeepComparer {
     if (Array.isArray(obj)) {
       const newArray = [];
       for (const entry of obj) {
-        newArray.push(this.decycle(entry, s, compareDepth, compareDepthReached));
+        newArray.push(this.decycle(entry, s, depth, depthReached));
       }
       return newArray;
     } else {
       const newObj = {};
       for (const key of Object.keys(obj)) {
-        newObj[key] = this.decycle(obj[key], s, compareDepth, compareDepthReached);
+        newObj[key] = this.decycle(obj[key], s, depth, depthReached);
       }
       return newObj;
     }
@@ -125,7 +143,7 @@ export class DeepComparer {
    * @param a - The first object
    * @param b - The second object
    */
-  objEqualsProperties(a, b) {
+  objEqualsProperties(a, b): boolean {
     const aKeys = Object.keys(a);
     const bKeys = Object.keys(b);
 

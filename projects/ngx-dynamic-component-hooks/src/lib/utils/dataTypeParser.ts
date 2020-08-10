@@ -16,7 +16,7 @@ export class DataTypeParser {
 
   /**
    * Takes a string containing a Javascript data type as it would in code, such a number ('15'), a string ('"hello"'),
-   * an array ('[1,2,3]'), an object ({prop: 'something'}) etc., and evaluates it to be an an actual variable.
+   * an array ('[1,2,3]'), an object ('{prop: "something"}') etc., and evaluates it to be an an actual variable.
    *
    * Note: This function works without invoking eval() and instead uses JSON.parse() for the heavy lifting. As such, it should be safe
    * to use and should cover most forms of input.
@@ -29,9 +29,8 @@ export class DataTypeParser {
    * @param allowContextFunctionCalls - (optional) Whether to allow function calls in context vars
    */
   evaluateDataTypeFromString(dataTypeString: string, context: {[key: string]: any} = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
-    // console.log('Evaluating data type for...', dataTypeString, trackContextVariables);
 
-    // 1. Simple types
+    // a) Simple types
     // --------------------
     // null or undefined
     if (dataTypeString === 'null') { return null; }
@@ -40,7 +39,7 @@ export class DataTypeParser {
     if (dataTypeString === 'true') { return true; }
     if (dataTypeString === 'false') { return false; }
     // number
-    if (!isNaN(<any> dataTypeString))  { return parseInt(dataTypeString, 10); }
+    if (!isNaN(dataTypeString as any))  { return parseInt(dataTypeString, 10); }
     // string
     if (
       (dataTypeString.startsWith('"') && dataTypeString.endsWith('"')) ||
@@ -53,7 +52,7 @@ export class DataTypeParser {
       return decodedString;
     }
 
-    // 2. Complex types
+    // b) Complex types
     // --------------------
     // IMPORTANT: To properly parse complex object structures as well as context variables with regex, the string needs to be prepared. This means:
     // 1. Substrings must be rendered 'harmless', meaning all special characters that regex might confuse with variable syntax must be encoded.
@@ -85,19 +84,29 @@ export class DataTypeParser {
     throw Error('Data type for following input was not recognized and could not be parsed: "' + dataTypeString + '"');
   }
 
-  encodeDataTypeString(variable: string): string {
-    variable = this.dataTypeEncoder.encodeSubstrings(variable);              // Encode all potential substrings
-    variable = this.dataTypeEncoder.encodeSubfunctions(variable);            // Encode all potential subfunctions
-    variable = this.dataTypeEncoder.encodeVariableSubbrackets(variable);     // Encode all potential subbrackets of variables
-    return variable;
+  /**
+   * Encodes a data type string
+   *
+   * @param dataTypeString - The string to encode
+   */
+  encodeDataTypeString(dataTypeString: string): string {
+    dataTypeString = this.dataTypeEncoder.encodeSubstrings(dataTypeString);              // Encode all potential substrings
+    dataTypeString = this.dataTypeEncoder.encodeSubfunctions(dataTypeString);            // Encode all potential subfunctions
+    dataTypeString = this.dataTypeEncoder.encodeVariableSubbrackets(dataTypeString);     // Encode all potential subbrackets of variables
+    return dataTypeString;
   }
 
-  decodeDataTypeString(variable: string): string {
-    variable = this.dataTypeEncoder.decodeStringSpecialChars(variable);     // Decode special chars from substrings
-    variable = this.dataTypeEncoder.decodeFunctionBrackets(variable);       // Decode subfunctions
-    variable = this.dataTypeEncoder.decodeVariableBrackets(variable);       // Decode subbrackets
-    variable = variable.trim();                                             // Trim whitespace
-    return variable;
+  /**
+   * Decodes a data type string
+   *
+   * @param dataTypeString - The string to decode
+   */
+  decodeDataTypeString(dataTypeString: string): string {
+    dataTypeString = this.dataTypeEncoder.decodeStringSpecialChars(dataTypeString);     // Decode special chars from substrings
+    dataTypeString = this.dataTypeEncoder.decodeFunctionBrackets(dataTypeString);       // Decode subfunctions
+    dataTypeString = this.dataTypeEncoder.decodeVariableBrackets(dataTypeString);       // Decode subbrackets
+    dataTypeString = dataTypeString.trim();                                             // Trim whitespace
+    return dataTypeString;
   }
 
   /**
@@ -105,6 +114,7 @@ export class DataTypeParser {
    * This functions ensures that these are followed and corrects the input if not.
    *
    * @param JSONString - The string to be given to JSON.parse()
+   * @param unescapeStrings - Whether to unescape the strings of this JSON
    */
   parseAsJSON(JSONString: string, unescapeStrings: boolean = true): any {
 
@@ -147,7 +157,7 @@ export class DataTypeParser {
     // PARSE
     const json = JSON.parse(JSONString);
 
-    // Decode all strings that are not context var placeholders
+    // Decode all strings that are not context vars or the event object
     this.decodeJSONStrings(json, unescapeStrings);
 
     return json;
@@ -155,9 +165,9 @@ export class DataTypeParser {
 
   /**
    * Given a stringified json and a json value regex, allows you to replace all occurences
-   * of those values in the json via a callback function
+   * of those values in the json via a callback function.
    *
-   * IMPORTANT: JSONString must be already encoded via this.encodeDataTypeString() for this to work
+   * IMPORTANT: JSONString must be already encoded via this.encodeDataTypeString() for this to work.
    *
    * @param JSONString - The stringified JSON
    * @param valueRegex - The values to find
@@ -183,6 +193,12 @@ export class DataTypeParser {
     });
   }
 
+  /**
+   * Decodes all 'normal' strings without special meaning in a JSON-like object
+   *
+   * @param jsonLevel - The current level of parsing
+   * @param unescapeStrings - Whether to unescape the decoded strings as well
+   */
   decodeJSONStrings(jsonLevel: any, unescapeStrings: boolean = true): void {
     for (const prop in jsonLevel) {
       if (typeof jsonLevel[prop] === 'string') {
@@ -209,10 +225,11 @@ export class DataTypeParser {
    * IMPORTANT: To correctly find variables, their substrings, subfunction and subbrackets must be encoded (done in evaluateDataTypeFromString())
    *
    * @param input - The input variable to check
-   * @param context - The current context object
-   * @param event - The $event object, if available
+   * @param context - The current context object, if any
+   * @param event - The current event object, if any
    * @param unescapeStrings - Whether to unescape strings or not
    * @param trackContextVariables - An optional object that will be filled out with all found context vars
+   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
   loadVariables(input: any, context: {[key: string]: any} = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
     const wrapper = {result: input};
@@ -220,6 +237,16 @@ export class DataTypeParser {
     return wrapper.result;
   }
 
+  /**
+   * Travels a JSON-like object to find all context vars and event object and replaces them with their actual values
+   *
+   * @param arrayOrObject - The property of the JSON to analyze
+   * @param context - The current context object, if any
+   * @param event - The current event object, if any
+   * @param unescapeStrings - Whether to unescape strings or not
+   * @param trackContextVariables - Whether to unescape strings or not
+   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
+   */
   loadVariablesLoop(arrayOrObject: any, context: {[key: string]: any} = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): void {
     for (const prop in arrayOrObject) {
       // Only interested in strings
@@ -247,6 +274,7 @@ export class DataTypeParser {
    * @param event - An event object, if available
    * @param unescapeStrings - Whether to unescape strings or not
    * @param trackContextVariables - An optional object that will be filled out with all found context vars
+   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
   safelyLoadContextVariable(contextVar: string, context: {[key: string]: any} = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
     try {
@@ -272,6 +300,7 @@ export class DataTypeParser {
    * @param event - An event object, if available
    * @param unescapeStrings - Whether to unescape strings or not
    * @param trackContextVariables - An optional object that will be filled out with all found context vars
+   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
   loadContextVariable(contextVar: string, context: {[key: string]: any} = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
     const shortContextVar = contextVar.substr(7);  // Cut off 'context' from the front
@@ -281,8 +310,8 @@ export class DataTypeParser {
       return context;
     }
 
-    // Otherwise, create variable path array and fetch value, so the context object can be easily traveled
-    // Path array example: 'restaurants["newOrleans"].reviews[5]' becomes ['restaurants', 'newOrleans', 'reviews', 5],
+    // Otherwise, create variable path array and fetch value, so the context object can be easily traveled.
+    // Variable path example: 'restaurants["newOrleans"].reviews[5]' becomes ['restaurants', 'newOrleans', 'reviews', 5],
     const path = [];
     const pathMatches = matchAll(shortContextVar, new RegExp(regexes.variablePathPartRegex, 'gm'));
     for (const match of pathMatches) {
@@ -312,7 +341,7 @@ export class DataTypeParser {
       if (match[0].startsWith('(') && match[0].endsWith(')')) {
         // Check if function calls are allowed
         if (!allowContextFunctionCalls) {
-          throw Error('Tried to call a function in a context variable. This is forbidden with the current config.');
+          throw Error('Tried to call a function in a context variable. This has been disallowed in the current config.');
         }
 
         const funcParams = match[0].substr(1, match[0].length - 2);  // Strip outer brackets
@@ -334,7 +363,6 @@ export class DataTypeParser {
     }
 
     try {
-      // console.log(path, context);
       return this.fetchContextVariable(context, JSON.parse(JSON.stringify(path)));
     } catch (e) {
       if (isDevMode()) {
@@ -399,9 +427,5 @@ export class DataTypeParser {
     }
     return result;
   }
-
-
-
-
 
 }

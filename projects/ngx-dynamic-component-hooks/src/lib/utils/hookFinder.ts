@@ -3,7 +3,7 @@ import { HookPosition } from '../interfacesPublic';
 import { matchAll } from '../polyfills/matchAll';
 
 /**
- * Functions for finding, parsing and analyzing generic hooks
+ * A utility service to easily parse hooks from a string of text
  */
 @Injectable()
 export class HookFinder {
@@ -12,14 +12,14 @@ export class HookFinder {
   /**
    * Finds all hooks that are non-enclosing in a string of text, e.g. '<hook>'
    *
-   * @param dynamicText - The text to search
+   * @param content - The text to search
    * @param hookRegex - The regex to use for the hook
    */
-  findStandaloneHooks(dynamicText: string, hookRegex: RegExp): Array<HookPosition> {
+  findStandaloneHooks(content: string, hookRegex: RegExp): Array<HookPosition> {
     const result: Array<HookPosition> = [];
 
     // Find all hooks
-    const openingTagMatches = matchAll(dynamicText, hookRegex);
+    const openingTagMatches = matchAll(content, hookRegex);
 
     for (const match of openingTagMatches) {
       result.push({
@@ -49,17 +49,17 @@ export class HookFinder {
    *
    * There is no regex that works for both scenarios. This method therefore manually counts and compares the opening tags with the closing tags.
    *
-   * @param dynamicText - The text to parse
+   * @param content - The text to parse
    * @param openingTagRegex - The regex for the opening tag
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
    */
-  findEnclosingHooks(dynamicText: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested: boolean = true): Array<HookPosition> {
+  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested: boolean = true): Array<HookPosition> {
     const allTags = [];
     const result: Array<HookPosition> = [];
 
     // Find all opening tags
-    const openingTagMatches = matchAll(dynamicText, openingTagRegex);
+    const openingTagMatches = matchAll(content, openingTagRegex);
     for (const match of openingTagMatches) {
       allTags.push({
         isOpening: true,
@@ -70,7 +70,7 @@ export class HookFinder {
     }
 
     // Find all closing tags
-    const closingTagMatches = matchAll(dynamicText, closingTagRegex);
+    const closingTagMatches = matchAll(content, closingTagRegex);
     for (const match of closingTagMatches) {
       allTags.push({
         isOpening: false,

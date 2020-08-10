@@ -1,13 +1,15 @@
-import { ComponentFactoryResolver, ComponentRef, Injector, ApplicationRef, SimpleChange, isDevMode, Injectable, ChangeDetectorRef, Renderer2, RendererFactory2 } from '@angular/core';
+import { ComponentFactoryResolver, Injector, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
 import { Hook, HookIndex } from '../../../interfaces';
-import { DynamicContentChildren, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
+import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
 import { ComponentUpdater } from './componentUpdater';
 
-
+/**
+ * The service responsible for dynamically creating components for all found Hooks
+ */
 @Injectable()
 export class ComponentCreator {
   private renderer: Renderer2;
@@ -23,9 +25,6 @@ export class ComponentCreator {
    * @param hookIndex - The current hookIndex (ids must match component selector ids)
    * @param token - The token used for parsetoken-attribute of the component selectors
    * @param context - The current context
-   * @param cfr - The ComponentFactoryResolver responsible for the components to load
-   * @param injector - The injector to give to the loaded components
-   * @param appRef - The global ApplicationRef
    * @param options - The current HookComponentOptions
    */
   init(hostElement: HTMLElement, hookIndex: HookIndex, token: string, context: {[key: string]: any}, options: OutletOptions): ReplaySubject<boolean> {
@@ -57,14 +56,14 @@ export class ComponentCreator {
       // Start with of(true) to catch errors from loadComponentClass in the obs stream as well
       componentLoadSubjects.push(of(true)
         // Load component class first (might be lazy-loaded)
-        .pipe(mergeMap(() => this.loadComponentClass(hook.data.component, context, placeholderElement, options)))
+        .pipe(mergeMap(() => this.loadComponentClass(hook.data.component)))
         .pipe(tap((compClass) => {
           // Replace placeholder with actual component selector element
           const componentHostElement = this.replacePlaceholderElement(compClass, placeholderElement);
           // Get projectableNodes from content slots
           const projectableNodes = this.getContentSlotElements(componentHostElement, token);
           // Instantiate component
-          this.createComponent(hook, context, componentHostElement, projectableNodes, options, compClass, token);
+          this.createComponent(hook, context, componentHostElement, projectableNodes, options, compClass);
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
@@ -88,9 +87,9 @@ export class ComponentCreator {
       // Call dynamic lifecycle methods for all created components
       for (const hook of Object.values(hookIndex)) {
         // Find all content children components
-        const contentChildren: Array<DynamicContentChildren> = [];
+        const contentChildren: Array<DynamicContentChild> = [];
         if (typeof hook.componentRef.instance['onDynamicMount'] === 'function' || typeof hook.componentRef.instance['onDynamicChanges'] === 'function') {
-          this.findContentChildren(hook.componentRef.location.nativeElement, contentChildren, hookIndex);
+          this.findContentChildren(hook.componentRef.location.nativeElement, contentChildren, hookIndex, token);
         }
 
         // OnDynamicChanges
@@ -187,11 +186,8 @@ export class ComponentCreator {
    * Returns a subject the emits the component class when ready.
    *
    * @param componentConfig - The componentConfig from HookData
-   * @param hook - The hook in question
-   * @param placeholderElement - The placeholder DOM node to create the dynamic component in
-   * @param options - The current HookComponentOptions
    */
-  loadComponentClass(componentConfig: ComponentConfig, context: {[key: string]: any}, placeholderElement: Element, options: OutletOptions): ReplaySubject<new(...args: any[]) => any> {
+  loadComponentClass(componentConfig: ComponentConfig): ReplaySubject<new(...args: any[]) => any> {
     const componentClassLoaded: ReplaySubject<new(...args: any[]) => any> = new ReplaySubject(1);
 
     // a) If is normal class
@@ -261,7 +257,7 @@ export class ComponentCreator {
    * @param options - The current HookComponentOptions
    * @param compClass - The component's class
    */
-  createComponent(hook: Hook, context: any, componentHostElement: Element, projectableNodes: Array<Array<Element>>, options: OutletOptions, compClass: new(...args: any[]) => any, token: string): void {
+  createComponent(hook: Hook, context: any, componentHostElement: Element, projectableNodes: Array<Array<Element>>, options: OutletOptions, compClass: new(...args: any[]) => any): void {
 
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
@@ -292,19 +288,25 @@ export class ComponentCreator {
   // ----------------------------------------------------------------------------------------------------------------
 
   /**
-   * Find all components that would be the ContentChildren of a dynamic component from a HTML node downwards and returns them in a hierarchical tree object
+   * Find all components that would be the ContentChildren of a dynamic component and returns them in a hierarchical tree object
    * Important: This function depends on the component selector attributes 'parsetoken' and 'hookid' not being removed yet
    *
    * @param node - The HTML node to parse
    * @param treeLevel - The current tree level of DynamicContentChildren (for recursiveness)
-   * @param dynamicComponentIndex - An index of all potential components that can be found
+   * @param hookIndex - The current hookIndex
+   * @param token - The current parseToken
    */
-  findContentChildren(node: Node, treeLevel: Array<DynamicContentChildren> = [], hookIndex: HookIndex): void {
+  findContentChildren(node: Node, treeLevel: Array<DynamicContentChild> = [], hookIndex: HookIndex, token: string): void {
     if (node['childNodes'] !== undefined && node.childNodes.length > 0) {
       node.childNodes.forEach((childNode, key) => {
         let componentFound = false;
         // If element has a parsetoken and hookid, it is a dynamic component
-        if (childNode['attributes'] !== undefined && childNode['hasAttribute']('parsetoken') && childNode['hasAttribute']('hookid')) {
+        if (
+          childNode['attributes'] !== undefined &&
+          childNode['hasAttribute']('parsetoken') &&
+          childNode['getAttribute']('parsetoken') === token &&
+          childNode['hasAttribute']('hookid')
+        ) {
           const hookId = parseInt(childNode['getAttribute']('hookid'), 10);
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
@@ -318,7 +320,7 @@ export class ComponentCreator {
         }
 
         const treeLevelForChildren = componentFound ? treeLevel[treeLevel.length - 1].contentChildren : treeLevel;
-        this.findContentChildren(childNode, treeLevelForChildren, hookIndex);
+        this.findContentChildren(childNode, treeLevelForChildren, hookIndex, token);
       });
     }
   }

@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional } from '@angular/core';
-import { DynamicContentChildren, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../testing-api';
+import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../testing-api';
 import { TestService, TESTSERVICETOKEN } from '../../services/testService';
 
 
@@ -30,9 +30,9 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() httpResponseReceived: EventEmitter<number> = new EventEmitter();
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChildren>;
+  mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChildren>;
+  changesContentChildren: Array<DynamicContentChild>;
 
 
   constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {

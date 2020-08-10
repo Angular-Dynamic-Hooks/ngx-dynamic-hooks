@@ -7,8 +7,8 @@ interface TextSegment {
 }
 
 /**
- * Various functions for en- and decoding data type strings in order to make them meaningfully
- * parseable by regex
+ * A service that provides various functions for en- and decoding data type strings in order to make them
+ * meaningfully parseable by regex
  */
 @Injectable()
 export class DataTypeEncoder {
@@ -20,12 +20,11 @@ export class DataTypeEncoder {
   // -----------------------------------------------------
 
   /**
-   * Replaces a number of special characters within substrings of a given text with @@@...@@@-placeholders.
-   * This is to prevent substrings being mistakenly identified as JSON or context variable syntax
+   * Finds all substrings in a piece of text and replaces all special characters within with @@@...@@@-placeholders.
    *
    * @param text - The text to parse for substrings
    */
-  encodeSubstrings(text: string) {
+  encodeSubstrings(text: string): string {
     // Get a list of all quotes (that are not preceded by an escaping backslash)
     const singleQuotes: any = matchAll(text, /'/gm).filter(match => match.index === 0 || text[match.index - 1] !== '\\');
     const doubleQuotes: any = matchAll(text, /"/gm).filter(match => match.index === 0 || text[match.index - 1] !== '\\');
@@ -56,12 +55,18 @@ export class DataTypeEncoder {
     return encodedBracketsText;
   }
 
-  encodeStringSpecialChars(text: string) {
+  /**
+   * Encodes all special characters that might be confused as code syntax in a piece of string
+   *
+   * @param text - The text to encode
+   */
+  encodeStringSpecialChars(text: string): string {
     text = text.replace(/'/g, '@@@singlequote@@@');
     text = text.replace(/"/g, '@@@doublequote@@@');
     text = text.replace(/`/g, '@@@gravequote@@@');
     text = text.replace(/:/g, '@@@colon@@@');
     text = text.replace(/;/g, '@@@semicolon@@@');
+    text = text.replace(/\./g, '@@@dot@@@');
     text = text.replace(/,/g, '@@@comma@@@');
     text = text.replace(/\\/g, '@@@backslash@@@');
     text = text.replace(/\(/g, '@@@openRoundBracket@@@');
@@ -73,12 +78,18 @@ export class DataTypeEncoder {
     return text;
   }
 
-  decodeStringSpecialChars(text: string) {
+  /**
+   * Decodes the special characters again
+   *
+   * @param text - The text to decode
+   */
+  decodeStringSpecialChars(text: string): string {
     text = text.replace(/@@@singlequote@@@/g, '\'');
     text = text.replace(/@@@doublequote@@@/g, '"');
     text = text.replace(/@@@gravequote@@@/g, '`');
     text = text.replace(/@@@colon@@@/g, ':');
     text = text.replace(/@@@semicolon@@@/g, ';');
+    text = text.replace(/@@@dot@@@/g, '.');
     text = text.replace(/@@@comma@@@/g, ',');
     text = text.replace(/@@@backslash@@@/g, '\\');
     text = text.replace(/@@@openRoundBracket@@@/g, '(');
@@ -93,7 +104,12 @@ export class DataTypeEncoder {
   // Subfunctions
   // -----------------------------------------------------
 
-  encodeSubfunctions(text: string) {
+  /**
+   * Finds all subfunctions in a piece of text and replaces their round brackets with @@@...@@@-placeholders.
+   *
+   * @param text - The text to parse for substrings
+   */
+  encodeSubfunctions(text: string): string {
     const openingBrackets = matchAll(text, /\(/gm);
     const closingBrackets = matchAll(text, /\)/gm);
     const allBrackets = [...openingBrackets, ...closingBrackets];
@@ -123,13 +139,23 @@ export class DataTypeEncoder {
     return encodedFunctionsText;
   }
 
-  encodeFunctionBrackets(text: string) {
+  /**
+   * Encodes all round brackets with harmless placeholders
+   *
+   * @param text - The text to encode
+   */
+  encodeFunctionBrackets(text: string): string {
     text = text.replace(/\(/g, '@@@fnOpenBracket@@@');
     text = text.replace(/\)/g, '@@@fnCloseBracket@@@');
     return text;
   }
 
-  decodeFunctionBrackets(text: string) {
+  /**
+   * Decodes all round brackets again
+   *
+   * @param text - The text to decode
+   */
+  decodeFunctionBrackets(text: string): string {
     text = text.replace(/@@@fnOpenBracket@@@/g, '\(');
     text = text.replace(/@@@fnCloseBracket@@@/g, '\)');
     return text;
@@ -139,16 +165,18 @@ export class DataTypeEncoder {
   // -----------------------------------------------------
 
   /**
-   * Find property accessor brackets of variables and encode their content
+   * Finds all subbrackets in a piece of text and replaces their brackets with @@@...@@@-placeholders.
+   *
+   * @param text - The text to parse for substrings
    */
-  encodeVariableSubbrackets(text: string) {
+  encodeVariableSubbrackets(text: string): string {
 
     // Property accessor opening brackets can be identified by what they are preceded by.
     // Must be a) text, b) closing square bracket or c) closing round bracket. Arrays can't be preceded by any of these.
     const variableOpeningBrackets = '(?<=[a-zA-Z_$\\]\)])\\[';
     const openingBrackets = matchAll(text, new RegExp(variableOpeningBrackets, 'gm'));
-    // Note: Can't simply find closing brackets as well (as is done in the other encoder function),
-    // because the closing bracket doesn't have a uniquely identifiable syntax. Might also be array endings.
+    // Note: Can't simply find closing brackets as well (as is done in the other encoder functions), because the closing
+    // bracket doesn't have a uniquely identifiable syntax. Might also be array endings.
 
     // Find the corresponding closing bracket for each opening bracket by parsing the following brackets
     const bracketSegments: Array<TextSegment> = [];
@@ -175,7 +203,7 @@ export class DataTypeEncoder {
     // Throw out nested brackets
     const outerBracketSegments = [];
     for (const bracketSegment of bracketSegments) {
-      if  (outerBracketSegments.length === 0) {
+      if (outerBracketSegments.length === 0) {
         outerBracketSegments.push(bracketSegment);
       } else {
         if (outerBracketSegments[outerBracketSegments.length - 1].endIndex < bracketSegment.startIndex) {
@@ -190,13 +218,23 @@ export class DataTypeEncoder {
     return encodedBracketsText;
   }
 
-  encodeVariableBrackets(text: string) {
+  /**
+   * Encodes all brackets with harmless placeholders
+   *
+   * @param text - The text to encode
+   */
+  encodeVariableBrackets(text: string): string {
     text = text.replace(/\[/g, '@@@variableOpeningBracket@@@');
     text = text.replace(/\]/g, '@@@variableClosingBracket@@@');
     return text;
   }
 
-  decodeVariableBrackets(text: string) {
+  /**
+   * Decodes all brackets again
+   *
+   * @param text - The text to encode
+   */
+  decodeVariableBrackets(text: string): string {
     text = text.replace(/@@@variableOpeningBracket@@@/g, '\[');
     text = text.replace(/@@@variableClosingBracket@@@/g, '\]');
     return text;
@@ -206,13 +244,13 @@ export class DataTypeEncoder {
   // -----------------------------------------------------
 
   /**
-   * Transforms an (already sub-encoded) context var into a string placeholder by encoding the context var syntax itself.
-   * This is so that can be safely parsed by JSON.parse() (double quotes are escaped) and also so it won't be misinterpreted
-   * by other regexes looking for code syntax (especially arrays b/c of context-var []-property-brackets)
+   * Transforms a context var (that is already encoded for substrings, subfunctions and subbrackets) into a string placeholder
+   * by encoding the context var syntax itself. This is so that can be safely parsed by JSON.parse() as a string and also so it
+   * won't be misinterpreted by other regexes looking for JSON syntax (especially arrays b/c of context-var []-property-brackets)
    *
    * @param contextVar - The context var to transform
    */
-  transformContextVarIntoPlacerholder(contextVar: string) {
+  transformContextVarIntoPlacerholder(contextVar: string): string {
     // Replace context. with __CXT__
     contextVar = '__CXT__' + contextVar.substr(7);
     // Encode variable syntax
@@ -225,7 +263,7 @@ export class DataTypeEncoder {
     return contextVar;
   }
 
-  transformPlaceholderIntoContextVar(contextVar: string) {
+  transformPlaceholderIntoContextVar(contextVar: string): string {
     contextVar = 'context' + contextVar.substr(7);
     contextVar = contextVar.replace(/@@@cxtDoubleQuote@@@/g, '"');
     contextVar = contextVar.replace(/@@@cxtDot@@@/g, '.');
@@ -240,18 +278,18 @@ export class DataTypeEncoder {
   // -----------------------------------------------------
 
   /**
-   * Takes a text as well as array of TextSegments and encodes them with the help of an encodingFunction
-   * The encoded text is them automatically assembled and returned
+   * Takes a piece of text as well as array of TextSegments and encodes them with the help of an encodingFunction
+   * The encoded text is then automatically assembled and returned.
    *
    * @param text - The text in question
    * @param specialTextSegments - The segments in the text to encode
    * @param encodingFunction - The encoding function to use
    */
-  private encodeTextSegments(text: string, specialTextSegments: Array<TextSegment>, encodingFunction: any) {
-    // Divide text into segments
+  private encodeTextSegments(text: string, specialTextSegments: Array<TextSegment>, encodingFunction: any): string {
+    // 1. Divide whole text into two types of segments: Those to be encoded and those to be left as they are
     const allTextSegments = [];
     for (const specialTextSegment of specialTextSegments) {
-      // Push text segment
+      // Push normal text segment since last special segment
       const lastSegmentEndIndex = allTextSegments.length === 0 ? 0 : allTextSegments[allTextSegments.length - 1].endIndex;
       allTextSegments.push({
         type: 'text',
@@ -260,7 +298,7 @@ export class DataTypeEncoder {
         string: text.substr(lastSegmentEndIndex, specialTextSegment.startIndex - lastSegmentEndIndex)
       });
 
-      // Push bracket segment
+      // Push next special segment
       allTextSegments.push({
         type: 'special',
         startIndex: specialTextSegment.startIndex,
@@ -268,7 +306,7 @@ export class DataTypeEncoder {
         string: text.substr(specialTextSegment.startIndex, specialTextSegment.endIndex - specialTextSegment.startIndex)
       });
     }
-    // Add last bit of text
+    // Add text segment for trailing text after last special segment
     const lastBracketEndIndex = allTextSegments.length === 0 ? 0 : allTextSegments[allTextSegments.length - 1].endIndex;
     allTextSegments.push({
       type: 'text',
@@ -277,13 +315,14 @@ export class DataTypeEncoder {
       string: text.substr(lastBracketEndIndex)
     });
 
-    // Encode subfunction brackets
+    // 2. Encode all special segments
     for (const segment of allTextSegments) {
       if (segment.type === 'special') {
         segment.string = encodingFunction(segment.string);
       }
     }
 
+    // 3. Concat everything together again
     let encodedString = '';
     for (const segment of allTextSegments) {
       encodedString += segment.string;
@@ -292,12 +331,22 @@ export class DataTypeEncoder {
     return encodedString;
   }
 
-  stripSlashes(text: string) {
+  /**
+   * Strips all escaping backslashes from a piece of text
+   *
+   * @param text - The text in question
+   */
+  stripSlashes(text: string): string {
     return text.replace(/\\(.)/g, '$1');
     // return text.replace(new RegExp('\\\\(.)', 'g'), '$1');
   }
 
-  escapeDoubleQuotes(text: string) {
+  /**
+   * Escapes all double quotes in a piece of text
+   *
+   * @param text - The text in question
+   */
+  escapeDoubleQuotes(text: string): string {
     const result = text.replace(/\\/g, '\\\\').replace(/\"/g, '\\"');
     return result;
   }

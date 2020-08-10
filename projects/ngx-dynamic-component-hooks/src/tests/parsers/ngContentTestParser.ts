@@ -1,5 +1,5 @@
 import { ComponentFactoryResolver, Injectable } from '@angular/core';
-import { HookParser, HookPosition, HookValue, HookData, HookBindings } from '../testing-api';
+import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../testing-api';
 import { GenericSelectorFinder } from '../testing-api';
 import { NgContentTestComponent } from '../components/ngContentTest/ngContentTest.c';
 
@@ -19,10 +19,10 @@ export class NgContentTestParser implements HookParser {
   public findHooks(text: string, context: {[key: string]: any}): Array<HookPosition> {
     const selector = this.cfr.resolveComponentFactory(this.component).selector;
     const bracketStyle = {opening: '<', closing: '>'};
-    return this.genericSelectorFinder.findMultiTagSelectors(text, selector, bracketStyle, true);
+    return this.genericSelectorFinder.findMultiTagSelectors(text, selector, bracketStyle);
   }
 
-  public loadHook(hookId: number, hookValue: HookValue, context: {[key: string]: any}, childNodes: Array<Element>): HookData {
+  public loadHook(hookId: number, hookValue: HookValue, context: {[key: string]: any}, childNodes: Array<Element>): HookComponentData {
     const customSpan = document.createElement('span');
     customSpan.innerHTML = 'this should be highlighted';
 

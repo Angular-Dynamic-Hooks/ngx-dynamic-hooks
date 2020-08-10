@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, ComponentFactoryResolver, Inject, DoCheck, AfterViewChecked, Output, EventEmitter, Optional, Renderer2, SkipSelf } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, Inject, DoCheck, AfterViewChecked, Output, EventEmitter, Optional } from '@angular/core';
 
 import { HookIndex } from '../../interfaces';
 import { HookParser } from '../../interfacesPublic';
@@ -13,22 +13,23 @@ import { OptionsResolver } from './options/optionsResolver';
 import { ComponentUpdater } from './services/componentUpdater';
 
 /**
- * Short explanation:
+ * The main component of the DynamicComponentHooksModule. Accepts a string of text and replaces all hooks inside of it with dynamically created
+ * components that behave just like any other Angular component.
  *
- * 1. A dynamic text is passed in via @Input(). On init, this component will then hand this dynamicText to all parsers from supportedParsers, who will find the shortcode/pattern they are
- * responsible for and each return an Array<DynamicTextSegment>.
+ * Explanation in a nutshell:
  *
- * 2. This component then has to make sense of these individual results and combine them into the final textSegments Array<DynamicTextSegment> which includes everything that was found.
+ *  1. A dynamic string of content is passed in as @Input() and an array of parsers is retrieved either as @Input() or from the global settings.
  *
- * 3. The template will render the textSegments-array automatically and place an anchor at each component location. In AfterViewInit, this component then calls loadComponentsForAnchors,
- * which will dynamically create and insert the respective AdapterComponents into their anchor positions and pass along the whole shortcode to analyze.
+ *  2. The content is given to all registered parsers who will find their respective hooks. The hooks are then replaced with dynamic component
+ *     placeholder elements in the content string.
  *
- * 4. From then on out, it is the AdapterComponents responsibility to parse all required values from its shortcode and properly initialize their respective components with them.
+ *  3. The content string is then parsed by the native browser HTML parser to create a DOM tree, which is then inserted as the innerHTML of the
+ *     OutletComponent.
  *
- * Alternative: You can also interpret strings as literal Angular templates via this method: https://stackoverflow.com/a/44082399/3099523
- * However, this allows no control over what Angular features are allowed and which aren't. When used in comments, users could write their own fully-functional templates and use all
- * declared components of my app. Via my DynamicTextComponent, you have fine-grained control over what parsers should be active / shortcodes are allowed and what arguments can be
- * passed to them.
+ *  4. The corresponding components for each hook are dynamically loaded into the previously created placeholder elements as fully-functional
+ *     Angular components via ComponentFactory.create().
+ *
+ *  5. Any @Inputs() & @Outputs() for the components will be registered with them and automatically updated on following change detection runs.
  */
 
 @Component({
@@ -61,12 +62,11 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     private hooksReplacer: HooksReplacer,
     private componentCreator: ComponentCreator,
     private componentUpdater: ComponentUpdater
-  ) {
-    console.warn('Something is not quite right.');
-  }
+  ) {}
 
   ngDoCheck(): void {
-    if (this.initialized && this.activeOptions.changeDetectionStrategy.toLowerCase() === 'default') {
+    // Update bindings on every change detection run?
+    if (this.initialized && !this.activeOptions.updateOnPushOnly) {
       this.componentUpdater.refresh(this.hookIndex, this.context, this.activeOptions, false);
     }
   }
@@ -169,13 +169,9 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   }
 
   /**
-   * The main function of this component
+   * The main method of this component to initialize it
    *
-   * Takes the text input, replaces all found hooks with placeholders and builds a hookIndex,
-   * parses the text via the native DOMParser, replaces the placeholders with the actual selector
-   * elements and dynamically loads the desired components into them.
-   *
-   * @param text - The input text to parse
+   * @param content - The input content to parse
    */
   parse(content: string): void {
     if (!content || typeof content !== 'string') {
@@ -189,7 +185,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
 
     // Replace hooks with component selector elements
     const result = this.hooksReplacer.replaceHooksWithNodes(content, this.context, this.activeParsers, this.token, this.activeOptions);
-    content = result.text;
+    content = result.content;
     this.hookIndex = result.hookIndex;
 
     // Parse HTML

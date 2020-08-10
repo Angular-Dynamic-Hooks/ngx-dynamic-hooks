@@ -1,13 +1,20 @@
 import { Injectable, ComponentFactoryResolver } from '@angular/core';
 import { GenericSelectorParserConfig, genericSelectorParserConfigDefaults } from './parserConfig';
-import { LazyLoadComponentConfig } from '../../../interfacesPublic';
 
+/**
+ * A helper class for resolving GenericSelectorParserConfigs
+ */
 @Injectable()
 export class ParserConfigResolver {
 
   constructor(private cfr: ComponentFactoryResolver) {
   }
 
+  /**
+   * Overwrites the default parser config with a (partial) GenericSelectorParserConfig object and returns the result
+   *
+   * @param userParserConfig - The (partial) GenericSelectorParserConfig object
+   */
   processConfig(userParserConfig: GenericSelectorParserConfig): GenericSelectorParserConfig {
     const parserConfig = JSON.parse(JSON.stringify(genericSelectorParserConfigDefaults));
 

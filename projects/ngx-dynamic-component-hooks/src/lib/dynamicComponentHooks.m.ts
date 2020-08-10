@@ -39,12 +39,12 @@ import { ParserConfigResolver } from './parsers/genericSelector/config/parserCon
 export class DynamicComponentHooksModule {
   // Make sure not to set the optional function signature "ModuleWithProviders<T>".
   // Angular 5's version was non-generic, so will break backwards-compatibility.
-  static forRoot(globals: DynamicComponentHooksGlobalSettings)/*: ModuleWithProviders<DynamicComponentHooksModule>*/ {
+  static forRoot(globalSettings: DynamicComponentHooksGlobalSettings)/*: ModuleWithProviders<DynamicComponentHooksModule>*/ {
     return {
       ngModule: DynamicComponentHooksModule,
       providers: [
         // Put app-wide services here
-        { provide: DYNAMICCOMPONENTHOOKS_GLOBALSETTINGS, useValue: globals },
+        { provide: DYNAMICCOMPONENTHOOKS_GLOBALSETTINGS, useValue: globalSettings },
         DataTypeEncoder,
         DataTypeParser,
         DeepComparer,

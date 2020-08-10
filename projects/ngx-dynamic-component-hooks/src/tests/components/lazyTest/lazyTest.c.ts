@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
-import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
+import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 
 @Component({
   selector: 'dynhooks-lazytest',
@@ -9,9 +9,9 @@ import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData
 export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() name: string;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChildren>;
+  mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChildren>;
+  changesContentChildren: Array<DynamicContentChild>;
 
   constructor (private cd: ChangeDetectorRef) {
   }

@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
-import { DynamicContentChildren, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
+import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 import { TestService } from '../../services/testService';
 
 
@@ -10,9 +10,9 @@ import { TestService } from '../../services/testService';
 })
 export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChildren>;
+  mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChildren>;
+  changesContentChildren: Array<DynamicContentChild>;
 
   constructor(private cd: ChangeDetectorRef, private testService: TestService) {
   }

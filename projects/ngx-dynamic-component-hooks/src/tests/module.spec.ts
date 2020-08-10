@@ -880,7 +880,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest [simpleObject]='{validContextVar: context._jediCouncil.kenobi, invalidContextVar: context.sithTriumvirate.kreia}'>`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
 
     // One of them should be undefined
@@ -1165,7 +1165,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest>`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'onPush'};
+    comp.options = {updateOnPushOnly: true};
     comp.ngOnChanges({content: true, context: true, options: true});
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
 
@@ -1182,7 +1182,7 @@ describe('DynamicHooksComponent', () => {
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
 
@@ -1425,7 +1425,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest [simpleObject]="{something: true, extra: 'hi, this is a string!'}">`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
 
     // Check bindings
@@ -1450,7 +1450,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest [simpleObject]="{something: context.$lightSaberCollection}">`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
 
     // Check bindings
@@ -1476,7 +1476,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest [simpleObject]="{something: context.$lightSaberCollection}">`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
 
     // Check bindings
@@ -1503,7 +1503,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `<dynhooks-singletagtest [simpleArray]="[context.order]" [simpleObject]="{something: context.$lightSaberCollection}">`;
     comp.content = testText;
     comp.context = context;
-    comp.options = {changeDetectionStrategy: 'default'};
+    comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true});
 
     // Check bindings
@@ -1630,7 +1630,7 @@ describe('DynamicHooksComponent', () => {
     ({fixture, comp} = prepareTestingModule([{
       component: MultiTagTestComponent,
       parseInputs: false,
-      changeDetectionStrategy: 'Default'
+      refreshBindingsOnPushOnly: false
     }]));
 
     const testText = `<p>Here is a hook whose input shall not be parsed: <dynhooks-multitagtest [nr]="123" [fonts]="['arial', {prop: true}]">text within hook</dynhooks-multitagtest></p>`;
