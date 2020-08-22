@@ -1,0 +1,26 @@
+language: node_js
+node_js: lts/*
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+env:
+  global:
+    CODECOV_TOKEN=$CODECOV_TOKEN
+stages:
+  - test
+jobs:
+  include:
+    - stage: test
+      cache:
+        directories:
+          - ./node_modules
+      install:
+        - npm install
+        - npm install codecov -g
+      script:
+        - npm run ci:build
+        - npm run ci:test
+        - npm run ci:reportCoverage
