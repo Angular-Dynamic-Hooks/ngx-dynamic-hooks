@@ -64,11 +64,6 @@ export class HooksReplacer {
     const hookIndex: HookIndex = {};
     let hookCount = 0;
 
-    // If empty, return nothing
-    if (!content || content === '') {
-      return {content: '', hookIndex: {} };
-    }
-
     // Collect all parser results (before changing content), sort by startIndex
     let parserResults: Array<ParserResult> = [];
     for (const parser of parsers) {

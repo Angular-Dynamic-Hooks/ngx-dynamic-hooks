@@ -1,6 +1,26 @@
 {
   "name": "ngx-dynamic-hooks",
   "version": "1.0.0",
+  "description": "Automatically insert live Angular components into a dynamic string of content (based on their selector or any pattern of your choice) and render the result in the DOM.",
+  "person": "Marvin Tobisch <mvin@live.de>",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "angular2",
+    "ng",
+    "dynamic",
+    "component",
+    "hooks",
+    "innerHTML",
+    "content",
+    "elements",
+    "loader"
+  ],
+  "homepage": "https://github.com/MTobisch/ngx-dynamic-hooks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MTobisch/ngx-dynamic-hooks.git"
+  },
   "peerDependencies": {
     "@angular/core": "6 - 10",
     "rxjs": "~6"

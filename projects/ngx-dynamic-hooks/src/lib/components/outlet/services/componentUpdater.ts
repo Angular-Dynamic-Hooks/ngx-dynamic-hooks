@@ -129,7 +129,8 @@ export class ComponentUpdater {
         if (!['__proto__', 'prototype', 'constructor'].includes(inputName)) {
           existingInputs[inputName] = inputValue;
         } else {
-          throw Error('Tried to overwrite a __proto__, prototype or constructor property with input "' + inputName + '" for hook "' + hook.componentRef.componentType.name + '". This is not allowed.');
+          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + inputName + '" for hook "' + hook.componentRef.componentType.name + '". This is not allowed.');
+          continue;
         }
       }
     } else {
@@ -222,13 +223,13 @@ export class ComponentUpdater {
     }
     if (oldResult.result === null) {
       if (isDevMode()) {
-        console.warn('Could stringify old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
+        console.warn('Could not stringify old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
         return false;
       }
     }
     if (newResult.result === null) {
       if (isDevMode()) {
-        console.warn('Could stringify new value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
+        console.warn('Could not stringify new value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
         return false;
       }
     }

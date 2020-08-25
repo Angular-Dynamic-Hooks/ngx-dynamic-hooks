@@ -8,34 +8,13 @@ import { TestService } from '../../services/testService';
   templateUrl: './ngContentTest.c.html',
   styleUrls: ['./ngContentTest.c.scss']
 })
-export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges {
   mountContext: any;
   mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
   changesContentChildren: Array<DynamicContentChild>;
 
   constructor(private cd: ChangeDetectorRef, private testService: TestService) {
-  }
-
-
-  ngOnInit () {
-    // console.log('textbox init');
-  }
-
-  ngOnChanges(changes) {
-    // console.log('textbox changes');
-  }
-
-  ngDoCheck() {
-    // console.log('textbox doCheck');
-  }
-
-  ngAfterViewInit() {
-    // console.log('textbox afterviewinit');
-  }
-
-  ngOnDestroy() {
-    // console.log('textbox destroy');
   }
 
   onDynamicMount(data: OnDynamicData) {

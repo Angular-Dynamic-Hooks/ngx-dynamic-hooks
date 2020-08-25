@@ -630,7 +630,7 @@ One of the goals of this library was to make it **safe to use even with potentia
 
 Most notably, it uses Angular's `DOMSanitizer` by default to remove all unsafe HTML, CSS and JS in the content string that is not part of a hook. Though not recommended, you may turn this setting off in the [OutletOptions](#64-outletoptions). You will then have to ensure yourself that the rendered content does not include [Cross Site Scripting attacks (XSS)](https://en.wikipedia.org/wiki/Cross-site_scripting) or other malicious code, however.
 
-As mentioned, the `DOMSanitizer` does not actually parse the hooks themselves (as it may remove them depending on their pattern). This is not an issue as the hooks are replaced by components anyway and never actually rendered. Only the corresponding `HookParser` sees the hook in its original form in order to analyze it. It is therefore the parser's responsibility to ensure that whatever malicious code there may be in the hook is not somehow transferred to the rendered component. For this reason, the standard `SelectorHookParser` that comes with this library does not rely on JavaScript's dangerous `eval()` function to evaluate inputs and outputs and instead internally uses `JSON.parse()` to safely turn strings into variables. **Note:** When writing custom parsers for hooks that take their inputs/outputs directly from the text, make sure to take similar security precautions!
+As mentioned, the `DOMSanitizer` does not actually sanitize the hooks themselves (as it may remove them depending on their pattern). This is not an issue as the hooks are replaced by components anyway and never actually rendered. Only the corresponding `HookParser` sees the hook in its original form in order to analyze it. It is therefore the parser's responsibility to ensure that whatever malicious code there may be in the hook is not somehow transferred to the rendered component. For this reason, the standard `SelectorHookParser` that comes with this library does not rely on JavaScript's dangerous `eval()` function to evaluate inputs and outputs and instead internally uses `JSON.parse()` to safely turn strings into variables. **Note:** When writing custom parsers for hooks that take their inputs/outputs directly from the text, make sure to take similar security precautions!
 
 In addition to this, the scope of code that is accessible by the author of the content string is limited to the [context object](#51-context--dependency-injection), which you can customize to your liking. 
 
@@ -656,7 +656,7 @@ However, there are a number of advantages this library offers compared to Angula
 #### [Ng-Dynamic](https://github.com/lacolaco/ng-dynamic)
 This library was one of the inspirations for Ngx-Dynamic-Hooks and is unfortunately not maintained anymore. It consited of two parts, but I'll just focus on its `<dynamic-html>`-component, which worked like a simpler version of this library. In short, it looked for a component selector in a content string and simply replaced it with the corresponding component, also using `ComponentFactory.create()`. As that is pretty much all it focused on, it:
 
-* required HTML elements to load components (hooks can be anything)
+* required selector elements to load components (hooks can be anything)
 * provided no direct line of communication to the parent component like the context object
 * did not automatically handle inputs/outputs in any way
 * did not automatically handle projected content in any way
@@ -669,6 +669,10 @@ Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-d
 There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or other template syntax is blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
 
 ## 9. Troubleshooting
+**I'm getting the error "`<ngx-dynamic-hooks>` is not a known element" in my templates**
+
+Some editors like VS Code don't always immediately catch on to the newly available components when a module has been imported. Try restarting the editor to see if that helps (it should compile fine, though). If not, check that you have correctly imported the `DynamicHooksModule` into you main module as shown in the [Quick start](#4-quick-start)-section to make everything available.
+
 **I'm getting the error "Data type for following input was not recognized and could not be parsed"**
 
 You most likely have a typo in the input. If its a string, remember to put quotation marks around it ('', "" or ``). If that isn't it, it may help to copy the input into an IDE that is set to JS/TS syntax and have it highlight potential typos for you.
@@ -683,7 +687,7 @@ Make sure you have explicitly given the parsers a name (see the [HookParserEntry
 
 **I'm writing a custom parser. When implementing `loadComponent()`, why are there `<dynamic-component-placeholder>`-elements in the passed `childNodes`?**
 
-At this point in the workflow, the original hooks have already been replaced with the placeholder-elements you see in the `childNodes`. These placeholders are later replaced again with the actual Angular components. Note that if you replace the inner content of the hook and modify or remove the placeholders, the corresponding component may not load correctly!
+At this point in the workflow, the original hooks have already been replaced with the placeholder-elements you see in the `childNodes`. These placeholders are later replaced again with the actual Angular components. Note that if you replace the inner content of the hook and modify or remove these placeholders, the corresponding component may not load correctly!
 
 **I've written a custom parser. `ngOnChanges()` keeps triggering in my dynamic components!**
 

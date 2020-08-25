@@ -6,8 +6,8 @@ import { first } from 'rxjs/operators';
 // Importing files through testing-api file here instead of their own paths.
 // This way, we can add easily add the testing-api file as an import to public-api if we want to
 // temporarily grant access to all testing resources in the final build. This is useful for testing this
-// library with different ng-versions, as it allows us to run the tests from within the ng-app with the
-// compiled version of this library (by copying this spec-file over) instead of with the uncompiled version here.
+// library with different ng-versions, as it allows us to run the tests from the ng-app against a
+// compiled version of this library (by copying this spec-file over) instead of the uncompiled version here.
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
@@ -40,10 +40,6 @@ import { NonServiceTestParser } from './parsers/nonServiceTestParser';
 import { TESTSERVICETOKEN, TestService } from './services/testService';
 import { NgContentTestComponent } from './components/ngContentTest/ngContentTest.c';
 import { LazyTestComponent } from './components/lazyTest/lazyTest.c';
-
-/**
- * This file consists of feature-oriented, large tests for the whole module
- */
 
 export class MockElementRef {
   nativeElement: {};
@@ -138,6 +134,12 @@ function prepareTestingModule(parsers?, options?, extraComponents: Array<any> = 
   };
 }
 
+
+/**
+ * This test suite mostly consists of feature-oriented, integration-like tests for the whole library.
+ * It implicitly tests the subservices and -classes by testing all functions of the OutletComponent with
+ * various inputs and expecting the correct results in the end.
+ */
 describe('DynamicHooksComponent', () => {
   let fixture;
   let comp: OutletComponent;
@@ -241,6 +243,75 @@ describe('DynamicHooksComponent', () => {
     expect(comp.activeParsers.length).toBe(0);
   });
 
+  it('#should reset and reload when relevant bindings change', () => {
+    spyOn(comp, 'parse').and.callThrough();
+    spyOn(comp, 'reset').and.callThrough();
+
+    // Initialize
+    const testTextOne = `<div>Some random component <dynHooks-multitagtest>with inner content.</dynHooks-multitagtest></div>`;
+    comp.content = testTextOne;
+    comp.ngOnChanges({content: true});
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.parse['calls'].count()).toBe(1);
+
+    // Change 'text'
+    const testTextTwo = `<span>Some other text <dynHooks-singletagtest><dynHooks-multitagtest></dynHooks-multitagtest></span>`;
+    comp.content = testTextTwo;
+    comp.ngOnChanges({content: true});
+    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
+    expect(Object.values(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.parse['calls'].count()).toBe(2);
+
+    // Change 'options'
+    const newOptions = {sanitize: false};
+    comp.options = newOptions;
+    comp.ngOnChanges({options: true});
+    expect(comp.parse['calls'].count()).toBe(3);
+
+    // Change 'globalParsersBlacklist'
+    const blacklist = ['SingleTagTestComponentParser'];
+    comp.globalParsersBlacklist = blacklist;
+    comp.ngOnChanges({globalParsersBlacklist: true});
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.parse['calls'].count()).toBe(4);
+
+    // Reset
+    comp.globalParsersBlacklist = null;
+    comp.globalParsersWhitelist = null;
+    comp.ngOnChanges({globalParsersBlacklist: true, globalParsersWhitelist: true});
+    expect(Object.values(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.parse['calls'].count()).toBe(5);
+
+    // Change 'globalParsersWhitelist'
+    const whitelist = ['SingleTagTestComponentParser'];
+    comp.globalParsersWhitelist = whitelist;
+    comp.ngOnChanges({globalParsersWhitelist: true});
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.parse['calls'].count()).toBe(6);
+
+    // Change 'parsers' (while leaving 'globalParsersWhitelist' as is, should be ignored)
+    comp.parsers = [{component: MultiTagTestComponent, name: 'LocalParser!'}];
+    comp.ngOnChanges({parsers: true});
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.activeParsers.length).toBe(1);
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
+    expect(comp.activeParsers[0]['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.activeParsers[0]['name']).toBe('LocalParser!');
+    expect(comp.parse['calls'].count()).toBe(7);
+  });
+
+  // 2. HookParsers (in general)
+  // --------------------------------------------------------------------------
+
   it('#should load global parsers correctly', () => {
     comp.content = 'something';
     comp.ngOnChanges({content: true});
@@ -316,6 +387,56 @@ describe('DynamicHooksComponent', () => {
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-singletagtest');
     expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
+
+
+    // Should ignore invalid parser entries
+    comp.content = 'This text is irrelevant for this test.';
+    comp.parsers = [true as any];
+    spyOn(console, 'error').and.callThrough();
+    comp.ngOnChanges({content: true, parsers: true});
+    expect(comp.activeParsers.length).toBe(0);
+    expect(console.error['calls'].count()).toBe(1);
+  });
+
+  it('#should check parser functions', () => {
+    comp.content = 'This text is irrelevant for this test.';
+    // Create an objects that will be mistaken for parser instances (as they have constructor.name)
+    // Test with varying amounts of incomplete parser functions to trigger an error for each scenario
+    const noFuncParser = {constructor: {name: 'something'}};
+    const parseWithOneFunc = {constructor: {name: 'something'}, findHooks: () => {}};
+    const parseWithTwoFuncs = {constructor: {name: 'something'}, findHooks: () => {}, loadComponent: () => {}};
+
+    comp.parsers = [noFuncParser as any];
+    spyOn(console, 'error').and.callThrough();
+    comp.ngOnChanges({content: true, parsers: true});
+    expect(comp.activeParsers.length).toBe(0);
+    expect(console.error['calls'].count()).toBe(1);
+    expect(console.error['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "findHooks()". Removing from list of active parsers:');
+
+    comp.parsers = [parseWithOneFunc as any];
+    comp.ngOnChanges({content: true, parsers: true});
+    expect(comp.activeParsers.length).toBe(0);
+    expect(console.error['calls'].count()).toBe(2);
+    expect(console.error['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "loadComponent()". Removing from list of active parsers:');
+
+    comp.parsers = [parseWithTwoFuncs as any];
+    comp.ngOnChanges({content: true, parsers: true});
+    expect(comp.activeParsers.length).toBe(0);
+    expect(console.error['calls'].count()).toBe(3);
+    expect(console.error['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "getBindings()". Removing from list of active parsers:');
+  });
+
+  it('#should check parser names', () => {
+    comp.content = 'This text is irrelevant for this test.';
+    comp.parsers = [
+      {component: SingleTagTestComponent, name: 'someParser'},
+      {component: MultiTagTestComponent, name: 'someParser'}
+    ];
+    spyOn(console, 'warn').and.callThrough();
+    comp.ngOnChanges({content: true, parsers: true});
+    expect(comp.activeParsers.length).toBe(2);
+    expect(console.warn['calls'].count()).toBe(1);
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Parser name "someParser" is not unique and appears multiple times in the list of active parsers.');
   });
 
   it('#should load fine without parsers', () => {
@@ -389,121 +510,236 @@ describe('DynamicHooksComponent', () => {
     expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
   });
 
-  it('#should load global options correctly', () => {
-    const differentOptions = {};
-    for (const [key, value] of Object.entries(outletOptionDefaults)) {
-      if (typeof value === 'boolean') { differentOptions[key] = !value; }
-      else if (typeof value === 'number') { differentOptions[key] = value * 2; }
-      else if (typeof value === 'string') { differentOptions[key] = value; }
-      else {  differentOptions[key] = null; }
-    }
+  it('#should check the parserBlacklist and parserWhitelist', () => {
+    const testText = 'This text is irrelevant for this test';
+    comp.content = testText;
+    comp.globalParsersBlacklist = ['blacklistedParser'];
+    comp.globalParsersWhitelist = ['whitelistedParser'];
+    spyOn(console, 'warn').and.callThrough();
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
 
-    ({fixture, comp} = prepareTestingModule(testParsers, differentOptions));
-
-    comp.content = 'something';
-    comp.ngOnChanges({content: true});
-
-    for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe(differentOptions[key]);
-    }
+    // Check that warnings have been fired
+    expect(console.warn['calls'].count()).toBe(2);
+    expect(console.warn['calls'].allArgs()[0][0]).toBe('Blacklisted parser name "blacklistedParser" does not appear in the list of global parsers names. Make sure both spellings are identical.');
+    expect(console.warn['calls'].allArgs()[1][0]).toBe('Whitelisted parser name "whitelistedParser" does not appear in the list of global parsers names. Make sure both spellings are identical.');
   });
 
-  it('#should load local options correctly', () => {
-    const differentOptions = {};
-    for (const [key, value] of Object.entries(outletOptionDefaults)) {
-      if (typeof value === 'boolean') { differentOptions[key] = !value; }
-      else if (typeof value === 'number') { differentOptions[key] = value * 2; }
-      else if (typeof value === 'string') { differentOptions[key] = value; }
-      else {  differentOptions[key] = null; }
-    }
-
-    comp.options = differentOptions as OutletOptions;
-    comp.ngOnChanges({content: true, options: true});
-
-    for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe(differentOptions[key]);
-    }
+  it('#should ensure the component field of a parser is correct', () => {
+    // Load with nonsensical componentConfig
+    expect(() => comp['componentCreator'].loadComponentClass(true as any))
+      .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig'));
   });
 
-  it('#should load fine without options', () => {
-    ({fixture, comp} = prepareTestingModule(testParsers, []));
+  it('#should check that the "importPromise"-field  of lazy-loaded parsers is not the promise itself', () => {
+    comp.content = 'Should load here: <someSelector></someSelector>';
+    comp.parsers = [{
+      component: {
+        importPromise: (new Promise(() => {})) as any,
+        importName: 'test'
+      },
+      selector: 'someSelector'
+    }];
+    spyOn(console, 'error');
+    comp.ngOnChanges({content: true, parsers: true});
 
-    comp.content = 'something';
-    comp.ngOnChanges({content: true});
-
-    expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
-    for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe(outletOptionDefaults[key]);
-    }
-  });
-
-  it('#should reset and reload when relevant bindings change', () => {
-    spyOn(comp, 'parse').and.callThrough();
-    spyOn(comp, 'reset').and.callThrough();
-
-    // Initialize
-    const testTextOne = `<div>Some random component <dynHooks-multitagtest>with inner content.</dynHooks-multitagtest></div>`;
-    comp.content = testTextOne;
-    comp.ngOnChanges({content: true});
-    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.parse['calls'].count()).toBe(1);
-
-    // Change 'text'
-    const testTextTwo = `<span>Some other text <dynHooks-singletagtest><dynHooks-multitagtest></dynHooks-multitagtest></span>`;
-    comp.content = testTextTwo;
-    comp.ngOnChanges({content: true});
-    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
-    expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.parse['calls'].count()).toBe(2);
-
-    // Change 'options'
-    const newOptions = {sanitize: false};
-    comp.options = newOptions;
-    comp.ngOnChanges({options: true});
-    expect(comp.parse['calls'].count()).toBe(3);
-
-    // Change 'globalParsersBlacklist'
-    const blacklist = ['SingleTagTestComponentParser'];
-    comp.globalParsersBlacklist = blacklist;
-    comp.ngOnChanges({globalParsersBlacklist: true});
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.parse['calls'].count()).toBe(4);
-
-    // Reset
-    comp.globalParsersBlacklist = null;
-    comp.globalParsersWhitelist = null;
-    comp.ngOnChanges({globalParsersBlacklist: true, globalParsersWhitelist: true});
-    expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.parse['calls'].count()).toBe(5);
-
-    // Change 'globalParsersWhitelist'
-    const whitelist = ['SingleTagTestComponentParser'];
-    comp.globalParsersWhitelist = whitelist;
-    comp.ngOnChanges({globalParsersWhitelist: true});
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.parse['calls'].count()).toBe(6);
-
-    // Change 'parsers' (while leaving 'globalParsersWhitelist' as is, should be ignored)
-    comp.parsers = [{component: MultiTagTestComponent, name: 'LocalParser!'}];
-    comp.ngOnChanges({parsers: true});
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
-    expect(comp.activeParsers[0]['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.activeParsers[0]['name']).toBe('LocalParser!');
-    expect(comp.parse['calls'].count()).toBe(7);
+    expect(console.error['calls'].mostRecent().args[0]).toBe('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
   });
 
-  // 2. Loading dynamic components
+  it('#should warn if using lazy-loaded parsers with old Angular versions', () => {
+    // Load app first
+    comp.content = 'Should load here: <someSelector></someSelector>';
+    spyOn(console, 'warn');
+    comp.ngOnChanges({content: true});
+
+    // Change ng-version
+    fixture.nativeElement.setAttribute('ng-version', 8);
+
+    // Load parser and check that it warns the user
+    comp.parsers = [{
+      component: {
+        importPromise: () => new Promise(() => {}),
+        importName: 'test'
+      },
+      selector: 'someSelector'
+    }];
+    comp.ngOnChanges({parsers: true});
+
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
+  });
+
+  it('#should resubscribe to outputs if outputs returned by parser changed', () => {
+    const testText = `<dynhooks-singletagtest (httpResponseReceived)="content.maneuvers.getMentalState()">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+    spyOn(comp.hookIndex[0].componentRef.instance['httpResponseReceived'], 'subscribe').and.callThrough();
+
+    // Change returned output
+    spyOn(comp.activeParsers[0], 'getBindings').and.returnValue({
+      outputs: {
+        httpResponseReceived: () => 'someotherfunction'
+      }
+    });
+
+    // Trigger cd
+    comp.ngDoCheck();
+
+    // Should have resubscribed
+    expect(comp.hookIndex[0].componentRef.instance['httpResponseReceived'].subscribe['calls'].count()).toBe(1);
+  });
+
+  it('#should validate the HookPositions of parsers', () => {
+    const hooksReplacer = comp['hooksReplacer'];
+    spyOn(console, 'warn').and.callThrough();
+
+    // 1. Every hook must be in itself well-formed
+    // -------------------------------------------
+
+    // openingTagEndIndex must be greater than openingTagStartIndex
+    let parserResults: any = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 10,
+        openingTagEndIndex: 5
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.');
+
+    // closingTag must start after openingTag
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 15,
+        closingTagStartIndex: 10,
+        closingTagEndIndex: 20,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - The closing tag must start after the opening tag has concluded. Ignoring.');
+
+    // closingTagEndIndex must be greater than closingTagStartIndex
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 20,
+        closingTagEndIndex: 15,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.');
+
+    // 2. The opening/closing tags of a hook must not overlap with those of another hook
+    // ---------------------------------------------------------------------------------
+    spyOn(hooksReplacer, 'generateHookPosWarning' as any).and.callThrough();
+
+    // must not have identical indexes
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 15,
+        closingTagEndIndex: 20
+      }
+    }, {
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 15,
+        closingTagEndIndex: 20,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('A hook with the same position as another hook was found. There may be multiple identical parsers active that are looking for the same hook. Ignoring duplicates.');
+
+    // Opening tag must begin after previous opening tag has ended
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 15
+      }
+    }, {
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 10,
+        openingTagEndIndex: 20,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
+
+    // Opening tag must not overlap with previous closing tag
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 15,
+        closingTagEndIndex: 20
+      }
+    }, {
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 15,
+        openingTagEndIndex: 20,
+        closingTagStartIndex: 25,
+        closingTagEndIndex: 30,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
+
+    // Closing tag must not overlap with previous closing tag
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 30,
+        closingTagEndIndex: 35
+      }
+    }, {
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 15,
+        openingTagEndIndex: 20,
+        closingTagStartIndex: 30,
+        closingTagEndIndex: 40,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
+
+    // Check if hooks are incorrectly nested
+    parserResults = [{
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 5,
+        openingTagEndIndex: 10,
+        closingTagStartIndex: 25,
+        closingTagEndIndex: 30
+      }
+    }, {
+      parser: null,
+      hookPosition: {
+        openingTagStartIndex: 15,
+        openingTagEndIndex: 20,
+        closingTagStartIndex: 35,
+        closingTagEndIndex: 40,
+      }
+    }];
+    hooksReplacer['validateHookPositions'](parserResults, '');
+    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
+  });
+
+  // 3. Loading dynamic components
   // --------------------------------------------------------------------------
 
   it('#should load just the text if there are no dynamic components', () => {
@@ -539,6 +775,17 @@ describe('DynamicHooksComponent', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('This is the inner content.'); // Transcluded content works
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+  });
+
+  it('#should remove components if they fail to load', () => {
+    const testText = `<dynHooks-multitagtest>This is the inner content.</dynHooks-multitagtest>`;
+    comp.content = testText;
+    spyOn(comp['componentCreator'], 'createComponent').and.throwError('Test error');
+    spyOn(console, 'error');
+    comp.ngOnChanges({content: true});
+
+    expect(Object.values(comp.hookIndex).length).toBe(0);
+    expect(console.error['calls'].count()).toBe(1);
   });
 
   it('#should load nested components', () => {
@@ -741,177 +988,28 @@ describe('DynamicHooksComponent', () => {
     }
   });
 
-  it('#should parse inputs properly', () => {
-    const testText = `
-    <dynhooks-multitagtest [fonts]="['test', 'something', 'here']"></dynhooks-multitagtest>
-    <dynhooks-singletagtest
-      id="someid"
-      [nonInputProperty]="'this should not be set as input'"
-      [stringPropAlias]="'this is just a test string'"
-      [numberProp]="846"
-      [booleanProp]="true"
-      [nullProp]="null"
-      [undefinedProp]='undefined'
-      [simpleObject]='{config: {lightbox: false, size: {width: "200px", height: "100px"}}}'
-      [simpleArray]="[1, 2, 'three', true, undefined, null, [5, 6]]"
-      [variable]='context["$lightS\\aberCollection"][2]'
-      [variableLookalike]='"seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]"'
-      [variableInObject]='{propInObj: context["_jediCouncil"].kiAdiMundi[8]["planet"]}'
-      [variableInArray]='["melon", context["_jediCouncil"].yoda900, 798]'
-      [contextWithoutAnything]="context"
-      [nestedFunctions]="{dangerousStr: 'heres a couple of (dangerous) , chars', functionsProp: [context.maneuvers.combo(context.maneuvers.defend('Leia'), context.maneuvers.attack(context.maneuvers.generateEnemy('Wampa')['name']))]}"
-      [nestedFunctionsInBrackets]="[
-        context.maneuvers[context['maneuvers'].findAppropriateAction(context.maneuvers.getMentalState())]().action,
-        context['maneuvers'][context.maneuvers['findAppropriateAction']('peaceful')]().state
-      ]"
-      [everythingTogether]="[
-        'Jar-Jar Binks',
-        35,
-        {
-          someObjProp: [
-            true,
-            \`hello\`,
-            null,
-            76,
-            '02:46am',
-            context.greeting
-          ]
-        },
-        [
-          'another',
-          'variable',
-          context._jediCouncil.skywalker,
-          'laststring',
-          {
-            complexFunctionCall: context.maneuvers[context['maneuvers'].findAppropriateAction(context.maneuvers.getMentalState())]().state
-          }
-        ]
-      ]"
-    >
-    <p>This should be untouched</p>
-    <dynhooks-inlinetest [nr]="123" [config]="{name: 'test', supportedValues: [1, 2, 3], active: true}"></dynhooks-inlinetest>`;
-    comp.content = testText;
-    comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    const firstComp: MultiTagTestComponent = comp.hookIndex[0].componentRef.instance;
-    const secondComp: SingleTagTestComponent = comp.hookIndex[1].componentRef.instance;
-    const thirdComp: InlineTestComponent = comp.hookIndex[2].componentRef.instance;
-
-    // Make sure components are loaded properly
-    expect(Object.keys(comp.hookIndex).length).toBe(3);
-    expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
-    expect(secondComp.constructor.name).toBe('SingleTagTestComponent');
-    expect(thirdComp.constructor.name).toBe('InlineTestComponent');
-    expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
-
-    // Check all inputs
-    expect(firstComp.fonts).toEqual(['test', 'something', 'here']);
-
-    expect(secondComp['id']).toBe(undefined);
-    expect(secondComp.nonInputProperty).toBe('this is the default value');
-    expect(secondComp.stringProp).toBe('this is just a test string');
-    expect(secondComp.numberProp).toBe(846);
-    expect(secondComp.booleanProp).toBe(true);
-    expect(secondComp.nullProp).toBe(null);
-    expect(secondComp.undefinedProp).toBe(undefined);
-    expect(secondComp.simpleObject).toEqual({
-      config: {
-        lightbox: false,
-        size: {
-          height: '100px',
-          width: '200px'
-        }
-      }
-    });
-    expect(secondComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
-    expect(secondComp.variable).toBe('orange');
-    expect(secondComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
-    expect(secondComp.variableInObject).toEqual({
-      propInObj: 'kashyyyk'
-    });
-    expect(secondComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
-    expect(secondComp.contextWithoutAnything).toEqual(context);
-    expect(secondComp.nestedFunctions).toEqual({
-      dangerousStr: 'heres a couple of (dangerous) , chars',
-      functionsProp: ['Combo: defending Leia! and attacking the evil Wampa!']
-    });
-    expect(secondComp.nestedFunctionsInBrackets).toEqual([
-      'meditating!', 'vigilant'
-    ]);
-    expect(secondComp.everythingTogether).toEqual([
-      'Jar-Jar Binks',
-      35,
-      {
-        someObjProp: [
-          true,
-          'hello',
-          null,
-          76,
-          '02:46am',
-          'Hello there!'
-        ]
-      }, [
-        'another',
-        'variable',
-        undefined,
-        'laststring',
-        {
-          complexFunctionCall: 'calm'
-        }
-      ]
-    ]);
-
-    expect(thirdComp.nr).toBe(123);
-    expect(thirdComp.config).toEqual({name: 'test', supportedValues: [1, 2, 3], active: true});
-  });
-
-  it('#should parse outputs properly', () => {
-    const testText = `<dynhooks-singletagtest [numberProp]="123" (componentClickedAlias)="context.maneuvers.modifyParent($event)">`;
-    comp.content = testText;
-    comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-
-    expect(comp['completelyNewProperty']).toBeUndefined();
-    comp.hookIndex[0].componentRef.instance.componentClicked.emit(555);
-    expect(comp['completelyNewProperty']).toBe(555);
-  });
-
-  it('#should replace (currently) invalid context vars with undefined, but fix them when they become available', () => {
-    const testText = `<dynhooks-singletagtest [simpleObject]='{validContextVar: context._jediCouncil.kenobi, invalidContextVar: context.sithTriumvirate.kreia}'>`;
-    comp.content = testText;
-    comp.context = context;
-    comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
-
-    // One of them should be undefined
-    const loadedComp = comp.hookIndex[0].componentRef.instance;
-    expect(loadedComp.simpleObject).toEqual({validContextVar: context._jediCouncil.kenobi, invalidContextVar: undefined});
-
-    // Should automatically fix itself when context var becomes available
-    spyOn(loadedComp, 'ngOnChanges').and.callThrough();
-    comp.context['sithTriumvirate'] = {kreia: 'you are blind'};
-    comp.ngDoCheck();
-    expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
-    expect(Object.keys(loadedComp.ngOnChanges['calls'].mostRecent().args[0]).length).toBe(1);
-    expect(loadedComp.ngOnChanges['calls'].mostRecent().args[0]['simpleObject']).toBeDefined();
-    expect(loadedComp.simpleObject).toEqual({validContextVar: context._jediCouncil.kenobi, invalidContextVar: 'you are blind'});
-  });
-
   it('#should load custom ng-content properly', () => {
+    // Test custom ng-content
+    // NgContentTestParser always returns unique hardcoded ngContent for NgContentTestComponent
+    // instead of the actual childNodes. Check that this hardcoded content is correctly rendered.
+
     const parsersWithNgContentParser = testParsers.concat([NgContentTestParser]);
     ({fixture, comp} = prepareTestingModule(parsersWithNgContentParser, undefined, [NgContentTestComponent]));
-    const testText = `<dynhooks-ngcontenttest><p>original content</p></dynhooks-ngcontenttest>`;
+    const testText = `<dynhooks-ngcontenttest><p>original content</p><dynhooks-singletagtest></dynhooks-ngcontenttest>`;
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.context = {};
+    comp.ngOnChanges({content: true, context: context});
 
+    // Inner component should be removed
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[0].componentRef.instance.constructor.name).toBe('NgContentTestComponent');
+
+    // Make sure that <ng-content> slots of NgContentComponent are correctly filled out
     const componentElement = fixture.nativeElement.children[0];
     const firstContentContainer = componentElement.children[0].children[0].children[1];
     const secondContentContainer = componentElement.children[0].children[1].children[1];
     const thirdContentContainer = componentElement.children[0].children[2].children[1];
 
-    // Test custom ng-content
-    // NgContentTestParser always returns unique hardcoded ngContent for NgContentTestComponent
-    // instead of the actual childNodes. Check that this hardcoded content is correctly rendered.
     expect(firstContentContainer.innerHTML.trim()).toBe('<span>this should be highlighted</span>');                    // Should replace normal child nodes
     expect(secondContentContainer.innerHTML.trim()).toBe('');                                                          // Intentionally skipped this ngContent-index
     expect(thirdContentContainer.innerHTML.trim()).toBe('<h2>This is the title</h2><div>Some random content</div>');   // Should have two elements
@@ -1077,15 +1175,233 @@ describe('DynamicHooksComponent', () => {
     expect(Object.keys(comp.hookIndex).length).toBe(0);
     expect(firstCompRef.destroy['calls'].count()).toBe(1);
     expect(secondCompRef.destroy['calls'].count()).toBe(1);
-
-    setTimeout(() => {
-      console.log(firstCompRef);
-    }, 5000);
-
   });
 
-  // 3. OutletComponent options
+  // 4. Bindings
   // --------------------------------------------------------------------------
+
+  it('#should parse inputs properly', () => {
+    const testText = `
+    <dynhooks-multitagtest [fonts]="['test', 'something', 'here']"></dynhooks-multitagtest>
+    <dynhooks-singletagtest
+      id="someid"
+      [nonInputProperty]="'this should not be set as input'"
+      [stringPropAlias]="'this is just a test string'"
+      [numberProp]="846"
+      [booleanProp]="true"
+      [nullProp]="null"
+      [undefinedProp]='undefined'
+      [simpleObject]='{config: {lightbox: false, size: {width: "200px", height: "100px"}}}'
+      [simpleArray]="[1, 2, 'three', true, undefined, null, [5, 6]]"
+      [variable]='context["$lightS\\aberCollection"][2]'
+      [variableLookalike]='"seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]"'
+      [variableInObject]='{propInObj: context["_jediCouncil"].kiAdiMundi[8]["planet"]}'
+      [variableInArray]='["melon", context["_jediCouncil"].yoda900, 798]'
+      [contextWithoutAnything]="context"
+      [nestedFunctions]="{dangerousStr: 'heres a couple of (dangerous) , chars', functionsProp: [context.maneuvers.combo(context.maneuvers.defend('Leia'), context.maneuvers.attack(context.maneuvers.generateEnemy('Wampa')['name']))]}"
+      [nestedFunctionsInBrackets]="[
+        context.maneuvers[context['maneuvers'].findAppropriateAction(context.maneuvers.getMentalState())]().action,
+        context['maneuvers'][context.maneuvers['findAppropriateAction']('peaceful')]().state
+      ]"
+      [everythingTogether]="[
+        'Jar-Jar Binks',
+        35,
+        {
+          someObjProp: [
+            true,
+            \`hello\`,
+            null,
+            76,
+            '02:46am',
+            context.greeting
+          ]
+        },
+        [
+          'another',
+          'variable',
+          context._jediCouncil.skywalker,
+          'laststring',
+          {
+            complexFunctionCall: context.maneuvers[context['maneuvers'].findAppropriateAction(context.maneuvers.getMentalState())]().state
+          }
+        ]
+      ]"
+    >
+    <p>This should be untouched</p>
+    <dynhooks-inlinetest [nr]="123" [config]="{name: 'test', supportedValues: [1, 2, 3], active: true}"></dynhooks-inlinetest>`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+    const firstComp: MultiTagTestComponent = comp.hookIndex[0].componentRef.instance;
+    const secondComp: SingleTagTestComponent = comp.hookIndex[1].componentRef.instance;
+    const thirdComp: InlineTestComponent = comp.hookIndex[2].componentRef.instance;
+
+    // Make sure components are loaded properly
+    expect(Object.keys(comp.hookIndex).length).toBe(3);
+    expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
+    expect(secondComp.constructor.name).toBe('SingleTagTestComponent');
+    expect(thirdComp.constructor.name).toBe('InlineTestComponent');
+    expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
+
+    // Check all inputs
+    expect(firstComp.fonts).toEqual(['test', 'something', 'here']);
+
+    expect(secondComp['id']).toBe(undefined);
+    expect(secondComp.nonInputProperty).toBe('this is the default value');
+    expect(secondComp.stringProp).toBe('this is just a test string');
+    expect(secondComp.numberProp).toBe(846);
+    expect(secondComp.booleanProp).toBe(true);
+    expect(secondComp.nullProp).toBe(null);
+    expect(secondComp.undefinedProp).toBe(undefined);
+    expect(secondComp.simpleObject).toEqual({
+      config: {
+        lightbox: false,
+        size: {
+          height: '100px',
+          width: '200px'
+        }
+      }
+    });
+    expect(secondComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
+    expect(secondComp.variable).toBe('orange');
+    expect(secondComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
+    expect(secondComp.variableInObject).toEqual({
+      propInObj: 'kashyyyk'
+    });
+    expect(secondComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
+    expect(secondComp.contextWithoutAnything).toEqual(context);
+    expect(secondComp.nestedFunctions).toEqual({
+      dangerousStr: 'heres a couple of (dangerous) , chars',
+      functionsProp: ['Combo: defending Leia! and attacking the evil Wampa!']
+    });
+    expect(secondComp.nestedFunctionsInBrackets).toEqual([
+      'meditating!', 'vigilant'
+    ]);
+    expect(secondComp.everythingTogether).toEqual([
+      'Jar-Jar Binks',
+      35,
+      {
+        someObjProp: [
+          true,
+          'hello',
+          null,
+          76,
+          '02:46am',
+          'Hello there!'
+        ]
+      }, [
+        'another',
+        'variable',
+        undefined,
+        'laststring',
+        {
+          complexFunctionCall: 'calm'
+        }
+      ]
+    ]);
+
+    expect(thirdComp.nr).toBe(123);
+    expect(thirdComp.config).toEqual({name: 'test', supportedValues: [1, 2, 3], active: true});
+  });
+
+  it('#should not accept forbidden inputs', () => {
+    const testText = `<dynhooks-singletagtest [prototype]="false">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {acceptInputsForAnyProperty: true};
+    comp.ngOnChanges({content: true, context: true, options: true});
+
+    const loadedComp: SingleTagTestComponent = comp.hookIndex[0].componentRef.instance;
+    expect(loadedComp['prototype']).not.toBe(false);
+  });
+
+  it('#should parse outputs properly', () => {
+    const testText = `<dynhooks-singletagtest [numberProp]="123" (componentClickedAlias)="context.maneuvers.modifyParent($event)">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+
+    expect(comp['completelyNewProperty']).toBeUndefined();
+    comp.hookIndex[0].componentRef.instance.componentClicked.emit(555);
+    expect(comp['completelyNewProperty']).toBe(555);
+  });
+
+  it('#should catch errors if output string cannot be evaluated', () => {
+    spyOn(console, 'error').and.callThrough();
+    const testText = `<dynhooks-singletagtest (componentClickedAlias)="context.maneuvers.modifyParent($event">`; // Missing final bracket
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+
+    expect(comp['completelyNewProperty']).toBeUndefined();
+    comp.hookIndex[0].componentRef.instance.componentClicked.emit(555);
+    expect(comp['completelyNewProperty']).toBe(undefined);
+    expect(console.error['calls'].count(1));
+  });
+
+  // 5. OutletOptions
+  // --------------------------------------------------------------------------
+
+  it('#should load global options correctly', () => {
+    const differentOptions = {};
+    for (const [key, value] of Object.entries(outletOptionDefaults)) {
+      if (typeof value === 'boolean') { differentOptions[key] = !value; }
+      else if (typeof value === 'number') { differentOptions[key] = value * 2; }
+      else if (typeof value === 'string') { differentOptions[key] = value; }
+      else {  differentOptions[key] = null; }
+    }
+
+    ({fixture, comp} = prepareTestingModule(testParsers, differentOptions));
+
+    comp.content = 'something';
+    comp.ngOnChanges({content: true});
+
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe(differentOptions[key]);
+    }
+  });
+
+  it('#should load local options correctly', () => {
+    const differentOptions = {};
+    for (const [key, value] of Object.entries(outletOptionDefaults)) {
+      if (typeof value === 'boolean') { differentOptions[key] = !value; }
+      else if (typeof value === 'number') { differentOptions[key] = value * 2; }
+      else if (typeof value === 'string') { differentOptions[key] = value; }
+      else {  differentOptions[key] = null; }
+    }
+
+    comp.options = differentOptions as OutletOptions;
+    comp.ngOnChanges({content: true, options: true});
+
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe(differentOptions[key]);
+    }
+  });
+
+  it('#should ignore invalid options', () => {
+    const invalidOptions = {
+      invalidOption: true
+    };
+
+    comp.options = invalidOptions as OutletOptions;
+    comp.ngOnChanges({content: true, options: true});
+
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe(outletOptionDefaults[key]);
+    }
+  });
+
+  it('#should load fine without options', () => {
+    ({fixture, comp} = prepareTestingModule(testParsers, []));
+
+    comp.content = 'something';
+    comp.ngOnChanges({content: true});
+
+    expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe(outletOptionDefaults[key]);
+    }
+  });
 
   it('#should sanitize, if requested', () => {
     const testText = `
@@ -1273,6 +1589,59 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.simpleObject.lightsabers).toBe(newContext.$lightSaberCollection);     // Should have been replaced
   });
 
+  it('#should fallback on comparison by ref if inputs cannot be compared by value', () => {
+    const componentUpdater = comp['componentUpdater'];
+    const testHook = {
+      componentRef: {componentType: {name: 'someComponent'}},
+      bindings: {inputs: {testInput: true}},
+      previousBindings: {inputs: {testInput: {
+        reference: false,
+        stringified: {
+          result: null,
+          depthReachedCount: 0
+        }
+      }}}
+    };
+
+    const changedBindings = componentUpdater.getChangedBindings(testHook as any, 'inputs', true, 5);
+    expect(changedBindings.testInput).not.toBeUndefined();
+  });
+
+  it('#should warn if inputs cannot be compared by value', () => {
+    const componentUpdater = comp['componentUpdater'];
+    spyOn(console, 'warn').and.callThrough();
+
+    let oldResult = {result: null, depthReachedCount: 0};
+    let newResult = {result: null, depthReachedCount: 0};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Could stringify neither new nor old value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
+
+    oldResult = {result: null, depthReachedCount: 0};
+    newResult = {result: true, depthReachedCount: 0};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Could not stringify old value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
+
+    oldResult = {result: true, depthReachedCount: 0};
+    newResult = {result: null, depthReachedCount: 0};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toBe('Could not stringify new value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
+
+    oldResult = {result: true, depthReachedCount: 1};
+    newResult = {result: true, depthReachedCount: 1};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
+
+    oldResult = {result: true, depthReachedCount: 0};
+    newResult = {result: true, depthReachedCount: 1};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
+
+    oldResult = {result: true, depthReachedCount: 1};
+    newResult = {result: true, depthReachedCount: 0};
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    expect(console.warn['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
+  });
+
   it('#should apply the desired compareByValueDepth', () => {
     const firstContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 5 }}}}};
     const secondContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 10 }}}}};
@@ -1389,7 +1758,7 @@ describe('DynamicHooksComponent', () => {
     expect(comp.hookIndex[0].outputSubscriptions['nonOutputEventEmitter']).toBeUndefined();
   });
 
-  // 4. SelectorHookParser bindings
+  // 6. SelectorHookParser bindings
   // --------------------------------------------------------------------------
 
   it('#should track all hooks and their bindings with used context variables', () => {
@@ -1534,7 +1903,7 @@ describe('DynamicHooksComponent', () => {
   });
 
   it('#should change binding references on update if binding has bound context vars and they have changed', () => {
-    const testText = `<dynhooks-singletagtest [simpleArray]="[context.order]" [simpleObject]="{something: context.$lightSaberCollection}">`;
+    const testText = `<dynhooks-singletagtest [simpleArray]="[context.order]" [simpleObject]="{something: context.$lightSaberCollection}" (httpResponseReceived)="content.maneuvers.getMentalState()">`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
@@ -1554,19 +1923,26 @@ describe('DynamicHooksComponent', () => {
     expect(Object.keys(singleTagBindings[0].inputs['simpleObject'].boundContextVariables).length).toBe(1);
     expect(singleTagBindings[0].inputs['simpleObject'].boundContextVariables['context.$lightSaberCollection']).toBe(context.$lightSaberCollection);
 
+    expect(singleTagBindings[0].outputs['httpResponseReceived'].raw).toBe('content.maneuvers.getMentalState()');
+    expect(typeof singleTagBindings[0].outputs['httpResponseReceived'].value).toBe('function');
+    expect(Object.keys(singleTagBindings[0].outputs['httpResponseReceived'].boundContextVariables).length).toBe(0); // Can't be known until the event triggers
+
     spyOn(comp.activeParsers[0], 'getBindings').and.callThrough();
 
     // Change bound property and trigger cd
     let previousArrayRef = singleTagBindings[0].inputs['simpleArray'].value;
     let previousObjectRef = singleTagBindings[0].inputs['simpleObject'].value;
+    let previousOutputRef = singleTagBindings[0].outputs['httpResponseReceived'].value;
     context.order = 77;
     context.$lightSaberCollection = ['cyan', 'viridian', 'turquoise'];
+    context.maneuvers.getMentalState = () => 'happy';
     comp.ngDoCheck();
 
     // Parser should have changed binding reference on reevaluation
     expect(comp.activeParsers[0].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[0].inputs['simpleArray'].value).not.toBe(previousArrayRef);
     expect(singleTagBindings[0].inputs['simpleObject'].value).not.toBe(previousObjectRef);
+    expect(singleTagBindings[0].outputs['httpResponseReceived'].value).toBe(previousOutputRef); // Output wrapper func refs should never change
 
     // Test identical by value:
     // If object, binding reference should change even if new context prop is identical by value, as the reference is still different.
@@ -1581,8 +1957,143 @@ describe('DynamicHooksComponent', () => {
     expect(singleTagBindings[0].inputs['simpleObject'].value).not.toBe(previousObjectRef);
   });
 
-  // 5. SelectorHookParser options
+  it('#should replace (currently) invalid context vars with undefined, but fix them when they become available', () => {
+    const testText = `<dynhooks-singletagtest [simpleObject]='{validContextVar: context._jediCouncil.kenobi, invalidContextVar: context.sithTriumvirate.kreia}'>`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {updateOnPushOnly: false};
+    comp.ngOnChanges({content: true, context: true, options: true});
+
+    // One of them should be undefined
+    const loadedComp = comp.hookIndex[0].componentRef.instance;
+    expect(loadedComp.simpleObject).toEqual({validContextVar: context._jediCouncil.kenobi, invalidContextVar: undefined});
+
+    // Should automatically fix itself when context var becomes available
+    spyOn(loadedComp, 'ngOnChanges').and.callThrough();
+    comp.context['sithTriumvirate'] = {kreia: 'you are blind'};
+    comp.ngDoCheck();
+    expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
+    expect(Object.keys(loadedComp.ngOnChanges['calls'].mostRecent().args[0]).length).toBe(1);
+    expect(loadedComp.ngOnChanges['calls'].mostRecent().args[0]['simpleObject']).toBeDefined();
+    expect(loadedComp.simpleObject).toEqual({validContextVar: context._jediCouncil.kenobi, invalidContextVar: 'you are blind'});
+  });
+
+  // 7. SelectorHookParserConfig
   // --------------------------------------------------------------------------
+
+  it('#should throw errors on invalid parser configs', () => {
+    // In general, should not include parsers with invalid configs
+    spyOn(console, 'error').and.callThrough();
+    comp.parsers = [{
+      component: SingleTagTestComponent,
+      selector: true
+    } as any];
+    comp.ngOnChanges({content: true, context: true});
+
+    expect(comp.activeParsers.length).toBe(0);
+    expect(console.error['calls'].count()).toBe(1);
+
+    // Get instance of SelectorHookParserConfigResolver for faster, more detailed tests
+    const configResolver = comp['parserEntryResolver']['parserResolver'];
+
+    // No config
+    let config = null;
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('Missing the required "component" property for the SelectorHookParserConfig. Must be either the component class or a LazyLoadComponentConfig.'));
+
+    // Lazy-loading config without selector
+    config = {
+      component: {importPromise: () => new Promise(() => {}), importName: 'someComponent'}
+    };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error(`When using lazy-loaded dynamic components, you have to specify the "selector" property in the parser config (that will be used to find it in the text), as the real selector can't be known before the component is loaded.`));
+
+    // Wrong component type
+    config = { component: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The "component" property in the SelectorHookParserConfig must either contain the component class or a LazyLoadComponentConfig.'));
+
+    // Wrong name type
+    config = { component: SingleTagTestComponent, name: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "name" property in the SelectorHookParserConfig must be of type string, was boolean'));
+
+    // Wrong selector type
+    config = { component: SingleTagTestComponent, selector: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "selector" property in the SelectorHookParserConfig must be of type string, was boolean'));
+
+    // Wrong selector type
+    config = { component: SingleTagTestComponent, enclosing: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "enclosing" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
+    // Wrong backet style type
+    config = { component: SingleTagTestComponent, bracketStyle: {brackets: '<>'} };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "bracketStyle" property in the SelectorHookParserConfig must have the form {opening: string, closing: string}'));
+
+    // Wrong unescapeStrings type
+    config = { component: SingleTagTestComponent, unescapeStrings: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "unescapeStrings" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
+    // Wrong parseInputs type
+    config = { component: SingleTagTestComponent, parseInputs: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "parseInputs" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
+    // Wrong inputsBlacklist type
+    config = { component: SingleTagTestComponent, inputsBlacklist: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "inputsBlacklist" property in the SelectorHookParserConfig must be an array of strings.'));
+
+    // Wrong inputsBlacklist entry type
+    config = { component: SingleTagTestComponent, inputsBlacklist: [true] };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('All entries of the submitted "inputsBlacklist" property in the SelectorHookParserConfig must be of type string, boolean found.'));
+
+    // Wrong inputsWhitelist type
+    config = { component: SingleTagTestComponent, inputsWhitelist: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "inputsWhitelist" property in the SelectorHookParserConfig must be an array of strings.'));
+
+    // Wrong inputsWhitelist entry type
+    config = { component: SingleTagTestComponent, inputsWhitelist: [true] };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('All entries of the submitted "inputsWhitelist" property in the SelectorHookParserConfig must be of type string, boolean found.'));
+
+    // Wrong outputsBlacklist type
+    config = { component: SingleTagTestComponent, outputsBlacklist: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "outputsBlacklist" property in the SelectorHookParserConfig must be an array of strings.'));
+
+    // Wrong outputsBlacklist entry type
+    config = { component: SingleTagTestComponent, outputsBlacklist: [true] };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('All entries of the submitted "outputsBlacklist" property in the SelectorHookParserConfig must be of type string, boolean found.'));
+
+    // Wrong outputsWhitelist type
+    config = { component: SingleTagTestComponent, outputsWhitelist: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "outputsWhitelist" property in the SelectorHookParserConfig must be an array of strings.'));
+
+    // Wrong outputsWhitelist entry type
+    config = { component: SingleTagTestComponent, outputsWhitelist: [true] };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('All entries of the submitted "outputsWhitelist" property in the SelectorHookParserConfig must be of type string, boolean found.'));
+
+    // Wrong allowContextInBindings entry type
+    config = { component: SingleTagTestComponent, allowContextInBindings: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "allowContextInBindings" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
+    // Wrong allowContextFunctionCalls entry type
+    config = { component: SingleTagTestComponent, allowContextFunctionCalls: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "allowContextFunctionCalls" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
+  });
 
   it('#should recognize custom selectors', () => {
     ({fixture, comp} = prepareTestingModule([{

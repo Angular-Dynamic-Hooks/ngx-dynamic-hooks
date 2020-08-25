@@ -129,7 +129,7 @@ export class ComponentCreator {
   createContentSlotElements(placeholderElement: Element, hook: Hook, token: string): void {
     let content;
 
-    // If content property is defined, use the defits content slots
+    // If content property is defined, use the submitted content slots
     if (hook.data.hasOwnProperty('content') && Array.isArray(hook.data.content)) {
       content = hook.data.content;
     // Otherwise just wrap existing content into single content slot
@@ -138,8 +138,8 @@ export class ComponentCreator {
     }
 
     // Empty child nodes
-    // Note: Not sure why, but renderer.removeChild() does not work here. Fallback on native method.
-    placeholderElement.childNodes.forEach(childNode => placeholderElement.removeChild(childNode));
+    // Note: Not sure why, but renderer.removeChild() and placeholderElement.removeChild() do not reliably work here. Fallback on native method.
+    placeholderElement.innerHTML = '';
 
     // Insert new ones
     let slotIndex = 0;

@@ -85,7 +85,7 @@ export class SelectorHookParserConfigResolver {
     if (userParserConfig.hasOwnProperty('inputsBlacklist')) {
       if (!Array.isArray(userParserConfig.inputsBlacklist)) { throw Error('The submitted "inputsBlacklist" property in the SelectorHookParserConfig must be an array of strings.'); }
       for (const entry of userParserConfig.inputsBlacklist) {
-        if (typeof entry !== 'string') { throw Error('All entries of the submitted "inputsBlacklist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + 'found.'); }
+        if (typeof entry !== 'string') { throw Error('All entries of the submitted "inputsBlacklist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + ' found.'); }
       }
       parserConfig.inputsBlacklist = userParserConfig.inputsBlacklist;
     }
@@ -94,7 +94,7 @@ export class SelectorHookParserConfigResolver {
     if (userParserConfig.hasOwnProperty('inputsWhitelist')) {
       if (!Array.isArray(userParserConfig.inputsWhitelist)) { throw Error('The submitted "inputsWhitelist" property in the SelectorHookParserConfig must be an array of strings.'); }
       for (const entry of userParserConfig.inputsWhitelist) {
-        if (typeof entry !== 'string') { throw Error('All entries of the submitted "inputsWhitelist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + 'found.'); }
+        if (typeof entry !== 'string') { throw Error('All entries of the submitted "inputsWhitelist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + ' found.'); }
       }
       parserConfig.inputsWhitelist = userParserConfig.inputsWhitelist;
     }
@@ -103,7 +103,7 @@ export class SelectorHookParserConfigResolver {
     if (userParserConfig.hasOwnProperty('outputsBlacklist')) {
       if (!Array.isArray(userParserConfig.outputsBlacklist)) { throw Error('The submitted "outputsBlacklist" property in the SelectorHookParserConfig must be an array of strings.'); }
       for (const entry of userParserConfig.outputsBlacklist) {
-        if (typeof entry !== 'string') { throw Error('All entries of the submitted "outputsBlacklist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + 'found.'); }
+        if (typeof entry !== 'string') { throw Error('All entries of the submitted "outputsBlacklist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + ' found.'); }
       }
       parserConfig.outputsBlacklist = userParserConfig.outputsBlacklist;
     }
@@ -112,7 +112,7 @@ export class SelectorHookParserConfigResolver {
     if (userParserConfig.hasOwnProperty('outputsWhitelist')) {
       if (!Array.isArray(userParserConfig.outputsWhitelist)) { throw Error('The submitted "outputsWhitelist" property in the SelectorHookParserConfig must be an array of strings.'); }
       for (const entry of userParserConfig.outputsWhitelist) {
-        if (typeof entry !== 'string') { throw Error('All entries of the submitted "outputsWhitelist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + 'found.'); }
+        if (typeof entry !== 'string') { throw Error('All entries of the submitted "outputsWhitelist" property in the SelectorHookParserConfig must be of type string, ' + typeof entry + ' found.'); }
       }
       parserConfig.outputsWhitelist = userParserConfig.outputsWhitelist;
     }

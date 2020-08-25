@@ -7,7 +7,6 @@ import { matchAll } from '../polyfills/matchAll';
  */
 @Injectable()
 export class HookFinder {
-  testVar = 'hookfinder active!';
 
   /**
    * Finds all hooks that are non-enclosing in a string of text, e.g. <hook>
@@ -90,7 +89,7 @@ export class HookFinder {
       // Any subsequent tag is only allowed to start after previous tag has ended
       if (index > 0 && tag.startIndex < allTags[index - 1].endIndex) {
         if (isDevMode()) {
-          console.warn('Syntax error - New tag "' + tag.value + '" started at position ' + tag.starIndex + ' before previous tag "' + allTags[index - 1].value + '" ended at position ' + allTags[index - 1].endIndex + '. Ignoring.');
+          console.warn('Syntax error - New tag "' + tag.value + '" started at position ' + tag.startIndex + ' before previous tag "' + allTags[index - 1].value + '" ended at position ' + allTags[index - 1].endIndex + '. Ignoring.');
         }
         continue;
       }

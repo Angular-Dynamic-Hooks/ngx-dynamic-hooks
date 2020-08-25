@@ -28,7 +28,10 @@ export class ParserEntryResolver {
     // Load all requested parsers
     const parsers: Array<HookParser> = [];
     for (const parser of parserEntries) {
-      parsers.push(this.resolveEntry(parser));
+      const resolvedParser = this.resolveEntry(parser);
+      if (resolvedParser) {
+        parsers.push(resolvedParser);
+      }
     }
 
     // Check parser functions
