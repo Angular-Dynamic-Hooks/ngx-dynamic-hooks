@@ -535,8 +535,8 @@ export class DynamicRouterLinkParser implements HookParser {
 
     constructor(private hookFinder: HookFinder) {
         // Lets assemble a regex that finds the opening <a>-tags for internal links
-        const domainName = 'mysite\\.com';  // Assume this is our website
-        const internalUrl = '(?:(?:https:)?\\/\\/www\\.' + domainName + '|(?!(?:https:)?\\/\\/))([^\\"]*?)';
+        const domainName = this.escapeRegExp(window.location.hostname); // <-- This is our website name
+        const internalUrl = '(?:(?:https:)?\\/\\/(?:www\\.)?' + domainName + '|(?!(?:https:)?\\/\\/))([^\\"]*?)';
         const hrefAttr = '\\s+href\=\\"' + internalUrl + '"';
         const anyOtherAttr = '\\s+[a-zA-Z]+\\=\\"[^\\"]*?\\"';
         const linkOpeningTag = '\\<a(?:' + anyOtherAttr + ')*?' + hrefAttr + '(?:' + anyOtherAttr + ')*?\\>';
@@ -587,6 +587,17 @@ export class DynamicRouterLinkParser implements HookParser {
     }
 
     /**
+     * A helper function that safely escapes the special regex chars of any string so it
+     * can be used literally in a Regex.
+     * Approach by coolaj86 & Darren Cook @ https://stackoverflow.com/a/6969486/3099523
+     *
+     * @param string - The string to escape
+     */
+    private escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    /**
      * A helper function that transforms a query string into a QueryParams object
      * Approach by Wolfgang Kuehn @ https://stackoverflow.com/a/8649003/3099523
      *
@@ -605,9 +616,7 @@ export class DynamicRouterLinkParser implements HookParser {
 
 Just register the parser with the library as in other examples and that's it! All `<a>`-elements that point to internal urls will now automatically replaced by `[DynamicRouterLinkComponent]`s.
 
-Have a look at the full, working example in this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed). 
-
-**Note:** If you copy this example for your own apps, make sure to adjust the `domainName`-regex accordingly.
+Have a look at the full, working example in this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed).
 
 ## 8. Trivia
 
