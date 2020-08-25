@@ -2,7 +2,7 @@
 
 [![Travis CI](https://img.shields.io/travis/com/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://travis-ci.com/github/MTobisch/ngx-dynamic-hooks)
 [![Coverage](https://img.shields.io/codecov/c/gh/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/MTobisch/ngx-dynamic-hooks)
-[![Licence](https://img.shields.io/github/license/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
+[![Licence](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=orange&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
 [![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
 
 Automatically insert live Angular components into a dynamic string of content (based on their selector or **any pattern of your choice**) and render the result in the DOM.
