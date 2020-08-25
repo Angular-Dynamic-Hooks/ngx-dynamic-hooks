@@ -581,7 +581,7 @@ export class DynamicRouterLinkParser implements HookParser {
             inputs: {
                 link: relativeLink,
                 queryParams: queryParams,
-                fragment: anchorFragment
+                anchorFragment: anchorFragment
             }
         };
     }
