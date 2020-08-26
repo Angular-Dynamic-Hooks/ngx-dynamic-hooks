@@ -53,12 +53,12 @@ yarn add ngx-dynamic-hooks
 ## 2. Compatibility
 | Angular | Library | JiT | AoT | Ivy | NPM |
 | --- | --- | --- | --- | --- | --- |
-| 6 - 10  | 1.x.x | yes | yes | yes | `ngx-dynamic-component-hooks@^1.0.0` |
+| 6 - 10  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1.0.0` |
 
 The library is compatible with both the older template engine (view engine) as well as Ivy. As it does not rely on a runtime compiler, it also works in both JiT- and AoT-environments.
 
 ## 3. What it does
-In Angular, components are loaded when their selector appears in a template. But what if you wanted to load components not just in fixed templates, but in dynamically loaded content as well - such as in blog posts, markdown files or even user comments from a database?
+In Angular, components are loaded when their selector appears in a template. But what if you wanted to load components not just in fixed templates, but in dynamic content as well - such as in blog posts from a database, markdown files or even just string variables?
 
 The `[innerHTML]`-directive provided by Angular, which is typically used to render dynamic HTML content, might be the first solution to come to mind. However, not least due to security concerns, it isn't parsed for Angular template syntax, so it won't load Angular components.
 
