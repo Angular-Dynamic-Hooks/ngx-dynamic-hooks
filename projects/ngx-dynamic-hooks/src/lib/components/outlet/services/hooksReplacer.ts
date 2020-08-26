@@ -62,7 +62,7 @@ export class HooksReplacer {
    */
   replaceHooksWithNodes(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions): {content: string, hookIndex: HookIndex} {
     const hookIndex: HookIndex = {};
-    let hookCount = 0;
+    let hookCount = 1;
 
     // Collect all parser results (before changing content), sort by startIndex
     let parserResults: Array<ParserResult> = [];

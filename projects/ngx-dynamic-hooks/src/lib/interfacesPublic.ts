@@ -160,3 +160,13 @@ export interface DynamicContentChild {
     contentChildren: Array<DynamicContentChild>;
     hookValue: HookValue;
 }
+
+// Other
+// ---------------------------------
+
+export interface LoadedComponent {
+    hookId: number;
+    hookValue: HookValue;
+    hookParser: HookParser;
+    componentRef: ComponentRef<any>;
+}

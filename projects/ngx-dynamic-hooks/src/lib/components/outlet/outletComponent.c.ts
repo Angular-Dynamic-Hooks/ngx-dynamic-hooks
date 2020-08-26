@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, Inject, DoCheck, AfterViewChecked, Output, EventEmitter, Optional } from '@angular/core';
 
-import { HookIndex } from '../../interfaces';
-import { HookParser } from '../../interfacesPublic';
+import { HookIndex, Hook } from '../../interfaces';
+import { HookParser, LoadedComponent } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './options/options';
 import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../../globalSettings';
 import { HooksReplacer } from './services/hooksReplacer';
@@ -44,7 +44,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   @Input() globalParsersWhitelist: Array<string>;
   @Input() parsers: Array<HookParserEntry>;
   @Input() options: OutletOptions;
-  @Output() componentsLoaded: EventEmitter<boolean> = new EventEmitter();
+  @Output() componentsLoaded: EventEmitter<LoadedComponent[]> = new EventEmitter();
   hookIndex: HookIndex = {};
   activeOptions: OutletOptions = outletOptionDefaults;
   activeParsers: Array<HookParser> = [];
@@ -197,7 +197,17 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     .pipe(first())
     .subscribe((allComponentsLoaded: boolean) => {
       this.initialized = true;
-      this.componentsLoaded.emit(true);
+
+      // Return all loaded components
+      const loadedComponents: LoadedComponent[] = Object.values(this.hookIndex).map((hook: Hook) => {
+        return {
+          hookId: hook.id,
+          hookValue: hook.value,
+          hookParser: hook.parser,
+          componentRef: hook.componentRef
+        };
+      });
+      this.componentsLoaded.emit(loadedComponents);
     });
   }
 

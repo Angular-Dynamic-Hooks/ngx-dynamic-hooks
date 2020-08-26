@@ -2,8 +2,8 @@
 
 [![Travis CI](https://img.shields.io/travis/com/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://travis-ci.com/github/MTobisch/ngx-dynamic-hooks)
 [![Coverage](https://img.shields.io/codecov/c/gh/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/MTobisch/ngx-dynamic-hooks)
-[![Licence](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=orange&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
-[![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
+[![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?color=orange&style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
+[![License](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
 
 Automatically insert live Angular components into a dynamic string of content (based on their selector or **any pattern of your choice**) and render the result in the DOM.
 
@@ -58,11 +58,11 @@ yarn add ngx-dynamic-hooks
 The library is compatible with both the older template engine (view engine) as well as Ivy. As it does not rely on a runtime compiler, it also works in both JiT- and AoT-environments.
 
 ## 3. What it does
-In Angular, components are loaded when their selector appears in a template. But what if you wanted to load components not just in fixed templates, but in dynamic content as well - such as in blog posts from a database, markdown files or even just string variables?
+In Angular, components are loaded when their selector appears in a template. But what if you wanted to load components not just in fixed templates, but in dynamic content as well - such as in text from a database, markdown files or even just string variables?
 
 The `[innerHTML]`-directive provided by Angular, which is typically used to render dynamic HTML content, might be the first solution to come to mind. However, not least due to security concerns, it isn't parsed for Angular template syntax, so it won't load Angular components.
 
-The Dynamic Hooks library provides you with an outlet component that acts as an enhanced version of `[innerHTML]` of sorts, allowing you to dynamically load components into a string of content in a controlled and secure manner by using so-called **hooks**.
+The Dynamic Hooks library provides you with an outlet-component that acts as an enhanced version of `[innerHTML]` of sorts, allowing you to dynamically load components into a string of content in a controlled and secure manner by using so-called **hooks**.
 
 ![How hooks work](https://i.imgur.com/BRnmD2d.png)
 
@@ -76,7 +76,7 @@ In many cases, you might simply want to use the existing component selectors as 
 
 Keep in mind, though, that hooks can be anything - not just component selectors! If you want, you can create custom hook parsers that look for any text pattern of your choice to be replaced by an Angular component! (For examples, [see below](#7-writing-your-own-hookparser))
 
-The dynamically-loaded components are fully functional and seamlessly integrate into the rest of the app: @Inputs(), @Outputs(), content projection / transcluded content, change detection, dependency Injection and lifecycle methods all work normally. If you are using the Ivy templating engine, you can even lazy-load components right when they are needed. For more details about all of these topics, see the following sections.
+The dynamically-loaded components are fully-functional and created with native Angular methods. They seamlessly integrate into the rest of the app: @Inputs(), @Outputs(), content projection / transcluded content, change detection, dependency Injection and lifecycle methods all work normally. If you are using the Ivy templating engine, you can even lazy-load components right when they are needed. For more details about all of these topics, see the following sections.
 
 >**Note:** This library does not parse the content string as an actual Angular template. It merely looks for all registered hooks and replaces them with their corresponding Angular components. This means that special Angular template syntax will **not** work. On the flipside, this grants a great deal more flexbility and security than just parsing a template, such as allowing components to be loaded by any text pattern, support for both JiT- and AoT-modes, granular control over which components are allowed, sanitization etc.
 
@@ -184,7 +184,7 @@ As with normal Angular @Output() bindings, the special `$event`-keyword can opti
 A function directly assigned to the context object will have `this` pointing to the context object itself when called, as per standard JavaScript behavior. This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
 
 * Assign the parent of the function to the context object (instead of the function itself) and call via `context.parent.func()`
-* If you don't want to expose the parent, assign a bound function to the context object like `const contextObj = {func: this.func.bind(this)}`.
+* If you don't want to expose the parent, assign a [bound function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) to the context object like `const contextObj = {func: this.func.bind(this)}`.
 
 ### 5.4 Content projection:
 Hooks can be nested without limitations. The loaded components will correctly be rendered in each others `<ng-content>`-slots. When using selector hooks, it will look and work identical as in normal Angular templates:
@@ -269,7 +269,18 @@ There is also an output you may subscribe to:
 
 Output name | Type | Description
 --- | --- | ---
-`componentsLoaded` | `Observable<boolean>` | Will trigger once all components have loaded (including [lazy-loaded ones](#65-lazy-loading-components))
+`componentsLoaded` | `Observable<LoadedComponent[]>` | Will trigger once all components have loaded (including [lazy-loaded ones](#65-lazy-loading-components))
+
+Each `LoadedComponent` from the output represents a dynamically-created component and contains some information you may find interesting:
+
+```ts
+interface LoadedComponent {
+    hookId: number;                     // The unique hook id
+    hookValue: HookValue;               // The hook that was replaced by this component
+    hookParser: HookParser;             // The associated parser
+    componentRef: ComponentRef<any>;    // The created componentRef
+}
+```
 
 ### 6.3 `HookParserEntry`:
 Hooks can only be found if they have a corresponding `HookParser`. You can register `HookParser`s in the [global settings](#61-global-settings) or [on each OutletComponent](#64-outletoptions) individually. Both expect a `HookParserEntry`-array, which is just a fancy alias for several possible values. A `HookParserEntry` can be either:
@@ -352,7 +363,7 @@ That's all there is to it! `LazyComponent` will now automatically be lazy-loaded
 
 ![Custom hook](https://i.imgur.com/9J9t5ze.png)
 
-In all of the examples above, we have used the standard `SelectorHookParser`, which comes with this library and is easy to use if all you want is to load components by their selectors. However, by creating custom parsers, any text pattern you want can be replaced by an Angular component.
+In all of the examples above, we have used the standard `SelectorHookParser`, which comes with this library and is easy to use if all you need is to load components by their selectors. However, by creating custom parsers, any text pattern you want can be replaced by an Angular component.
 
 ### 7.1 What makes a parser:
 
@@ -675,7 +686,7 @@ This library was one of the inspirations for Ngx-Dynamic-Hooks and is unfortunat
 Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-dynamic's `<dynamic-html>`-component and takes it further.
 
 #### [Ngx-Dynamic-Template](https://github.com/apoterenko/ngx-dynamic-template), etc
-There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or other template syntax is blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
+There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
 
 ## 9. Troubleshooting
 **I'm getting the error "`<ngx-dynamic-hooks>` is not a known element" in my templates**
