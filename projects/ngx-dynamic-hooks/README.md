@@ -76,7 +76,7 @@ In many cases, you might simply want to use the existing component selectors as 
 
 Keep in mind, though, that hooks can be anything - not just component selectors! If you want, you can create custom hook parsers that look for any text pattern of your choice to be replaced by an Angular component! (For examples, [see below](#7-writing-your-own-hookparser))
 
-The dynamically-loaded components are fully-functional and created with native Angular methods. They seamlessly integrate into the rest of the app: @Inputs(), @Outputs(), content projection / transcluded content, change detection, dependency Injection and lifecycle methods all work normally. If you are using the Ivy templating engine, you can even lazy-load components right when they are needed. For more details about all of these topics, see the following sections.
+The dynamically-loaded components are fully-functional and created with native Angular methods. They seamlessly integrate into the rest of the app: @Inputs(), @Outputs(), content projection / transcluded content, change detection, dependency injection and lifecycle methods all work normally. If you are using the Ivy templating engine, you can even lazy-load components right when they are needed. For more details about all of these topics, see the following sections.
 
 >**Note:** This library does not parse the content string as an actual Angular template. It merely looks for all registered hooks and replaces them with their corresponding Angular components. This means that special Angular template syntax will **not** work. On the flipside, this grants a great deal more flexbility and security than just parsing a template, such as allowing components to be loaded by any text pattern, support for both JiT- and AoT-modes, granular control over which components are allowed, sanitization etc.
 
@@ -151,7 +151,7 @@ And then use the `context`-keyword to use its data in selector hooks:
 
 The context object is typically a simple object literal that provides some values of interest from the parent component, but it can technically be anything - even the parent component itself. You can also use alternative notations to access its properties like `context['name']`, call functions like `context.someFunc()` and even use nested expressions like `context[context.someProp].someFunc(context.someParam)`.
 
-**Note:** The context object is only piece of live code that can accessed from within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure. Simply put whatever you want to make available to the author of the text into the context object.
+**Note:** The context object is the only piece of live code that can accessed from within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure. Simply put whatever you want to make available to the author of the text into the context object.
 
 ![Communication flow](https://i.imgur.com/K63SQGU.jpg)
 
