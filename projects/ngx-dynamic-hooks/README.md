@@ -283,7 +283,7 @@ interface LoadedComponent {
 ```
 
 ### 6.3 `HookParserEntry`:
-Hooks can only be found if they have a corresponding `HookParser`. You can register `HookParser`s in the [global settings](#61-global-settings) or [on each OutletComponent](#64-outletoptions) individually. Both expect a `HookParserEntry`-array, which is just a fancy alias for several possible values. A `HookParserEntry` can be either:
+Hooks can only be found if they have a corresponding `HookParser`. You can register `HookParser`s in the [global settings](#61-global-settings) or [on each OutletComponent](#62-outlet-component-bindings) individually. Both expect a `HookParserEntry`-array, which is just a fancy alias for several possible values. A `HookParserEntry` can be either:
 
 1. A custom `HookParser` instance.
 2. A custom `HookParser` class. If this class is registered as a provider in the root injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
