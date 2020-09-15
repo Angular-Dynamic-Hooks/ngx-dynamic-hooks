@@ -53,7 +53,7 @@ export class ComponentCreator {
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       const placeholderElement = hookPlaceholders[hookId];
 
-      // Start with of(true) to catch errors from loadComponentClass in the obs stream as well
+      // Start with of(true) to catch errors from loadComponentClass in the observable stream as well
       componentLoadSubjects.push(of(true)
         // Load component class first (might be lazy-loaded)
         .pipe(mergeMap(() => this.loadComponentClass(hook.data.component)))
@@ -120,7 +120,11 @@ export class ComponentCreator {
   }
 
   /**
-   * Creates a content slot dom element for each ng-content outlet of the dynamically loaded component
+   * Creates a content slot dom element for each ng-content outlet of the dynamically loaded component.
+   *
+   * This is to create a direct dom-representation of each entry in the projectableNodes array returned
+   * by parser.loadComponent, so it can be cleanly resolved back into projectableNodes later on. Without these
+   * content slots for seperation, you wouldn't know which child nodes go into which ng-content slot.
    *
    * @param placeholderElement - The dom element to create the content slots in
    * @param hook - The hook of the component
@@ -281,7 +285,11 @@ export class ComponentCreator {
 
     // Activate change detection
     this.appRef.attachView(dynamicComponentRef.hostView);
-    dynamicComponentRef.changeDetectorRef.detectChanges();  // Initial cd call, otherwise ExpressionHasChangedError in Angular<8
+
+    // Trigger an Initial cd call to:
+    // - have Angular automatically invoke ngOnInit(), which happens the first time the change detector runs for a component
+    // - prevent ExpressionHasChangedErrors in Angular<8
+    dynamicComponentRef.changeDetectorRef.detectChanges();
   }
 
   // After component creation
@@ -319,11 +327,12 @@ export class ComponentCreator {
           }
         }
 
-        const treeLevelForChildren = componentFound ? treeLevel[treeLevel.length - 1].contentChildren : treeLevel;
-        this.findContentChildren(childNode, treeLevelForChildren, hookIndex, token);
+        // The hierarchical structure of the result is solely built on found components. It DOES NOT reflect the actual HTML structure.
+        // E.g. two components returned on the same array level in the result may be on completely different nesting levels in the HTML,
+        // as the only reason to 'go a level deeper' in the result is when a component was found.
+        const treeLevelForNested = componentFound ? treeLevel[treeLevel.length - 1].contentChildren : treeLevel;
+        this.findContentChildren(childNode, treeLevelForNested, hookIndex, token);
       });
     }
   }
-
- 
 }

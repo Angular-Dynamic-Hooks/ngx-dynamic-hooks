@@ -49,7 +49,7 @@ export class HooksReplacer {
   // -----------------------------------------------------------------------------------------------------------------------
 
   /**
-   * Lets all registered parsers anaylyse the content to find all hooks within. Then replaces those hooks with component placeholder elements
+   * Lets all registered parsers anaylyze the content to find all hooks within. Then replaces those hooks with component placeholder elements
    * (that will remain empty for now) and creates the hookIndex.
    *
    * It optionally also sanitizes the content and fixes paragraph artifacts.

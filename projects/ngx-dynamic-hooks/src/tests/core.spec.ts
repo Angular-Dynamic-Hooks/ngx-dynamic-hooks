@@ -959,6 +959,36 @@ describe('DynamicHooksComponent', () => {
     expect(thirdContentContainer.innerHTML.trim()).toBe('<h2>This is the title</h2><div>Some random content</div>');   // Should have two elements
   });
 
+  it('#should trigger ngOnInit() after component creation', () => {
+    const testText = `Just some component: <dynhooks-singletagtest>`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+
+    const loadedComp = comp.hookIndex[1].componentRef.instance;
+    expect(loadedComp.ngOnInitTriggered).toBe(true);
+  });
+
+  it('#should trigger ngOnChanges() after component creation and any time an input changes', () => {
+    const testText = `Just some component: <dynhooks-singletagtest [numberProp]="context.order">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {updateOnPushOnly: false};
+    comp.ngOnChanges({content: true, context: true, options: true});
+
+    const loadedComp = comp.hookIndex[1].componentRef.instance;
+    expect(loadedComp.ngOnChangesTriggered).toBe(true);
+    expect(loadedComp.numberProp).toBe(66);
+
+    // Change bound input and expect ngOnChanges to trigger
+    spyOn(loadedComp, 'ngOnChanges').and.callThrough();
+    context.order = 77;
+    comp.ngDoCheck();
+
+    expect(loadedComp.numberProp).toBe(77);
+    expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
+  });
+
   it('#should correctly trigger onDynamicMount() on init', () => {
     const testText = `
     <dynhooks-multitagtest id="outercomp">
@@ -1761,7 +1791,7 @@ describe('DynamicHooksComponent', () => {
     loadedComp = comp.hookIndex[1].componentRef.instance;
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
-    // Expect ngOnChanges to trigger if changed value is within of reach
+    // Expect ngOnChanges to trigger if changed value is within reach
     comp.context = secondContext;
     comp.ngOnChanges({context: true});
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);

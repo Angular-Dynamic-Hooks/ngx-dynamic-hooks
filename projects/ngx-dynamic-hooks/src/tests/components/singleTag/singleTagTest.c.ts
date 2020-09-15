@@ -29,6 +29,8 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() httpResponseReceived: EventEmitter<number> = new EventEmitter();
+  ngOnInitTriggered: boolean = false;
+  ngOnChangesTriggered: boolean = false;
   mountContext: any;
   mountContentChildren: Array<DynamicContentChild>;
   changesContext: any;
@@ -42,9 +44,11 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   }
 
   ngOnInit () {
+    this.ngOnInitTriggered = true;
   }
 
   ngOnChanges(changes) {
+    this.ngOnChangesTriggered = true;
     // console.log(changes);
   }
 

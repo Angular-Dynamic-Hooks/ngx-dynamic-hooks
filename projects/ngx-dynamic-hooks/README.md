@@ -5,7 +5,7 @@
 [![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?color=orange&style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
 [![License](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
 
-Automatically insert live Angular components into a dynamic string of content (based on their selector or **any pattern of your choice**) and render the result in the DOM.
+Automatically insert live Angular components into dynamic strings (based on their selector or **any pattern of your choice**) and render the result in the DOM.
 
 ## Table of contents
 1. [Installation](#1-installation)
@@ -546,9 +546,9 @@ export class DynamicRouterLinkParser implements HookParser {
 
     constructor(private hookFinder: HookFinder) {
         // Lets assemble a regex that finds the opening <a>-tags for internal links
-        const domainName = this.escapeRegExp(window.location.hostname); // <-- This is our website name
+        const domainName = this.escapeRegExp(window.location.hostname.replace('www.', '')); // <-- This is our website name
         const internalUrl = '(?:(?:https:)?\\/\\/(?:www\\.)?' + domainName + '|(?!(?:https:)?\\/\\/))([^\\"]*?)';
-        const hrefAttr = '\\s+href\=\\"' + internalUrl + '"';
+        const hrefAttr = '\\s+href\=\\"' + internalUrl + '\\"';
         const anyOtherAttr = '\\s+[a-zA-Z]+\\=\\"[^\\"]*?\\"';
         const linkOpeningTag = '\\<a(?:' + anyOtherAttr + ')*?' + hrefAttr + '(?:' + anyOtherAttr + ')*?\\>';
 
