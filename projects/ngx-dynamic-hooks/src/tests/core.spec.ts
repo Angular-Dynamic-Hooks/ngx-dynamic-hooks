@@ -1309,6 +1309,7 @@ describe('DynamicHooksComponent', () => {
     <dynhooks-singletagtest
       id="someid"
       inputWithoutBrackets="{test: 'Hullo!'}"
+      [_weird5Input$Name13]="'Even names like this should be recognized.'"
       [nonInputProperty]="'this should not be set as input'"
       [stringPropAlias]="'this is just a test string'"
       [numberProp]="846"
@@ -1372,6 +1373,7 @@ describe('DynamicHooksComponent', () => {
 
     expect(secondComp['id']).toBe(undefined);
     expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
+    expect(secondComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
     expect(secondComp.nonInputProperty).toBe('this is the default value');
     expect(secondComp.stringProp).toBe('this is just a test string');
     expect(secondComp.numberProp).toBe(846);

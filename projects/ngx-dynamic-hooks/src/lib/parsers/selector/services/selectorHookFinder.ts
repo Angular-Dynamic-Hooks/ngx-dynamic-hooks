@@ -54,7 +54,7 @@ export class SelectorHookFinder {
    */
   private generateOpeningTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): RegExp {
     // Find opening tag of hook lazily
-    // Examples for this regex: https://regex101.com/r/17x3cc/13
+    // Examples for this regex: https://regex101.com/r/17x3cc/17
     // Features: Ignores redundant whitespace & line-breaks, supports n attributes, both normal and []-attribute-name-syntax, both ' and " as attribute-value delimiters
     const openingArrow = this.escapeRegex(bracketStyle.opening);
     const selectorName = this.escapeRegex(selector);
