@@ -223,7 +223,7 @@ describe('HookFinder', () => {
     const content = 'Here is an openingTag and a closingTag. Here is just a closingTag.';
     expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex)).toEqual([{ openingTagStartIndex: 11, openingTagEndIndex: 21, closingTagStartIndex: 28, closingTagEndIndex: 38 }]);
     expect(console.warn['calls'].allArgs()[0])
-      .toContain('Syntax error - Closing tag without preceding opening tag found.');
+      .toContain('Syntax error - Closing tag without preceding opening tag found: "closingTag". Ignoring.');
   });
 
   it('#should skip nested hooks, if not allowed', () => {

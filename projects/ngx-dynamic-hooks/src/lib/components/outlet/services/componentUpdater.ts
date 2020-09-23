@@ -121,7 +121,7 @@ export class ComponentUpdater {
     // Find out which inputs have changed
     const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue, options.compareByValueDepth);
 
-    // Check if inputs exist on component
+    // Check if inputs exists on component
     const existingInputs = {};
     if (options.acceptInputsForAnyProperty) {
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {

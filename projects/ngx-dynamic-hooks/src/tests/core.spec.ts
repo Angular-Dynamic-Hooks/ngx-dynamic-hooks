@@ -1308,6 +1308,7 @@ describe('DynamicHooksComponent', () => {
     <dynhooks-multitagtest [fonts]="['test', 'something', 'here']"></dynhooks-multitagtest>
     <dynhooks-singletagtest
       id="someid"
+      inputWithoutBrackets="{test: 'Hullo!'}"
       [nonInputProperty]="'this should not be set as input'"
       [stringPropAlias]="'this is just a test string'"
       [numberProp]="846"
@@ -1370,6 +1371,7 @@ describe('DynamicHooksComponent', () => {
     expect(firstComp.fonts).toEqual(['test', 'something', 'here']);
 
     expect(secondComp['id']).toBe(undefined);
+    expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
     expect(secondComp.nonInputProperty).toBe('this is the default value');
     expect(secondComp.stringProp).toBe('this is just a test string');
     expect(secondComp.numberProp).toBe(846);

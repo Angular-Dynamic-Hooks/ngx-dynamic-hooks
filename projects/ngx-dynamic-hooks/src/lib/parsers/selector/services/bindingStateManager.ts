@@ -49,11 +49,20 @@ export class BindingStateManager {
    */
   private createInputBindings(openingTag: string, context: any, parserConfig: SelectorHookParserConfig): {[key: string]: RichBindingData} {
     // Read inputs from opening tag
-    const rawInputs = this.getBindingsFromOpeningTag('inputs', openingTag, parserConfig.inputsBlacklist, parserConfig.inputsWhitelist);
+    const rawNoBracketInputs = this.getBindingsFromOpeningTag('noBracketInputs', openingTag, parserConfig.inputsBlacklist, parserConfig.inputsWhitelist);
+    const rawBracketInputs = this.getBindingsFromOpeningTag('bracketInputs', openingTag, parserConfig.inputsBlacklist, parserConfig.inputsWhitelist);
+
+    // NoBracketInputs are to be interpreted as plain strings, so wrap them in quotes
+    for (const [noBracketInputName, noBracketInputValue] of Object.entries(rawNoBracketInputs)) {
+      rawNoBracketInputs[noBracketInputName] = "'" + noBracketInputValue + "'";
+    }
+
+    // Merge both input objects
+    const mergedRawInputs = {...rawNoBracketInputs, ...rawBracketInputs};
 
     // Create bindings object
     const inputBindings: {[key: string]: RichBindingData} = {};
-    for (const [rawInputKey, rawInputValue] of Object.entries(rawInputs)) {
+    for (const [rawInputKey, rawInputValue] of Object.entries(mergedRawInputs)) {
       inputBindings[rawInputKey] = {
         raw: rawInputValue,
         value: rawInputValue,
@@ -220,21 +229,27 @@ export class BindingStateManager {
    * @param blacklist - What bindings to exlude
    * @param whitelist - What bindings to exclusively include
    */
-  private getBindingsFromOpeningTag(type: 'inputs'|'outputs', openingTag: string, blacklist: string[], whitelist: string[]): {[key: string]: any} {
+  private getBindingsFromOpeningTag(type: 'noBracketInputs'|'bracketInputs'|'outputs', openingTag: string, blacklist: string[], whitelist: string[]): {[key: string]: any} {
     const bindings = {};
 
     // Examples: https://regex101.com/r/17x3cc/16
     const attributeValuesOR = '(?:' + regexes.attributeValueDoubleQuotesRegex + '|' + regexes.attributeValueSingleQuotesRegex + ')';
-    const attributeRegex = (type === 'inputs' ? regexes.attributeNameBracketsRegex : regexes.attributeNameRoundBracketsRegex) + '\=' + attributeValuesOR;
+    let attributeNameRegex;
+    switch (type) {
+      case 'noBracketInputs': attributeNameRegex = regexes.attributeNameNoBracketsRegex; break;
+      case 'bracketInputs': attributeNameRegex = regexes.attributeNameBracketsRegex; break;
+      case 'outputs': attributeNameRegex = regexes.attributeNameRoundBracketsRegex; break;
+    }
+    const attributeRegex = attributeNameRegex + '\=' + attributeValuesOR;
     const attributePattern = new RegExp(attributeRegex, 'gims');
     const attributeMatches = matchAll(openingTag, attributePattern);
 
-    // Collect raw inputs
+    // Collect raw bindings
     for (const match of attributeMatches) {
       bindings[match[1]] = match[2] || match[3]; // Could be either of the attribute value capturing groups
     }
 
-    // Filter inputs
+    // Filter bindings
     const filteredBindings = {};
     for (const [bindingName, bindingValue] of Object.entries(bindings)) {
       if (blacklist && blacklist.includes(bindingName)) {

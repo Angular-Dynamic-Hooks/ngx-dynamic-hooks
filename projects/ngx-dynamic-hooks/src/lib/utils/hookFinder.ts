@@ -101,7 +101,7 @@ export class HookFinder {
         // Syntax error: Closing tag without preceding opening tag. Syntax error.
         if (openedTags.length === 0) {
           if (isDevMode()) {
-            console.warn('Syntax error - Closing tag without preceding opening tag found.');
+            console.warn('Syntax error - Closing tag without preceding opening tag found: "' + tag.value + '". Ignoring.');
           }
           continue;
         }

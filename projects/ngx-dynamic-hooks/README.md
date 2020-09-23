@@ -168,9 +168,11 @@ You can pass data of almost any type to @Inputs() in selector hooks, such as:
 | object literals | `[inputName]="{planet: 'Tatooine', population: 200000}"` |
 | context variables (see [previous point](#51-context--dependency-injection)) | `[inputName]="context.someProp"` |
 
-The variables will be safely parsed and the automatically set in the dynamic component. This will also trigger `ngOnChanges()`/`ngOnInit()` normally.
+The inputs are automatically set in the dynamic component and will trigger `ngOnChanges()`/`ngOnInit()` normally.
 
-As with Angular propery bindings, take care to write all variables code-like, as if this was a TS/JS-file (e.g. don't forget put quotes around strings **in addition** to the quotes of the input property binding).
+If using []-brackets, the inputs will be safely parsed into their corresponding variable data type. Because of this, take care to write them code-like, as if this was a TS/JS-file (e.g. don't forget put quotes around strings **in addition** to the quotes of the input property binding).
+
+Alternatively, you may also write inputs without []-brackets as normal HTML-attributes, in which case they won't be parsed at all and will simply be considered strings.
 
 ### 5.3 Outputs:
 You can subscribe to @Output() events from selector hooks with functions from the context object like:

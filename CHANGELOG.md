@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.0] - 2020-09-23
+### Added
+- Inputs can now also be passed to dynamic components without []-brackets as normal HTML attributes, in which case they will be considered strings
+
 ## [1.1.0] - 2020-08-26
 ### Added
 - More tests of baseline functionality
@@ -17,5 +21,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - This was the initial release, so everything was added here, really.
 
 [Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.1.0...HEAD
+[1.2.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/releases/tag/v1.0.0
