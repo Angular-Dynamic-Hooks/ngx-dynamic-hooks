@@ -691,6 +691,12 @@ Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-d
 There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
 
 ## 9. Troubleshooting
+**Some of my elements/attributes are not rendering!**
+
+This might be due to sanitization. This library uses Angular's native DomSanitizer to remove potentially malicious code like `<script>`-tags from the content. To ensure maximum security, the sanitizer is fairly aggressive, however, and will also remove seemingly harmless elements, like `<input>` or attributes like `id`.
+
+You can turn off sanitization at any time through the [`OutletOptions`](#64-outletoptions). Note that you will then have to ensure that the content is safe to render by yourself!
+
 **I'm getting the error "`<ngx-dynamic-hooks>` is not a known element" in my templates**
 
 Some editors like VS Code don't always immediately catch on to the newly available components when a module has been imported. Try restarting the editor to see if that helps (it should compile fine, though). If not, check that you have correctly imported the `DynamicHooksModule` into you main module as shown in the [Quick start](#4-quick-start)-section to make everything available.
