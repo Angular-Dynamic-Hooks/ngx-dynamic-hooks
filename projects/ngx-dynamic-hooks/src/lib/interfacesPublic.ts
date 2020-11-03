@@ -1,4 +1,44 @@
 import { ComponentRef, Injector } from '@angular/core';
+import { OutletOptions } from '../tests/testing-api';
+import { Subscription } from 'rxjs';
+import { DetailedStringifyResult } from './utils/deepComparer';
+
+// Hook interfaces
+// ---------------------------------
+
+/**
+ * A list of Hooks
+ */
+export interface HookIndex {
+    [key: string]: Hook;
+}
+
+/**
+ * The main state object for a single Hook, containing all of its information and data
+ */
+export interface Hook {
+    id: number;
+    parser: HookParser;
+    value: HookValue;
+    data: HookComponentData;
+    componentRef: ComponentRef<any>;
+    bindings: HookBindings;
+    previousBindings: PreviousHookBindings;
+    dirtyInputs: Set<string>;
+    outputSubscriptions: {[key: string]: Subscription};
+}
+
+/**
+ * The previous bindings of a Hook
+ */
+export interface PreviousHookBindings {
+    inputs: {[key: string]: PreviousHookBinding};
+    outputs: {[key: string]: PreviousHookBinding};
+}
+export interface PreviousHookBinding {
+    reference: any;
+    stringified: DetailedStringifyResult;
+}
 
 // Parser
 // --------------------------------------------
@@ -163,6 +203,13 @@ export interface DynamicContentChild {
 
 // Other
 // ---------------------------------
+
+export interface OutletParseResult {
+    element: HTMLElement;
+    hookIndex: HookIndex;
+    resolvedParsers: HookParser[];
+    resolvedOptions: OutletOptions;
+}
 
 export interface LoadedComponent {
     hookId: number;

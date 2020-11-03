@@ -5,7 +5,7 @@
 
 // Public module resources
 export { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../lib/globalSettings';
-export { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, LoadedComponent } from '../lib/interfacesPublic';
+export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
 export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
 export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';

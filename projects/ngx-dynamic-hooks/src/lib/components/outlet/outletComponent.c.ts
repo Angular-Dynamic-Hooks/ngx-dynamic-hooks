@@ -1,15 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, Inject, DoCheck, AfterViewChecked, Output, EventEmitter, Optional } from '@angular/core';
 
-import { HookIndex, Hook } from '../../interfaces';
-import { HookParser, LoadedComponent } from '../../interfacesPublic';
+import { HookIndex, Hook } from '../../interfacesPublic';
+import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './options/options';
-import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../../globalSettings';
-import { HooksReplacer } from './services/hooksReplacer';
-import { ComponentCreator } from './services/componentCreator';
-import { ParserEntryResolver } from './options/parserEntryResolver';
-import { first } from 'rxjs/operators';
+import { OutletService } from './services/outletService';
 import { HookParserEntry } from './options/parserEntry';
-import { OptionsResolver } from './options/optionsResolver';
 import { ComponentUpdater } from './services/componentUpdater';
 
 /**
@@ -56,11 +51,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
 
   constructor(
     private hostElement: ElementRef,
-    @Optional() @Inject(DYNAMICHOOKS_GLOBALSETTINGS) private globalSettings: DynamicHooksGlobalSettings,
-    private parserEntryResolver: ParserEntryResolver,
-    private optionsResolver: OptionsResolver,
-    private hooksReplacer: HooksReplacer,
-    private componentCreator: ComponentCreator,
+    private outletService: OutletService,
     private componentUpdater: ComponentUpdater
   ) {}
 
@@ -84,8 +75,6 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
       changes.hasOwnProperty('options')
     ) {
       this.reset();
-      this.loadOptions();
-      this.loadParsers();
       this.parse(this.content);
       return;
 
@@ -111,23 +100,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
    * Empties the state of this component
    */
   reset(): void {
-    if (this.hookIndex) {
-      // Unsubscribe from hook outputs
-      for (const hook of Object.values(this.hookIndex)) {
-        for (const sub of Object.values(hook.outputSubscriptions)) {
-          if (sub) {
-            sub.unsubscribe();
-          }
-        }
-      }
-
-      // Destroy dynamic components
-      for (const hookIndexEntry of Object.values(this.hookIndex)) {
-        if (hookIndexEntry.componentRef) {
-          hookIndexEntry.componentRef.destroy();
-        }
-      }
-    }
+    this.outletService.destroy(this.hookIndex);
 
     // Reset state
     this.hostElement.nativeElement.innerHTML = '';
@@ -138,64 +111,24 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   }
 
   /**
-   * Loads the relevant outlet options
-   */
-  loadOptions(): void {
-    // If local
-    if (this.options) {
-      this.activeOptions = this.optionsResolver.resolve(this.options);
-    // If global
-    } else if (this.globalSettings && this.globalSettings.hasOwnProperty('globalOptions')) {
-      this.activeOptions = this.optionsResolver.resolve(this.globalSettings.globalOptions);
-    // If none given
-    } else {
-      this.activeOptions = outletOptionDefaults;
-    }
-  }
-
-  /**
-   * Loads the relevant parser configuration
-   */
-  loadParsers(): void {
-    // If local
-    if (this.parsers) {
-      this.activeParsers = this.parserEntryResolver.resolve(this.parsers);
-    // If global
-    } else if (this.globalSettings && this.globalSettings.hasOwnProperty('globalParsers')) {
-      this.activeParsers = this.parserEntryResolver.resolve(this.globalSettings.globalParsers, this.globalParsersBlacklist, this.globalParsersWhitelist);
-    // If none given
-    } else {
-      this.activeParsers = [];
-    }
-  }
-
-  /**
    * The main method of this component to initialize it
    *
    * @param content - The input content to parse
    */
   parse(content: string): void {
-    if (!content || typeof content !== 'string') {
-      return;
-    }
-
-    // Convert input HTML entities?
-    if (this.activeOptions.convertHTMLEntities) {
-      content = this.hooksReplacer.convertHTMLEntities(content);
-    }
-
-    // Replace hooks with component selector elements
-    const result = this.hooksReplacer.replaceHooksWithNodes(content, this.context, this.activeParsers, this.token, this.activeOptions);
-    content = result.content;
-    this.hookIndex = result.hookIndex;
-
-    // Parse HTML
-    this.hostElement.nativeElement.innerHTML = content;
-
-    // Dynamically create components in component selector elements
-    this.componentCreator.init(this.hostElement.nativeElement, this.hookIndex, this.token, this.context, this.activeOptions)
-    .pipe(first())
-    .subscribe((allComponentsLoaded: boolean) => {
+    this.outletService.parse(
+      content,
+      this.context,
+      this.globalParsersBlacklist,
+      this.globalParsersWhitelist,
+      this.parsers,
+      this.options,
+      this.hostElement.nativeElement,
+      this.hookIndex
+    ).subscribe((outletParseResult: OutletParseResult) => {
+      // hostElement and hookIndex are automatically filled
+      this.activeParsers = outletParseResult.resolvedParsers;
+      this.activeOptions = outletParseResult.resolvedOptions;
       this.initialized = true;
 
       // Return all loaded components

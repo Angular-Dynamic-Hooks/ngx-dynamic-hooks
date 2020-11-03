@@ -12,6 +12,7 @@ import { first } from 'rxjs/operators';
 
 // Testing api resources
 import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from './testing-api';
+import { OutletParseResult } from './testing-api';
 import { LoadedComponent } from './testing-api';
 import { OutletComponent } from './testing-api';
 import { OutletOptions, outletOptionDefaults } from './testing-api';
@@ -41,6 +42,7 @@ import { NonServiceTestParser } from './parsers/nonServiceTestParser';
 import { TESTSERVICETOKEN, TestService } from './services/testService';
 import { NgContentTestComponent } from './components/ngContentTest/ngContentTest.c';
 import { LazyTestComponent } from './components/lazyTest/lazyTest.c';
+import { OutletService } from '../lib/components/outlet/services/outletService';
 
 export class MockElementRef {
   nativeElement: {};
@@ -80,6 +82,7 @@ function prepareTestingModule(parsers?, options?, extraComponents: Array<any> = 
     // Main component services
     OptionsResolver,
     ParserEntryResolver,
+    OutletService,
     ComponentCreator,
     ComponentUpdater,
     HooksReplacer,
@@ -130,6 +133,7 @@ function prepareTestingModule(parsers?, options?, extraComponents: Array<any> = 
 
   const fixture = TestBed.createComponent(OutletComponent);
   return {
+    testBed: TestBed,
     fixture: fixture,
     comp: fixture.componentInstance
   };
@@ -142,6 +146,7 @@ function prepareTestingModule(parsers?, options?, extraComponents: Array<any> = 
  * various inputs and expecting the correct results in the end.
  */
 describe('DynamicHooksComponent', () => {
+  let testBed;
   let fixture;
   let comp: OutletComponent;
   let context: any;
@@ -150,7 +155,7 @@ describe('DynamicHooksComponent', () => {
   // ###############################################################################################################################################
 
   beforeEach(() => {
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({testBed, fixture, comp} = prepareTestingModule(testParsers));
 
     context = {
       parent: comp,
@@ -232,7 +237,7 @@ describe('DynamicHooksComponent', () => {
     comp.content = testText;
     comp.ngOnChanges({content: true});
 
-    expect(comp['globalSettings']).toBeNull();
+    expect(comp['outletService']['globalSettings']).toBeNull();
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default
@@ -527,7 +532,7 @@ describe('DynamicHooksComponent', () => {
 
   it('#should ensure the component field of a parser is correct', () => {
     // Load with nonsensical componentConfig
-    expect(() => comp['componentCreator'].loadComponentClass(true as any))
+    expect(() => comp['outletService']['componentCreator'].loadComponentClass(true as any))
       .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig'));
   });
 
@@ -591,7 +596,7 @@ describe('DynamicHooksComponent', () => {
   });
 
   it('#should validate the HookPositions of parsers', () => {
-    const hooksReplacer = comp['hooksReplacer'];
+    const hooksReplacer = comp['outletService']['hooksReplacer'];
     spyOn(console, 'warn').and.callThrough();
 
     // 1. Every hook must be in itself well-formed
@@ -758,7 +763,7 @@ describe('DynamicHooksComponent', () => {
   });
 
   it('#should load a single tag dynamic component', () => {
-    const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>`;
+    const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true});
 
@@ -779,7 +784,7 @@ describe('DynamicHooksComponent', () => {
   });
 
   it('#should load component hooks without any text surrounding them', () => {
-    const testText = `<dynHooks-singletagtest [stringAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'>`;
+    const testText = `<dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'>`;
     comp.content = testText;
     comp.ngOnChanges({content: true});
 
@@ -811,7 +816,7 @@ describe('DynamicHooksComponent', () => {
   it('#should remove components if they fail to load', () => {
     const testText = `<dynHooks-multitagtest>This is the inner content.</dynHooks-multitagtest>`;
     comp.content = testText;
-    spyOn(comp['componentCreator'], 'createComponent').and.throwError('Test error');
+    spyOn(comp['outletService']['componentCreator'], 'createComponent').and.throwError('Test error');
     spyOn(console, 'error');
     comp.ngOnChanges({content: true});
 
@@ -889,7 +894,7 @@ describe('DynamicHooksComponent', () => {
     const testText = `
     <ul>
       <li>This is the first li-element.</li>
-      <li>This is the <dynhooks-inlinetest>second</dynhooks-inlinetest> li-element. It has a component <dynhooks-singletagtest [stringAlias]="'/media/maps/azsuna.png'" [simpleArray]='["Farondis"]'> in it. Lets put another component <dynhooks-singletagtest [stringAlias]="'/media/maps/suramar.png'" [simpleArray]='["Elisande", "Thalyssra"]'> here.</li>
+      <li>This is the <dynhooks-inlinetest>second</dynhooks-inlinetest> li-element. It has a component <dynhooks-singletagtest [stringPropAlias]="'/media/maps/azsuna.png'" [simpleArray]='["Farondis"]'> in it. Lets put another component <dynhooks-singletagtest [stringPropAlias]="'/media/maps/suramar.png'" [simpleArray]='["Elisande", "Thalyssra"]'> here.</li>
       <li>This is the third li-element. It has a <a href="https://www.google.de" target="_blank">link</a>.</li>
       <li>
         <span>And this is the last</span>
@@ -2121,7 +2126,7 @@ describe('DynamicHooksComponent', () => {
     expect(console.error['calls'].count()).toBe(1);
 
     // Get instance of SelectorHookParserConfigResolver for faster, more detailed tests
-    const configResolver = comp['parserEntryResolver']['parserResolver'];
+    const configResolver = comp['outletService']['parserEntryResolver']['parserResolver'];
 
     // No config
     let config = null;
@@ -2528,6 +2533,60 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBe(undefined);
     loadedComp.httpResponseReceived.emit(200);
     expect(context.maneuvers.meditate['calls'].count()).toBe(1); // Should not have increased from before
+  });
+
+  // 8. OutletService standalone usage
+  // --------------------------------------------------------------------------
+
+  it('#should create and fill a new HTML-Element by using the OutletService directly', () => {
+    const outletService = TestBed.inject(OutletService);
+
+    const testText = `
+      <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
+      <p>Here's another one: <dynHooks-multiTagTest [fonts]="['arial', 'calibri']"></dynHooks-multiTagTest></p>
+    `;
+
+    outletService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+      expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
+
+      expect(outletParseResult.element.querySelector('.singletag-component')).not.toBe(null);
+      expect(outletParseResult.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(outletParseResult.hookIndex[1].componentRef.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(outletParseResult.hookIndex[1].componentRef.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+
+      expect(outletParseResult.element.querySelector('.multitag-component')).not.toBe(null);
+      expect(outletParseResult.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(outletParseResult.hookIndex[2].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+    });
+  });
+
+  it('#should fill an existing HTML-Element by using the OutletService directly', () => {
+    const outletService = TestBed.inject(OutletService);
+
+    const testText = `
+      <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
+      <p>Here's another one: <dynHooks-multiTagTest [fonts]="['arial', 'calibri']"></dynHooks-multiTagTest></p>
+    `;
+
+    const existingElement = document.createElement('article');
+    existingElement.setAttribute('id', 'myExistingElement');
+
+    outletService.parse(testText, {}, null, null, null, null, existingElement, null).subscribe((outletParseResult: OutletParseResult) => {
+      expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
+
+      expect(existingElement.getAttribute('id')).toBe('myExistingElement');
+      expect(existingElement.tagName).toBe('ARTICLE');
+      expect(existingElement).toBe(outletParseResult.element);
+
+      expect(existingElement.querySelector('.singletag-component')).not.toBe(null);
+      expect(outletParseResult.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(outletParseResult.hookIndex[1].componentRef.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(outletParseResult.hookIndex[1].componentRef.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+
+      expect(existingElement.querySelector('.multitag-component')).not.toBe(null);
+      expect(outletParseResult.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(outletParseResult.hookIndex[2].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+    });
   });
 
 });

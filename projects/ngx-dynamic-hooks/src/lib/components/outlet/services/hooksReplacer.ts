@@ -1,4 +1,4 @@
-import { HookIndex } from '../../../interfaces';
+import { HookIndex } from '../../../interfacesPublic';
 import { HookParser, HookPosition } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
 import { isDevMode, Injectable, SecurityContext, Renderer2, RendererFactory2 } from '@angular/core';
@@ -59,9 +59,9 @@ export class HooksReplacer {
    * @param parsers - All of the registered parsers
    * @param token - A random token to attach to all created selector elements
    * @param options - The current OutletOptions
+   * @param hookIndex - The hookIndex object to fill
    */
-  replaceHooksWithNodes(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions): {content: string, hookIndex: HookIndex} {
-    const hookIndex: HookIndex = {};
+  replaceHooksWithNodes(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
     let hookCount = 1;
 
     // Collect all parser results (before changing content), sort by startIndex

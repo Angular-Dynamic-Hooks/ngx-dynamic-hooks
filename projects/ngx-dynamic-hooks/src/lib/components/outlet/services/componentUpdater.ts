@@ -1,7 +1,7 @@
 import { ComponentFactoryResolver, SimpleChange, isDevMode, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Hook, HookIndex, PreviousHookBinding } from '../../../interfaces';
+import { Hook, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
 import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepComparer';
 

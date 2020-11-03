@@ -13,6 +13,7 @@ import { HookFinder } from './utils/hookFinder';
 import { OptionsResolver } from './components/outlet/options/optionsResolver';
 import { ParserEntryResolver } from './components/outlet/options/parserEntryResolver';
 import { SelectorHookParserConfigResolver } from './parsers/selector/config/selectorHookParserConfigResolver';
+import { OutletService } from './components/outlet/services/outletService';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ export class DynamicHooksModule {
       providers: [
         // Put app-wide services here
         { provide: DYNAMICHOOKS_GLOBALSETTINGS, useValue: globalSettings },
+        OutletService,
         DataTypeEncoder,
         DataTypeParser,
         DeepComparer,

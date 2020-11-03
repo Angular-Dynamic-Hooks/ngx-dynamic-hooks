@@ -2,7 +2,7 @@ import { ComponentFactoryResolver, Injector, ApplicationRef, isDevMode, Injectab
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
-import { Hook, HookIndex } from '../../../interfaces';
+import { Hook, HookIndex } from '../../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
 import { ComponentUpdater } from './componentUpdater';

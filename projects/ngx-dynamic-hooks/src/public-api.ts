@@ -11,6 +11,7 @@ export * from './lib/globalSettings';
 export * from './lib/components/outlet/outletComponent.c';
 export * from './lib/components/outlet/options/options';
 export * from './lib/components/outlet/options/parserEntry';
+export * from './lib/components/outlet/services/outletService';
 
 // SelectorHookParser
 export * from './lib/parsers/selector/selectorHookParser';

@@ -29,13 +29,15 @@ Automatically insert live Angular components into dynamic strings (based on thei
     * [7.1 What makes a parser](#71-what-makes-a-parser)
     * [7.2 Example: Emoji parser (standalone)](#72-example-emoji-parser-standalone)
     * [7.3 Example: Internal link parser (enclosing)](#73-example-internal-link-parser-enclosing)
-8. [Trivia](#8-trivia)
-    * [8.1 How it works](#81-how-it-works)
-    * [8.2 Security](#82-security)
-    * [8.3 Caveats](#83-caveats)
-    * [8.4 Comparison with similar libraries](#84-comparison-with-similar-libraries)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Special thanks](#10-special-thanks)
+8. [Advanced notes](#8-advanced-notes)
+    * [8.1 Programmatic usage (without component)](#81-programmatic-usage-without-component)
+9. [Trivia](#9-trivia)
+    * [9.1 How it works](#91-how-it-works)
+    * [9.2 Security](#92-security)
+    * [9.3 Caveats](#93-caveats)
+    * [9.4 Comparison with similar libraries](#94-comparison-with-similar-libraries)
+10. [Troubleshooting](#10-troubleshooting)
+11. [Special thanks](#11-special-thanks)
 
 ## 1. Installation
 Simply install via npm 
@@ -631,9 +633,57 @@ Just register the parser with the library as in other examples and that's it! Al
 
 Have a look at the full, working example in this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed).
 
-## 8. Trivia
+## 8. Advanced notes
+### 8.1 Programmatic usage (without component)
+In some use cases, you might not actually need or want to insert the `<ngx-dynamic-hooks>`-component in your app and would rather have direct access to the parsed content to use programmatically. You can do so by injecting the `OutletService` and calling its `parse`-method directly (which the `OutletComponent` does internally as well):
 
-### 8.1 How it works:
+```ts
+parse(
+    content: string,
+    context: any = {},
+    globalParsersBlacklist: Array<string> = null,
+    globalParsersWhitelist: Array<string> = null,
+    parsers: Array<HookParserEntry> = null,
+    options: OutletOptions = null,
+    targetElement: HTMLElement = null,
+    targetHookIndex: HookIndex = null
+): Observable<OutletParseResult>;
+```
+
+Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. You can optionally also provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you.
+
+The function will return an observable that contains an `OutletParseResult` with the form:
+
+```ts
+interface OutletParseResult {
+    element: HTMLElement;               // The element containing the content with all components
+    hookIndex: HookIndex;               // An object containing the generated hook data
+    resolvedParsers: HookParser[];      // The parsers used for generating the result
+    resolvedOptions: OutletOptions;     // The options used for generating the result
+}
+```
+`element` is probably the most interesting part here as it contains the fully rendered content exactly as it would appear inside of the `<ngx-dynamic-hooks>`-component. `hookIndex` might also prove useful, as it is a fairly in-depth data object that holds various tidbits of info concerning the loaded components (as well as the componentRefs). 
+
+All in all, the whole process could then look like so:
+
+```ts
+import { OutletService } from 'ngx-dynamic-hooks';
+
+class SomeComponentOrService {
+  constructor(outletService: OutletService) {
+    outletService.parse("'Load a component here: <app-example></app-example>'").subscribe((outletParseResult: OutletParseResult) => {
+        // Do whatever with it
+    });
+  }
+```
+
+**Caution:** When loading components this way, keep in mind that the submitted content string is only parsed once. The inputs of contained components aren't automatically updated as they would be when using the `<ngx-dynamic-hooks>`-component normally.
+
+Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use `OutletService.destroy(hookIndex: HookIndex)` for this purpose.
+
+## 9. Trivia
+
+### 9.1 How it works:
 This library doesn't rely on any special "hacks" to load the dynamic components. Most notably, it uses [ComponentFactory.create()](https://angular.io/api/core/ComponentFactory#create) from Angular's public api, which is safe and has been around since Angular 2.  
 
 It then adds a lot of custom code around this core function to render the components at exactly the right place, register inputs and outputs, project the content properly, activate change detection, update and destroy them automatically, etc. - all to integrate the dynamic components into Angular as naturally as possible. If you are curious about the inner workings of the library, here's a short description:
@@ -647,7 +697,7 @@ It then adds a lot of custom code around this core function to render the compon
 7. When the `OutletComponent` is destroyed, all dynamically-loaded components are destroyed as well.
 
 
-### 8.2 Security:
+### 9.2 Security:
 One of the goals of this library was to make it **safe to use even with potentially unsafe input**, such as user-generated content. It is also designed to grant developers maximum control over which components are allowed to be loaded, and how. It uses the following techniques to achieve this:
 
 Most notably, it uses Angular's `DOMSanitizer` by default to remove all unsafe HTML, CSS and JS in the content string that is not part of a hook. Though not recommended, you may turn this setting off in the [OutletOptions](#64-outletoptions). You will then have to ensure yourself that the rendered content does not include [Cross Site Scripting attacks (XSS)](https://en.wikipedia.org/wiki/Cross-site_scripting) or other malicious code, however.
@@ -658,12 +708,12 @@ In addition to this, the scope of code that is accessible by the author of the c
 
 Finally, which components/hooks can be used by the author can be [freely adjusted](#63-hookparserentry) for each `OutletComponent`, as can their allowed inputs/outputs.
 
-### 8.3 Caveats:
+### 9.3 Caveats:
 1. As this library does not parse the content string as an actual Angular template, template syntax such as `*ngIf`, `*ngFor`, attribute bindings `[style.width]="'100px'"`, interpolation `{{ someVar }}` etc. will **not** work! This functionality is not planned to be added either, as it would require a fundamentally different approach by relying on the JiT template compiler, which breaks AoT compatibility and existing security measures.
 2. Hooks can only load components, not directives. There's no way to dynamically create directives as far as i'm aware. If you want to load a directive into the content string, try loading a component that contains that directive instead.
 3. `@ContentChildren` don't work in dynamically-loaded components, as these have to be known at compile-time. However, you can still access them via [onDynamicMount()](#55-lifecycle-methods).
 
-### 8.4 Comparison with similar libraries:
+### 9.4 Comparison with similar libraries:
 #### [Angular elements](https://angular.io/guide/elements)
 Angular elements allows you to register custom HTML elements (like component selector elements) with the browser itself that automatically load and host an Angular component when they appear anywhere in the DOM (see [Web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components)) - even outside of the Angular app. For that reason, these elements work in dynamic content as well and may satisfy your needs.
 
@@ -690,7 +740,7 @@ Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-d
 #### [Ngx-Dynamic-Template](https://github.com/apoterenko/ngx-dynamic-template), etc
 There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 **Some of my elements/attributes are not rendering!**
 
 This might be due to sanitization. This library uses Angular's native DomSanitizer to remove potentially malicious code like `<script>`-tags from the content. To ensure maximum security, the sanitizer is fairly aggressive, however, and will also remove seemingly harmless elements, like `<input>` or attributes like `id`.
@@ -727,7 +777,7 @@ You can avoid that by introducing a persistent state in your parsers and by reme
 
 You might be using Rxjs-version that is older than 6, which was introduced with Angular 6. If you are using Angular 5, either upgrade to 6 or try using [Rxjs compat](https://www.npmjs.com/package/rxjs-compat) to fix this issue.
 
-## 10. Special thanks
+## 11. Special thanks
 Thanks to [ng-dynamic](https://github.com/lacolaco/ng-dynamic) for giving me the idea for this library (as well [this blog post](https://www.arka.com/blog/dynamically-generate-angular-components-from-external-html), which explains it more).
 
 I am also grateful to Jesus Rodriguez & Ward Bell for their [in-depth presentation on the topic](https://www.youtube.com/watch?v=XDzxs00iIDE).
