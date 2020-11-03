@@ -671,7 +671,7 @@ import { OutletService } from 'ngx-dynamic-hooks';
 
 class SomeComponentOrService {
   constructor(outletService: OutletService) {
-    outletService.parse("'Load a component here: <app-example></app-example>'").subscribe((outletParseResult: OutletParseResult) => {
+    outletService.parse('Load a component here: <app-example></app-example>').subscribe((outletParseResult: OutletParseResult) => {
         // Do whatever with it
     });
   }
