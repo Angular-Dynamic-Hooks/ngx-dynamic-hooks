@@ -55,7 +55,7 @@ yarn add ngx-dynamic-hooks
 ## 2. Compatibility
 | Angular | Library | JiT | AoT | Ivy | NPM |
 | --- | --- | --- | --- | --- | --- |
-| 6 - 10  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1.0.0` |
+| 6 - 11  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1.0.0` |
 
 The library is compatible with both the older template engine (view engine) as well as Ivy. As it does not rely on a runtime compiler, it also works in both JiT- and AoT-environments.
 
