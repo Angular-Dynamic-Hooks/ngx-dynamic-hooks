@@ -24,4 +24,5 @@ export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
 export { DataTypeParser } from '../lib/utils/dataTypeParser';
 export { DeepComparer } from '../lib/utils/deepComparer';
 export { HookFinder } from '../lib/utils/hookFinder';
+export { OutletService } from '../lib/components/outlet/services/outletService';
 export { matchAll } from '../lib/polyfills/matchAll';

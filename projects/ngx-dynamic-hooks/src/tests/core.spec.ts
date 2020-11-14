@@ -31,6 +31,7 @@ import { DataTypeEncoder } from './testing-api';
 import { DataTypeParser } from './testing-api';
 import { DeepComparer } from './testing-api';
 import { HookFinder } from './testing-api';
+import { OutletService } from './testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from './components/singleTag/singleTagTest.c';
@@ -42,7 +43,6 @@ import { NonServiceTestParser } from './parsers/nonServiceTestParser';
 import { TESTSERVICETOKEN, TestService } from './services/testService';
 import { NgContentTestComponent } from './components/ngContentTest/ngContentTest.c';
 import { LazyTestComponent } from './components/lazyTest/lazyTest.c';
-import { OutletService } from '../lib/components/outlet/services/outletService';
 
 export class MockElementRef {
   nativeElement: {};
