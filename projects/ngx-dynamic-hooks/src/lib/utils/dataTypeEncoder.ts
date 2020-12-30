@@ -184,7 +184,9 @@ export class DataTypeEncoder {
 
     // Property accessor opening brackets can be identified by what they are preceded by.
     // Must be a) text, b) closing square bracket or c) closing round bracket. Arrays can't be preceded by any of these.
-    const variableOpeningBrackets = '(?<=[a-zA-Z_$\\]\)])\\[';
+    const variableOpeningBracketsWithLookbehinds = '(?<=[a-zA-Z_$\\]\)])\\['; // Too new for many older browsers
+    const variableOpeningBrackets = '(?:[a-zA-Z_$\\]\)])(\\[)';
+
     const openingBrackets = matchAll(text, new RegExp(variableOpeningBrackets, 'gm'));
     // Note: Can't simply find closing brackets as well (as is done in the other encoder functions), because the closing
     // bracket doesn't have a uniquely identifiable syntax. Might also be array endings.
@@ -192,7 +194,7 @@ export class DataTypeEncoder {
     // Find the corresponding closing bracket for each opening bracket by parsing the following brackets
     const bracketSegments: Array<TextSegment> = [];
     for (const openingBracket of openingBrackets) {
-      const followingText = text.substr(openingBracket.index + 1);
+      const followingText = text.substr(openingBracket.index + 2); // openingBracket.index + 2, b/c the regex starts at the character before the opening bracket and followingText is supposed to start after the opening bracket
       const followingOpeningBrackets = matchAll(followingText, /\[/gm);
       const followingClosingBrackets = matchAll(followingText, /\]/gm);
       const allFollowingBrackets = [...followingOpeningBrackets, ...followingClosingBrackets];
@@ -203,8 +205,8 @@ export class DataTypeEncoder {
         openedBrackets = followingBracket[0] === ']' ? openedBrackets - 1 : openedBrackets + 1;
         if (openedBrackets === 0) {
           bracketSegments.push({
-            startIndex: openingBracket.index + 1,
-            endIndex: openingBracket.index + 1 + followingBracket['index']
+            startIndex: openingBracket.index + 2,
+            endIndex: openingBracket.index + 2 + followingBracket['index']
           });
           break;
         }

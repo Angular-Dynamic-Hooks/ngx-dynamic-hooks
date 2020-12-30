@@ -128,8 +128,8 @@ describe('DeepComparer', () => {
 
   it('#should be able to stringify functions', () => {
     expect(deepComparer.detailedStringify({
-      someFunc: (event, someParam) => { console.log("this is a test"); const testVar = true; const anotherVar = ["this", "is", "an", "array"]}
-    }).result).toBe('{"someFunc":"(event, someParam) => { console.log(\\"this is a test\\"); const testVar = true; const anotherVar = [\\"this\\", \\"is\\", \\"an\\", \\"array\\"]; }"}');
+      someFunc: function (event, someParam) { console.log("this is a test"); var testVar = true; var anotherVar = ["this", "is", "an", "array"]; }
+    }).result).toBe('{"someFunc":"function (event, someParam) { console.log(\\"this is a test\\"); var testVar = true; var anotherVar = [\\"this\\", \\"is\\", \\"an\\", \\"array\\"]; }"}');
   });
 
   it('#should be able to stringify symbols', () => {

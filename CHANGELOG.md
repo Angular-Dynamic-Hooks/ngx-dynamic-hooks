@@ -4,6 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.4.1] - 2020-12-30
+### Maintenance
+- Improved compatibility with IE11 and older versions of JavaScript
+
+## [1.4.0] - 2020-11-14
+### Maintenance
+- Update to Angular 11
+- Updated readme
+
 ## [1.3.0] - 2020-11-03
 ### Added
 - Introduced OutletService, which can be used to parse a content string programmatically, skipping the use of the OutletComponent.
@@ -28,7 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.1.0...v1.2.0

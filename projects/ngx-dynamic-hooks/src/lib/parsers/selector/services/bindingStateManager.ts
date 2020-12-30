@@ -241,7 +241,7 @@ export class BindingStateManager {
       case 'outputs': attributeNameRegex = regexes.attributeNameRoundBracketsRegex; break;
     }
     const attributeRegex = attributeNameRegex + '\=' + attributeValuesOR;
-    const attributePattern = new RegExp(attributeRegex, 'gims');
+    const attributePattern = new RegExp(attributeRegex, 'gim');
     const attributeMatches = matchAll(openingTag, attributePattern);
 
     // Collect raw bindings

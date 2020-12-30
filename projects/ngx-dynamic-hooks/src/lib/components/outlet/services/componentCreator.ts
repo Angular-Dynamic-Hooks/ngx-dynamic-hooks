@@ -82,7 +82,7 @@ export class ComponentCreator {
     }
 
     // Once all normal and lazy components have loaded
-    combineLatest(...componentLoadSubjects).pipe(first()).subscribe(() => {
+    combineLatest([...componentLoadSubjects]).pipe(first()).subscribe(() => {
 
       // Call dynamic lifecycle methods for all created components
       for (const hook of Object.values(hookIndex)) {
@@ -143,7 +143,10 @@ export class ComponentCreator {
 
     // Empty child nodes
     // Note: Not sure why, but renderer.removeChild() and placeholderElement.removeChild() do not reliably work here. Fallback on native method.
-    placeholderElement.innerHTML = '';
+    // placeholderElement.innerHTML = ''; // This does not work in IE11. For some reason, it empties any text nodes that were contained within, so their refs I have in content are empty as well.
+    while (placeholderElement.firstChild) {
+      placeholderElement.removeChild(placeholderElement.lastChild);
+    }
 
     // Insert new ones
     let slotIndex = 0;
@@ -311,6 +314,7 @@ export class ComponentCreator {
         // If element has a parsetoken and hookid, it is a dynamic component
         if (
           childNode['attributes'] !== undefined &&
+          childNode['attributes'] !== null &&
           childNode['hasAttribute']('parsetoken') &&
           childNode['getAttribute']('parsetoken') === token &&
           childNode['hasAttribute']('hookid')

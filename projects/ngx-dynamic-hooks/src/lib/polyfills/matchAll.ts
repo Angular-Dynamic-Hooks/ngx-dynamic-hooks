@@ -13,16 +13,16 @@ export function matchAll(text: string, regExp: RegExp): Array<{[index: number]: 
     throw Error('TypeError: matchAll called with a non-global RegExp argument');
   }
 
-  // Clone RegExp object
-  const clonedRegExp = new RegExp(regExp.source, regExp.flags);
-
   // Get matches
   const result = [];
-  let match = clonedRegExp.exec(text);
+  let match = regExp.exec(text);
   while (match !== null) {
     result.push(match);
-    match = clonedRegExp.exec(text);
+    match = regExp.exec(text);
   }
+
+  // Reset internal index
+  regExp.lastIndex = 0;
 
   return result;
 }

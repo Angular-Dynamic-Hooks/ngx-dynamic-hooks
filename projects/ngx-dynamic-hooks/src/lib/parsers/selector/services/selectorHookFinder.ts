@@ -66,7 +66,7 @@ export class SelectorHookFinder {
 
     const fullRegex = openingArrow + selectorName + '(?:' + space + '*' + closingArrow + '|' + attributes + space + '*' + closingArrow + ')';
 
-    const regexObject = new RegExp(fullRegex, 'gims');
+    const regexObject = new RegExp(fullRegex, 'gim');
 
     return regexObject;
   }
@@ -84,7 +84,7 @@ export class SelectorHookFinder {
 
     const fullRegex = openingArrow + selectorName + closingArrow;
 
-    const regexObject = new RegExp(fullRegex, 'gims');
+    const regexObject = new RegExp(fullRegex, 'gim');
 
     return regexObject;
   }
