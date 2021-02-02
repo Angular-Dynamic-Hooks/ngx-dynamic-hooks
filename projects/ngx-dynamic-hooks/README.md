@@ -334,7 +334,7 @@ Option name | Type | Default | Description
 `acceptOutputsForAnyObservable` | `boolean` | `false` | Whether to disregard `@Output()`-decorators completely and allow subscribing to any `Observable` in dynamic components
 
 ### 6.5 Lazy-loading components:
-If you are using the Ivy templating engine (Angular 9+), you can configure your hook parsers in such a way that they lazy-load the component class right when it is needed and the corresponding hook appears in the content string.
+If you are using the Ivy templating engine (Angular 9+), you can configure your hook parsers in such a way that they lazy-load the component class only if it is needed and the corresponding hook appears in the content string.
 
 You may have noticed that the component-property in `SelectorHookParserConfig` has the type `ComponentConfig` (see [HookParserEntry](#63-hookparserentry)). This means it can be the component class, but also a `LazyLoadComponentConfig`:
 
@@ -362,6 +362,8 @@ The full `SelectorHookParserConfig` for a lazy-loaded component could then look 
 That's all there is to it! `LazyComponent` will now automatically be lazy-loaded if `<app-lazy>...</app-lazy>` is found in the content string.
 
 **Note:** `importPromise` must contain a function returning the import-promise, not the import-promise itself! Otherwise the promise would be executed right where it is defined, which defeats the point of lazy-loading.
+
+**Also:** Due to the way Angular component creation works and to prevent bugs, the host elements of lazily-loaded components are not directly inserted into the content string, but are instead wrapped in anchor elements, which serve as placeholders until they are ready.
 
 ## 7. Writing your own HookParser
 

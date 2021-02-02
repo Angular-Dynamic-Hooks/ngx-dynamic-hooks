@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.5.0] - 2020-02-02
+### Maintenance
+- Improved component host element creation logic to fix a bug of child components not loading when they are not immediately part of the DOM (through *ngIf, for example). Due to this, lazily-loaded components are now wrapped in anchor elements.
+
 ## [1.4.1] - 2020-12-30
 ### Maintenance
 - Improved compatibility with IE11 and older versions of JavaScript
@@ -37,7 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.2.1...v1.3.0

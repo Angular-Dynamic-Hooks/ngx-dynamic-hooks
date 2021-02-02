@@ -1205,7 +1205,7 @@ describe('DynamicHooksComponent', () => {
       expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
       expect(fixture.nativeElement.querySelector('.inline-component')).not.toBe(null);
       expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
-      expect(fixture.nativeElement.querySelector('dynamic-component-placeholder')).not.toBe(null);
+      expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
 
       expect(Object.values(comp.hookIndex).length).toBe(4);
       expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
@@ -1230,9 +1230,11 @@ describe('DynamicHooksComponent', () => {
 
       // Have to manually wait. Neither tick() nor fixture.whenStable() seems to wait for dynamic imports
       setTimeout(() => {
-        // Lazy-loaded component should be loaded by now
+        // Lazy-loaded component should be loaded by now in anchor
         expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
-        expect(fixture.nativeElement.querySelector('dynamic-component-placeholder')).toBe(null);
+        expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
+        expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).toBe('dynhooks-lazytest-anchor');    // Anchor should have comp class
+        expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes[0].tagName).toBe('DYNHOOKS-LAZYTEST');  // Selector element should be loaded in anchor
         expect(comp.hookIndex[3].componentRef.instance.constructor.name).toBe('LazyTestComponent');
         expect(comp.hookIndex[3].componentRef.instance.name).toBe('sleepy');
 

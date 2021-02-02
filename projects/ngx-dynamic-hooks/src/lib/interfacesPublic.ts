@@ -75,7 +75,7 @@ export interface HookParser {
     loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData;
 
     /**
-     * Which @Inputs() to insert and which @Outputs() to register withthe component of this hook.
+     * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.
      *
      * This function is called any time an update of the bindings is requested.
      *
