@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.5.1] - 2020-03-08
+### Maintenance
+- Input/Output names on selector hooks can now include hyphens (-)
+
 ## [1.5.0] - 2020-02-02
 ### Maintenance
 - Improved component host element creation logic to fix a bug of child components not loading when they are not immediately part of the DOM (through *ngIf, for example). Due to this, lazily-loaded components are now wrapped in anchor elements.

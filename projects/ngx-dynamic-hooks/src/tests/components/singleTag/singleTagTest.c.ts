@@ -13,6 +13,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   @Input() inputWithoutBrackets: string;
   @Input() _weird5Input$Name13: string;
   @Input('stringPropAlias') stringProp: any;
+  @Input('data-somevalue') dataSomeValue: string;
   @Input() numberProp: any;
   @Input() booleanProp: boolean;
   @Input() nullProp;
