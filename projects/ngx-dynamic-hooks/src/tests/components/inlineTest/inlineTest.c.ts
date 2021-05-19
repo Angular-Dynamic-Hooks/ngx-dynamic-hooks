@@ -1,29 +1,28 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Inject, InjectionToken } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../testing-api';
 
 @Component({
   selector: 'dynhooks-inlinetest',
   templateUrl: './inlineTest.c.html',
-  styleUrls: ['./inlineTest.c.scss']
+  styleUrls: ['./inlineTest.c.scss'],
 })
 export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() backgroundColor: string = '#25436c';
-  @Input() nr: number;
+  @Input() nr!: number;
   @Input() config: any;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChild>;
+  mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChild>;
+  changesContentChildren!: Array<DynamicContentChild>;
 
-  constructor (private cd: ChangeDetectorRef) {
+  constructor(private cd: ChangeDetectorRef) {
   }
-
 
   ngOnInit () {
     // console.log('textbox init');
   }
 
-  ngOnChanges(changes) {
+  ngOnChanges(changes: any) {
     // console.log('textbox changes');
   }
 
@@ -41,7 +40,7 @@ export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, Do
 
   onDynamicMount(data: OnDynamicData) {
     this.mountContext = data.context;
-    this.mountContentChildren = data.contentChildren;
+    this.mountContentChildren = (data as any).contentChildren;
   }
 
   onDynamicChanges(data: OnDynamicData) {
@@ -49,7 +48,7 @@ export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, Do
       this.changesContext = data.context;
     }
     if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = data.contentChildren;
+      this.changesContentChildren = (data as any).contentChildren;
     }
   }
 

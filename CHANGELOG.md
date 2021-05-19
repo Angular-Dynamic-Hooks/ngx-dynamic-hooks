@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.6.0] - 2020-05-19
+### Maintenance
+- Update to Angular 12
+- Updated readme
+
 ## [1.5.1] - 2020-03-08
 ### Maintenance
 - Input/Output names on selector hooks can now include hyphens (-)
@@ -45,7 +50,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.3.0...v1.4.0

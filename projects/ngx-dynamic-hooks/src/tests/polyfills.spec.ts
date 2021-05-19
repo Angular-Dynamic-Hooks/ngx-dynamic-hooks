@@ -1,4 +1,4 @@
-import { matchAll } from '../lib/polyfills/matchAll';
+import { matchAll } from './testing-api';
 
 // Straight Jasmine testing without Angular's testing support
 describe('Polyfills', () => {

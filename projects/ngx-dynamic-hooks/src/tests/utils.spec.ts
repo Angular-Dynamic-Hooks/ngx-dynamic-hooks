@@ -1,7 +1,7 @@
-import { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
-import { DeepComparer } from '../lib/utils/deepComparer';
-import { DataTypeParser } from '../lib/utils/dataTypeParser';
-import { HookFinder } from '../lib/utils/hookFinder';
+import { DataTypeEncoder } from './testing-api';
+import { DeepComparer } from './testing-api';
+import { DataTypeParser } from './testing-api';
+import { HookFinder } from './testing-api';
 
 // These tests mostly only test the lines/branches that aren't already covered by core.spec.ts
 
@@ -73,10 +73,18 @@ describe('DataTypeParser', () => {
 
   it('#should try to find functions in the __proto__ property if they cannot be found on the context property itself', () => {
     // Create method on instance prototype
+    /*
     const Person = function(name: string): void {
       this.name = name;
-    };
-    Person.prototype.getName = function(): string {
+    };*/
+
+    class Person {
+      name: string;
+      constructor (name: string) {
+        this.name = name;
+      }
+    }
+    (Person as any).prototype.getName = function(): string {
       return this.name;
     };
     const john = new Person('John');
@@ -128,7 +136,7 @@ describe('DeepComparer', () => {
 
   it('#should be able to stringify functions', () => {
     expect(deepComparer.detailedStringify({
-      someFunc: function (event, someParam) { console.log("this is a test"); var testVar = true; var anotherVar = ["this", "is", "an", "array"]; }
+      someFunc: function (event: any, someParam: any) { console.log("this is a test"); var testVar = true; var anotherVar = ["this", "is", "an", "array"]; }
     }).result).toBe('{"someFunc":"function (event, someParam) { console.log(\\"this is a test\\"); var testVar = true; var anotherVar = [\\"this\\", \\"is\\", \\"an\\", \\"array\\"]; }"}');
   });
 
@@ -139,17 +147,17 @@ describe('DeepComparer', () => {
   });
 
   it('#should remove cyclic objects paths', () => {
-    const parentObject = {};
-    const childObject = {parent: parentObject};
+    const parentObject: any = {};
+    const childObject: any = {parent: parentObject};
     parentObject['child'] = childObject;
 
     expect(deepComparer.detailedStringify(parentObject).result).toBe('{"child":{"parent":null}}');
   });
 
   it('#should remove cyclic objects paths by recognizing them by their properties, not reference', () => {
-    const parentObject = {name: 'this is the parent'};
-    const childObject = {name: 'this is the child'};
-    const anotherParentObject = {name: 'this is the parent'};
+    const parentObject: any = {name: 'this is the parent'};
+    const childObject: any = {name: 'this is the child'};
+    const anotherParentObject: any = {name: 'this is the parent'};
     parentObject['child'] = childObject;
     childObject['parent'] = anotherParentObject;
     anotherParentObject['child'] = childObject;
@@ -183,8 +191,8 @@ describe('DeepComparer', () => {
   it('#should warn and return false if two object cannot be compared', () => {
     // Can't think of an input that would break it, but that doesn't mean one doesn't exist
     // So just break it manually by not removing cyclical refs for this test
-    const childObj = {};
-    const parentObj = {child: childObj};
+    const childObj: any = {};
+    const parentObj: any = {child: childObj};
     childObj['parent'] = parentObj;
     spyOn(deepComparer, 'decycle').and.returnValue(parentObj);
     spyOn(console, 'warn').and.callThrough();
@@ -192,7 +200,7 @@ describe('DeepComparer', () => {
     const obj1 = {name: 'Marlene'};
     const obj2 = {name: 'Marlene'};
     expect(deepComparer.isEqual(obj1, obj2)).toBe(false);
-    expect(console.warn['calls'].mostRecent().args[0]).toContain('Objects could not be compared by value as one or both of them could not be stringified. Returning false.');
+    expect((console as any).warn['calls'].mostRecent().args[0]).toContain('Objects could not be compared by value as one or both of them could not be stringified. Returning false.');
   });
 
 });
@@ -211,7 +219,7 @@ describe('HookFinder', () => {
     const content = 'Here is an openingTag.';
 
     expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex)).toEqual([]);
-    expect(console.warn['calls'].allArgs()[0])
+    expect((console as any).warn['calls'].allArgs()[0])
       .toContain('Syntax error - New tag "Tag" started at position 18 before previous tag "openingTag" ended at position 21. Ignoring.');
   });
 
@@ -222,7 +230,7 @@ describe('HookFinder', () => {
 
     const content = 'Here is an openingTag and a closingTag. Here is just a closingTag.';
     expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex)).toEqual([{ openingTagStartIndex: 11, openingTagEndIndex: 21, closingTagStartIndex: 28, closingTagEndIndex: 38 }]);
-    expect(console.warn['calls'].allArgs()[0])
+    expect((console as any).warn['calls'].allArgs()[0])
       .toContain('Syntax error - Closing tag without preceding opening tag found: "closingTag". Ignoring.');
   });
 

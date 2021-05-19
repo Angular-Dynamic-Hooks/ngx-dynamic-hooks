@@ -7,11 +7,11 @@ import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } 
   styleUrls: ['./lazyTest.c.scss']
 })
 export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
-  @Input() name: string;
+  @Input() name!: string;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChild>;
+  mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChild>;
+  changesContentChildren!: Array<DynamicContentChild>;
 
   constructor (private cd: ChangeDetectorRef) {
   }
@@ -21,7 +21,7 @@ export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCh
     // console.log('textbox init');
   }
 
-  ngOnChanges(changes) {
+  ngOnChanges(changes: any) {
     // console.log('textbox changes');
   }
 
@@ -39,7 +39,7 @@ export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCh
 
   onDynamicMount(data: OnDynamicData) {
     this.mountContext = data.context;
-    this.mountContentChildren = data.contentChildren;
+    this.mountContentChildren = (data as any).contentChildren;
   }
 
   onDynamicChanges(data: OnDynamicData) {
@@ -47,7 +47,7 @@ export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCh
       this.changesContext = data.context;
     }
     if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = data.contentChildren;
+      this.changesContentChildren = (data as any).contentChildren;
     }
   }
 

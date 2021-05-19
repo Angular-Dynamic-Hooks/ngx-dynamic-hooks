@@ -10,16 +10,16 @@ import { TestService } from '../../services/testService';
 })
 export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges {
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChild>;
+  mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChild>;
+  changesContentChildren!: Array<DynamicContentChild>;
 
   constructor(private cd: ChangeDetectorRef, private testService: TestService) {
   }
 
   onDynamicMount(data: OnDynamicData) {
     this.mountContext = data.context;
-    this.mountContentChildren = data.contentChildren;
+    this.mountContentChildren = (data as any).contentChildren;
   }
 
   onDynamicChanges(data: OnDynamicData) {
@@ -27,7 +27,7 @@ export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges 
       this.changesContext = data.context;
     }
     if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = data.contentChildren;
+      this.changesContentChildren = (data as any).contentChildren;
     }
   }
 

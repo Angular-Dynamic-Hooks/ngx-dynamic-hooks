@@ -20,9 +20,7 @@ export class NonServiceTestParser implements HookParser {
     for (const match of matches) {
       result.push({
         openingTagStartIndex: match.index,
-        openingTagEndIndex: match.index + match[0].length,
-        closingTagStartIndex: null,
-        closingTagEndIndex: null,
+        openingTagEndIndex: match.index + match[0].length
       });
     }
 

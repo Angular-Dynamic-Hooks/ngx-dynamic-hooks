@@ -182,7 +182,7 @@ export class ComponentCreator {
       this.renderer.setAttribute(selectorElement, 'hookid', componentHostElement.getAttribute('hookid'));
       this.renderer.setAttribute(selectorElement, 'parsetoken', componentHostElement.getAttribute('parsetoken'));
       if (componentHostElement.getAttribute('parser')) {
-        this.renderer.setAttribute(selectorElement, 'parser', componentHostElement.getAttribute('parser')); 
+        this.renderer.setAttribute(selectorElement, 'parser', componentHostElement.getAttribute('parser'));
       }
 
       this.renderer.removeAttribute(componentHostElement, 'hookid');

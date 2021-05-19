@@ -10,12 +10,12 @@ import { TestService } from '../../services/testService';
 })
 export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() backgroundColor: string = '#4493ff40';
-  @Input() nr: number;
-  @Input() fonts: Array<string>;
+  @Input() nr!: number;
+  @Input() fonts!: Array<string>;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChild>;
+  mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChild>;
+  changesContentChildren!: Array<DynamicContentChild>;
 
   constructor(private cd: ChangeDetectorRef, private testService: TestService) {
   }
@@ -25,7 +25,7 @@ export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, 
     // console.log('textbox init');
   }
 
-  ngOnChanges(changes) {
+  ngOnChanges(changes: any) {
     // console.log('textbox changes');
   }
 
@@ -43,7 +43,7 @@ export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, 
 
   onDynamicMount(data: OnDynamicData) {
     this.mountContext = data.context;
-    this.mountContentChildren = data.contentChildren;
+    this.mountContentChildren = (data as any).contentChildren;
   }
 
   onDynamicChanges(data: OnDynamicData) {
@@ -51,7 +51,7 @@ export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, 
       this.changesContext = data.context;
     }
     if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = data.contentChildren;
+      this.changesContentChildren = (data as any).contentChildren;
     }
   }
 

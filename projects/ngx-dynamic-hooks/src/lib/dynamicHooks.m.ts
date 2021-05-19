@@ -40,7 +40,7 @@ import { OutletService } from './components/outlet/services/outletService';
 export class DynamicHooksModule {
   // Make sure not to set the optional function signature "ModuleWithProviders<T>".
   // Angular 5's version was non-generic, so will break backwards-compatibility.
-  static forRoot(globalSettings: DynamicHooksGlobalSettings)/*: ModuleWithProviders<DynamicHooksModule>*/ {
+  static forRoot(globalSettings: DynamicHooksGlobalSettings) /*: ModuleWithProviders<DynamicHooksModule>*/ {
     return {
       ngModule: DynamicHooksModule,
       providers: [

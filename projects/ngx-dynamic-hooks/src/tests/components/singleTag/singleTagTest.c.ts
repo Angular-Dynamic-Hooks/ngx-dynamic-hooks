@@ -10,24 +10,24 @@ import { TestService, TESTSERVICETOKEN } from '../../services/testService';
 })
 export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   nonInputProperty: string = 'this is the default value';
-  @Input() inputWithoutBrackets: string;
-  @Input() _weird5Input$Name13: string;
+  @Input() inputWithoutBrackets!: string;
+  @Input() _weird5Input$Name13!: string;
   @Input('stringPropAlias') stringProp: any;
-  @Input('data-somevalue') dataSomeValue: string;
+  @Input('data-somevalue') dataSomeValue!: string;
   @Input() numberProp: any;
-  @Input() booleanProp: boolean;
-  @Input() nullProp;
-  @Input() undefinedProp;
+  @Input() booleanProp!: boolean;
+  @Input() nullProp: any;
+  @Input() undefinedProp: any;
   @Input() simpleObject: any;
   @Input() simpleArray: any;
-  @Input() variable: string;
-  @Input() variableLookalike: string;
+  @Input() variable!: string;
+  @Input() variableLookalike!: string;
   @Input() variableInObject: any;
-  @Input() variableInArray: Array<any>;
+  @Input() variableInArray!: Array<any>;
   @Input() contextWithoutAnything: any;
   @Input() nestedFunctions: any;
-  @Input() nestedFunctionsInBrackets: Array<any>;
-  @Input() everythingTogether: Array<any>;
+  @Input() nestedFunctionsInBrackets!: Array<any>;
+  @Input() everythingTogether!: Array<any>;
   nonOutputEventEmitter: EventEmitter<number> = new EventEmitter();
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
@@ -35,9 +35,9 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   ngOnInitTriggered: boolean = false;
   ngOnChangesTriggered: boolean = false;
   mountContext: any;
-  mountContentChildren: Array<DynamicContentChild>;
+  mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
-  changesContentChildren: Array<DynamicContentChild>;
+  changesContentChildren!: Array<DynamicContentChild>;
 
 
   constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {
@@ -50,7 +50,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
     this.ngOnInitTriggered = true;
   }
 
-  ngOnChanges(changes) {
+  ngOnChanges(changes: any) {
     this.ngOnChangesTriggered = true;
     // console.log(changes);
   }
@@ -63,7 +63,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
 
   onDynamicMount(data: OnDynamicData) {
     this.mountContext = data.context;
-    this.mountContentChildren = data.contentChildren;
+    this.mountContentChildren = (data as any).contentChildren;
   }
 
   onDynamicChanges(data: OnDynamicData) {
@@ -71,7 +71,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
       this.changesContext = data.context;
     }
     if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = data.contentChildren;
+      this.changesContentChildren = (data as any).contentChildren;
     }
   }
 
