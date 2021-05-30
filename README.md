@@ -683,6 +683,34 @@ class SomeComponentOrService {
 
 Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use `OutletService.destroy(hookIndex: HookIndex)` for this purpose.
 
+### 8.2 Non-browser Platforms implemention
+The default implementation of `ngx-dynamic-hooks` only works in browsers ([platform-browser](https://angular.io/api/platform-browser)) since it relies on manipulating HTML DOM.
+
+There are cases when this approach doesn't work; for example when using Angular Universal ([platform-server](https://angular.io/api/platform-server)) or Angular with [NativeScript](https://nativescript.org/).
+
+In such cases all you need is to implement `PlatformService` abstract class and pass it as the second parameter to `DynamicHooksModule.forRoot` method:
+
+```ts
+import {DynamicHooksModule, PlatformService} from 'ngx-dynamic-hooks';
+
+class MyPlatformServerService implements PlatformService {
+    // ...
+}
+
+@NgModule({
+  imports: [
+    // ...
+    DynamicHooksModule.forRoot({
+      globalParsers: /* ... */
+    }, MyPlatformServerService),
+    // ...
+  ],
+  // ...
+})
+export class AppModule { }
+
+```
+
 ## 9. Trivia
 
 ### 9.1 How it works:

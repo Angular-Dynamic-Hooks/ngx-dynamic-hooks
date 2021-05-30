@@ -1,6 +1,8 @@
 import { ElementRef, Injector } from '@angular/core';
 import { TestBed, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { DomSanitizer } from '@angular/platform-browser';
+
 import { first } from 'rxjs/operators';
 
 // Importing files through testing-api file here instead of their own paths.
@@ -18,6 +20,8 @@ import { OutletComponent } from './testing-api';
 import { OutletOptions, outletOptionDefaults } from './testing-api';
 import { HookParserEntry } from './testing-api';
 import { SelectorHookParser } from './testing-api';
+import { PlatformService } from './testing-api';
+
 
 import { OptionsResolver } from './testing-api';
 import { ParserEntryResolver } from './testing-api';
@@ -32,6 +36,8 @@ import { DataTypeParser } from './testing-api';
 import { DeepComparer } from './testing-api';
 import { HookFinder } from './testing-api';
 import { OutletService } from './testing-api';
+import { PlatformBrowserService } from './testing-api';
+
 
 // Custom testing resources
 import { SingleTagTestComponent } from './components/singleTag/singleTagTest.c';
@@ -104,6 +110,8 @@ function prepareTestingModule(parsers?: any, options?: any, extraComponents: Arr
     ServiceTestParser,
     EnclosingCustomParser,
     NgContentTestParser,
+    // Platform
+    { provide: PlatformService, useClass: PlatformBrowserService, deps: [DomSanitizer] }
   ];
 
   // Generate providers

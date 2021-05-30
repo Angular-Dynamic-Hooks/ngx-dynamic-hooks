@@ -10,6 +10,7 @@ export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
 export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
+export { PlatformService } from '../lib/platform/platformService';
 
 // Private module resources
 export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
@@ -25,4 +26,6 @@ export { DataTypeParser } from '../lib/utils/dataTypeParser';
 export { DeepComparer } from '../lib/utils/deepComparer';
 export { HookFinder } from '../lib/utils/hookFinder';
 export { OutletService } from '../lib/components/outlet/services/outletService';
+export { PlatformBrowserService } from '../lib/platform/platformBrowserService';
+
 export { matchAll } from '../lib/polyfills/matchAll';

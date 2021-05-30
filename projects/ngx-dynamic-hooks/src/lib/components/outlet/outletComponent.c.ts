@@ -6,6 +6,7 @@ import { OutletOptions, outletOptionDefaults } from './options/options';
 import { OutletService } from './services/outletService';
 import { HookParserEntry } from './options/parserEntry';
 import { ComponentUpdater } from './services/componentUpdater';
+import { PlatformService } from '../../platform/platformService';
 
 /**
  * The main component of the DynamicHooksModule. Accepts a string of text and replaces all hooks inside of it with dynamically created
@@ -52,7 +53,8 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   constructor(
     private hostElement: ElementRef,
     private outletService: OutletService,
-    private componentUpdater: ComponentUpdater
+    private componentUpdater: ComponentUpdater,
+    private platform: PlatformService
   ) {}
 
   ngDoCheck(): void {
@@ -103,7 +105,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     this.outletService.destroy(this.hookIndex);
 
     // Reset state
-    this.hostElement.nativeElement.innerHTML = '';
+    this.platform.setInnerContent(this.hostElement.nativeElement, '');
     this.hookIndex = {};
     this.activeOptions = undefined;
     this.activeParsers = undefined;

@@ -4,6 +4,7 @@ import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
 import { Hook, HookIndex } from '../../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
+import { PlatformService } from '../../../platform/platformService';
 import { OutletOptions } from '../options/options';
 import { ComponentUpdater } from './componentUpdater';
 
@@ -14,7 +15,7 @@ import { ComponentUpdater } from './componentUpdater';
 export class ComponentCreator {
   private renderer: Renderer2;
 
-  constructor(private injector: Injector, private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater) {
+  constructor(private injector: Injector, private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater, private platform: PlatformService) {
     this.renderer = this.rendererFactory.createRenderer(null, null);
   }
 
@@ -27,16 +28,16 @@ export class ComponentCreator {
    * @param context - The current context object
    * @param options - The current HookComponentOptions
    */
-  init(contentElement: HTMLElement, hookIndex: HookIndex, token: string, context: any, options: OutletOptions): ReplaySubject<boolean> {
+  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
     const hookHostElements = {};
 
     // Get HookData, replace placeholders and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
-      const placeholderElement = contentElement.querySelector('[parsetoken="' + token + '"][hookid="' + hookId + '"]');
+      const placeholderElement = this.platform.findPlaceholderElement(contentElement, token, hookId);
       if (placeholderElement) {
-        hook.data = hook.parser.loadComponent(hook.id, hook.value, context, Array.prototype.slice.call(placeholderElement.childNodes));
+        hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platform.getChildNodes(placeholderElement));
 
         // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
         hookHostElements[hookId] = this.replacePlaceholderElement(placeholderElement, hook);
@@ -128,7 +129,7 @@ export class ComponentCreator {
    * @param placeholderElement - The placeholder to replace
    * @param hook - The corresponding hook object
    */
-  replacePlaceholderElement(placeholderElement: Element, hook: Hook): Element {
+  replacePlaceholderElement(placeholderElement: any, hook: Hook): Element {
     let selector;
     if (hook.data.component.hasOwnProperty('prototype')) {
       selector = this.cfr.resolveComponentFactory(hook.data.component as (new(...args: any[]) => any)).selector;
@@ -137,20 +138,19 @@ export class ComponentCreator {
     }
 
     const hostElement = this.renderer.createElement(selector);
-    this.renderer.setAttribute(hostElement, 'hookid', placeholderElement.getAttribute('hookid'));
-    this.renderer.setAttribute(hostElement, 'parsetoken', placeholderElement.getAttribute('parsetoken'));
-    if (placeholderElement.getAttribute('parser')) {
-      this.renderer.setAttribute(hostElement, 'parser', placeholderElement.getAttribute('parser'));
+    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement,'hookid'));
+    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement,'parsetoken'));
+    if (this.platform.getAttribute(placeholderElement,'parser')) {
+      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement,'parser'));
     }
 
-    const childNodes = Array.prototype.slice.call(placeholderElement.childNodes);
+    const childNodes = this.platform.getChildNodes(placeholderElement);
     for (const node of childNodes) {
       this.renderer.appendChild(hostElement, node);
     }
 
-    this.renderer.insertBefore(placeholderElement.parentNode, hostElement, placeholderElement);
-    // Note: renderer.removeChild() once again does not reliably work here. Fallback on native method.
-    placeholderElement.parentNode.removeChild(placeholderElement);
+    this.renderer.insertBefore(this.platform.getParentNode(placeholderElement), hostElement, placeholderElement);
+    this.platform.removeChild(this.platform.getParentNode(placeholderElement), placeholderElement);
 
     return hostElement;
   }
@@ -173,16 +173,16 @@ export class ComponentCreator {
    * @param componentHostElement - The preliminary host element which might be an anchor
    * @param compClass - The loaded component class
    */
-  handleAnchorElement(componentHostElement: Element, compClass: new(...args: any[]) => any): Element {
-    if (componentHostElement.tagName === 'DYNAMIC-COMPONENT-ANCHOR') {
+  handleAnchorElement(componentHostElement: any, compClass: new(...args: any[]) => any): any {
+    if (this.platform.getTagName(componentHostElement) === 'DYNAMIC-COMPONENT-ANCHOR') {
       const selector = this.cfr.resolveComponentFactory(compClass).selector;
       const selectorElement = this.renderer.createElement(selector);
 
       // Move attributes to selector
-      this.renderer.setAttribute(selectorElement, 'hookid', componentHostElement.getAttribute('hookid'));
-      this.renderer.setAttribute(selectorElement, 'parsetoken', componentHostElement.getAttribute('parsetoken'));
-      if (componentHostElement.getAttribute('parser')) {
-        this.renderer.setAttribute(selectorElement, 'parser', componentHostElement.getAttribute('parser'));
+      this.renderer.setAttribute(selectorElement, 'hookid', this.platform.getAttribute(componentHostElement, 'hookid'));
+      this.renderer.setAttribute(selectorElement, 'parsetoken', this.platform.getAttribute(componentHostElement, 'parsetoken'));
+      if (this.platform.getAttribute(componentHostElement, 'parser')) {
+        this.renderer.setAttribute(selectorElement, 'parser', this.platform.getAttribute(componentHostElement, 'parser'));
       }
 
       this.renderer.removeAttribute(componentHostElement, 'hookid');
@@ -190,7 +190,7 @@ export class ComponentCreator {
       this.renderer.removeAttribute(componentHostElement, 'parser');
 
       // Move child nodes to selector
-      const childNodes = Array.prototype.slice.call(componentHostElement.childNodes);
+      const childNodes = this.platform.getChildNodes(componentHostElement);
       for (const node of childNodes) {
         this.renderer.appendChild(selectorElement, node);
       }
@@ -217,7 +217,7 @@ export class ComponentCreator {
    * @param hook - The hook of the component
    * @param token - The current parse token
    */
-  createContentSlotElements(hostElement: Element, hook: Hook, token: string): void {
+  createContentSlotElements(hostElement: any, hook: Hook, token: string): void {
     let content;
 
     // If content property is defined, use the submitted content slots
@@ -225,15 +225,11 @@ export class ComponentCreator {
       content = hook.data.content;
     // Otherwise just wrap existing content into single content slot
     } else {
-      content = [Array.prototype.slice.call(hostElement.childNodes)];
+      content = [this.platform.getChildNodes(hostElement)];
     }
 
     // Empty child nodes
-    // Note: Not sure why, but renderer.removeChild() and hostElement.removeChild() do not reliably work here. Fallback on native method.
-    // placeholderElement.innerHTML = ''; // This does not work in IE11. For some reason, it empties any text nodes that were contained within, so their refs I have in content are empty as well.
-    while (hostElement.firstChild) {
-      hostElement.removeChild(hostElement.lastChild);
-    }
+    this.platform.clearChildNodes(hostElement);
 
     // Insert new ones
     let slotIndex = 0;
@@ -257,15 +253,15 @@ export class ComponentCreator {
    * @param componentHostElement - The dom element with the content slots
    * @param token - The current parse token
    */
-  getContentSlotElements(componentHostElement: Element, token: string): Array<Array<Element>> {
+  getContentSlotElements(componentHostElement: any, token: string): Array<Array<any>> {
     // Resolve ng-content from content slots
     const projectableNodes = [];
-    const contentSlotElements = Array.prototype.slice.call(componentHostElement.childNodes)
-      .filter(entry => entry.tagName === 'DYNAMIC-COMPONENT-CONTENTSLOT' && entry.getAttribute('parsetoken') === token);
+    const contentSlotElements = this.platform.getChildNodes(componentHostElement)
+      .filter(entry => this.platform.getTagName(entry) === 'DYNAMIC-COMPONENT-CONTENTSLOT' && this.platform.getAttribute(entry, 'parsetoken') === token);
 
     for (const contentSlotElement of contentSlotElements) {
-      const slotIndex = contentSlotElement.getAttribute('slotIndex');
-      projectableNodes[slotIndex] = Array.prototype.slice.call(contentSlotElement.childNodes);
+      const slotIndex = this.platform.getAttribute(contentSlotElement, 'slotIndex');
+      projectableNodes[slotIndex] = this.platform.getChildNodes(contentSlotElement);
     }
 
     return projectableNodes;
@@ -295,11 +291,10 @@ export class ComponentCreator {
         throw Error(`When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.`);
       }
       // Warning if using old Angular version
-      if (document && document.querySelector('[ng-version]')) {
-        const version = parseInt(document.querySelector('[ng-version]').getAttribute('ng-version'), 10);
-        if (version < 9 && isDevMode()) {
+      const ngVersion = this.platform.getNgVersion();
+      
+      if (ngVersion < 9 && isDevMode()) {
           console.warn('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
-        }
       }
 
       (componentConfig as LazyLoadComponentConfig).importPromise().then((m) =>  {
@@ -325,7 +320,7 @@ export class ComponentCreator {
    * @param options - The current HookComponentOptions
    * @param compClass - The component's class
    */
-  createComponent(hook: Hook, context: any, componentHostElement: Element, projectableNodes: Array<Array<Element>>, options: OutletOptions, compClass: new(...args: any[]) => any): void {
+  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any): void {
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
     // The order of component creation or injection via projectableNodes does not seem to matter.
@@ -367,23 +362,24 @@ export class ComponentCreator {
    * @param hookIndex - The current hookIndex
    * @param token - The current parseToken
    */
-  findContentChildren(node: Node, treeLevel: Array<DynamicContentChild> = [], hookIndex: HookIndex, token: string): void {
-    if (node['childNodes'] !== undefined && node.childNodes.length > 0) {
-      node.childNodes.forEach((childNode, key) => {
+  findContentChildren(node: any, treeLevel: Array<DynamicContentChild> = [], hookIndex: HookIndex, token: string): void {
+    const childNodes = this.platform.getChildNodes(node);
+    if (childNodes != undefined && childNodes.length > 0) {
+      childNodes.forEach((childNode, key) => {
         let componentFound = false;
         // If element has a parsetoken and hookid, it is a dynamic component
+        const parseToken = this.platform.getAttribute(childNode, 'parsetoken');
+
         if (
-          childNode['attributes'] !== undefined &&
-          childNode['attributes'] !== null &&
-          childNode['hasAttribute']('parsetoken') &&
-          childNode['getAttribute']('parsetoken') === token &&
-          childNode['hasAttribute']('hookid')
+          parseToken !== null &&
+          parseToken === token &&
+          this.platform.getAttribute(childNode, 'hookid')
         ) {
-          const hookId = parseInt(childNode['getAttribute']('hookid'), 10);
+          const hookId = parseInt(this.platform.getAttribute(childNode, 'hookid'), 10);
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
               componentRef: hookIndex[hookId].componentRef,
-              componentSelector: childNode['tagName'].toLowerCase(),
+              componentSelector: this.platform.getTagName(childNode).toLowerCase(),
               contentChildren: [],
               hookValue: hookIndex[hookId].value
             });

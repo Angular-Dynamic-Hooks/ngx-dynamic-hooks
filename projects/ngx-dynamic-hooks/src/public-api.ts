@@ -27,6 +27,9 @@ export * from './lib/utils/regexes';
 // Polyfills
 export * from './lib/polyfills/matchAll';
 
+// Platform
+export * from './lib/platform/platformService';
+
 // Testing
 // export * from './tests/testing-api';
 

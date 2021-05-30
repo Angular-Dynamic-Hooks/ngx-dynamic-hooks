@@ -1,4 +1,4 @@
-import { NgModule, InjectionToken } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
+import { NgModule, InjectionToken, Type } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
 import { OutletComponent } from './components/outlet/outletComponent.c';
 import { ComponentCreator } from './components/outlet/services/componentCreator';
 import { ComponentUpdater } from './components/outlet/services/componentUpdater';
@@ -14,6 +14,8 @@ import { OptionsResolver } from './components/outlet/options/optionsResolver';
 import { ParserEntryResolver } from './components/outlet/options/parserEntryResolver';
 import { SelectorHookParserConfigResolver } from './parsers/selector/config/selectorHookParserConfigResolver';
 import { OutletService } from './components/outlet/services/outletService';
+import { PlatformService } from './platform/platformService';
+import { PlatformBrowserService } from './platform/platformBrowserService';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,7 @@ import { OutletService } from './components/outlet/services/outletService';
 export class DynamicHooksModule {
   // Make sure not to set the optional function signature "ModuleWithProviders<T>".
   // Angular 5's version was non-generic, so will break backwards-compatibility.
-  static forRoot(globalSettings: DynamicHooksGlobalSettings) /*: ModuleWithProviders<DynamicHooksModule>*/ {
+  static forRoot(globalSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) /*: ModuleWithProviders<DynamicHooksModule>*/ {
     return {
       ngModule: DynamicHooksModule,
       providers: [
@@ -50,8 +52,9 @@ export class DynamicHooksModule {
         DataTypeEncoder,
         DataTypeParser,
         DeepComparer,
-        HookFinder
+        HookFinder,
+        { provide: PlatformService, useClass: platformService || PlatformBrowserService }
       ]
     };
   }
- }
+}
