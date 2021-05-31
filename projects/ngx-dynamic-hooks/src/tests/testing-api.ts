@@ -11,6 +11,7 @@ export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/op
 export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
 export { PlatformService } from '../lib/platform/platformService';
+export { DynamicHooksModule } from '../lib/dynamicHooks.m';
 
 // Private module resources
 export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';

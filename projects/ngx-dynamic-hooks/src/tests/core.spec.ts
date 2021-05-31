@@ -1296,6 +1296,7 @@ describe('DynamicHooksComponent', () => {
         importPromise: () => import('./components/lazyTest/lazyTest.c'),
         importName: 'LazyTestComponent'
       },
+      name: 'lazyParser',
       selector: 'dynhooks-lazytest'
     }]);
     ({fixture, comp} = prepareTestingModule(parsersWithLazyParser, undefined, [LazyTestComponent]));
@@ -2718,5 +2719,4 @@ describe('DynamicHooksComponent', () => {
       expect(outletParseResult.hookIndex[2].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
     });
   });
-
 });
