@@ -1,7 +1,7 @@
-import { DynamicHooksModule, PlatformBrowserService } from "./testing-api";
+import { DynamicHooksModule, PlatformBrowserService } from './testing-api';
 
 describe('DynamicHooks module', () => {
-  it('#should set platformService provider to custon platfromService if passed', () => {
+  it('#should set platformService provider to custom platformService if passed', () => {
     const CustomPlatformService = class {
     };
 

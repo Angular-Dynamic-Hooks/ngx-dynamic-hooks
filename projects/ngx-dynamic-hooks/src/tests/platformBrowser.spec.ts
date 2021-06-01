@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeStyle, SafeUrl } from '@angular/platform-browser';
-import { PlatformBrowserService, OutletComponent } from '../public-api';
+import { PlatformBrowserService, OutletComponent } from './testing-api';
 import { EmptyTestComponent } from './components/emptyTest/emptyTest.c';
 
 class MockDomSanitizer implements DomSanitizer {
@@ -42,7 +42,7 @@ describe('PlatformBrowserService', () => {
 
     const testText = `
       <div parsetoken="${token}" hookid="${hookId}"></div>
-    `
+    `;
 
     const contentElement = document.createElement('div',);
     contentElement.innerHTML = testText;
@@ -95,7 +95,7 @@ describe('PlatformBrowserService', () => {
 
     const attrName = 'testattr';
 
-    const result = platformService.getAttribute(null, attrName);
+    const result = platformService.getAttribute(null as any, attrName);
 
     expect(result).toBeNull();
   });
@@ -146,7 +146,7 @@ describe('PlatformBrowserService', () => {
   it('#should return null as child nodes when parent is null', () => {
     const platformService = getPlatformService();
 
-    const childNodes = platformService.getChildNodes(null);
+    const childNodes = platformService.getChildNodes(null as any);
 
     expect(childNodes).toBeNull();
   });
@@ -166,7 +166,7 @@ describe('PlatformBrowserService', () => {
   it(`#should return null as tag name when element is null`, () => {
     const platformService = getPlatformService();
 
-    const actualTagName = platformService.getTagName(null);
+    const actualTagName = platformService.getTagName(null as any);
 
     expect(actualTagName).toBeNull();
   });
@@ -180,10 +180,10 @@ describe('PlatformBrowserService', () => {
     parent.innerHTML = testText;
     const toBeRemoved = parent.firstChild;
 
-    platformService.removeChild(parent, toBeRemoved);
+    platformService.removeChild(parent, toBeRemoved as any);
 
     expect(parent.childNodes.length).toBe(2);
-    expect(parent.firstChild.textContent).toBe('Child2');
+    expect((parent.firstChild as any).textContent).toBe('Child2');
   });
 
   it(`#should do nothing when trying to remove a child element from null parent`, () => {
@@ -195,7 +195,7 @@ describe('PlatformBrowserService', () => {
     parent.innerHTML = testText;
     const toBeRemoved = parent.firstChild;
 
-    platformService.removeChild(null, toBeRemoved);
+    platformService.removeChild(null as any, toBeRemoved as any);
 
     expect(parent.childNodes.length).toBe(3);
   });
@@ -208,7 +208,7 @@ describe('PlatformBrowserService', () => {
     const parent = document.createElement('div');
     parent.innerHTML = testText;
 
-    platformService.removeChild(parent, null);
+    platformService.removeChild(parent, null as any);
 
     expect(parent.childNodes.length).toBe(3);
   });
@@ -234,7 +234,7 @@ describe('PlatformBrowserService', () => {
     const parent = document.createElement('div');
     parent.innerHTML = testText;
 
-    platformService.clearChildNodes(null);
+    platformService.clearChildNodes(null as any);
 
     expect(parent.childNodes.length).toBe(3);
   });
@@ -273,7 +273,7 @@ describe('PlatformBrowserService', () => {
     parent.innerHTML = testText;
     const child = parent.firstChild;
 
-    const actualParent = platformService.getParentNode(child);
+    const actualParent = platformService.getParentNode(child as any);
 
     expect(actualParent).not.toBeNull();
     expect(actualParent).toBe(parent);
@@ -282,7 +282,7 @@ describe('PlatformBrowserService', () => {
   it(`#should return null as parent when child node is null`, () => {
     const platformService = getPlatformService();
 
-    const actualParent = platformService.getParentNode(null);
+    const actualParent = platformService.getParentNode(null as any);
 
     expect(actualParent).toBeNull();
   });
@@ -307,7 +307,7 @@ describe('PlatformBrowserService', () => {
     const element = document.createElement('div');
     element.innerHTML = expectedContent;
 
-    platformService.setInnerContent(null, 'NEW_TEST_TEXT');
+    platformService.setInnerContent(null as any, 'NEW_TEST_TEXT');
 
     expect(element.innerHTML).toBe(expectedContent);
   });
@@ -339,8 +339,8 @@ describe('PlatformBrowserService', () => {
     const testText = `<div>Child1</div>`;
     const expectedResult = 'SANITIZED';
 
-    spyOn(platformService['sanitizer'],'sanitize').and.returnValue(expectedResult);
-    
+    spyOn(platformService['sanitizer'], 'sanitize').and.returnValue(expectedResult);
+
     const actualResult = platformService.sanitize(testText)
 
     expect(actualResult).toBe(expectedResult);

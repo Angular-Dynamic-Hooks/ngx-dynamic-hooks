@@ -1,10 +1,11 @@
-import { SecurityContext } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
-import { PlatformService } from "./platformService";
+import { Injectable, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { PlatformService } from './platformService';
 
 /**
  * Platform Browser Implementation of PlatformService
  */
+@Injectable()
 export class PlatformBrowserService implements PlatformService {
   constructor(private sanitizer: DomSanitizer) { }
 
