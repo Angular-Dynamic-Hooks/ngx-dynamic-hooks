@@ -4,6 +4,7 @@
 export abstract class PlatformService {
   /**
    * Clears the child nodes of an element.
+   * The mehod does not throw an exception when there's an error.
    * @param element An Element
    */
   abstract clearChildNodes(element: any): void;
@@ -17,37 +18,43 @@ export abstract class PlatformService {
   abstract findPlaceholderElement(contentElement: any, token: string, hookId: string): any;
   
   /**
-   * Returns the value of an element attribute.
+   * Returns the value of an element attribute. 
+   * Returns null when attribute doesn't exist or there's an error.
    * @param element The element
    * @param attributeName Attribute Name
    */
   abstract getAttribute(element: any, attributeName: string): string;
   
   /**
-   * Returns the child nodes of a node.
+   * Returns an array of child nodes. 
+   * Returns an empty array if there's no child and null when there's an error.
    * @param node A node
    */
   abstract getChildNodes(node: any): any[];
   
   /**
    * Returns Angular Version.
+   * Returns 0 when there's an error.
    */
   abstract getNgVersion(): number;
   
   /**
    * Returns the tag name of an element.
+   * Returns null when there's an error.
    * @param element An element
    */
   abstract getTagName(element: any): string;
   
   /**
    * Returns the parent of an element.
+   * Returns null when there'a an error.
    * @param element An element
    */
   abstract getParentNode(element: any): any;
   
   /**
    * Returns the inner text of an element.
+   * Returns null when there's an error.
    * @param element An element
    */
   abstract getInnerText(element: any): string;

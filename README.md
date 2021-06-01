@@ -31,6 +31,7 @@ Automatically insert live Angular components into dynamic strings (based on thei
     * [7.3 Example: Internal link parser (enclosing)](#73-example-internal-link-parser-enclosing)
 8. [Advanced notes](#8-advanced-notes)
     * [8.1 Programmatic usage (without component)](#81-programmatic-usage-without-component)
+    * [8.1 Programmatic usage (without component)](#82-non-browser-platforms-implemention)
 9. [Trivia](#9-trivia)
     * [9.1 How it works](#91-how-it-works)
     * [9.2 Security](#92-security)
@@ -694,7 +695,95 @@ In such cases all you need is to implement `PlatformService` abstract class and 
 import {DynamicHooksModule, PlatformService} from 'ngx-dynamic-hooks';
 
 class MyPlatformServerService implements PlatformService {
-    // ...
+
+  /**
+   * This method should remove an element's child nodes. 
+   * The method should not throw an exception when the given element doesn't exist.
+   */
+  clearChildNodes(element: any): void {
+    //...
+  }
+
+  /**
+   * Should return an element corresponding to a token and hookId.
+   * The impelemtation should not throw an exception when the given element doesn't exist. It should return null instead.
+   */
+  findPlaceholderElement(contentElement: any, token: string, hookId: string): any {
+    //...
+  }
+  
+  /**
+   * Should return an attribute value of a given element.
+   * The implementation shoud return null in case there's an error or element or attribute don't exist.
+   */
+  getAttribute(element: any, attributeName: string): string {
+    //...
+  }
+  
+  /**
+   * Should return an array of element's child nodes.
+   * If there's no child node, it should return an empty array. 
+   * It should return null when the given node doesn't exist.
+   */
+  getChildNodes(node: any): any[] {
+    //...
+  }
+  
+  /**
+   * Should return the Angular version.
+   * In case no version can be identified or there's an error, it should return 0.
+   */
+  getNgVersion(): number {
+    //...
+  }
+  
+  /**
+   * Should return an element's tag name.
+   * Should return null when tag name cannot be found or element doesn't exist.
+   */
+  getTagName(element: any): string {
+    //...
+  }
+  
+  /**
+   * Should return the parent node of a given element.
+   * Should return null when the given element doesn't exist.
+   */
+  getParentNode(element: any): any {
+    //...
+  }
+  
+  /**
+   * Should return the inner text of an element.
+   * The implementation should return null when the given element doesn't exist.
+   */
+  getInnerText(element: any): string {
+    //...
+  }
+  
+  /**
+   * Should remove a child element from a given parent element.
+   * The implementation should throw an exception when parent element or child element don't exist.
+   */
+  removeChild(parentElement: any, childElement: any): void {
+    //...
+  }
+  
+  /**
+   * Should return the sanitized version of a given content.
+   */
+  sanitize(content: string): string {
+    //...
+  }
+  
+  /**
+   * Should set the inner content (e.g. innerHTML in browser) of a geiven element.
+   * The implementation should not throw an exception when the given element doesn't exist.
+   */
+  setInnerContent(element: any, content: string): void {
+    //...
+  }
+
 }
 
 @NgModule({
