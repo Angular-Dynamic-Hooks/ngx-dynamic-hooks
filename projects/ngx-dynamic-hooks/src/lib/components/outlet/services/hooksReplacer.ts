@@ -1,8 +1,8 @@
 import { HookIndex } from '../../../interfacesPublic';
 import { HookParser, HookPosition } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
-import { isDevMode, Injectable, SecurityContext, Renderer2, RendererFactory2 } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { PlatformService } from '../../../platform/platformService';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
@@ -41,7 +41,7 @@ interface HookSegments {
 export class HooksReplacer {
   private renderer: Renderer2;
 
-  constructor(private sanitizer: DomSanitizer, rendererFactory: RendererFactory2) {
+  constructor(rendererFactory: RendererFactory2, private platform: PlatformService) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
@@ -150,7 +150,7 @@ export class HooksReplacer {
 
     // Sanitize? (ignores the encoded component selector elements)
     if (options.sanitize) {
-      content = this.sanitizer.sanitize(SecurityContext.HTML, content);
+      content = this.platform.sanitize(content);
     }
 
     // Decode component selector elements again
@@ -393,8 +393,8 @@ export class HooksReplacer {
     const result = text.replace(/&[#A-Za-z0-9]+;/gi, (hmtlEntity) => {
         // Replace invisible nbsp-whitespace with normal whitespace (not \u00A0). Leads to problems with JSON.parse() otherwise.
         if (hmtlEntity === ('&nbsp;')) { return ' '; }
-        div.innerHTML = hmtlEntity;
-        return div.innerText;
+        this.platform.setInnerContent(div,hmtlEntity);
+        return this.platform.getInnerText(div);
     });
     return result;
   }
