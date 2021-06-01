@@ -739,8 +739,8 @@ This library was one of the inspirations for Ngx-Dynamic-Hooks and is unfortunat
 
 Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-dynamic's `<dynamic-html>`-component and takes it further.
 
-#### [Ngx-Dynamic-Template](https://github.com/apoterenko/ngx-dynamic-template), etc
-There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. They are generally incompatible with AoT-compilation (which Ivy uses by default) and are dangerous to use if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. They also suffer from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
+#### Runtime compilation,  [Ngx-Dynamic-Template](https://github.com/apoterenko/ngx-dynamic-template), etc.
+There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. Many of them do not offer support for AoT-compilation (which Ivy uses by default). While it is [technically possible](https://indepth.dev/posts/1054/here-is-what-you-need-to-know-about-dynamic-components-in-angular) to load the JiT-compiler during runtime in AoT-mode, this approach uses the low-level API of Angular and as such may break without warning in the future. Also, note that rendering a dynamic template as though it were a static file is dangerous if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. Runtime compilation also also suffers from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
 
 ## 10. Troubleshooting
 **Some of my elements/attributes are not rendering!**
