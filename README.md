@@ -31,7 +31,7 @@ Automatically insert live Angular components into dynamic strings (based on thei
     * [7.3 Example: Internal link parser (enclosing)](#73-example-internal-link-parser-enclosing)
 8. [Advanced notes](#8-advanced-notes)
     * [8.1 Programmatic usage (without component)](#81-programmatic-usage-without-component)
-    * [8.1 Programmatic usage (without component)](#82-non-browser-platforms-implemention)
+    * [8.2 Non-browser Platforms implemention](#82-non-browser-platforms-implemention)
 9. [Trivia](#9-trivia)
     * [9.1 How it works](#91-how-it-works)
     * [9.2 Security](#92-security)
