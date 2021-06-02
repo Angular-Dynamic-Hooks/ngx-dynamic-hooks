@@ -689,7 +689,7 @@ The default implementation of `ngx-dynamic-hooks` only works in browsers ([platf
 
 There are cases when this approach doesn't work; for example when using Angular Universal ([platform-server](https://angular.io/api/platform-server)) or Angular with [NativeScript](https://nativescript.org/).
 
-In such cases all you need is to implement `PlatformService` abstract class and pass it as the second parameter to `DynamicHooksModule.forRoot` method:
+In such cases, all you need is to implement the `PlatformService` abstract class and pass it as the second parameter to the `DynamicHooksModule.forRoot` method:
 
 ```ts
 import {DynamicHooksModule, PlatformService} from 'ngx-dynamic-hooks';
@@ -697,88 +697,87 @@ import {DynamicHooksModule, PlatformService} from 'ngx-dynamic-hooks';
 class MyPlatformServerService implements PlatformService {
 
   /**
-   * This method should remove an element's child nodes. 
-   * The method should not throw an exception when the given element doesn't exist.
+   * Removes an element's child nodes. 
+   * Should not throw an exception when the given element doesn't exist.
    */
   clearChildNodes(element: any): void {
     //...
   }
 
   /**
-   * Should return an element corresponding to a token and hookId.
-   * The impelemtation should not throw an exception when the given element doesn't exist. It should return null instead.
+   * Returns an element corresponding to a token and hookId.
+   * Should return null on error or when the element does not exist.
    */
   findPlaceholderElement(contentElement: any, token: string, hookId: string): any {
     //...
   }
   
   /**
-   * Should return an attribute value of a given element.
-   * The implementation shoud return null in case there's an error or element or attribute don't exist.
+   * Returns an attribute value of a given element.
+   * Shoud return null on error or when the element/attribute does not exist.
    */
   getAttribute(element: any, attributeName: string): string {
     //...
   }
   
   /**
-   * Should return an array of element's child nodes.
-   * If there's no child node, it should return an empty array. 
-   * It should return null when the given node doesn't exist.
+   * Returns an array of an element's child nodes.
+   * Should return an empty array if there are no child nodes and null when the given node does not exist.
    */
   getChildNodes(node: any): any[] {
     //...
   }
   
   /**
-   * Should return the Angular version.
-   * In case no version can be identified or there's an error, it should return 0.
+   * Returns the Angular version
+   * Should return 0 in case no version can be identified.
    */
   getNgVersion(): number {
     //...
   }
   
   /**
-   * Should return an element's tag name.
-   * Should return null when tag name cannot be found or element doesn't exist.
+   * Returns an element's tag name.
+   * Should return null on error, when a tag name cannot be found or the element does not exist.
    */
   getTagName(element: any): string {
     //...
   }
   
   /**
-   * Should return the parent node of a given element.
-   * Should return null when the given element doesn't exist.
+   * Returns the parent node of a given element.
+   * Should return null when the given element does not exist.
    */
   getParentNode(element: any): any {
     //...
   }
   
   /**
-   * Should return the inner text of an element.
-   * The implementation should return null when the given element doesn't exist.
+   * Returns the inner text of an element.
+   * Should return null when the given element doesn't exist.
    */
   getInnerText(element: any): string {
     //...
   }
   
   /**
-   * Should remove a child element from a given parent element.
-   * The implementation should throw an exception when parent element or child element don't exist.
+   * Removes a child element from a given parent element.
+   * Should not throw an exception when the parent or child element do not exist.
    */
   removeChild(parentElement: any, childElement: any): void {
     //...
   }
   
   /**
-   * Should return the sanitized version of a given content.
+   * Returns the sanitized version of a given content.
    */
   sanitize(content: string): string {
     //...
   }
   
   /**
-   * Should set the inner content (e.g. innerHTML in browser) of a geiven element.
-   * The implementation should not throw an exception when the given element doesn't exist.
+   * Sets the inner content (e.g. innerHTML in browser) of a given element.
+   * Should not throw an exception when the given element does not exist.
    */
   setInnerContent(element: any, content: string): void {
     //...
@@ -828,7 +827,7 @@ In addition to this, the scope of code that is accessible by the author of the c
 Finally, which components/hooks can be used by the author can be [freely adjusted](#63-hookparserentry) for each `OutletComponent`, as can their allowed inputs/outputs.
 
 ### 9.3 Caveats:
-1. As this library does not parse the content string as an actual Angular template, template syntax such as `*ngIf`, `*ngFor`, attribute bindings `[style.width]="'100px'"`, interpolation `{{ someVar }}` etc. will **not** work! This functionality is not planned to be added either, as it would require a fundamentally different approach by relying on the JiT template compiler, which breaks AoT compatibility and existing security measures.
+1. As this library does not parse the content string as an actual Angular template, template syntax such as `*ngIf`, `*ngFor`, attribute bindings `[style.width]="'100px'"`, interpolation `{{ someVar }}` etc. will **not** work! This functionality is not planned to be added either, as it would require a fundamentally different approach by relying on the JiT template compiler (which this library intentionally doesn't). This would break flexibility and all existing security features.
 2. Hooks can only load components, not directives. There's no way to dynamically create directives as far as i'm aware. If you want to load a directive into the content string, try loading a component that contains that directive instead.
 3. `@ContentChildren` don't work in dynamically-loaded components, as these have to be known at compile-time. However, you can still access them via [onDynamicMount()](#55-lifecycle-methods).
 

@@ -30,7 +30,7 @@ class MockDomSanitizer implements DomSanitizer {
 }
 
 function getPlatformService() {
-  return new PlatformBrowserService(new MockDomSanitizer())
+  return new PlatformBrowserService(new MockDomSanitizer());
 }
 
 describe('PlatformBrowserService', () => {

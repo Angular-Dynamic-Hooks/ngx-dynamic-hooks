@@ -106,7 +106,7 @@ export class HookFinder {
           continue;
         }
 
-        // If nested hooks not allowed: Skip
+        // If nested hooks not allowed and more than one tag is open, discard both this closing tag and the latest opening tag
         if (!includeNested && openedTags.length > 1) {
           openedTags.pop();
           continue;

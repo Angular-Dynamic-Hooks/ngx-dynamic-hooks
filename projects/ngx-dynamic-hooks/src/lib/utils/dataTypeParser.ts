@@ -238,7 +238,7 @@ export class DataTypeParser {
   }
 
   /**
-   * Travels a JSON-like object to find all context vars and event object and replaces them with their actual values
+   * Travels a JSON-like object to find all context vars and event objects and replaces their placeholders with the actual values
    *
    * @param arrayOrObject - The property of the JSON to analyze
    * @param context - The current context object, if any

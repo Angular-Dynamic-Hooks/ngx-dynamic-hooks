@@ -31,10 +31,8 @@ export class ComponentUpdater {
         outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth)
       };
 
-      // Request new bindings from parser
+      // Update bindings
       hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
-
-      // Update component with new bindings
       this.updateComponentWithNewOutputs(hook, context, options);
       this.updateComponentWithNewInputs(hook, options);
     }

@@ -292,7 +292,7 @@ export class ComponentCreator {
       }
       // Warning if using old Angular version
       const ngVersion = this.platform.getNgVersion();
-      
+
       if (ngVersion < 9 && isDevMode()) {
           console.warn('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
       }
