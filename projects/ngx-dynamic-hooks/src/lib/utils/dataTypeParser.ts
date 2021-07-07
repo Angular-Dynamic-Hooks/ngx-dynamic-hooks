@@ -310,7 +310,7 @@ export class DataTypeParser {
       return context;
     }
 
-    // Otherwise, create variable path array and fetch value, so the context object can be easily traveled.
+    // Otherwise, create variable path array and fetch value, so the context object can be easily travelled.
     // Variable path example: 'restaurants["newOrleans"].reviews[5]' becomes ['restaurants', 'newOrleans', 'reviews', 5],
     const path = [];
     const pathMatches = matchAll(shortContextVar, new RegExp(regexes.variablePathPartRegex, 'gm'));

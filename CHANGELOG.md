@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.7.1] - 2020-07-07
+### Maintenance
+- Fixed bug so that bracketless inputs with empty values now return empty strings instead of undefined
+
 ## [1.7.0] - 2020-06-01
 ### Added
 - Introduced PlatformService which serves as an abstraction layer for DOM manipulation. By defining custom PlatformServices, users can now use the library on other platforms than the browser as well.
@@ -54,7 +58,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.0...v1.5.1

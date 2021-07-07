@@ -246,7 +246,13 @@ export class BindingStateManager {
 
     // Collect raw bindings
     for (const match of attributeMatches) {
-      bindings[match[1]] = match[2] || match[3]; // Could be either of the attribute value capturing groups
+      // Could be either of the attribute value capturing groups
+      let rawBindingValue = match[2] || match[3];
+      // If value is empty (someInput=""), it will return undefined for it. When using noBracketInputs, return empty string instead.
+      if (rawBindingValue === undefined && type === 'noBracketInputs') {
+        rawBindingValue = '';
+      }
+      bindings[match[1]] = rawBindingValue;
     }
 
     // Filter bindings

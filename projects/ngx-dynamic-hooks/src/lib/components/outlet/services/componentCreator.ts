@@ -138,10 +138,10 @@ export class ComponentCreator {
     }
 
     const hostElement = this.renderer.createElement(selector);
-    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement,'hookid'));
-    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement,'parsetoken'));
-    if (this.platform.getAttribute(placeholderElement,'parser')) {
-      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement,'parser'));
+    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement, 'hookid'));
+    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement, 'parsetoken'));
+    if (this.platform.getAttribute(placeholderElement, 'parser')) {
+      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement, 'parser'));
     }
 
     const childNodes = this.platform.getChildNodes(placeholderElement);

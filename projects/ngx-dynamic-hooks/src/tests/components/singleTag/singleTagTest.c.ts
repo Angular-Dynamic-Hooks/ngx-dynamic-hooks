@@ -11,6 +11,9 @@ import { TestService, TESTSERVICETOKEN } from '../../services/testService';
 export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   nonInputProperty: string = 'this is the default value';
   @Input() inputWithoutBrackets!: string;
+  @Input() emptyInputWithoutBrackets: string;
+  @Input() emptyInput: string;
+  @Input() emptyStringInput: string;
   @Input() _weird5Input$Name13!: string;
   @Input('stringPropAlias') stringProp: any;
   @Input('data-somevalue') dataSomeValue!: string;

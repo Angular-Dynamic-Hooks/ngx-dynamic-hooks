@@ -1443,6 +1443,9 @@ describe('DynamicHooksComponent', () => {
       id="someid"
       id-with-hyphen="something"
       inputWithoutBrackets="{test: 'Hullo!'}"
+      emptyInputWithoutBrackets=""
+      [emptyInput]=""
+      [emptyStringInput]="''"
       [_weird5Input$Name13]="'Even names like this should be recognized.'"
       [nonInputProperty]="'this should not be set as input'"
       [stringPropAlias]="'this is just a test string'"
@@ -1508,6 +1511,9 @@ describe('DynamicHooksComponent', () => {
 
     expect((secondComp as any)['id']).toBe(undefined);
     expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
+    expect(secondComp.emptyInputWithoutBrackets).toBe('');
+    expect(secondComp.emptyInput).toBeUndefined();
+    expect(secondComp.emptyStringInput).toBe('');
     expect(secondComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
     expect(secondComp.nonInputProperty).toBe('this is the default value');
     expect(secondComp.stringProp).toBe('this is just a test string');
