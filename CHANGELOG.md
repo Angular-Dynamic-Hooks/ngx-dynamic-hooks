@@ -4,24 +4,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [1.7.1] - 2020-07-07
+## [1.7.2] - 2021-11-06
+### Maintenance
+- Update to Angular 13
+- Updated readme
+
+## [1.7.1] - 2021-07-07
 ### Maintenance
 - Fixed bug so that bracketless inputs with empty values now return empty strings instead of undefined
 
-## [1.7.0] - 2020-06-01
+## [1.7.0] - 2021-06-01
 ### Added
 - Introduced PlatformService which serves as an abstraction layer for DOM manipulation. By defining custom PlatformServices, users can now use the library on other platforms than the browser as well.
 
-## [1.6.0] - 2020-05-19
+## [1.6.0] - 2021-05-19
 ### Maintenance
 - Update to Angular 12
 - Updated readme
 
-## [1.5.1] - 2020-03-08
+## [1.5.1] - 2021-03-08
 ### Maintenance
 - Input/Output names on selector hooks can now include hyphens (-)
 
-## [1.5.0] - 2020-02-02
+## [1.5.0] - 2021-02-02
 ### Maintenance
 - Improved component host element creation logic to fix a bug of child components not loading when they are not immediately part of the DOM (through *ngIf, for example). Due to this, lazily-loaded components are now wrapped in anchor elements.
 
@@ -58,7 +63,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.1...v1.6.0
