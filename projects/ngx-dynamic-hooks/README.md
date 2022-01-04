@@ -869,6 +869,10 @@ This might be due to sanitization. This library uses Angular's native DomSanitiz
 
 You can turn off sanitization at any time through the [`OutletOptions`](#64-outletoptions). Note that you will then have to ensure that the content is safe to render by yourself!
 
+**Escaped HTML entities such as `&gt;` and `&lt;` are transformed back to their actual characters (`<` and `>`) in the content string. This is not desired behavior.**
+
+Automatically transforming HTML entities is a convenience feature to ensure maximum compatibility when parsing hooks. You can turn it off at any time via the `convertHTMLEntities`-setting in the [`OutletOptions`](#64-outletoptions).
+
 **I'm getting the error "`<ngx-dynamic-hooks>` is not a known element" in my templates**
 
 Some editors like VS Code don't always immediately catch on to the newly available components when a module has been imported. Try restarting the editor to see if that helps (it should compile fine, though). If not, check that you have correctly imported the `DynamicHooksModule` into you main module as shown in the [Quick start](#4-quick-start)-section to make everything available.
