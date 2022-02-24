@@ -10,7 +10,7 @@ export class PlatformBrowserService implements PlatformService {
   constructor(private sanitizer: DomSanitizer) { }
 
   findPlaceholderElement(contentElement: Element, token: string, hookId: string): Element {
-    return contentElement && contentElement.querySelector('[parsetoken="' + token + '"][hookid="' + hookId + '"]')
+    return contentElement && contentElement.querySelector('[parsetoken="' + token + '"][hookid="' + hookId + '"]');
   }
 
   getAttribute(element: Element, attributeName: string): string {

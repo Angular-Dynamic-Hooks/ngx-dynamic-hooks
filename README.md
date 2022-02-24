@@ -54,9 +54,10 @@ yarn add ngx-dynamic-hooks
 ```
 
 ## 2. Compatibility
-| Angular | Library | JiT | AoT | Ivy | NPM |
+| Angular | Version | JiT | AoT | Ivy | NPM |
 | --- | --- | --- | --- | --- | --- |
-| 6 - 13  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1.0.0` |
+| 6 - 12  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1.0.0` |
+| 13  | 2.x.x | - | yes | yes | `ngx-dynamic-hooks@^2.0.0` |
 
 The library is compatible with both the older template engine (view engine) as well as Ivy. As it does not rely on a runtime compiler, it also works in both JiT- and AoT-environments.
 
@@ -328,7 +329,7 @@ Option name | Type | Default | Description
 `updateOnPushOnly` | `boolean` | `false` | Normally, the bindings of all dynamic components are checked/updated on each change detection run. This setting will update them only when the context object passed to the `OutletComponent` changes by reference.
 `compareInputsByValue` | `boolean` | `false` | Whether to deeply-compare inputs for dynamic components by their value instead of by their reference on updates
 `compareOutputsByValue` | `boolean` | `false` | Whether to deeply-compare outputs for dynamic components by their value instead of by their reference on updates
-`compareByValueDepth` | `boolean` | `5` | When comparing by value, how many levels deep to compare them (may impact performance)
+`compareByValueDepth` | `number` | `5` | When comparing by value, how many levels deep to compare them (may impact performance)
 `ignoreInputAliases` | `boolean` | `false` | Whether to ignore input aliases like `@Input('someAlias')` in dynamic components and use the actual property names instead
 `ignoreOutputAliases` | `boolean` | `false` | Whether to ignore output aliases like `@Output('someAlias')` in dynamic components and use the actual property names instead
 `acceptInputsForAnyProperty` | `boolean` | `false` | Whether to disregard `@Input()`-decorators completely and allow passing in values to any property in dynamic components

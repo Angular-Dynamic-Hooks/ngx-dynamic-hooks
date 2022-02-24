@@ -7,9 +7,6 @@ import { OutletOptions, outletOptionDefaults } from './options';
 @Injectable()
 export class OptionsResolver {
 
-  constructor() {
-  }
-
   /**
    * Overwrites the default options with a (partial) OutletOptions object and returns the result
    *

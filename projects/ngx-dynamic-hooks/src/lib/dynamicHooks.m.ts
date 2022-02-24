@@ -1,4 +1,4 @@
-import { NgModule, InjectionToken, Type } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
+import { NgModule, InjectionToken, Type, ModuleWithProviders } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
 import { OutletComponent } from './components/outlet/outletComponent.c';
 import { ComponentCreator } from './components/outlet/services/componentCreator';
 import { ComponentUpdater } from './components/outlet/services/componentUpdater';
@@ -40,9 +40,9 @@ import { PlatformBrowserService } from './platform/platformBrowserService';
   ]
 })
 export class DynamicHooksModule {
-  // Make sure not to set the optional function signature "ModuleWithProviders<T>".
-  // Angular 5's version was non-generic, so will break backwards-compatibility.
-  static forRoot(globalSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) /*: ModuleWithProviders<DynamicHooksModule>*/ {
+  // Make sure to set the optional function signature "ModuleWithProviders<T>".
+  // Note: This will break Angular 5 backwards compatibility, but enable compatibility with newer versions (13+?).
+  static forRoot(globalSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>): ModuleWithProviders<DynamicHooksModule> {
     return {
       ngModule: DynamicHooksModule,
       providers: [
