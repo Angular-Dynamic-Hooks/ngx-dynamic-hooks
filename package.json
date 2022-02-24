@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "ci:build": "ng build --prod",
+    "ci:build": "ng build --configuration production",
     "ci:test": "ng test --no-watch --no-progress --browsers=ChromeHeadlessCI --code-coverage",
     "ci:reportCoverage": "codecov"
   },
