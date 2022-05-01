@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.1] - 2022-12-07
+### Update
+- Changed readme
+
 ## [2.0.0] - 2021-11-06
 ### Update
 - Support for rxjs 7 and full update of all dependencies.
@@ -68,7 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...v2.0.0
 [1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1

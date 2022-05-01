@@ -52,7 +52,7 @@ describe('PlatformBrowserService', () => {
     expect(placeholderElement).not.toBeNull();
     expect(placeholderElement.getAttribute('parsetoken')).toBe(token);
     expect(placeholderElement.getAttribute('hookid')).toBe(hookId);
-  })
+  });
 
   it('#should not find placeholder by wrong token and hookId', () => {
     const platformService = getPlatformService();
