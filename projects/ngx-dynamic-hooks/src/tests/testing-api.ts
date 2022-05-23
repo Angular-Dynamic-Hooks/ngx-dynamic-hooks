@@ -1,6 +1,7 @@
 /*
  * Testing API Surface of ngx-dynamic-component-hooks
- * This serves as an abstraction layer for all testing files to request their resources from the main library
+ * This serves as an abstraction layer that the tests can use to access all library components, services, etc. they need.
+ * It can be temporarily included in public-api.ts to make everything needed for tests publically accessible in case you want to run the tests from a parent project (with the library compiled in node_modules)
  */
 
 // Public module resources

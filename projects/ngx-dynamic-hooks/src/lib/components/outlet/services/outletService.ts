@@ -1,4 +1,4 @@
-import { Injectable, Renderer2, RendererFactory2, Optional, Inject } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2, Optional, Inject, Injector } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
@@ -26,7 +26,8 @@ export class OutletService {
     private optionsResolver: OptionsResolver,
     private hooksReplacer: HooksReplacer,
     private componentCreator: ComponentCreator,
-    private rendererFactory: RendererFactory2
+    private rendererFactory: RendererFactory2,
+    private injector: Injector
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
@@ -42,6 +43,7 @@ export class OutletService {
    * @param options - An optional list of options to use instead of the global ones
    * @param targetElement - An optional HTML element to use as the container for the loaded content. If none is provided, one is created and returned for you.
    * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
+   * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the root injector is used.
    */
   parse(
     content: string,
@@ -51,7 +53,8 @@ export class OutletService {
     parsers: Array<HookParserEntry> = null,
     options: OutletOptions = null,
     targetElement: HTMLElement = null,
-    targetHookIndex: HookIndex = null
+    targetHookIndex: HookIndex = null,
+    injector: Injector = null
   ): Observable<OutletParseResult> {
 
     // If no container element or hookIndex given, create them
@@ -64,7 +67,7 @@ export class OutletService {
 
     // Resolve options and parsers
     const resolvedOptions = this.loadOptions(options);
-    const resolvedParsers = this.loadParsers(parsers, globalParsersBlacklist, globalParsersWhitelist);
+    const resolvedParsers = this.loadParsers(parsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
 
     // Needs a content string
     if (!content || typeof content !== 'string') {
@@ -90,7 +93,7 @@ export class OutletService {
     targetElement.innerHTML = content;
 
     // Dynamically create components in component selector elements
-    return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions)
+    return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, injector || this.injector)
     .pipe(first())
     .pipe(map((allComponentsLoaded: boolean) => {
       // Everything done! Return finished hookIndex and resolved parsers and options
@@ -153,15 +156,15 @@ export class OutletService {
   /**
    * Loads the relevant parser configuration
    */
-  private loadParsers(parsers: Array<HookParserEntry>, globalParsersBlacklist: Array<string>, globalParsersWhitelist: Array<string>): Array<HookParser> {
+  private loadParsers(parsers: Array<HookParserEntry>, injector: Injector, globalParsersBlacklist: Array<string>, globalParsersWhitelist: Array<string>): Array<HookParser> {
     let resolvedParsers: Array<HookParser>;
 
     // If local
     if (parsers) {
-      resolvedParsers = this.parserEntryResolver.resolve(parsers);
+      resolvedParsers = this.parserEntryResolver.resolve(parsers, injector);
     // If global
     } else if (this.globalSettings && this.globalSettings.hasOwnProperty('globalParsers')) {
-      resolvedParsers = this.parserEntryResolver.resolve(this.globalSettings.globalParsers, globalParsersBlacklist, globalParsersWhitelist);
+      resolvedParsers = this.parserEntryResolver.resolve(this.globalSettings.globalParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
     // If none given
     } else {
       resolvedParsers = [];

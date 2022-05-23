@@ -20,15 +20,16 @@ export class ParserEntryResolver {
    * Takes a list of HookParserEntries and transforms them into a list of loaded HookParsers
    *
    * @param parserEntries - The list of HookParserEntries to process
+   * @param injector - The injector to use for resolving parsers
    * @param blacklist - (optional) Which parsers to blacklist by name
    * @param whitelist - (optional) Which parsers to whitelist by name
    */
-  resolve(parserEntries: Array<HookParserEntry>, blacklist?: Array<string>, whitelist?: Array<string>): Array<HookParser> {
+  resolve(parserEntries: Array<HookParserEntry>, injector: Injector, blacklist?: Array<string>, whitelist?: Array<string>): Array<HookParser> {
 
     // Load all requested parsers
     const parsers: Array<HookParser> = [];
     for (const parser of parserEntries) {
-      const resolvedParser = this.resolveEntry(parser);
+      const resolvedParser = this.resolveEntry(parser, injector);
       if (resolvedParser) {
         parsers.push(resolvedParser);
       }
@@ -75,13 +76,14 @@ export class ParserEntryResolver {
    * - an object literal to configure SelectorHookParser with
    *
    * @param parserEntry - The HookParserEntry to process
+   * @param injector - The injector to use for resolving this parser
    */
-  resolveEntry(parserEntry: HookParserEntry): HookParser {
+  resolveEntry(parserEntry: HookParserEntry, injector: Injector): HookParser {
     // Check if class
     if (parserEntry.hasOwnProperty('prototype')) {
       // Check if service
       try {
-        return this.injector.get(parserEntry);
+        return injector.get(parserEntry);
       // Otherwise instantiate manually
       } catch (e) {
         return new (parserEntry as new(...args: any[]) => any)();

@@ -6,13 +6,13 @@ describe('DynamicHooks module', () => {
     };
 
     const module = DynamicHooksModule.forRoot({}, CustomPlatformService as any);
-    const platformServiceProvider = module.providers.find((p: any) => p.useClass === CustomPlatformService);
+    const platformServiceProvider = module.providers?.find((p: any) => p.useClass === CustomPlatformService);
     expect(platformServiceProvider).not.toBeUndefined();
   });
 
   it('#should set platformService to PlatformBrowserService if custom platform not passed', () => {
     const module = DynamicHooksModule.forRoot({});
-    const platformServiceProvider = module.providers.find((p: any) => p.useClass === PlatformBrowserService);
+    const platformServiceProvider = module.providers?.find((p: any) => p.useClass === PlatformBrowserService);
     expect(platformServiceProvider).not.toBeUndefined();
   });
 });
