@@ -292,7 +292,7 @@ interface LoadedComponent {
 Hooks can only be found if they have a corresponding `HookParser`. You can register `HookParser`s in the [global settings](#61-global-settings) or [on each OutletComponent](#62-outlet-component-bindings) individually. Both expect a `HookParserEntry`-array, which is just a fancy alias for several possible values. A `HookParserEntry` can be either:
 
 1. A custom `HookParser` instance.
-2. A custom `HookParser` class. If this class is registered as a provider in the root injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
+2. A custom `HookParser` class. If this class is registered as a provider in the nearest injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
 3. A `SelectorHookParserConfig` object literal, which automatically sets up an instance of `SelectorHookParser` for you.
 
 See the section [Writing your own HookParser](#7-writing-your-own-hookparser) for more info about option 1 and 2. 
@@ -306,7 +306,7 @@ Property | Type | Default | Description
 `component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig](#65-lazy-loading-components).
 `name` | `string` | - | The name of the parser. Required if you want to black- or whitelist it.
 `selector` | `string` | The component selector | The selector to use for the hook
-`injector` | `Injector` | The root injector | The injector to create the component with
+`injector` | `Injector` | The nearest injector | The injector to create the component with
 `enclosing` | `boolean` | `true` | Whether the selector is enclosing (`<app-hook>...</app-hook>`) or not (`<app-hook>`)
 `bracketStyle` | `{opening: string, closing: string}` | `{opening: '<', closing: '>'}` | The brackets to use for the selector
 `parseInputs` | `boolean` | `true` | Whether to parse inputs into live variables or leave them as strings
@@ -650,11 +650,12 @@ parse(
     parsers: Array<HookParserEntry> = null,
     options: OutletOptions = null,
     targetElement: HTMLElement = null,
-    targetHookIndex: HookIndex = null
+    targetHookIndex: HookIndex = null,
+    injector = null
 ): Observable<OutletParseResult>;
 ```
 
-Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. You can optionally also provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you.
+Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to the root injector. 
 
 The function will return an observable that contains an `OutletParseResult` with the form:
 

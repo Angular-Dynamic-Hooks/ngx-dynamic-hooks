@@ -4,7 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [2.0.1] - 2022-12-07
+## [2.0.2] - 2022-05-23
+### Update
+- Fix: Dynamically-created components now use the nearest injector by default, not the root injector. This prevents routing bugs related to components being passed the wrong ActivatedRoute.
+
+## [2.0.1] - 2022-05-01
 ### Update
 - Changed readme
 
@@ -72,7 +76,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...v2.0.0
 [1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2

@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../testing-api';
 import { TestService, TESTSERVICETOKEN } from '../../services/testService';
+import { OUTLETCOMPONENTSERVICE } from '../OutletComponentWithProviders';
 
 
 @Component({
@@ -11,9 +12,9 @@ import { TestService, TESTSERVICETOKEN } from '../../services/testService';
 export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   nonInputProperty: string = 'this is the default value';
   @Input() inputWithoutBrackets!: string;
-  @Input() emptyInputWithoutBrackets: string;
-  @Input() emptyInput: string;
-  @Input() emptyStringInput: string;
+  @Input() emptyInputWithoutBrackets!: string;
+  @Input() emptyInput!: string;
+  @Input() emptyStringInput!: string;
   @Input() _weird5Input$Name13!: string;
   @Input('stringPropAlias') stringProp: any;
   @Input('data-somevalue') dataSomeValue!: string;
@@ -43,7 +44,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   changesContentChildren!: Array<DynamicContentChild>;
 
 
-  constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {
+  constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(OUTLETCOMPONENTSERVICE) private outletComponentService: any, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {
   }
 
   ngDoCheck() {

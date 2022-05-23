@@ -1,5 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, Inject, DoCheck, AfterViewChecked, Output, EventEmitter, Optional } from '@angular/core';
-
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './options/options';
@@ -54,7 +53,8 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     private hostElement: ElementRef,
     private outletService: OutletService,
     private componentUpdater: ComponentUpdater,
-    private platform: PlatformService
+    private platform: PlatformService,
+    private injector: Injector
   ) {}
 
   ngDoCheck(): void {
@@ -126,7 +126,8 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
       this.parsers,
       this.options,
       this.hostElement.nativeElement,
-      this.hookIndex
+      this.hookIndex,
+      this.injector
     ).subscribe((outletParseResult: OutletParseResult) => {
       // hostElement and hookIndex are automatically filled
       this.activeParsers = outletParseResult.resolvedParsers;

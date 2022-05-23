@@ -16,7 +16,6 @@ import { first } from 'rxjs/operators';
 import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from './testing-api';
 import { OutletParseResult } from './testing-api';
 import { LoadedComponent } from './testing-api';
-import { OutletComponent } from './testing-api';
 import { OutletOptions, outletOptionDefaults } from './testing-api';
 import { HookParserEntry } from './testing-api';
 import { SelectorHookParser } from './testing-api';
@@ -40,6 +39,7 @@ import { PlatformBrowserService } from './testing-api';
 
 
 // Custom testing resources
+import { OutletComponentWithProviders } from './components/OutletComponentWithProviders';
 import { SingleTagTestComponent } from './components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from './components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from './components/inlineTest/inlineTest.c';
@@ -82,7 +82,7 @@ function prepareTestingModule(parsers?: any, options?: any, extraComponents: Arr
   if (options) { globalSettings.globalOptions = options; }
 
   // Generate declarations
-  let declarations = [OutletComponent];
+  let declarations = [OutletComponentWithProviders];
   if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
   declarations = declarations.concat(extraComponents);
 
@@ -143,7 +143,7 @@ function prepareTestingModule(parsers?: any, options?: any, extraComponents: Arr
     }
   });
 
-  const fixture = TestBed.createComponent(OutletComponent);
+  const fixture = TestBed.createComponent(OutletComponentWithProviders);
   return {
     testBed: TestBed,
     fixture: fixture,
@@ -160,7 +160,7 @@ function prepareTestingModule(parsers?: any, options?: any, extraComponents: Arr
 describe('DynamicHooksComponent', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponent;
+  let comp: OutletComponentWithProviders;
   let context: any;
 
   // Set up
@@ -2378,6 +2378,22 @@ describe('DynamicHooksComponent', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('for the multitag component');
   });
 
+  it('#should use the OutletComponent injector by default', (done) => {
+    const testText = `<dynhooks-singletagtest>`;
+
+    // As OutletComponentService is provided directly on OutletComponent, it should be available
+    comp.content = testText;
+    comp.ngOnChanges({content: true});
+    expect(comp.hookIndex[1].componentRef.instance.outletComponentService).toEqual({name: 'OutletComponentService'});
+
+    // Use OutletService.parse() without injector param to force usage of root injector, so OutletComponentService should not be available
+    const outletService: any = TestBed.inject(OutletService);
+    outletService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+      expect(outletParseResult.hookIndex[1].componentRef.instance.outletComponentService).toBeNull();
+      done();
+    });
+  });
+
   it('#should recognize custom injectors', () => {
     const testText = `<dynhooks-singletagtest>`;
 
@@ -2528,9 +2544,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBeUndefined();
     expect(loadedComp.simpleArray).toEqual([123, true, 'test']);
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // b) Test inputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, inputsWhitelist: ['simpleArray']}]));
@@ -2541,9 +2557,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBeUndefined();
     expect(loadedComp.numberProp).toBeUndefined();
     expect(loadedComp.simpleArray).toEqual([123, true, 'test']);
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // c) Test inputBlacklist + inputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, inputsBlacklist: ['simpleArray'], inputsWhitelist: ['simpleArray', 'numberProp']}]));
@@ -2554,9 +2570,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBeUndefined();
     expect(loadedComp.numberProp).toBe(917);
     expect(loadedComp.simpleArray).toBeUndefined();
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // d) Test outputBlacklist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsBlacklist: ['eventTriggeredAlias']}]));
@@ -2567,9 +2583,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
     expect(loadedComp.simpleArray).toEqual([123, true, 'test']);
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeUndefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeUndefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // e) Test outputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsWhitelist: ['httpResponseReceived']}]));
@@ -2580,9 +2596,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
     expect(loadedComp.simpleArray).toEqual([123, true, 'test']);
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeUndefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeUndefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeUndefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeUndefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // f) Test outputBlacklist + outputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsBlacklist: ['httpResponseReceived'], outputsWhitelist: ['eventTriggeredAlias', 'httpResponseReceived']}]));
@@ -2593,9 +2609,9 @@ describe('DynamicHooksComponent', () => {
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
     expect(loadedComp.simpleArray).toEqual([123, true, 'test']);
-    expect(comp.hookIndex[1].outputSubscriptions.componentClicked).toBeUndefined();
-    expect(comp.hookIndex[1].outputSubscriptions.eventTriggered).toBeDefined();
-    expect(comp.hookIndex[1].outputSubscriptions.httpResponseReceived).toBeUndefined();
+    expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeUndefined();
+    expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeDefined();
+    expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeUndefined();
   });
 
   it('#should disallow context access, if requested', () => {

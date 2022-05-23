@@ -15,7 +15,7 @@ import { ComponentUpdater } from './componentUpdater';
 export class ComponentCreator {
   private renderer: Renderer2;
 
-  constructor(private injector: Injector, private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater, private platform: PlatformService) {
+  constructor(private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater, private platform: PlatformService) {
     this.renderer = this.rendererFactory.createRenderer(null, null);
   }
 
@@ -27,8 +27,9 @@ export class ComponentCreator {
    * @param token - The token used for parsetoken-attribute of the component selectors
    * @param context - The current context object
    * @param options - The current HookComponentOptions
+   * @param injector - The injector to use for the dynamically-create components
    */
-  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions): ReplaySubject<boolean> {
+  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
     const hookHostElements = {};
@@ -64,7 +65,7 @@ export class ComponentCreator {
           // Get projectableNodes from the content slots
           const projectableNodes = this.getContentSlotElements(hookHostElements[hookId], token);
           // Instantiate component
-          this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass);
+          this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass, injector);
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
@@ -319,14 +320,15 @@ export class ComponentCreator {
    * @param projectableNodes - The nodes to inject as ng-content
    * @param options - The current HookComponentOptions
    * @param compClass - The component's class
+   * @param injector - The default injector to use for the component
    */
-  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any): void {
+  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any, injector: Injector): void {
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
     // The order of component creation or injection via projectableNodes does not seem to matter.
     const dynamicComponentFactory = this.cfr.resolveComponentFactory(compClass);
-    const injector = hook.data.injector ? hook.data.injector : this.injector;
-    const dynamicComponentRef = dynamicComponentFactory.create(injector, projectableNodes, componentHostElement);
+    const chosenInjector = hook.data.injector || injector;
+    const dynamicComponentRef = dynamicComponentFactory.create(chosenInjector, projectableNodes, componentHostElement);
 
     // Track component
     hook.componentRef = dynamicComponentRef;
