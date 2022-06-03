@@ -1589,7 +1589,7 @@ describe('DynamicHooksComponent', () => {
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true});
-    
+
     expect((comp as any)['completelyNewProperty']).toBeUndefined();
     comp.hookIndex[1].componentRef.instance.componentClicked.emit(555);
     expect((comp as any)['completelyNewProperty']).toBe(555);
