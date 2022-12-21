@@ -1,6 +1,6 @@
 {
   "name": "ngx-dynamic-hooks",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Automatically insert live Angular components into a dynamic string of content (based on their selector or any pattern of your choice) and render the result in the DOM.",
   "person": "Marvin Tobisch <mvin@live.de>",
   "license": "MIT",
@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "tslib": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=13"
   }
 }
