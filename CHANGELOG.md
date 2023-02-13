@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.5] - 2022-12-21
+### Update
+- Fix: Included stack traces when logging some errors
+
 ## [2.0.4] - 2022-12-21
 ### Update
 - Maintenance: Checked compatibility with Angular 15 and updated readme.
@@ -84,7 +88,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...HEAD
+[2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
 [2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...v2.0.2

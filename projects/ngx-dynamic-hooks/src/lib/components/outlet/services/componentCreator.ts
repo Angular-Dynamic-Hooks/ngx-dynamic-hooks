@@ -70,7 +70,7 @@ export class ComponentCreator {
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
           if (isDevMode()) {
-            console.error(e.message);
+            console.error(e.stack);
           }
           delete hookIndex[hook.id];
           return of(null);
