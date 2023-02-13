@@ -1,5 +1,5 @@
 language: node_js
-node_js: lts/*
+node_js: 17 # lts/* currently resolves to node 18 which doesn't work with ubuntu 16.04 xenial used by travis. try again later perhaps.
 addons:
   apt:
     sources:
@@ -9,6 +9,7 @@ addons:
 env:
   global:
     CODECOV_TOKEN=$CODECOV_TOKEN
+before_install: npm config set progress=false
 stages:
   - test
 jobs:

@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.7.5] - 2023-02-13
+### Maintenance
+- Fix: Included stack traces when logging some errors
+- Fix: Fixed travis.yml node version
+
 ## [1.7.3+4] - 2022-05-23
 ### Maintenance
 - Fix: Dynamically-created components now use the nearest injector by default, not the root injector. This prevents routing bugs related to components being passed the wrong ActivatedRoute.
@@ -67,7 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.4...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.5...HEAD
+[1.7.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.4...v1.7.5
 [1.7.3+4]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...v1.7.4
 [1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1

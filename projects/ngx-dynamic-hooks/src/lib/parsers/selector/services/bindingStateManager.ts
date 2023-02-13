@@ -88,8 +88,8 @@ export class BindingStateManager {
         );
       } catch (e) {
         if (isDevMode()) {
-          e.message = `Hook input parsing error\nselector: ` + parserConfig.selector +  `\ninput: ` + inputName + `\nvalue: "` + inputBinding.value + `"\nmessage: "` + e.message + `"`;
-          console.error(e);
+          console.error(`Hook input parsing error\nselector: ` + parserConfig.selector +  `\ninput: ` + inputName + `\nvalue: "` + inputBinding.value + `"`);
+          console.error(e.stack);
         }
         // If binding could not be parsed at all due to syntax error, remove from list of inputs.
         // No amount of calls to updateInputBindings() will fix this kind of error.
@@ -208,8 +208,8 @@ export class BindingStateManager {
           );
         } catch (e) {
           if (isDevMode()) {
-            e.message = `Hook output parsing error\nselector: ` + parserConfig.selector +  `\noutput: ` + outputName + `\nvalue: "` + outputBinding.raw + `"\nmessage: "` + e.message + `"`;
-            console.error(e);
+            console.error(`Hook output parsing error\nselector: ` + parserConfig.selector +  `\noutput: ` + outputName + `\nvalue: "` + outputBinding.value + `"`);
+            console.error(e.stack);
           }
         }
       };

@@ -561,7 +561,7 @@ describe('DynamicHooksComponent', () => {
     comp.ngOnChanges({content: true, parsers: true});
 
     expect(comp.activeParsers.length).toBe(1);
-    expect((<any>console.error)['calls'].mostRecent().args[0]).toBe('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
+    expect((<any>console.error)['calls'].mostRecent().args[0]).toContain('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
   });
 
   it('#should warn if using lazy-loaded parsers with old Angular versions', () => {
