@@ -349,7 +349,7 @@ export class DataTypeParser {
         const paramsArray = [];
         if (funcParams !== '') {
           for (const param of funcParams.split(',')) {
-            let p = this.decodeDataTypeString(param);                                                                                     // Decode variable
+            let p = this.decodeDataTypeString(param);                                                                   // Decode variable
             p = this.evaluate(p, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);    // Recursively repeat the process
             paramsArray.push(p);
           }
@@ -363,7 +363,7 @@ export class DataTypeParser {
     }
 
     try {
-      return this.fetchContextVariable(context, JSON.parse(JSON.stringify(path)));
+      return this.fetchContextVariable(context, path);
     } catch (e) {
       if (isDevMode()) {
         console.warn(e);

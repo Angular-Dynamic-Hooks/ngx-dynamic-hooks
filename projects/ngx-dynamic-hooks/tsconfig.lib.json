@@ -3,7 +3,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/lib",
-    "target": "es5",
+    "target": "es6",
     "declaration": true,
     "inlineSources": true,
     "types": [],

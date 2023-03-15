@@ -127,7 +127,8 @@ export class BindingStateManager {
         for (const [contextVarName, contextVarValue] of Object.entries(inputBinding.boundContextVariables)) {
           const encodedContextVarName = this.dataTypeParser.encodeDataTypeString(contextVarName);
           // Compare with previous value
-          if (this.dataTypeParser.safelyLoadContextVariable(encodedContextVarName, context, undefined, parserConfig.unescapeStrings, {}, parserConfig.allowContextFunctionCalls) !== contextVarValue) {
+          const newContextVarValue = this.dataTypeParser.safelyLoadContextVariable(encodedContextVarName, context, undefined, parserConfig.unescapeStrings, {}, parserConfig.allowContextFunctionCalls);
+          if (newContextVarValue !== contextVarValue) {
             boundContextVarHasChanged = true;
             break;
           }
