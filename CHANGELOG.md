@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.6] - 2022-12-21
+### Update
+- Fix: No longer de/serializes nested context variables, which caused unserializable objects to be removed
+
 ## [2.0.5] - 2022-12-21
 ### Update
 - Fix: Included stack traces when logging some errors
