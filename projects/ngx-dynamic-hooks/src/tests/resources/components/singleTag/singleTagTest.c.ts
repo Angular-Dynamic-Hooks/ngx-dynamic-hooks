@@ -36,6 +36,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() httpResponseReceived: EventEmitter<number> = new EventEmitter();
+  @Output() onDestroyEmitter: EventEmitter<string> = new EventEmitter();
   ngOnInitTriggered: boolean = false;
   ngOnChangesTriggered: boolean = false;
   mountContext: any;
@@ -63,6 +64,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   }
 
   ngOnDestroy() {
+    this.onDestroyEmitter.emit('Event triggered from onDestroy!');
   }
 
   onDynamicMount(data: OnDynamicData) {

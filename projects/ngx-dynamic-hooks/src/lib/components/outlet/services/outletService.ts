@@ -118,19 +118,19 @@ export class OutletService {
    */
   destroy(hookIndex: HookIndex): void {
     if (hookIndex) {
+      // Destroy dynamic components
+      for (const hookIndexEntry of Object.values(hookIndex)) {
+        if (hookIndexEntry.componentRef) {
+          hookIndexEntry.componentRef.destroy();
+        }
+      }
+
       // Unsubscribe from hook outputs
       for (const hook of Object.values(hookIndex)) {
         for (const sub of Object.values(hook.outputSubscriptions)) {
           if (sub) {
             sub.unsubscribe();
           }
-        }
-      }
-
-      // Destroy dynamic components
-      for (const hookIndexEntry of Object.values(hookIndex)) {
-        if (hookIndexEntry.componentRef) {
-          hookIndexEntry.componentRef.destroy();
         }
       }
     }
