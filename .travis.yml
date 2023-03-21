@@ -19,7 +19,7 @@ jobs:
         directories:
           - ./node_modules
       install:
-        - npm install
+        - npm install --force
         - npm install codecov -g
       script:
         - npm run ci:build
