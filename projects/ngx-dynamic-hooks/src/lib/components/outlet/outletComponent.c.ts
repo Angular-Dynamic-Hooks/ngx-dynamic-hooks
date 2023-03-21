@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './options/options';
@@ -6,6 +6,7 @@ import { OutletService } from './services/outletService';
 import { HookParserEntry } from './options/parserEntry';
 import { ComponentUpdater } from './services/componentUpdater';
 import { PlatformService } from '../../platform/platformService';
+import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';
 
 /**
  * The main component of the DynamicHooksModule. Accepts a string of text and replaces all hooks inside of it with dynamically created
@@ -50,12 +51,15 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   // ----------------------------------------------------------------------
 
   constructor(
+    // Just needs to request injecting this to ensure that forRoot was called
+    @Optional() @Inject(DYNAMICHOOKS_FORROOTCHECK) private check,
     private hostElement: ElementRef,
     private outletService: OutletService,
     private componentUpdater: ComponentUpdater,
     private platform: PlatformService,
-    private injector: Injector
-  ) {}
+    private injector: Injector,
+  ) {
+  }
 
   ngDoCheck(): void {
     // Update bindings on every change detection run?

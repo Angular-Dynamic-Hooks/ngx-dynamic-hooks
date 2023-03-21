@@ -1,5 +1,5 @@
 import { Injector } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
 import { OutletParseResult } from '../testing-api';

@@ -27,7 +27,7 @@ export class ComponentCreator {
    * @param token - The token used for parsetoken-attribute of the component selectors
    * @param context - The current context object
    * @param options - The current HookComponentOptions
-   * @param injector - The injector to use for the dynamically-create components
+   * @param injector - The injector to use for the dynamically-created components
    */
   init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);

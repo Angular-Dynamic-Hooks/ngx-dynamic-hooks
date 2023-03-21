@@ -85,26 +85,26 @@ export class ComponentUpdater {
     // Check if outputs exist on component
     const existingOutputs: {[key: string]: (e, c) => any} = {};
     if (options.acceptOutputsForAnyObservable) {
-      for (const [outputName, outputValue] of Object.entries(changedOutputs)) {
+      for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
         if (hook.componentRef.instance[outputName] instanceof Observable) {
-          existingOutputs[outputName] = outputValue;
+          existingOutputs[outputName] = outputCallback;
         }
       }
     } else {
       const compFactory = this.cfr.resolveComponentFactory(hook.componentRef.componentType);
-      for (const [outputName, outputValue] of Object.entries(changedOutputs)) {
+      for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
         const outputEntry = compFactory.outputs.filter(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName));
         if (outputEntry.length > 0) {
           // Save in existingInputs with actual property name, not alias
-          existingOutputs[outputEntry[0].propName] = outputValue;
+          existingOutputs[outputEntry[0].propName] = outputCallback;
         }
       }
     }
 
     // (Re)subscribe to outputs, store subscription in Hook
-    for (const [outputName, outputValue] of Object.entries(existingOutputs)) {
+    for (const [outputName, outputCallback] of Object.entries(existingOutputs)) {
       if (hook.outputSubscriptions[outputName]) { hook.outputSubscriptions[outputName].unsubscribe(); }
-      hook.outputSubscriptions[outputName] = hook.componentRef.instance[outputName].subscribe(event => outputValue(event, context));
+      hook.outputSubscriptions[outputName] = hook.componentRef.instance[outputName].subscribe(event => outputCallback(event, context));
     }
 
   }

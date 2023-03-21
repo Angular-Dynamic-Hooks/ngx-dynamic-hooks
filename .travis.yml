@@ -1,5 +1,5 @@
 language: node_js
-node_js: 17 # lts/* currently resolves to node 18 which doesn't work with ubuntu 16.04 xenial used by travis. try again later perhaps.
+# node_js: normally is "17" or "lts/*". disabling to let travis handle node version. manual version can cause OS incompatibilities.
 addons:
   apt:
     sources:

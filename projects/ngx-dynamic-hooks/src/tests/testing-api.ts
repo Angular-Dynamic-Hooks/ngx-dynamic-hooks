@@ -5,16 +5,26 @@
  */
 
 // Public module resources
-export { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../lib/globalSettings';
+export { DynamicHooksModule } from '../lib/dynamicHooks.m';
+export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/globalSettings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
 export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
 export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
+export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
+export { OutletService } from '../lib/components/outlet/services/outletService';
 export { PlatformService } from '../lib/platform/platformService';
-export { DynamicHooksModule } from '../lib/dynamicHooks.m';
+export { PlatformBrowserService } from '../lib/platform/platformBrowserService';
+export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
+export { DataTypeParser } from '../lib/utils/dataTypeParser';
+export { DeepComparer } from '../lib/utils/deepComparer';
+export { HookFinder } from '../lib/utils/hookFinder';
+export { regexes } from '../lib/utils/regexes';
+export { matchAll } from '../lib/polyfills/matchAll';
 
 // Private module resources
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
 export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
 export { ParserEntryResolver } from '../lib/components/outlet/options/parserEntryResolver';
 export { ComponentCreator } from '../lib/components/outlet/services/componentCreator';
@@ -23,11 +33,3 @@ export { HooksReplacer } from '../lib/components/outlet/services/hooksReplacer';
 export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
 export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
 export { SelectorHookFinder } from '../lib/parsers/selector/services/selectorHookFinder';
-export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
-export { DataTypeParser } from '../lib/utils/dataTypeParser';
-export { DeepComparer } from '../lib/utils/deepComparer';
-export { HookFinder } from '../lib/utils/hookFinder';
-export { OutletService } from '../lib/components/outlet/services/outletService';
-export { PlatformBrowserService } from '../lib/platform/platformBrowserService';
-
-export { matchAll } from '../lib/polyfills/matchAll';

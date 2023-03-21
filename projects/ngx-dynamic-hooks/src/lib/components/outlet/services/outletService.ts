@@ -7,10 +7,11 @@ import { HookParser, OutletParseResult } from '../../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from '../options/options';
 import { HooksReplacer } from './hooksReplacer';
 import { ComponentCreator } from './componentCreator';
-import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../../../globalSettings';
+import { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../../../globalSettings';
 import { ParserEntryResolver } from '../options/parserEntryResolver';
 import { OptionsResolver } from '../options/optionsResolver';
 import { HookParserEntry } from '../options/parserEntry';
+import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in OutletComponent, so that its
@@ -19,9 +20,12 @@ import { HookParserEntry } from '../options/parserEntry';
 @Injectable()
 export class OutletService {
   private renderer: Renderer2;
+  private finalSettings: DynamicHooksGlobalSettings;
 
   constructor(
-    @Optional() @Inject(DYNAMICHOOKS_GLOBALSETTINGS) private globalSettings: DynamicHooksGlobalSettings,
+    @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksGlobalSettings[],
+    @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksGlobalSettings[],
+    @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksGlobalSettings,
     private parserEntryResolver: ParserEntryResolver,
     private optionsResolver: OptionsResolver,
     private hooksReplacer: HooksReplacer,
@@ -43,7 +47,7 @@ export class OutletService {
    * @param options - An optional list of options to use instead of the global ones
    * @param targetElement - An optional HTML element to use as the container for the loaded content. If none is provided, one is created and returned for you.
    * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
-   * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the root injector is used.
+   * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the injector of the module this library is imported to is used.
    */
   parse(
     content: string,
@@ -66,6 +70,7 @@ export class OutletService {
     }
 
     // Resolve options and parsers
+    this.resolveSettings();
     const resolvedOptions = this.loadOptions(options);
     const resolvedParsers = this.loadParsers(parsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
 
@@ -133,6 +138,54 @@ export class OutletService {
 
   // ----------------------------------------------------------------------------------------------------------
 
+  private resolveSettings(): void {
+    if (!this.moduleSettings.hasOwnProperty('lazyInheritance') || this.moduleSettings.lazyInheritance === DynamicHooksInheritance.All) {
+      // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
+      // This is in case other settings were added to the back of allSettings after registering this module
+      const ancestorOptions = this.ancestorSettings.map(ancestorSettings => ancestorSettings.hasOwnProperty('globalOptions') ? {globalOptions: ancestorSettings.globalOptions} : {});
+      const allSettings = [...this.allSettings, ...ancestorOptions];
+
+      this.finalSettings = this.mergeSettings(allSettings);
+    } else if (this.moduleSettings.lazyInheritance === DynamicHooksInheritance.Linear) {
+      this.finalSettings = this.mergeSettings(this.ancestorSettings);
+    } else if (this.moduleSettings.lazyInheritance === DynamicHooksInheritance.None) {
+      this.finalSettings = this.moduleSettings;
+    } else {
+      throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${this.moduleSettings.lazyInheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
+    }
+  }
+
+  /**
+   * Merges multiple settings objects, overwriting previous ones with later ones in the provided array
+   *
+   * @param settingsArray - The settings objects to merge
+   */
+  private mergeSettings(settingsArray: DynamicHooksGlobalSettings[]): DynamicHooksGlobalSettings {
+    const finalSettings: DynamicHooksGlobalSettings = {};
+    for (const settings of settingsArray) {
+      // Parsers are simply all collected, not overwritten
+      if (settings.hasOwnProperty('globalParsers')) {
+        if (!finalSettings.hasOwnProperty('globalParsers')) {
+          finalSettings.globalParsers = [];
+        }
+        for (const parserEntry of settings.globalParsers) {
+          finalSettings.globalParsers.push(parserEntry);
+        }
+      }
+      // Options are individually overwritten
+      if (settings.hasOwnProperty('globalOptions')) {
+        if (!finalSettings.hasOwnProperty('globalOptions')) {
+          finalSettings.globalOptions = {};
+        }
+        for (const [optionKey, optionValue] of Object.entries(settings.globalOptions)) {
+          finalSettings.globalOptions[optionKey] = optionValue;
+        }
+      }
+    }
+
+    return finalSettings;
+  }
+
   /**
    * Loads the relevant outlet options
    */
@@ -143,8 +196,8 @@ export class OutletService {
     if (options) {
       resolvedOptions = this.optionsResolver.resolve(options);
     // If global
-    } else if (this.globalSettings && this.globalSettings.hasOwnProperty('globalOptions')) {
-      resolvedOptions = this.optionsResolver.resolve(this.globalSettings.globalOptions);
+    } else if (this.finalSettings && this.finalSettings.hasOwnProperty('globalOptions')) {
+      resolvedOptions = this.optionsResolver.resolve(this.finalSettings.globalOptions);
     // If none given
     } else {
       resolvedOptions = outletOptionDefaults;
@@ -163,8 +216,8 @@ export class OutletService {
     if (parsers) {
       resolvedParsers = this.parserEntryResolver.resolve(parsers, injector);
     // If global
-    } else if (this.globalSettings && this.globalSettings.hasOwnProperty('globalParsers')) {
-      resolvedParsers = this.parserEntryResolver.resolve(this.globalSettings.globalParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
+    } else if (this.finalSettings && this.finalSettings.hasOwnProperty('globalParsers')) {
+      resolvedParsers = this.parserEntryResolver.resolve(this.finalSettings.globalParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
     // If none given
     } else {
       resolvedParsers = [];
