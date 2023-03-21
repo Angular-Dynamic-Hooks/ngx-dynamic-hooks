@@ -4,6 +4,7 @@ import { OutletComponentWithProviders } from '../resources/components/OutletComp
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
+import { OutletService } from '../testing-api';
 
 describe('Loading dynamic bindings', () => {
   let testBed;
@@ -188,5 +189,18 @@ describe('Loading dynamic bindings', () => {
     expect((comp as any)['completelyNewProperty']).toBe(undefined);
     expect((<any>console.error)['calls'].count(1));
   });
- 
+
+  it('#should not unsubscribe from outputs before components are destroyed', () => {
+    const testText = `<dynhooks-singletagtest (onDestroyEmitter)="context.maneuvers.modifyParent($event)">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true});
+
+    const outletService: OutletService = testBed.inject(OutletService);
+
+    expect((comp as any)['completelyNewProperty']).toBeUndefined();
+    outletService.destroy(comp.hookIndex);
+    expect((comp as any)['completelyNewProperty']).toBe('Event triggered from onDestroy!');
+  });
+
 });
