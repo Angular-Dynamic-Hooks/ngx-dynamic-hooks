@@ -4,28 +4,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [2.0.6] - 2022-12-21
-### Update
+## [2.1.0] - 2023-03-21
+### Added
+- Added forChild feature
+- Fix: Outputs of dynamic components now still work in onDestroy
+
+## [2.0.6] - 2023-03-15
+### Maintenance
 - Fix: No longer de/serializes nested context variables, which caused unserializable objects to be removed
 
 ## [2.0.5] - 2022-12-21
-### Update
+### Maintenance
 - Fix: Included stack traces when logging some errors
 
 ## [2.0.4] - 2022-12-21
-### Update
+### Maintenance
 - Maintenance: Checked compatibility with Angular 15 and updated readme.
 
 ## [2.0.3] - 2022-05-23
-### Update
+### Maintenance
 - Maintenance: Checked compatibility with Angular 14 and updated readme.
 
 ## [2.0.2] - 2022-05-23
-### Update
+### Maintenance
 - Fix: Dynamically-created components now use the nearest injector by default, not the root injector. This prevents routing bugs related to components being passed the wrong ActivatedRoute.
 
 ## [2.0.1] - 2022-05-01
-### Update
+### Maintenance
 - Changed readme
 
 ## [2.0.0] - 2021-11-06
@@ -92,9 +97,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...HEAD
-[2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
-[2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.0
+[2.0.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6
+[2.0.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
+[2.0.4]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.0...v2.0.1
