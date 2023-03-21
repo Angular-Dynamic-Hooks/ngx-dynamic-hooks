@@ -55,14 +55,17 @@ describe('Initialization', () => {
     expect(Object.keys(comp.hookIndex).length).toBe(0);
   });
 
-  it('#should not crash if the user does not declare global settings', () => {
+  it('#should not crash if the user passes an empty object as global settings', () => {
     const testText = `<p>This is just a bit of text.</p>`;
 
     ({fixture, comp} = prepareTestingModule());
     comp.content = testText;
     comp.ngOnChanges({content: true});
 
-    expect(comp['outletService']['globalSettings']).toBeNull();
+    expect(comp['outletService']['allSettings'].length).toBe(1);
+    expect(comp['outletService']['allSettings'][0]).toEqual({});
+    expect(comp['outletService']['moduleSettings']).toEqual({});
+    expect(comp['outletService']['finalSettings']).toEqual({});
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default

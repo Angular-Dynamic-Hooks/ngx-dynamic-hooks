@@ -13,43 +13,18 @@ import { first } from 'rxjs/operators';
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
-import { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings, OutletComponent } from '../testing-api';
-import { OutletParseResult } from '../testing-api';
-import { LoadedComponent } from '../testing-api';
-import { OutletOptions, outletOptionDefaults } from '../testing-api';
-import { HookParserEntry } from '../testing-api';
-import { SelectorHookParser } from '../testing-api';
-import { PlatformService } from '../testing-api';
-
-import { OptionsResolver } from '../testing-api';
-import { ParserEntryResolver } from '../testing-api';
-import { ComponentCreator } from '../testing-api';
-import { ComponentUpdater } from '../testing-api';
-import { HooksReplacer } from '../testing-api';
-import { SelectorHookParserConfigResolver } from '../testing-api';
-import { BindingStateManager } from '../testing-api';
-import { SelectorHookFinder } from '../testing-api';
-import { DataTypeEncoder } from '../testing-api';
-import { DataTypeParser } from '../testing-api';
-import { DeepComparer } from '../testing-api';
-import { HookFinder } from '../testing-api';
-import { OutletService } from '../testing-api';
-import { PlatformBrowserService } from '../testing-api';
+import { DynamicHooksGlobalSettings, DynamicHooksModule, HookParserEntry } from '../testing-api';
 
 // Custom testing resources
 import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
-import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
-import { ChildTestComponent } from '../resources/components/parentTest/childTest/childTest.c';
+import { TestService } from '../resources/services/testService';
 import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
 import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
 import { ServiceTestParser } from '../resources/parsers/serviceTestParser';
-import { NonServiceTestParser } from '../resources/parsers/nonServiceTestParser';
-import { TESTSERVICETOKEN, TestService } from '../resources/services/testService';
-import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
-import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
+
 
 export class MockElementRef {
   nativeElement!: {};
@@ -86,50 +61,9 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   if (options) { globalSettings.globalOptions = options; }
 
   // Generate declarations
-  let declarations = [OutletComponentWithProviders];
+  let declarations = [];
   if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
   declarations = declarations.concat(extraComponents);
-
-  // Get all services
-  const services = [
-    // Main component services
-    OptionsResolver,
-    ParserEntryResolver,
-    OutletService,
-    ComponentCreator,
-    ComponentUpdater,
-    HooksReplacer,
-    // Parser services
-    SelectorHookParserConfigResolver,
-    BindingStateManager,
-    SelectorHookFinder,
-    // Util services
-    DataTypeEncoder,
-    DataTypeParser,
-    DeepComparer,
-    HookFinder,
-    // Test services
-    TestService,
-    // Other
-    ServiceTestParser,
-    EnclosingCustomParser,
-    NgContentTestParser,
-    // Platform
-    { provide: PlatformService, useClass: PlatformBrowserService, deps: [DomSanitizer] }
-  ];
-
-  // Generate providers
-  const providers: any = [
-    {provide: ComponentFixtureAutoDetect, useValue: true},
-    {provide: ElementRef, useClass: MockElementRef},
-    ...services
-  ];
-  if (Object.keys(globalSettings).length > 0) {
-    providers.push({
-      provide: DYNAMICHOOKS_GLOBALSETTINGS,
-      useValue: globalSettings
-    });
-  }
 
   // Generate entryComponents
   let entryComponents: any = [];
@@ -137,11 +71,30 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   entryComponents = entryComponents.concat(extraComponents);
 
   // Create testing module
+  DynamicHooksModule.reset();
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
+    imports: [
+      DynamicHooksModule.forRoot(globalSettings)
+    ],
     declarations,
-    providers,
-  }).overrideModule(BrowserDynamicTestingModule, {
+    providers: [
+      {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
+      {provide: ElementRef, useClass: MockElementRef},
+      TestService,
+      ServiceTestParser,
+      EnclosingCustomParser,
+      NgContentTestParser
+    ]
+  })
+  .overrideModule(DynamicHooksModule, {
+    add: {
+      declarations: [OutletComponentWithProviders],
+      entryComponents: [OutletComponentWithProviders],
+      exports: [OutletComponentWithProviders]
+    }
+  })
+  .overrideModule(BrowserDynamicTestingModule, {
     set: {
       entryComponents
     }
@@ -154,8 +107,6 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
     comp: fixture.componentInstance
   };
 }
-
-
 
 export interface TestingModuleComponentAndContext {
   testBed: TestBedStatic;

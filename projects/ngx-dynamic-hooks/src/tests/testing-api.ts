@@ -6,7 +6,7 @@
 
 // Public module resources
 export { DynamicHooksModule } from '../lib/dynamicHooks.m';
-export { DYNAMICHOOKS_GLOBALSETTINGS, DynamicHooksGlobalSettings } from '../lib/globalSettings';
+export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/globalSettings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
 export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
@@ -24,6 +24,7 @@ export { regexes } from '../lib/utils/regexes';
 export { matchAll } from '../lib/polyfills/matchAll';
 
 // Private module resources
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
 export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
 export { ParserEntryResolver } from '../lib/components/outlet/options/parserEntryResolver';
 export { ComponentCreator } from '../lib/components/outlet/services/componentCreator';

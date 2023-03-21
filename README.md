@@ -24,7 +24,8 @@ Automatically insert live Angular components into dynamic strings (based on thei
     * [6.2 Outlet component bindings](#62-outlet-component-bindings)
     * [6.3 `HookParserEntry`](#63-hookparserentry)
     * [6.4 `OutletOptions`](#64-outletoptions)
-    * [6.5 Lazy-loading components](#65-lazy-loading-components)
+    * [6.5 Child modules (forChild)](#65-child-modules-forchild)
+    * [6.6 Lazy-loading components](#66-lazy-loading-components)
 7. [Writing your own HookParser](#7-writing-your-own-hookparser)
     * [7.1 What makes a parser](#71-what-makes-a-parser)
     * [7.2 Example: Emoji parser (standalone)](#72-example-emoji-parser-standalone)
@@ -256,6 +257,7 @@ Name | Type | Description
 --- | --- | ---
 `globalParsers` | `HookParserEntry[]` | An list of hook parsers to provide to all `OutletComponents` (see [HookParserEntry](#63-hookparserentry))
 `globalOptions` | `OutletOptions` | An options object to provide to all `OutletComponents` (see [OutletOptions](#64-outletoptions))
+`lazyInheritance` | `number` | An enum option from `DynamicHooksInheritance` (see [Child modules (forChild)](#65-child-modules-forchild))
 
 Note that you don't have to define a global settings object. You can also configure each `OutletComponent` with their [own parsers and options](#62-outlet-component-bindings) as inputs.
 
@@ -335,7 +337,47 @@ Option name | Type | Default | Description
 `acceptInputsForAnyProperty` | `boolean` | `false` | Whether to disregard `@Input()`-decorators completely and allow passing in values to any property in dynamic components
 `acceptOutputsForAnyObservable` | `boolean` | `false` | Whether to disregard `@Output()`-decorators completely and allow subscribing to any `Observable` in dynamic components
 
-### 6.5 Lazy-loading components:
+### 6.5 Child modules (forChild):
+
+If you are using child modules, you can use `DynamicHooksModule.forChild()` to load a subset of dynamic component hook parsers & options along with a child module instead of loading all of them at once via `forRoot()` on the main module.
+
+`DynamicHooksModule.forChild()` works both with eagerly imported child modules as well as [lazily-loaded child modules](https://angular.io/guide/lazy-loading-ngmodules). There are however some differences as to how child settings/components are loaded.
+
+In eagerly imported child modules, the `forChild()` parsers will be **added** to the global root parsers. As a result, every instance of `<ngx-dynamic-hooks>` in your app will use the same list of parsers. This ultimately behaves the same as registering all parsers via `forRoot()`. Meanwhile, options are merged in the order of importing them.
+
+In lazily-loaded child modules, you can modify what parsers & options are used by the child module via the optional `lazyInheritance` option in [DynamicHooksGlobalSettings](#61-global-settings). It accepts a value from the `DynamicHooksInheritance` enum, which are as follows:
+
+1. `DynamicHooksInheritance.All`: (Default) The child module uses all parsers & options from anywhere in the app. 
+2. `DynamicHooksInheritance.Linear`: The child module only uses parsers & options from direct module ancestors (such a father and grandfather modules, but not "uncle" modules)
+3. `DynamicHooksInheritance.None`: The child module only uses parsers & options defined by itself
+
+If relevant, options are always merged in the following order: Any module options, direct ancestor module options, then own options.
+
+An example for a lazily-loaded child module might then look like this:
+
+```
+import { DynamicHooksModule, DynamicHooksInheritance } from 'ngx-dynamic-hooks';
+
+@NgModule({
+  ...
+  imports: [
+    DynamicHooksModule.forChild({
+        globalParsers: [
+          {component: ChildDynamicComponent}
+        ],
+        globalOptions: {
+            // whatever you like for this module
+        }
+        lazyInheritance: DynamicHooksInheritance.Linear
+      })
+  ],
+})
+export class LazilyLoadedChildModule {}
+```
+
+***Warning***: Do not use or set the `lazyInheritance` option to anything other than `All` in eagerly-loaded modules. The other options will not work as Angular near-seamlessly merges eager modules with the root module and using it will almost certainly result in unexpected behaviour.
+
+### 6.6 Lazy-loading components:
 If you are using the Ivy templating engine (Angular 9+), you can configure your hook parsers in such a way that they lazy-load the component class only if it is needed and the corresponding hook appears in the content string.
 
 You may have noticed that the component-property in `SelectorHookParserConfig` has the type `ComponentConfig` (see [HookParserEntry](#63-hookparserentry)). This means it can be the component class, but also a `LazyLoadComponentConfig`:
@@ -655,7 +697,7 @@ parse(
 ): Observable<OutletParseResult>;
 ```
 
-Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to the root injector. 
+Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to the injector of the module that imported this library.
 
 The function will return an observable that contains an `OutletParseResult` with the form:
 

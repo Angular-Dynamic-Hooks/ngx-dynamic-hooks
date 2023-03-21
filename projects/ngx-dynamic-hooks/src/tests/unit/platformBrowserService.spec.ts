@@ -341,7 +341,7 @@ describe('PlatformBrowserService', () => {
 
     spyOn(platformService['sanitizer'], 'sanitize').and.returnValue(expectedResult);
 
-    const actualResult = platformService.sanitize(testText)
+    const actualResult = platformService.sanitize(testText);
 
     expect(actualResult).toBe(expectedResult);
   });
