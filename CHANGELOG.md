@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.8.0] - 2023-03-21
+### Added
+- Added forChild feature
+- Fix: Outputs of dynamic components now still work in onDestroy
+
 ## [1.7.6] - 2023-03-23
 ### Maintenance 
 - Fix: No longer de/serializes nested context variables, which caused unserializable objects to be removed
@@ -76,8 +81,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.6...HEAD
-[1.7.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.5...v1.7.6
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.6...v1.8.0
+[1.7.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.5...v1.7.6
 [1.7.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.4...v1.7.5
 [1.7.3+4]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...v1.7.4
 [1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
