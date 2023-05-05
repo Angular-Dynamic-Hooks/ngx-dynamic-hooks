@@ -188,7 +188,7 @@ You can subscribe to @Output() events from selector hooks with functions from th
 As with normal Angular @Output() bindings, the special `$event`-keyword can optionally be used to pass the emitted event object as a parameter to the function.
 
 #### A note about `this`:
-A function directly assigned to the context object will have `this` pointing to the context object itself when called, as per standard JavaScript behavior. This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
+A function directly assigned to the context object will have `this` pointing to the context object itself when called, as per standard JavaScript behaviour. This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
 
 * Assign the parent of the function to the context object (instead of the function itself) and call via `context.parent.func()`
 * If you don't want to expose the parent, assign a [bound function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) to the context object like `const contextObj = {func: this.func.bind(this)}`.
@@ -241,6 +241,8 @@ export class DynamicComponent implements OnDynamicMount, OnDynamicChanges {
 ```
 
 **Note:** You may have spotted that content children are given as `DynamicContentChild`-arrays. Each `DynamicContentChild` consists of the `ComponentRef`, the selector and the `HookValue` of the component, as well as all of its own content children, again given as a `DynamicContentChild` array. It is therefore a hierarchical list of all content children, not a flat one.
+
+**Also:** As normal, make sure to still include an `<ng-content>` block in each parent component so Angular knows where to render the child content.
 
 ### 5.6 Change detection:
 Dynamically-loaded components are connected to Angular change detection and will be checked when it is triggered like any other part of the app. Setting `ChangeDetectionStrategy.OnPush` on them to limit change detection will work as well. 
@@ -321,7 +323,7 @@ Property | Type | Default | Description
 `allowContextFunctionCalls` | `boolean` | `true` | Whether to allow calling context object functions in inputs and outputs
 
 ### 6.4 `OutletOptions`:
-You can also provide your own `OutletOptions` for each `OutletComponent` and overwrite the default values. These options determine the overall behavior of the outlet, such as of how the content string is rendered and how dynamic components are managed.
+You can also provide your own `OutletOptions` for each `OutletComponent` and overwrite the default values. These options determine the overall behaviour of the outlet, such as of how the content string is rendered and how dynamic components are managed.
 
 Option name | Type | Default | Description
 --- | --- | --- | ---
@@ -913,7 +915,7 @@ This might be due to sanitization. This library uses Angular's native DomSanitiz
 
 You can turn off sanitization at any time through the [`OutletOptions`](#64-outletoptions). Note that you will then have to ensure that the content is safe to render by yourself!
 
-**Escaped HTML entities such as `&gt;` and `&lt;` are transformed back to their actual characters (`<` and `>`) in the content string. This is not desired behavior.**
+**Escaped HTML entities such as `&gt;` and `&lt;` are transformed back to their actual characters (`<` and `>`) in the content string. This is not desired behaviour.**
 
 Automatically transforming HTML entities is a convenience feature to ensure maximum compatibility when parsing hooks. You can turn it off at any time via the `convertHTMLEntities`-setting in the [`OutletOptions`](#64-outletoptions).
 
