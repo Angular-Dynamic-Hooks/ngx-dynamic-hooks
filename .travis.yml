@@ -1,3 +1,4 @@
+dist: jammy
 language: node_js
 node_js: 17 #  normally is "17" or "lts/*". removing it disabling has travis sometimes pick weird versions like 0.10.
 addons:
