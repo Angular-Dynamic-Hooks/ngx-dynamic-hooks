@@ -336,7 +336,9 @@ Option name | Type | Default | Description
 `acceptInputsForAnyProperty` | `boolean` | `false` | Whether to disregard `@Input()`-decorators completely and allow passing in values to any property in dynamic components
 `acceptOutputsForAnyObservable` | `boolean` | `false` | Whether to disregard `@Output()`-decorators completely and allow subscribing to any `Observable` in dynamic components
 
-### 6.5 Child modules (forChild):
+### 6.5 Child modules (forChild) - Only with Ivy:
+
+**Note**: The following forChild-functionality only properly works with the new Ivy compiler, as it will break AOT compilation with the old View Engine compiler.
 
 If you are using child modules, you can use `DynamicHooksModule.forChild()` to load a subset of dynamic component hook parsers & options along with a child module instead of loading all of them at once via `forRoot()` on the main module.
 

@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.8.1] - 2023-05-15
+### Maintenance
+- Fixed AOT (prod) compilation with View Engine
+
 ## [1.8.0] - 2023-03-21
 ### Added
 - Added forChild feature
@@ -81,7 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.6...v1.8.0
 [1.7.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.5...v1.7.6
 [1.7.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.4...v1.7.5

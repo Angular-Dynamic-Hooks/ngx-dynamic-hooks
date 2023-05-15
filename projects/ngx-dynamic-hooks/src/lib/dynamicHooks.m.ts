@@ -16,9 +16,24 @@ import { SelectorHookParserConfigResolver } from './parsers/selector/config/sele
 import { OutletService } from './components/outlet/services/outletService';
 import { PlatformService } from './platform/platformService';
 import { PlatformBrowserService } from './platform/platformBrowserService';
-import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from './interfaces';
+import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_ROOTSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from './interfaces';
 
-const allSettings: DynamicHooksGlobalSettings[] = [];
+const allSettings = [];
+const allChildSettings: DynamicHooksGlobalSettings[] = [];
+
+export function allSettingsInjectorFactory(rootSettings: DynamicHooksGlobalSettings): DynamicHooksGlobalSettings[] {
+  if (rootSettings === null) {
+    throw new Error('It seems you\'re trying to use ngx-dynamic-hooks without calling forRoot() on the main module first. Make sure to include this to register all needed services.');
+  }
+  // Clear array but keep reference
+  allSettings.length = 0;
+
+  // Repopulate with updated values
+  allSettings.push(rootSettings);
+  allChildSettings.forEach(childSettings => allSettings.push(childSettings));
+
+  return allSettings;
+}
 
 @NgModule()
 export class DynamicHooksChildModule {}
@@ -38,12 +53,16 @@ export class DynamicHooksModule {
   // Make sure not to set the optional function signature "ModuleWithProviders<T>".
   // Angular 5's version was non-generic, so will break backwards-compatibility.
   static forRoot(rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) /*: ModuleWithProviders<DynamicHooksModule>*/ {
-    allSettings.push(rootSettings);
+    // Note: Do not put any logic into forRoot. Otherwise it will break AOT compilation with View Engine (non Ivy). It needs to be very static.
     return {
       ngModule: DynamicHooksModule,
       providers: [
-        { provide: DYNAMICHOOKS_FORROOTCALLED, useValue: true },
-        { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
+        {
+          provide: DYNAMICHOOKS_ALLSETTINGS,
+          useFactory: allSettingsInjectorFactory,
+          deps: [[new Optional(), DYNAMICHOOKS_ROOTSETTINGS]]
+        },
+        { provide: DYNAMICHOOKS_ROOTSETTINGS, useValue: rootSettings },
         { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
         { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
         { provide: PlatformService, useClass: platformService || PlatformBrowserService },
@@ -66,22 +85,17 @@ export class DynamicHooksModule {
   }
 
   static forChild(childSettings: DynamicHooksGlobalSettings) /*: ModuleWithProviders<DynamicHooksModule>*/ {
-    allSettings.push(childSettings);
+    allChildSettings.push(childSettings);
     return {
       ngModule: DynamicHooksModule,
       providers: [
-        {
-          provide: DYNAMICHOOKS_FORROOTCHECK,
-          useFactory: (forRootCalled: boolean) => {
-            if (!forRootCalled) {
-              throw new Error('It seems you\'re trying to use ngx-dynamic-hooks without calling forRoot() on the main module first. Make sure to include this to register all needed services.');
-            }
-            return true;
-          },
-          deps: [[new Optional(), DYNAMICHOOKS_FORROOTCALLED]]
-        },
         // Provide the child settings
         { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: childSettings },
+        {
+          provide: DYNAMICHOOKS_ALLSETTINGS,
+          useFactory: allSettingsInjectorFactory,
+          deps: [[new Optional(), DYNAMICHOOKS_ROOTSETTINGS]]
+        },
         // Also add child settings to hierarchical array of child settings
         // By having itself as a dependency with SkipSelf, a circular reference is avoided as Angular will look for DYNAMICHOOKS_ANCESTORSETTINGS in the parent injector.
         // It will keep traveling injectors upwards until it finds another or just use null as the dep.
@@ -101,6 +115,6 @@ export class DynamicHooksModule {
   }
 
   static reset(): void {
-    allSettings.length = 0;
+    allChildSettings.length = 0;
   }
 }

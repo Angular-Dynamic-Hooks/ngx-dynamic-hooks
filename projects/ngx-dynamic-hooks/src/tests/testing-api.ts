@@ -24,7 +24,7 @@ export { regexes } from '../lib/utils/regexes';
 export { matchAll } from '../lib/polyfills/matchAll';
 
 // Private module resources
-export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
 export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
 export { ParserEntryResolver } from '../lib/components/outlet/options/parserEntryResolver';
 export { ComponentCreator } from '../lib/components/outlet/services/componentCreator';

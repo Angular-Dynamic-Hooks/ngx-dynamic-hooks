@@ -435,13 +435,13 @@ describe('forChild', () => {
     const setup = createTestingModuleSync();
     const allSettings = setup.testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(Object.keys(allSettings).length).toBe(7);
-    expect((allSettings[0].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicHyperlanesComponent);
-    expect((allSettings[1].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicStarsComponent);
-    expect((allSettings[2].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetsComponent);
-    expect((allSettings[3].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCountriesComponent);
-    expect((allSettings[4].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCitiesComponent);
-    expect((allSettings[5].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetSpeciesComponent);
-    expect((allSettings[6].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
+    expect((allSettings[0].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
+    expect((allSettings[1].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicHyperlanesComponent);
+    expect((allSettings[2].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicStarsComponent);
+    expect((allSettings[3].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetsComponent);
+    expect((allSettings[4].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCountriesComponent);
+    expect((allSettings[5].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCitiesComponent);
+    expect((allSettings[6].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicPlanetSpeciesComponent);
 
     let html = setup.rootComp.hostElement.nativeElement.innerHTML;
     expect(html).toContain('DYNAMIC ROOT COMPONENT');
@@ -453,7 +453,7 @@ describe('forChild', () => {
     expect(html).toContain('DYNAMIC PLANET CITIES COMPONENT');
   }));
 
-  it('#should only have DynamicHooksInheritance.All work in sync config', fakeAsync(() => {
+  it('#should only have DynamicHooksInheritance.All (and no other inheritance setting) work in sync config', fakeAsync(() => {
     const setup = createTestingModuleSync();
     const router = setup.testBed.inject(Router);
     const allSettings = setup.testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
@@ -463,13 +463,12 @@ describe('forChild', () => {
     tick(1000);
     setup.fixture.detectChanges();
 
-    // When loading child settings synchronously, all providers are merged into the root injector, so the last ones loaded overwrites the previous ones
+    // When loading child settings synchronously, all providers are merged into the root injector, so the last ones loaded overwrite the previous ones
     // This has several implications
     const countriesComponent = setup.fixture.debugElement.query(By.directive(PlanetCountriesComponent)).componentInstance;
     let html = countriesComponent.hostElement.nativeElement.innerHTML;
 
     // Root moduleSettings are loaded last in test module. And b/c they're loaded last, they overwrite all other moduleSettings
-    expect((allSettings[allSettings.length - 1].globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
     expect((countriesComponent.moduleSettings.globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
 
     // The same goes for ancestorSettings. There will only be a single ancestor settings object in the injector, and it will be that of the module which was loaded last (root in this case)
