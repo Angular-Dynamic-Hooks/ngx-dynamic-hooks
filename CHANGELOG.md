@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.1.1] - 2024-04-16
+### Added
+- Fix: Resolved errors caused by lazily-loaded dynamic components when using SSR
+
 ## [2.1.0] - 2023-03-21
 ### Added
 - Added forChild feature
@@ -97,8 +101,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...HEAD
-[2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.0
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.1
+[2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4

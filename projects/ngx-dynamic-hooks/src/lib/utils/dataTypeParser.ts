@@ -15,7 +15,7 @@ export class DataTypeParser {
   }
 
   /**
-   * Takes a string containing a Javascript data type as it would in code, such a number ('15'), a string ('"hello"'),
+   * Takes a string containing a Javascript data type as it would appear in code, such a number ('15'), a string ('"hello"'),
    * an array ('[1,2,3]'), an object ('{prop: "something"}') etc., and evaluates it to be an an actual variable.
    *
    * Note: This function works without invoking eval() and instead uses JSON.parse() for the heavy lifting. As such, it should be safe
@@ -111,7 +111,7 @@ export class DataTypeParser {
 
   /**
    * In order to successfully parse a data type string with JSON.parse(), it needs to follow certain formatting rules.
-   * This functions ensures that these are followed and corrects the input if not.
+   * This function ensures that these are followed and corrects the input if not.
    *
    * @param JSONString - The string to be given to JSON.parse()
    * @param unescapeStrings - Whether to unescape the strings of this JSON

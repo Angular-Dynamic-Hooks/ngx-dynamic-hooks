@@ -66,7 +66,7 @@ describe('SelectorHookParserConfig', () => {
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "selector" property in the SelectorHookParserConfig must be of type string, was boolean'));
 
-    // Wrong selector type
+    // Wrong enclosing type
     config = { component: SingleTagTestComponent, enclosing: 'true' };
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "enclosing" property in the SelectorHookParserConfig must be of type boolean, was string'));

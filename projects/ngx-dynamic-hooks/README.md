@@ -328,7 +328,7 @@ You can also provide your own `OutletOptions` for each `OutletComponent` and ove
 Option name | Type | Default | Description
 --- | --- | --- | ---
 `sanitize` | `boolean` | `true` | Whether to use Angular's `DomSanitizer` to sanitize the content string before output (hooks are unaffected by this)
-`convertHTMLEntities` | `boolean` | `true` | Whether to replace HTML entities like `&nbsp;` with normal characters
+`convertHTMLEntities` | `boolean` | `true` | Whether to replace HTML entities like `&amp;` with normal characters
 `fixParagraphTags` | `boolean` | `true` | When using a WYSIWYG-editor, writing enclosing hooks may *rip apart* paragraph HTML (the `<p>`-tag starting before the hook and the corresponding `</p>`-tag ending inside, and vice versa). This will result in weird HTML when rendered in a browser. This setting removes these ripped-apart tags.
 `updateOnPushOnly` | `boolean` | `false` | Normally, the bindings of all dynamic components are checked/updated on each change detection run. This setting will update them only when the context object passed to the `OutletComponent` changes by reference.
 `compareInputsByValue` | `boolean` | `false` | Whether to deeply-compare inputs for dynamic components by their value instead of by their reference on updates

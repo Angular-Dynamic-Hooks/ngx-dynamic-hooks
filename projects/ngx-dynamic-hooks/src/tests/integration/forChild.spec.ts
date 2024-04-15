@@ -24,7 +24,7 @@ interface TestSetup {
 }
 
 const createTestingModuleSync: () => TestSetup = () => {
-  // Rerun DynamicHooksModule.forChild()s of child modules to internally add settings to allSettings again after reset
+  // Rerun DynamicHooksModule.forChild()s of child modules to internally re-add settings to allSettings again after reset
   createHyperlanesModuleHooksImport();
   createStarsModuleHooksImport();
   createPlanetsModuleHooksImport();
@@ -77,6 +77,9 @@ const createTestingModuleLazy: (rootSettings?: 'include'|'empty'|'none') => Test
   const imports = [
     HyperlanesModuleSync,
     RouterModule.forRoot([
+      // Much like at start of in createTestingModuleSync, have to manually call createXModuleHooksImport() when lazy-loading a route like this, b/c we're not really using the import() syntax normally used in lazy-loaded routes.
+      // In testing, we just create a promise and return the module to simulate that - but the module is already loaded of course. This is a problem b/c when running multiple tests and you call
+      // DynamicHooksModule.reset() after each one, all settings are deleted for all modules. On the next test, if your didn't call createXModuleHooksImport() manually, the module settings wouldn't be repopulated again.
       { path: 'planets', loadChildren: () => new Promise(resolve => { createPlanetsModuleHooksImport(); resolve(PlanetsModuleLazy); }) },
       { path: 'stars', loadChildren: () => new Promise(resolve => { createStarsModuleHooksImport(); resolve(StarsModuleLazy); }) }
     ]),

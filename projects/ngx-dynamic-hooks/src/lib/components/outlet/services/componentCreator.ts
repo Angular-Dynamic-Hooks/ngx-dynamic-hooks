@@ -1,4 +1,5 @@
-import { ComponentFactoryResolver, Injector, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { ComponentFactoryResolver, Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
@@ -15,7 +16,14 @@ import { ComponentUpdater } from './componentUpdater';
 export class ComponentCreator {
   private renderer: Renderer2;
 
-  constructor(private cfr: ComponentFactoryResolver, private appRef: ApplicationRef, private rendererFactory: RendererFactory2, private componentUpdater: ComponentUpdater, private platform: PlatformService) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId,
+    private cfr: ComponentFactoryResolver, 
+    private appRef: ApplicationRef, 
+    private rendererFactory: RendererFactory2, 
+    private componentUpdater: ComponentUpdater, 
+    private platform: PlatformService
+  ) {
     this.renderer = this.rendererFactory.createRenderer(null, null);
   }
 
@@ -37,24 +45,33 @@ export class ComponentCreator {
     // Get HookData, replace placeholders and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       const placeholderElement = this.platform.findPlaceholderElement(contentElement, token, hookId);
-      if (placeholderElement) {
-        hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platform.getChildNodes(placeholderElement));
 
-        // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
-        hookHostElements[hookId] = this.replacePlaceholderElement(placeholderElement, hook);
-
-        // Also replace child nodes with all desired ng-content slots
-        // Note: Doing this immediately after the evaluation of each hook so that succeeding hooks that are
-        // removed by the previous' hooks ng-content don't even need to be evaluated (let alone loaded below)
-        this.createContentSlotElements(hookHostElements[hookId], hook, token);
-      } else {
-        // If removed by previous hook in loop via ng-content replacement
+      // If removed by previous hook in loop via ng-content replacement
+      if (!placeholderElement) {
         delete hookIndex[hook.id];
+        continue;
       }
+
+      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platform.getChildNodes(placeholderElement));
+
+      // Skip loading lazy components during SSR
+      if (!isPlatformBrowser(this.platformId) && hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName')) {
+        delete hookIndex[hook.id];
+        continue;
+      }
+
+      // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
+      hookHostElements[hookId] = this.replacePlaceholderElement(placeholderElement, hook);
+
+      // Also replace child nodes with all desired ng-content slots
+      // Note: Doing this immediately after the evaluation of each hook so that succeeding hooks that are
+      // removed by the previous' hooks ng-content don't even need to be evaluated (let alone loaded below)
+      this.createContentSlotElements(hookHostElements[hookId], hook, token);
     }
 
     // Load all components from hookIndex into the prepared host elements
     for (const [hookId, hook] of Object.entries(hookIndex)) {
+
       // Start with of(true) to catch errors from loadComponentClass in the observable stream as well
       componentLoadSubjects.push(of(true)
         // Load component class first (might be lazy-loaded)
@@ -294,13 +311,13 @@ export class ComponentCreator {
       // Warning if using old Angular version
       const ngVersion = this.platform.getNgVersion();
 
-      if (ngVersion < 9 && isDevMode()) {
+      if (ngVersion > 0 && ngVersion < 9 && isDevMode()) {
           console.warn('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
       }
 
       (componentConfig as LazyLoadComponentConfig).importPromise().then((m) =>  {
         const importName = (componentConfig as LazyLoadComponentConfig).importName;
-        const compClass = m.hasOwnProperty(importName) ? m[importName] : m['default'];
+        const compClass = Object.prototype.hasOwnProperty.call(m, importName) ? m[importName] : m['default'];
         componentClassLoaded.next(compClass);
       });
 
@@ -323,6 +340,7 @@ export class ComponentCreator {
    * @param injector - The default injector to use for the component
    */
   createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any, injector: Injector): void {
+    
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
     // The order of component creation or injection via projectableNodes does not seem to matter.

@@ -40,7 +40,7 @@ export class PlatformBrowserService implements PlatformService {
   }
 
   getNgVersion(): number {
-    if (document && document.querySelector('[ng-version]')) {
+    if (typeof document !== "undefined" && document.querySelector('[ng-version]')) {
       return parseInt(document.querySelector('[ng-version]').getAttribute('ng-version'), 10);
     }
     return 0;
