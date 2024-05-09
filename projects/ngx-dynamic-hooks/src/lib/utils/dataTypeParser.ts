@@ -47,7 +47,7 @@ export class DataTypeParser {
       (dataTypeString.startsWith("`") && dataTypeString.endsWith("`"))
     ) {
       // Remove outer quotes, potentially unescape and return
-      let decodedString = dataTypeString.substr(1, dataTypeString.length - 2);
+      let decodedString = dataTypeString.substring(1, dataTypeString.length - 1);
       decodedString = unescapeStrings ? this.dataTypeEncoder.stripSlashes(decodedString) : decodedString;
       return decodedString;
     }
@@ -303,7 +303,7 @@ export class DataTypeParser {
    * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
   loadContextVariable(contextVar: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
-    const shortContextVar = contextVar.substr(7);  // Cut off 'context' from the front
+    const shortContextVar = contextVar.substring(7);  // Cut off 'context' from the front
 
     // If context object is requested directly
     if (shortContextVar.trim() === '') {
@@ -320,13 +320,13 @@ export class DataTypeParser {
       if (match[0].startsWith('.')) {
         path.push({
           type: 'property',
-          value: match[0].substr(1)
+          value: match[0].substring(1)
         });
       }
 
       // 2. If bracket notation
       if (match[0].startsWith('[') && match[0].endsWith(']')) {
-        let bracketValue = match[0].substr(1, match[0].length - 2);
+        let bracketValue = match[0].substring(1, match[0].length - 1);
 
         // Evaluate bracket parameter
         bracketValue = this.decodeDataTypeString(bracketValue);                                                                                             // Decode variable
@@ -344,7 +344,7 @@ export class DataTypeParser {
           throw Error('Tried to call a function in a context variable. This has been disallowed in the current config.');
         }
 
-        const funcParams = match[0].substr(1, match[0].length - 2);  // Strip outer brackets
+        const funcParams = match[0].substring(1, match[0].length - 1);  // Strip outer brackets
         // Evaluate function parameters
         const paramsArray = [];
         if (funcParams !== '') {

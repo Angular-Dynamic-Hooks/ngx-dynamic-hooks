@@ -194,7 +194,7 @@ export class DataTypeEncoder {
     // Find the corresponding closing bracket for each opening bracket by parsing the following brackets
     const bracketSegments: Array<TextSegment> = [];
     for (const openingBracket of openingBrackets) {
-      const followingText = text.substr(openingBracket.index + 2); // openingBracket.index + 2, b/c the regex starts at the character before the opening bracket and followingText is supposed to start after the opening bracket
+      const followingText = text.substring(openingBracket.index + 2); // openingBracket.index + 2, b/c the regex starts at the character before the opening bracket and followingText is supposed to start after the opening bracket
       const followingOpeningBrackets = matchAll(followingText, /\[/gm);
       const followingClosingBrackets = matchAll(followingText, /\]/gm);
       const allFollowingBrackets = [...followingOpeningBrackets, ...followingClosingBrackets];
@@ -269,7 +269,7 @@ export class DataTypeEncoder {
    */
   transformContextVarIntoPlacerholder(contextVar: string): string {
     // Replace context. with __CXT__
-    contextVar = '__CXT__' + contextVar.substr(7);
+    contextVar = '__CXT__' + contextVar.substring(7);
     // Encode variable syntax
     contextVar = contextVar.replace(/\"/g, '@@@cxtDoubleQuote@@@');
     contextVar = contextVar.replace(/\./g, '@@@cxtDot@@@');
@@ -281,7 +281,7 @@ export class DataTypeEncoder {
   }
 
   transformPlaceholderIntoContextVar(contextVar: string): string {
-    contextVar = 'context' + contextVar.substr(7);
+    contextVar = 'context' + contextVar.substring(7);
     contextVar = contextVar.replace(/@@@cxtDoubleQuote@@@/g, '"');
     contextVar = contextVar.replace(/@@@cxtDot@@@/g, '.');
     contextVar = contextVar.replace(/@@@cxtOpenSquareBracket@@@/g, '[');
@@ -312,7 +312,7 @@ export class DataTypeEncoder {
         type: 'text',
         startIndex: lastSegmentEndIndex,
         endIndex: specialTextSegment.startIndex,
-        string: text.substr(lastSegmentEndIndex, specialTextSegment.startIndex - lastSegmentEndIndex)
+        string: text.substring(lastSegmentEndIndex, specialTextSegment.startIndex)
       });
 
       // Push next special segment
@@ -320,7 +320,7 @@ export class DataTypeEncoder {
         type: 'special',
         startIndex: specialTextSegment.startIndex,
         endIndex: specialTextSegment.endIndex,
-        string: text.substr(specialTextSegment.startIndex, specialTextSegment.endIndex - specialTextSegment.startIndex)
+        string: text.substring(specialTextSegment.startIndex, specialTextSegment.endIndex)
       });
     }
     // Add text segment for trailing text after last special segment
@@ -329,7 +329,7 @@ export class DataTypeEncoder {
       type: 'text',
       startIndex: lastBracketEndIndex,
       endIndex: text.length - 1,
-      string: text.substr(lastBracketEndIndex)
+      string: text.substring(lastBracketEndIndex)
     });
 
     // 2. Encode all special segments

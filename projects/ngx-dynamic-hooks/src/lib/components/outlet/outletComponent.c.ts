@@ -44,7 +44,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   hookIndex: HookIndex = {};
   activeOptions: OutletOptions = outletOptionDefaults;
   activeParsers: Array<HookParser> = [];
-  token = Math.random().toString(36).substr(2, 10);
+  token = Math.random().toString(36).substring(2, 12);
   initialized: boolean = false;
 
   // Lifecycle methods

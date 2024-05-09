@@ -87,7 +87,7 @@ export class OutletService {
     }
 
     // Replace hooks with component selector elements
-    const token = Math.random().toString(36).substr(2, 10);
+    const token = Math.random().toString(36).substring(2, 12);
     const result = this.hooksReplacer.replaceHooksWithNodes(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
     content = result.content;
 

@@ -139,8 +139,8 @@ export class HooksReplacer {
     // Replace found hooks with encoded component placeholders
     let indexModifier = 0;
     for (const selectorReplaceInstruction of selectorReplaceInstructions) {
-      const textBeforeSelector = content.substr(0, selectorReplaceInstruction.startIndex + indexModifier);
-      const textAfterSelector = content.substr(selectorReplaceInstruction.endIndex + indexModifier);
+      const textBeforeSelector = content.substring(0, selectorReplaceInstruction.startIndex + indexModifier);
+      const textAfterSelector = content.substring(selectorReplaceInstruction.endIndex + indexModifier);
       const oldDynamicTextLength = content.length;
 
       // Reassemble and correct index
@@ -172,11 +172,11 @@ export class HooksReplacer {
     const enclosing = (Number.isInteger(hookPosition.closingTagStartIndex) && Number.isInteger(hookPosition.closingTagEndIndex));
     return {
       enclosing: enclosing,
-      textBefore: content.substr(0, hookPosition.openingTagStartIndex),
-      openingTag: content.substr(hookPosition.openingTagStartIndex, hookPosition.openingTagEndIndex - hookPosition.openingTagStartIndex),
-      innerValue: enclosing ? content.substr(hookPosition.openingTagEndIndex, hookPosition.closingTagStartIndex! - hookPosition.openingTagEndIndex) : null,
-      closingTag: enclosing ? content.substr(hookPosition.closingTagStartIndex!, hookPosition.closingTagEndIndex! - hookPosition.closingTagStartIndex!) : null,
-      textAfter: enclosing ? content.substr(hookPosition.closingTagEndIndex!) : content.substr(hookPosition.openingTagEndIndex)
+      textBefore: content.substring(0, hookPosition.openingTagStartIndex),
+      openingTag: content.substring(hookPosition.openingTagStartIndex, hookPosition.openingTagEndIndex),
+      innerValue: enclosing ? content.substring(hookPosition.openingTagEndIndex, hookPosition.closingTagStartIndex!) : null,
+      closingTag: enclosing ? content.substring(hookPosition.closingTagStartIndex!, hookPosition.closingTagEndIndex!) : null,
+      textAfter: enclosing ? content.substring(hookPosition.closingTagEndIndex!) : content.substring(hookPosition.openingTagEndIndex)
     };
   }
 
@@ -348,8 +348,8 @@ export class HooksReplacer {
 
     // If artifacts found on both sides, remove both by overwriting them with empty spaces (doesn't change index)
     if (firstArtifactFound && secondArtifactFound) {
-      firstText = firstText.substr(0, firstArtifactIndex) + ' '.repeat(firstArtifact.length) + firstText.substr(firstArtifactIndex + firstArtifact.length);
-      secondText = secondText.substr(0, secondArtifactIndex) + ' '.repeat(secondArtifact.length) + secondText.substr(secondArtifactIndex + secondArtifact.length);
+      firstText = firstText.substring(0, firstArtifactIndex) + ' '.repeat(firstArtifact.length) + firstText.substring(firstArtifactIndex + firstArtifact.length);
+      secondText = secondText.substring(0, secondArtifactIndex) + ' '.repeat(secondArtifact.length) + secondText.substring(secondArtifactIndex + secondArtifact.length);
     }
 
     // Trim after artifacts removed
