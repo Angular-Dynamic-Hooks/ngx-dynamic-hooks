@@ -6,7 +6,7 @@ import { isDevMode, Injectable } from '@angular/core';
  * Contains the stringified value as well as the number of times the maximum stringify depth was reached.
  */
 export interface DetailedStringifyResult {
-  result: string;
+  result: string|null;
   depthReachedCount: number;
 }
 
@@ -29,12 +29,12 @@ export class DeepComparer {
    * @param b - The second object
    * @param compareDepth - How many levels deep to compare
    */
-  isEqual(a, b, compareDepth?: number): boolean {
+  isEqual(a: any, b: any, compareDepth?: number): boolean {
     const aStringified = this.detailedStringify(a, compareDepth);
     const bStringified = this.detailedStringify(b, compareDepth);
 
     if (aStringified.result === null || bStringified.result === null) {
-      if (isDevMode) {
+      if (isDevMode()) {
         console.warn(
           'Objects could not be compared by value as one or both of them could not be stringified. Returning false. \n',
           'Objects:', a, b
@@ -55,7 +55,7 @@ export class DeepComparer {
    * @param obj - The object to stringify
    * @param depth - How many levels deep to stringify
    */
-  detailedStringify(obj, depth?: number): DetailedStringifyResult {
+  detailedStringify(obj: any, depth?: number): DetailedStringifyResult {
     try {
       // Null cyclic paths
       const depthReached = {count: 0};
@@ -91,7 +91,7 @@ export class DeepComparer {
    * @param depth - How many levels deep to decycle
    * @param depthReached - An object to track the number of times the max depth was reached
    */
-  decycle(obj, stack = [], depth: number = 5, depthReached: { count: number; }): any {
+  decycle(obj: any, stack: any[] = [], depth: number = 5, depthReached: { count: number; }): any {
     if (stack.length > depth) {
       depthReached.count++;
       return null;
@@ -129,7 +129,7 @@ export class DeepComparer {
       }
       return newArray;
     } else {
-      const newObj = {};
+      const newObj: any = {};
       for (const key of Object.keys(obj)) {
         newObj[key] = this.decycle(obj[key], s, depth, depthReached);
       }
@@ -143,7 +143,7 @@ export class DeepComparer {
    * @param a - The first object
    * @param b - The second object
    */
-  objEqualsProperties(a, b): boolean {
+  objEqualsProperties(a: any, b: any): boolean {
     const aKeys = Object.keys(a);
     const bKeys = Object.keys(b);
 

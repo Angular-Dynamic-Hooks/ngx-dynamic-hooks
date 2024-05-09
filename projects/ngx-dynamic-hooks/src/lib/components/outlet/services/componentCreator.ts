@@ -17,7 +17,7 @@ export class ComponentCreator {
   private renderer: Renderer2;
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId,
+    @Inject(PLATFORM_ID) private platformId: number,
     private cfr: ComponentFactoryResolver, 
     private appRef: ApplicationRef, 
     private rendererFactory: RendererFactory2, 
@@ -40,7 +40,7 @@ export class ComponentCreator {
   init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
-    const hookHostElements = {};
+    const hookHostElements: {[key: string]: Element} = {};
 
     // Get HookData, replace placeholders and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
@@ -75,7 +75,7 @@ export class ComponentCreator {
       // Start with of(true) to catch errors from loadComponentClass in the observable stream as well
       componentLoadSubjects.push(of(true)
         // Load component class first (might be lazy-loaded)
-        .pipe(mergeMap(() => this.loadComponentClass(hook.data.component)))
+        .pipe(mergeMap(() => this.loadComponentClass(hook.data!.component)))
         .pipe(tap((compClass) => {
           // Check if the host element is simply an anchor for a lazily-loaded component. If so, insert proper selector now.
           hookHostElements[hookId] = this.handleAnchorElement(hookHostElements[hookId], compClass);
@@ -107,18 +107,18 @@ export class ComponentCreator {
       for (const hook of Object.values(hookIndex)) {
         // Find all content children components
         const contentChildren: Array<DynamicContentChild> = [];
-        if (typeof hook.componentRef.instance['onDynamicMount'] === 'function' || typeof hook.componentRef.instance['onDynamicChanges'] === 'function') {
-          this.findContentChildren(hook.componentRef.location.nativeElement, contentChildren, hookIndex, token);
+        if (typeof hook.componentRef!.instance['onDynamicMount'] === 'function' || typeof hook.componentRef!.instance['onDynamicChanges'] === 'function') {
+          this.findContentChildren(hook.componentRef!.location.nativeElement, contentChildren, hookIndex, token);
         }
 
         // OnDynamicChanges
-        if (typeof hook.componentRef.instance['onDynamicChanges'] === 'function') {
-          hook.componentRef.instance['onDynamicChanges']({contentChildren});
+        if (typeof hook.componentRef!.instance['onDynamicChanges'] === 'function') {
+          hook.componentRef!.instance['onDynamicChanges']({contentChildren});
         }
 
         // OnDynamicMount
-        if (typeof hook.componentRef.instance['onDynamicMount'] === 'function') {
-          hook.componentRef.instance['onDynamicMount']({context, contentChildren});
+        if (typeof hook.componentRef!.instance['onDynamicMount'] === 'function') {
+          hook.componentRef!.instance['onDynamicMount']({context, contentChildren});
         }
       }
 
@@ -149,17 +149,17 @@ export class ComponentCreator {
    */
   replacePlaceholderElement(placeholderElement: any, hook: Hook): Element {
     let selector;
-    if (hook.data.component.hasOwnProperty('prototype')) {
-      selector = this.cfr.resolveComponentFactory(hook.data.component as (new(...args: any[]) => any)).selector;
+    if (hook.data!.component.hasOwnProperty('prototype')) {
+      selector = this.cfr.resolveComponentFactory(hook.data!.component as (new(...args: any[]) => any)).selector;
     } else {
       selector = 'dynamic-component-anchor';
     }
 
     const hostElement = this.renderer.createElement(selector);
-    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement, 'hookid'));
-    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement, 'parsetoken'));
+    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement, 'hookid')!);
+    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement, 'parsetoken')!);
     if (this.platform.getAttribute(placeholderElement, 'parser')) {
-      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement, 'parser'));
+      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement, 'parser')!);
     }
 
     const childNodes = this.platform.getChildNodes(placeholderElement);
@@ -197,10 +197,10 @@ export class ComponentCreator {
       const selectorElement = this.renderer.createElement(selector);
 
       // Move attributes to selector
-      this.renderer.setAttribute(selectorElement, 'hookid', this.platform.getAttribute(componentHostElement, 'hookid'));
-      this.renderer.setAttribute(selectorElement, 'parsetoken', this.platform.getAttribute(componentHostElement, 'parsetoken'));
+      this.renderer.setAttribute(selectorElement, 'hookid', this.platform.getAttribute(componentHostElement, 'hookid')!);
+      this.renderer.setAttribute(selectorElement, 'parsetoken', this.platform.getAttribute(componentHostElement, 'parsetoken')!);
       if (this.platform.getAttribute(componentHostElement, 'parser')) {
-        this.renderer.setAttribute(selectorElement, 'parser', this.platform.getAttribute(componentHostElement, 'parser'));
+        this.renderer.setAttribute(selectorElement, 'parser', this.platform.getAttribute(componentHostElement, 'parser')!);
       }
 
       this.renderer.removeAttribute(componentHostElement, 'hookid');
@@ -229,7 +229,7 @@ export class ComponentCreator {
    *
    * This is to create a direct dom-representation of each entry in the projectableNodes array returned
    * by parser.loadComponent, so it can be cleanly resolved back into projectableNodes later on. Without these
-   * content slots for seperation, you wouldn't know which child nodes go into which ng-content slot.
+   * content slots for separation, you wouldn't know which child nodes go into which ng-content slot.
    *
    * @param hostElement - The dom element to create the content slots in
    * @param hook - The hook of the component
@@ -239,8 +239,8 @@ export class ComponentCreator {
     let content;
 
     // If content property is defined, use the submitted content slots
-    if (hook.data.hasOwnProperty('content') && Array.isArray(hook.data.content)) {
-      content = hook.data.content;
+    if (hook.data!.hasOwnProperty('content') && Array.isArray(hook.data!.content)) {
+      content = hook.data!.content;
     // Otherwise just wrap existing content into single content slot
     } else {
       content = [this.platform.getChildNodes(hostElement)];
@@ -271,15 +271,15 @@ export class ComponentCreator {
    * @param componentHostElement - The dom element with the content slots
    * @param token - The current parse token
    */
-  getContentSlotElements(componentHostElement: any, token: string): Array<Array<any>> {
+  getContentSlotElements(componentHostElement: any, token: string): Element[][] {
     // Resolve ng-content from content slots
-    const projectableNodes = [];
+    const projectableNodes: Element[][] = [];
     const contentSlotElements = this.platform.getChildNodes(componentHostElement)
       .filter(entry => this.platform.getTagName(entry) === 'DYNAMIC-COMPONENT-CONTENTSLOT' && this.platform.getAttribute(entry, 'parsetoken') === token);
 
     for (const contentSlotElement of contentSlotElements) {
-      const slotIndex = this.platform.getAttribute(contentSlotElement, 'slotIndex');
-      projectableNodes[slotIndex] = this.platform.getChildNodes(contentSlotElement);
+      const slotIndex = this.platform.getAttribute(contentSlotElement, 'slotIndex')!;
+      projectableNodes[parseInt(slotIndex)] = this.platform.getChildNodes(contentSlotElement);
     }
 
     return projectableNodes;
@@ -345,7 +345,7 @@ export class ComponentCreator {
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
     // The order of component creation or injection via projectableNodes does not seem to matter.
     const dynamicComponentFactory = this.cfr.resolveComponentFactory(compClass);
-    const chosenInjector = hook.data.injector || injector;
+    const chosenInjector = hook.data!.injector || injector;
     const dynamicComponentRef = dynamicComponentFactory.create(chosenInjector, projectableNodes, componentHostElement);
 
     // Track component
@@ -395,10 +395,10 @@ export class ComponentCreator {
           parseToken === token &&
           this.platform.getAttribute(childNode, 'hookid')
         ) {
-          const hookId = parseInt(this.platform.getAttribute(childNode, 'hookid'), 10);
+          const hookId = parseInt(this.platform.getAttribute(childNode, 'hookid')!, 10);
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
-              componentRef: hookIndex[hookId].componentRef,
+              componentRef: hookIndex[hookId].componentRef!,
               componentSelector: this.platform.getTagName(childNode).toLowerCase(),
               contentChildren: [],
               hookValue: hookIndex[hookId].value

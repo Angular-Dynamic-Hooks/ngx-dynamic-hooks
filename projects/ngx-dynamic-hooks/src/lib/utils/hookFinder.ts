@@ -15,7 +15,7 @@ export class HookFinder {
    * @param hookRegex - The regex to use for the hook
    */
   findStandaloneHooks(content: string, hookRegex: RegExp): Array<HookPosition> {
-    const result: Array<HookPosition> = [];
+    const result: HookPosition[] = [];
 
     // Find all hooks
     const openingTagMatches = matchAll(content, hookRegex);
@@ -24,8 +24,8 @@ export class HookFinder {
       result.push({
         openingTagStartIndex: match.index,
         openingTagEndIndex: match.index + match[0].length,
-        closingTagStartIndex: null,
-        closingTagEndIndex: null,
+        closingTagStartIndex: undefined,
+        closingTagEndIndex: undefined,
       });
     }
 

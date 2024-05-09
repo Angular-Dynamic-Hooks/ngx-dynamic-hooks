@@ -24,7 +24,7 @@ describe('Parsers', () => {
 
   it('#should load global parsers correctly', () => {
     comp.content = 'something';
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(3);
     expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
@@ -41,7 +41,7 @@ describe('Parsers', () => {
       component: InlineTestComponent,
       parseInputs: false
     }];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
@@ -53,11 +53,11 @@ describe('Parsers', () => {
     // Should be able to load parsers that are object literals
     comp.content = 'This is a sentence with a <dynhooks-singletagtest>.';
     comp.parsers = [{component: SingleTagTestComponent, enclosing: false}];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-singletagtest');
     expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
@@ -65,11 +65,11 @@ describe('Parsers', () => {
     // Should be able to load parsers that are services
     comp.content = 'This is a sentence with a <dynhooks-serviceparsercomponent>.';
     comp.parsers = [ServiceTestParser];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0].constructor.name).toBe('ServiceTestParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-singletagtest');
     expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
@@ -77,11 +77,11 @@ describe('Parsers', () => {
     // Should be able to load parsers that are classes
     comp.content = 'This is a sentence with a customhook.';
     comp.parsers = [NonServiceTestParser];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0].constructor.name).toBe('NonServiceTestParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-singletagtest');
     expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
@@ -89,11 +89,11 @@ describe('Parsers', () => {
     // Should be able to load parsers that are instances
     comp.content = 'This is a sentence with a customhook.';
     comp.parsers = [new NonServiceTestParser()];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0].constructor.name).toBe('NonServiceTestParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-singletagtest');
     expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
@@ -103,7 +103,7 @@ describe('Parsers', () => {
     comp.content = 'This text is irrelevant for this test.';
     comp.parsers = [true as any];
     spyOn(console, 'error').and.callThrough();
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
     expect((<any> console.error)['calls'].count()).toBe(1);
   });
@@ -118,19 +118,19 @@ describe('Parsers', () => {
 
     comp.parsers = [noFuncParser as any];
     spyOn(console, 'error').and.callThrough();
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
     expect((<any> console.error)['calls'].count()).toBe(1);
     expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "findHooks()". Removing from list of active parsers:');
 
     comp.parsers = [parseWithOneFunc as any];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
     expect((<any> console.error)['calls'].count()).toBe(2);
     expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "loadComponent()". Removing from list of active parsers:');
 
     comp.parsers = [parseWithTwoFuncs as any];
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
     expect((<any> console.error)['calls'].count()).toBe(3);
     expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "getBindings()". Removing from list of active parsers:');
@@ -143,7 +143,7 @@ describe('Parsers', () => {
       {component: MultiTagTestComponent, name: 'someParser'}
     ];
     spyOn(console, 'warn').and.callThrough();
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(2);
     expect((<any> console.warn)['calls'].count()).toBe(1);
     expect((<any> console.warn)['calls'].mostRecent().args[0]).toBe('Parser name "someParser" is not unique and appears multiple times in the list of active parsers.');
@@ -153,7 +153,7 @@ describe('Parsers', () => {
     ({fixture, comp} = prepareTestingModule([]));
 
     comp.content = 'something';
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(0);
     expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
@@ -168,56 +168,56 @@ describe('Parsers', () => {
     comp.content = testText;
     (comp as any).globalParsersBlacklist = null;
     (comp as any).globalParsersWhitelist = null;
-    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     // Expect that no component is filtered
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.inline-component')).not.toBeNull();
     expect(Object.keys(comp.hookIndex).length).toBe(3);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[3].componentRef.instance.constructor.name).toBe('InlineTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Blacklist: Expect that MultiTagComponentParser is not loaded
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.globalParsersBlacklist = ['MultiTagTestComponentParser'];
     (comp as any).globalParsersWhitelist = null;
-    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.multitag-component')).toBeNull();
     expect(fixture.nativeElement.querySelector('.inline-component')).not.toBeNull();
     expect(Object.keys(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef.instance.constructor.name).toBe('InlineTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // WhiteList: Expect that only InlineTestComponentParser is loaded
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     (comp as any).globalParsersBlacklist = null;
     comp.globalParsersWhitelist = ['InlineTestComponentParser'];
-    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     expect(fixture.nativeElement.querySelector('.singletag-component')).toBeNull();
     expect(fixture.nativeElement.querySelector('.multitag-component')).toBeNull();
     expect(fixture.nativeElement.querySelector('.inline-component')).not.toBeNull();
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('InlineTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Both: Expect that only SingleTagTestComponentParser is loaded
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.globalParsersBlacklist = ['MultiTagTestComponentParser'];
     comp.globalParsersWhitelist = ['SingleTagTestComponentParser', 'MultiTagTestComponentParser'];
-    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.multitag-component')).toBeNull();
     expect(fixture.nativeElement.querySelector('.inline-component')).toBeNull();
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
   });
 
   it('#should check the parserBlacklist and parserWhitelist', () => {
@@ -226,7 +226,7 @@ describe('Parsers', () => {
     comp.globalParsersBlacklist = ['blacklistedParser'];
     comp.globalParsersWhitelist = ['whitelistedParser'];
     spyOn(console, 'warn').and.callThrough();
-    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true});
+    comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     // Check that warnings have been fired
     expect((<any>console.warn)['calls'].count()).toBe(2);
@@ -250,7 +250,7 @@ describe('Parsers', () => {
       selector: 'someSelector'
     }];
     spyOn(console, 'error');
-    comp.ngOnChanges({content: true, parsers: true});
+    comp.ngOnChanges({content: true, parsers: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
     expect((<any>console.error)['calls'].mostRecent().args[0]).toContain('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
@@ -260,7 +260,7 @@ describe('Parsers', () => {
     // Load app first
     comp.content = 'Should load here: <someSelector></someSelector>';
     spyOn(console, 'warn');
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     // Change ng-version
     fixture.nativeElement.setAttribute('ng-version', 8);
@@ -273,7 +273,7 @@ describe('Parsers', () => {
       },
       selector: 'someSelector'
     }];
-    comp.ngOnChanges({parsers: true});
+    comp.ngOnChanges({parsers: true} as any);
 
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
   });
@@ -282,8 +282,8 @@ describe('Parsers', () => {
     const testText = `<dynhooks-singletagtest (httpResponseReceived)="content.maneuvers.getMentalState()">`;
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    spyOn(comp.hookIndex[1].componentRef.instance['httpResponseReceived'], 'subscribe').and.callThrough();
+    comp.ngOnChanges({content: true, context: true} as any);
+    spyOn(comp.hookIndex[1].componentRef!.instance['httpResponseReceived'], 'subscribe').and.callThrough();
 
     // Change returned output
     spyOn(comp.activeParsers[0], 'getBindings').and.returnValue({
@@ -296,7 +296,7 @@ describe('Parsers', () => {
     comp.ngDoCheck();
 
     // Should have resubscribed
-    expect(comp.hookIndex[1].componentRef.instance['httpResponseReceived'].subscribe['calls'].count()).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance['httpResponseReceived'].subscribe['calls'].count()).toBe(1);
   });
 
   it('#should validate the HookPositions of parsers', () => {
@@ -366,7 +366,7 @@ describe('Parsers', () => {
       }
     }];
     hooksReplacer['validateHookPositions'](parserResults, '');
-    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('A hook with the same position as another hook was found. There may be multiple identical parsers active that are looking for the same hook. Ignoring duplicates.');
+    expect((hooksReplacer['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('A hook with the same position as another hook was found. There may be multiple identical parsers active that are looking for the same hook. Ignoring duplicates.');
 
     // Opening tag must begin after previous opening tag has ended
     parserResults = [{
@@ -383,7 +383,7 @@ describe('Parsers', () => {
       }
     }];
     hooksReplacer['validateHookPositions'](parserResults, '');
-    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
+    expect((hooksReplacer['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
 
     // Opening tag must not overlap with previous closing tag
     parserResults = [{
@@ -404,7 +404,7 @@ describe('Parsers', () => {
       }
     }];
     hooksReplacer['validateHookPositions'](parserResults, '');
-    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
+    expect((hooksReplacer['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Closing tag must not overlap with previous closing tag
     parserResults = [{
@@ -425,7 +425,7 @@ describe('Parsers', () => {
       }
     }];
     hooksReplacer['validateHookPositions'](parserResults, '');
-    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
+    expect((hooksReplacer['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Check if hooks are incorrectly nested
     parserResults = [{
@@ -446,6 +446,6 @@ describe('Parsers', () => {
       }
     }];
     hooksReplacer['validateHookPositions'](parserResults, '');
-    expect(hooksReplacer['generateHookPosWarning']['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
+    expect((hooksReplacer['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
   });
 });

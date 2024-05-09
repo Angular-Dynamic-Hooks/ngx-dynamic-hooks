@@ -1,5 +1,5 @@
 import { Injectable, ComponentFactoryResolver } from '@angular/core';
-import { SelectorHookParserConfig, selectorHookParserConfigDefaults } from './selectorHookParserConfig';
+import { SelectorHookParserConfig, SelectorHookParserConfigDefaults, selectorHookParserConfigDefaults } from './selectorHookParserConfig';
 
 /**
  * A helper class for resolving SelectorHookParserConfig
@@ -16,7 +16,7 @@ export class SelectorHookParserConfigResolver {
    * @param userParserConfig - The (partial) SelectorHookParserConfig object
    */
   processConfig(userParserConfig: SelectorHookParserConfig): SelectorHookParserConfig {
-    const parserConfig = JSON.parse(JSON.stringify(selectorHookParserConfigDefaults));
+    const parserConfig: SelectorHookParserConfigDefaults = JSON.parse(JSON.stringify(selectorHookParserConfigDefaults));
 
     // component
     if (!userParserConfig || !userParserConfig.hasOwnProperty('component')) {
@@ -129,6 +129,6 @@ export class SelectorHookParserConfigResolver {
       parserConfig.allowContextFunctionCalls = userParserConfig.allowContextFunctionCalls;
     }
 
-    return parserConfig;
+    return parserConfig as SelectorHookParserConfig;
   }
 }

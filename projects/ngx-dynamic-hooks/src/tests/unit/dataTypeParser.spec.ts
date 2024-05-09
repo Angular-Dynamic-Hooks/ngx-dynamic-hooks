@@ -41,9 +41,9 @@ describe('DataTypeParser', () => {
 
   it('#should not de/serialize nested context variables (fix)', () => {
     const context = {
-      randomMethod: (param) => ({evaluatedParam: param}),
+      randomMethod: (param: any) => ({evaluatedParam: param}),
       randomObj: {
-        thisIsAFunction: (firstParam, secondParam) => { /* some logic */ }
+        thisIsAFunction: (firstParam: any, secondParam: any) => { /* some logic */ }
       }
     };
 

@@ -50,8 +50,8 @@ describe('PlatformBrowserService', () => {
     const placeholderElement = platformService.findPlaceholderElement(contentElement, token, hookId);
 
     expect(placeholderElement).not.toBeNull();
-    expect(placeholderElement.getAttribute('parsetoken')).toBe(token);
-    expect(placeholderElement.getAttribute('hookid')).toBe(hookId);
+    expect(placeholderElement!.getAttribute('parsetoken')).toBe(token);
+    expect(placeholderElement!.getAttribute('hookid')).toBe(hookId);
   });
 
   it('#should not find placeholder by wrong token and hookId', () => {
@@ -328,7 +328,7 @@ describe('PlatformBrowserService', () => {
   it(`#should return null when trying to return inner text of a null element`, () => {
     const platformService = getPlatformService();
 
-    const actualContent = platformService.getInnerText(null);
+    const actualContent = platformService.getInnerText(null as any);
 
     expect(actualContent).toBeNull();
   });

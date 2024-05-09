@@ -24,7 +24,7 @@ describe('SelectorHookParser', () => {
     `;
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     // singletag hooks
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -69,7 +69,7 @@ describe('SelectorHookParser', () => {
     const testText = `<dynhooks-singletagtest [numberProp]="12345" [simpleObject]="{color: 'blue', speed: 100">`; // <-- object has missing closing tag
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     // simpleObject should not be tracked
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -82,7 +82,7 @@ describe('SelectorHookParser', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -107,7 +107,7 @@ describe('SelectorHookParser', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -133,7 +133,7 @@ describe('SelectorHookParser', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -160,7 +160,7 @@ describe('SelectorHookParser', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
     const singleTagBindings = (comp as any).activeParsers[0]['currentBindings'];
@@ -215,10 +215,10 @@ describe('SelectorHookParser', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // One of them should be undefined
-    const loadedComp = comp.hookIndex[1].componentRef.instance;
+    const loadedComp = comp.hookIndex[1].componentRef!.instance;
     expect(loadedComp.simpleObject).toEqual({validContextVar: context._jediCouncil.kenobi, invalidContextVar: undefined});
 
     // Should automatically fix itself when context var becomes available

@@ -17,7 +17,7 @@ export class DynamicStarsComponent {}
   </div>`
 })
 export class StarsComponent {
-  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString) {}
+  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
 export function createStarsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {

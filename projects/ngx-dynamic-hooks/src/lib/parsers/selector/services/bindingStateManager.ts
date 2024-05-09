@@ -28,7 +28,7 @@ export class BindingStateManager {
    * @param parserConfig - The parser config
    * @param currentInputBindings - The previous @Input() bindings, if existing
    */
-  getCurrentInputBindings(openingTag: string, context: any, parserConfig: SelectorHookParserConfig, currentInputBindings: {[key: string]: RichBindingData}): {[key: string]: RichBindingData} {
+  getCurrentInputBindings(openingTag: string, context: any, parserConfig: SelectorHookParserConfig, currentInputBindings: {[key: string]: RichBindingData}|undefined): {[key: string]: RichBindingData} {
     // If this is initial evaluation, create bindings object
     if (currentInputBindings === undefined) {
       currentInputBindings = this.createInputBindings(openingTag, context, parserConfig);
@@ -49,8 +49,8 @@ export class BindingStateManager {
    */
   private createInputBindings(openingTag: string, context: any, parserConfig: SelectorHookParserConfig): {[key: string]: RichBindingData} {
     // Read inputs from opening tag
-    const rawNoBracketInputs = this.getBindingsFromOpeningTag('noBracketInputs', openingTag, parserConfig.inputsBlacklist, parserConfig.inputsWhitelist);
-    const rawBracketInputs = this.getBindingsFromOpeningTag('bracketInputs', openingTag, parserConfig.inputsBlacklist, parserConfig.inputsWhitelist);
+    const rawNoBracketInputs = this.getBindingsFromOpeningTag('noBracketInputs', openingTag, parserConfig.inputsBlacklist || null, parserConfig.inputsWhitelist || null);
+    const rawBracketInputs = this.getBindingsFromOpeningTag('bracketInputs', openingTag, parserConfig.inputsBlacklist || null, parserConfig.inputsWhitelist || null);
 
     // NoBracketInputs are to be interpreted as plain strings, so wrap them in quotes
     for (const [noBracketInputName, noBracketInputValue] of Object.entries(rawNoBracketInputs)) {
@@ -86,7 +86,7 @@ export class BindingStateManager {
           inputBindings[inputName].boundContextVariables,
           parserConfig.allowContextFunctionCalls
         );
-      } catch (e) {
+      } catch (e: any) {
         if (isDevMode()) {
           console.error(`Hook input parsing error\nselector: ` + parserConfig.selector +  `\ninput: ` + inputName + `\nvalue: "` + inputBinding.value + `"`);
           console.error(e.stack);
@@ -134,7 +134,7 @@ export class BindingStateManager {
           }
         }
 
-        // Bound context var has changed! Reevaluate binding
+        // Bound context var has changed! Reevaluate whole binding (which may include more than one context var, or point to some child property)
         if (boundContextVarHasChanged) {
           inputBinding.boundContextVariables = {};
           inputBinding.value = this.dataTypeParser.evaluate(
@@ -160,7 +160,7 @@ export class BindingStateManager {
    * @param parserConfig - The parser config
    * @param currentOutputBindings - The previous @Output() bindings, if existing
    */
-  getCurrentOutputBindings(openingTag: string, parserConfig: SelectorHookParserConfig, currentOutputBindings: {[key: string]: RichBindingData}): {[key: string]: RichBindingData} {
+  getCurrentOutputBindings(openingTag: string, parserConfig: SelectorHookParserConfig, currentOutputBindings: {[key: string]: RichBindingData}|undefined): {[key: string]: RichBindingData} {
     // As opposed to inputs, outputs only need to be created once by the parser, never updated, as this process only
     // consists of wrapping the data type evaluation into an outer function so it can be executed later when the
     // output triggers, in which case the data type will always be evaluated fresh. There is no need to replace
@@ -180,7 +180,7 @@ export class BindingStateManager {
    * @param parserConfig - The current parser config
    */
   private createOutputBindings(openingTag: string, parserConfig: SelectorHookParserConfig): {[key: string]: RichBindingData} {
-    const rawOutputs = this.getBindingsFromOpeningTag('outputs', openingTag, parserConfig.outputsBlacklist, parserConfig.outputsWhitelist);
+    const rawOutputs = this.getBindingsFromOpeningTag('outputs', openingTag, parserConfig.outputsBlacklist || null, parserConfig.outputsWhitelist || null);
 
     // Create bindings object
     const outputBindings: {[key: string]: RichBindingData} = {};
@@ -197,7 +197,7 @@ export class BindingStateManager {
       // Simply wrap evaluate() into outer function that will be called when the corresponding event emits.
       // If the dataTypeString contains a function, it will therefore be evaluated and executed "just-in-time".
       // If it contains a variable, nothing will happen as the the evaluated dataTypeString is not assigned anywhere and simply discarded.
-      outputBindings[outputName].value = (event, context) => {
+      outputBindings[outputName].value = (event: any, context: any) => {
         try {
           this.dataTypeParser.evaluate(
             outputBinding.raw,
@@ -207,7 +207,7 @@ export class BindingStateManager {
             outputBinding.boundContextVariables,
             parserConfig.allowContextFunctionCalls
           );
-        } catch (e) {
+        } catch (e: any) {
           if (isDevMode()) {
             console.error(`Hook output parsing error\nselector: ` + parserConfig.selector +  `\noutput: ` + outputName + `\nvalue: "` + outputBinding.value + `"`);
             console.error(e.stack);
@@ -230,8 +230,8 @@ export class BindingStateManager {
    * @param blacklist - What bindings to exlude
    * @param whitelist - What bindings to exclusively include
    */
-  private getBindingsFromOpeningTag(type: 'noBracketInputs'|'bracketInputs'|'outputs', openingTag: string, blacklist: string[], whitelist: string[]): {[key: string]: any} {
-    const bindings = {};
+  private getBindingsFromOpeningTag(type: 'noBracketInputs'|'bracketInputs'|'outputs', openingTag: string, blacklist: string[]|null, whitelist: string[]|null): {[key: string]: any} {
+    const bindings: {[key: string]: any} = {};
 
     // Examples: https://regex101.com/r/17x3cc/16
     const attributeValuesOR = '(?:' + regexes.attributeValueDoubleQuotesRegex + '|' + regexes.attributeValueSingleQuotesRegex + ')';
@@ -257,7 +257,7 @@ export class BindingStateManager {
     }
 
     // Filter bindings
-    const filteredBindings = {};
+    const filteredBindings: {[key: string]: any} = {};
     for (const [bindingName, bindingValue] of Object.entries(bindings)) {
       if (blacklist && blacklist.includes(bindingName)) {
         continue;

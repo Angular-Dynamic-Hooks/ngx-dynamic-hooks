@@ -1,7 +1,7 @@
 import { ComponentFactoryResolver, SimpleChange, isDevMode, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Hook, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
+import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
 import { OutletOptions } from '../options/options';
 import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepComparer';
 
@@ -25,10 +25,14 @@ export class ComponentUpdater {
   refresh(hookIndex: HookIndex, context: any, options: OutletOptions, triggerOnDynamicChanges: boolean): void {
 
     for (const [hookId, hook] of Object.entries(hookIndex)) {
+      if (!hook.componentRef) { 
+        return; 
+      }
+
       // Save previous bindings
       hook.previousBindings = {
-        inputs: this.savePreviousBindings(hook, 'inputs', options.compareInputsByValue, options.compareByValueDepth),
-        outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth)
+        inputs: this.savePreviousBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!),
+        outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!)
       };
 
       // Update bindings
@@ -40,6 +44,10 @@ export class ComponentUpdater {
     // If context has changed by reference, call OnDynamicChanges() for all created components.
     if (triggerOnDynamicChanges) {
       for (const hook of Object.values(hookIndex)) {
+        if (!hook.componentRef) { 
+          return; 
+        }
+
         if (typeof hook.componentRef.instance['onDynamicChanges'] === 'function') {
           hook.componentRef.instance['onDynamicChanges']({context});
         }
@@ -57,8 +65,8 @@ export class ComponentUpdater {
    */
   savePreviousBindings(hook: Hook, type: 'inputs'|'outputs', saveStringified: boolean, stringifyDepth: number): {[key: string]: PreviousHookBinding} {
     const result: {[key: string]: PreviousHookBinding} = {};
-    if (hook.bindings.hasOwnProperty(type)) {
-      for (const [bindingName, bindingValue] of Object.entries(hook.bindings[type])) {
+    if (hook.bindings!.hasOwnProperty(type)) {
+      for (const [bindingName, bindingValue] of Object.entries(hook.bindings![type] as any)) {
         result[bindingName] = {
           reference: bindingValue,
           stringified: saveStringified ? this.deepComparer.detailedStringify(bindingValue, stringifyDepth) : null // To compare by value
@@ -80,18 +88,18 @@ export class ComponentUpdater {
    */
   updateComponentWithNewOutputs(hook: Hook, context: any, options: OutletOptions): void {
     // Find out which outputs have changed
-    const changedOutputs: {[key: string]: (e, c) => any} = this.getChangedBindings(hook, 'outputs', options.compareOutputsByValue, options.compareByValueDepth);
+    const changedOutputs: {[key: string]: (e: any, c: any) => any} = this.getChangedBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!);
 
     // Check if outputs exist on component
-    const existingOutputs: {[key: string]: (e, c) => any} = {};
+    const existingOutputs: {[key: string]: (e: any, c: any) => any} = {};
     if (options.acceptOutputsForAnyObservable) {
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
-        if (hook.componentRef.instance[outputName] instanceof Observable) {
+        if (hook.componentRef!.instance[outputName] instanceof Observable) {
           existingOutputs[outputName] = outputCallback;
         }
       }
     } else {
-      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef.componentType);
+      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef!.componentType);
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
         const outputEntry = compFactory.outputs.filter(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName));
         if (outputEntry.length > 0) {
@@ -104,7 +112,7 @@ export class ComponentUpdater {
     // (Re)subscribe to outputs, store subscription in Hook
     for (const [outputName, outputCallback] of Object.entries(existingOutputs)) {
       if (hook.outputSubscriptions[outputName]) { hook.outputSubscriptions[outputName].unsubscribe(); }
-      hook.outputSubscriptions[outputName] = hook.componentRef.instance[outputName].subscribe(event => outputCallback(event, context));
+      hook.outputSubscriptions[outputName] = hook.componentRef!.instance[outputName].subscribe((event: any) => outputCallback(event, context));
     }
 
   }
@@ -117,22 +125,22 @@ export class ComponentUpdater {
    */
   updateComponentWithNewInputs(hook: Hook, options: OutletOptions): void {
     // Find out which inputs have changed
-    const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue, options.compareByValueDepth);
+    const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!);
 
     // Check if inputs exists on component
-    const existingInputs = {};
+    const existingInputs: {[key: string]: any} = {};
     if (options.acceptInputsForAnyProperty) {
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {
         // Even this setting has limits. Don't allow setting fundamental JavaScript object properties.
         if (!['__proto__', 'prototype', 'constructor'].includes(inputName)) {
           existingInputs[inputName] = inputValue;
         } else {
-          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + inputName + '" for hook "' + hook.componentRef.componentType.name + '". This is not allowed.');
+          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + inputName + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
           continue;
         }
       }
     } else {
-      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef.componentType);
+      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef!.componentType);
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {
         const inputEntry = compFactory.inputs.filter(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName));
         if (inputEntry.length > 0) {
@@ -145,15 +153,15 @@ export class ComponentUpdater {
     // Pass in Inputs, create SimpleChanges object
     const simpleChanges: {[key: string]: SimpleChange} = {};
     for (const [inputName, inputValue] of Object.entries(existingInputs)) {
-      hook.componentRef.instance[inputName] = inputValue;
+      hook.componentRef!.instance[inputName] = inputValue;
       const previousValue = hook.previousBindings && hook.previousBindings.inputs.hasOwnProperty(inputName) ? hook.previousBindings.inputs[inputName].reference : undefined;
       simpleChanges[inputName] = new SimpleChange(previousValue, inputValue, !hook.dirtyInputs.has(inputName));
       hook.dirtyInputs.add(inputName);
     }
 
     // Call ngOnChanges()
-    if (Object.keys(simpleChanges).length > 0 && typeof hook.componentRef.instance['ngOnChanges'] === 'function') {
-      hook.componentRef.instance.ngOnChanges(simpleChanges);
+    if (Object.keys(simpleChanges).length > 0 && typeof hook.componentRef!.instance['ngOnChanges'] === 'function') {
+      hook.componentRef!.instance.ngOnChanges(simpleChanges);
     }
   }
 
@@ -166,8 +174,8 @@ export class ComponentUpdater {
    */
   getChangedBindings(hook: Hook, type: 'inputs'|'outputs', compareByValue: boolean, compareDepth: number): {[key: string]: any} {
     const changedBindings: {[key: string]: any} = {};
-    if (hook.bindings.hasOwnProperty(type)) {
-      for (const [key, binding] of Object.entries(hook.bindings[type])) {
+    if (hook.bindings!.hasOwnProperty(type)) {
+      for (const [key, binding] of Object.entries(hook.bindings![type] as any)) {
 
         // If binding did not exist in previous hook data, binding is considered changed
         if (!hook.previousBindings || !hook.previousBindings[type].hasOwnProperty(key)) {
@@ -184,10 +192,10 @@ export class ComponentUpdater {
         // b) By value
         } else {
           const stringifiedBinding = this.deepComparer.detailedStringify(binding, compareDepth);
-          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef.componentType.name, compareDepth, hook.previousBindings[type][key].stringified, stringifiedBinding);
+          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef!.componentType.name, compareDepth, hook.previousBindings[type][key].stringified!, stringifiedBinding);
 
           if (canBeComparedByValue) {
-            if (stringifiedBinding.result !== hook.previousBindings[type][key].stringified.result) {
+            if (stringifiedBinding.result !== hook.previousBindings[type][key].stringified!.result) {
               changedBindings[key] = binding;
             }
           } else {

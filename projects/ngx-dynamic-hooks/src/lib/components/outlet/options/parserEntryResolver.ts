@@ -24,10 +24,10 @@ export class ParserEntryResolver {
    * @param blacklist - (optional) Which parsers to blacklist by name
    * @param whitelist - (optional) Which parsers to whitelist by name
    */
-  resolve(parserEntries: Array<HookParserEntry>, injector: Injector, blacklist?: Array<string>, whitelist?: Array<string>): Array<HookParser> {
+  resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist?: string[]|null, whitelist?: string[]|null): Array<HookParser> {
 
     // Load all requested parsers
-    const parsers: Array<HookParser> = [];
+    const parsers: HookParser[] = [];
     for (const parser of parserEntries) {
       const resolvedParser = this.resolveEntry(parser, injector);
       if (resolvedParser) {
@@ -78,7 +78,7 @@ export class ParserEntryResolver {
    * @param parserEntry - The HookParserEntry to process
    * @param injector - The injector to use for resolving this parser
    */
-  resolveEntry(parserEntry: HookParserEntry, injector: Injector): HookParser {
+  resolveEntry(parserEntry: HookParserEntry, injector: Injector): HookParser|null {
     // Check if class
     if (parserEntry.hasOwnProperty('prototype')) {
       // Check if service
@@ -99,17 +99,14 @@ export class ParserEntryResolver {
       } else {
         try {
           return new SelectorHookParser(parserEntry as SelectorHookParserConfig, this.parserResolver, this.selectorFinder, this.bindingStateManager);
-        } catch (e)  {
-          if (isDevMode()) {
-            console.error('Invalid parser config - ', parserEntry, '\n', e);
-          }
-        }
-      }
-    } else {
-      if (isDevMode()) {
-        console.error('Invalid parser config - ', parserEntry);
+        } catch (e)  {}
       }
     }
+    
+    if (isDevMode()) {
+      console.error('Invalid parser config - ', parserEntry);
+    }
+    return null;
   }
 
   /**
@@ -143,9 +140,9 @@ export class ParserEntryResolver {
    * @param parsers - The parsers in question
    */
   checkParserNames(parsers: Array<HookParser>): void {
-    const parserNames = parsers.map(entry => entry.name).filter(entry => entry !== undefined);
-    const previousNames = [];
-    const alreadyWarnedNames = [];
+    const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
+    const previousNames: string[] = [];
+    const alreadyWarnedNames: string[] = [];
     for (const parserName of parserNames) {
       if (previousNames.includes(parserName) && !alreadyWarnedNames.includes(parserName)) {
         if (isDevMode()) {
@@ -164,8 +161,8 @@ export class ParserEntryResolver {
    * @param blacklist - The blacklist in question
    * @param whitelist - The whitelist in question
    */
-  checkBlackAndWhitelist(parsers: Array<HookParser>, blacklist?: Array<string>, whitelist?: Array<string>): void {
-    const parserNames = parsers.map(entry => entry.name).filter(entry => entry !== undefined);
+  checkBlackAndWhitelist(parsers: HookParser[], blacklist?: string[]|null, whitelist?: string[]|null): void {
+    const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
     if (blacklist) {
       for (const blacklistedParser of blacklist) {
         if (!parserNames.includes(blacklistedParser)) {

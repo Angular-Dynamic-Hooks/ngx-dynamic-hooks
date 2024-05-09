@@ -21,7 +21,7 @@ export class DynamicPlanetCountriesComponent {}
 export class PlanetCountriesComponent {
   constructor(
     public hostElement: ElementRef,
-    @Inject(CONTENT_STRING) public contentString,
+    @Inject(CONTENT_STRING) public contentString: any,
     @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksGlobalSettings[],
     @Inject(DYNAMICHOOKS_MODULESETTINGS) public moduleSettings: DynamicHooksGlobalSettings,
     public outletService: OutletService

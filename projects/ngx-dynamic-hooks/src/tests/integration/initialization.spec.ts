@@ -34,20 +34,20 @@ describe('Initialization', () => {
       enclosing: false
     }]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
     expect((comp.activeParsers[0] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
 
     // Test with config for MultiTagTestComponent
     ({fixture, comp} = prepareTestingModule([{
       component: MultiTagTestComponent
     }]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
@@ -60,12 +60,11 @@ describe('Initialization', () => {
 
     ({fixture, comp} = prepareTestingModule());
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(comp['outletService']['allSettings'].length).toBe(1);
     expect(comp['outletService']['allSettings'][0]).toEqual({});
     expect(comp['outletService']['moduleSettings']).toEqual({});
-    expect(comp['outletService']['finalSettings']).toEqual({});
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default
@@ -84,58 +83,58 @@ describe('Initialization', () => {
     // Initialize
     const testTextOne = `<div>Some random component <dynHooks-multitagtest>with inner content.</dynHooks-multitagtest></div>`;
     comp.content = testTextOne;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.parse as any)['calls'].count()).toBe(1);
 
     // Change 'text'
     const testTextTwo = `<span>Some other text <dynHooks-singletagtest><dynHooks-multitagtest></dynHooks-multitagtest></span>`;
     comp.content = testTextTwo;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
     expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.parse as any)['calls'].count()).toBe(2);
 
     // Change 'options'
     const newOptions = {sanitize: false};
     comp.options = newOptions;
-    comp.ngOnChanges({options: true});
+    comp.ngOnChanges({options: true} as any);
     expect((comp.parse as any)['calls'].count()).toBe(3);
 
     // Change 'globalParsersBlacklist'
     const blacklist = ['SingleTagTestComponentParser'];
     comp.globalParsersBlacklist = blacklist;
-    comp.ngOnChanges({globalParsersBlacklist: true});
+    comp.ngOnChanges({globalParsersBlacklist: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.parse as any)['calls'].count()).toBe(4);
 
     // Reset
     (comp as any).globalParsersBlacklist  = null;
     (comp as any).globalParsersWhitelist = null;
-    comp.ngOnChanges({globalParsersBlacklist: true, globalParsersWhitelist: true});
+    comp.ngOnChanges({globalParsersBlacklist: true, globalParsersWhitelist: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp as any).parse['calls'].count()).toBe(5);
 
     // Change 'globalParsersWhitelist'
     const whitelist = ['SingleTagTestComponentParser'];
     comp.globalParsersWhitelist = whitelist;
-    comp.ngOnChanges({globalParsersWhitelist: true});
+    comp.ngOnChanges({globalParsersWhitelist: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect((comp as any).parse['calls'].count()).toBe(6);
 
     // Change 'parsers' (while leaving 'globalParsersWhitelist' as is, should be ignored)
     comp.parsers = [{component: MultiTagTestComponent, name: 'LocalParser!'}];
-    comp.ngOnChanges({parsers: true});
+    comp.ngOnChanges({parsers: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.activeParsers.length).toBe(1);
     expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
     expect((comp as any).activeParsers[0]['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');

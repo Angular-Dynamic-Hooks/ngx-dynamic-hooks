@@ -35,18 +35,18 @@ describe('OutletService', () => {
       expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
 
       expect(outletParseResult.element.querySelector('.singletag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-      expect(outletParseResult.hookIndex[1].componentRef.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
-      expect(outletParseResult.hookIndex[1].componentRef.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
 
       expect(outletParseResult.element.querySelector('.multitag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
     });
   });
 
   it('#should fill an existing HTML-Element by using the OutletService directly', () => {
-    const outletService: any = TestBed.inject(OutletService);
+    const outletService: OutletService = TestBed.inject(OutletService);
 
     const testText = `
       <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
@@ -56,7 +56,7 @@ describe('OutletService', () => {
     const existingElement = document.createElement('article');
     existingElement.setAttribute('id', 'myExistingElement');
 
-    outletService.parse(testText, {}, null, null, null, null, existingElement, null).subscribe((outletParseResult: OutletParseResult) => {
+    outletService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((outletParseResult: OutletParseResult) => {
       expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
 
       expect(existingElement.getAttribute('id')).toBe('myExistingElement');
@@ -64,13 +64,13 @@ describe('OutletService', () => {
       expect(existingElement).toBe(outletParseResult.element);
 
       expect(existingElement.querySelector('.singletag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-      expect(outletParseResult.hookIndex[1].componentRef.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
-      expect(outletParseResult.hookIndex[1].componentRef.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
 
       expect(existingElement.querySelector('.multitag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[2].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
     });
   });
 

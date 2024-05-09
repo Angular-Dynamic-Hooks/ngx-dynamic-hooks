@@ -1,4 +1,4 @@
-import { Component, Inject, ElementRef } from '@angular/core';
+import { Component, Inject, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -16,5 +16,6 @@ export class DynamicRootComponent {}
   </div>`
 })
 export class RootComponent {
-  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString) {}
+  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {
+  }
 }

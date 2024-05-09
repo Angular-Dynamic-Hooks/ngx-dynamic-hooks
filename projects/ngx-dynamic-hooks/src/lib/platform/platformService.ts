@@ -16,7 +16,7 @@ export abstract class PlatformService {
    * @param token - A string that appears as the "token"-attribute on the element
    * @param hookId - A string that appears as the "hookId"-attribute on the element
    */
-  abstract findPlaceholderElement(contentElement: any, token: string, hookId: string): any;
+  abstract findPlaceholderElement(contentElement: any, token: string, hookId: string): any|null;
 
   /**
    * Returns the value of an element attribute.
@@ -24,7 +24,7 @@ export abstract class PlatformService {
    * @param element The element
    * @param attributeName Attribute Name
    */
-  abstract getAttribute(element: any, attributeName: string): string;
+  abstract getAttribute(element: any, attributeName: string): string|null;
 
   /**
    * Returns an array of child nodes.
@@ -51,7 +51,7 @@ export abstract class PlatformService {
    * Returns null when there'a an error.
    * @param element An element
    */
-  abstract getParentNode(element: any): any;
+  abstract getParentNode(element: any): any|null;
 
   /**
    * Returns the inner text of an element.
@@ -71,7 +71,7 @@ export abstract class PlatformService {
    * Sanitizes a dynamic component content.
    * @param content The content to be sanitized.
    */
-  abstract sanitize(content: string): string;
+  abstract sanitize(content: string): string|null;
 
   /**
    * Sets the content of an element.

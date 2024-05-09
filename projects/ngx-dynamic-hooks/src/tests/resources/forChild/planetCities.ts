@@ -20,7 +20,7 @@ export class DynamicPlanetCitiesComponent {}
 export class PlanetCitiesComponent {
   constructor(
     public hostElement: ElementRef,
-    @Inject(CONTENT_STRING) public contentString
+    @Inject(CONTENT_STRING) public contentString: any
   ) {}
 }
 

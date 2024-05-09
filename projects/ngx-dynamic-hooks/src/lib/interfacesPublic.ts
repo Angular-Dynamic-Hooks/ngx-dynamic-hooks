@@ -20,10 +20,10 @@ export interface Hook {
     id: number;
     parser: HookParser;
     value: HookValue;
-    data: HookComponentData;
-    componentRef: ComponentRef<any>;
-    bindings: HookBindings;
-    previousBindings: PreviousHookBindings;
+    data: HookComponentData|null;
+    componentRef: ComponentRef<any>|null;
+    bindings: HookBindings|null;
+    previousBindings: PreviousHookBindings|null;
     dirtyInputs: Set<string>;
     outputSubscriptions: {[key: string]: Subscription};
 }
@@ -37,7 +37,7 @@ export interface PreviousHookBindings {
 }
 export interface PreviousHookBinding {
     reference: any;
-    stringified: DetailedStringifyResult;
+    stringified: DetailedStringifyResult|null;
 }
 
 // Parser
@@ -105,7 +105,7 @@ export interface HookPosition {
  */
 export interface HookValue {
     openingTag: string;
-    closingTag: string;
+    closingTag: string|null;
 }
 
 /**

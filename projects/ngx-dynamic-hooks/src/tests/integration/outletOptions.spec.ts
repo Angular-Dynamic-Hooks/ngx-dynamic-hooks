@@ -29,7 +29,7 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers, differentOptions));
 
     comp.content = 'something';
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     for (const [key, value] of Object.entries(comp.activeOptions)) {
       expect(value).toBe(differentOptions[key]);
@@ -46,7 +46,7 @@ describe('OutletOptions', () => {
     }
 
     comp.options = differentOptions as OutletOptions;
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     for (const [key, value] of Object.entries(comp.activeOptions)) {
       expect(value).toBe(differentOptions[key]);
@@ -59,7 +59,7 @@ describe('OutletOptions', () => {
     };
 
     comp.options = invalidOptions as OutletOptions;
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     for (const [key, value] of Object.entries(comp.activeOptions)) {
       expect(value).toBe((outletOptionDefaults as any)[key]);
@@ -70,7 +70,7 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers, []));
 
     comp.content = 'something';
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
     for (const [key, value] of Object.entries(comp.activeOptions)) {
@@ -88,7 +88,7 @@ describe('OutletOptions', () => {
     </p>`;
     comp.content = testText;
     comp.options = { sanitize: true };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that sanitized
     expect(fixture.nativeElement.innerHTML).not.toContain('<script>');
@@ -99,14 +99,14 @@ describe('OutletOptions', () => {
     let customEl = fixture.nativeElement.querySelector('custom-element');
     expect(customEl).toBeNull();
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
 
     // Reset
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { sanitize: false };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that unsanitized
     expect(fixture.nativeElement.innerHTML).toContain('<script>console.log("somescript");</script>');
@@ -117,8 +117,8 @@ describe('OutletOptions', () => {
     customEl = fixture.nativeElement.querySelector('custom-element');
     expect(customEl).not.toBeNull();
     expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
   });
 
   it('#should convertHTMLEntities, if requested', () => {
@@ -128,20 +128,20 @@ describe('OutletOptions', () => {
     `;
     comp.content = testText;
     comp.options = { convertHTMLEntities: true, sanitize: false };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that HTML-Entities are replaced
     expect(fixture.nativeElement.querySelector('b')).not.toBeNull();
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.numberProp).toBe(21);
-    expect(comp.hookIndex[1].componentRef.instance.simpleArray).toEqual(['enrico', 'susanne']);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.numberProp).toBe(21);
+    expect(comp.hookIndex[1].componentRef!.instance.simpleArray).toEqual(['enrico', 'susanne']);
 
     // Reset
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { convertHTMLEntities: false, sanitize: false };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that HTML-Entities are not replaced
     expect(fixture.nativeElement.innerHTML).toContain('&lt;b&gt;BOLD&lt;/b&gt;');
@@ -162,7 +162,7 @@ describe('OutletOptions', () => {
     `;
     comp.content = testText;
     comp.options = { fixParagraphTags: true };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that p-artifacts are removed
     expect(fixture.nativeElement.children.length).toBe(2);
@@ -172,13 +172,13 @@ describe('OutletOptions', () => {
     expect(fixture.nativeElement.children[1].children.length).toBe(1);
     expect(fixture.nativeElement.children[1].children[0].className).toBe('multitag-component');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
 
     // Reset
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { fixParagraphTags: false };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that p-artifacts are not replaced
     // Any number of things can be wrong when letting the browser parse invalid HTML
@@ -191,31 +191,31 @@ describe('OutletOptions', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: true};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
 
     // Ensure that hooks are refreshed on context reference change only
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(0);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(0);
     comp.context.order = 99;
     comp.ngDoCheck();
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(0);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(0);
     comp.context = context;
-    comp.ngOnChanges({context: true});
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(1);
+    comp.ngOnChanges({context: true} as any);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
 
     // Reset
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
 
     // Ensure that hooks are refreshed on any change detection run
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(0);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(0);
     comp.context.order = 99;
     comp.ngDoCheck();
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(1);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
   });
 
   it('#should compareInputsByValue, if requested', () => {
@@ -228,16 +228,16 @@ describe('OutletOptions', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = { compareInputsByValue: true };
-    comp.ngOnChanges({content: true, context: true, options: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
     let simpleObject = loadedComp.simpleObject;
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
     // With compareByValue: Expect ngOnChanges not to trigger and inputs not to be replaced if value stays the same (even if ref changes)
     comp.context = newContext;
-    comp.ngOnChanges({context: true});
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(1);
+    comp.ngOnChanges({context: true} as any);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(0);
     expect(loadedComp.simpleObject).toBe(simpleObject);                                 // Should NOT have been replaced
     expect(loadedComp.simpleObject.lightsabers).toBe(context.$lightSaberCollection);    // Should NOT have been replaced
@@ -247,16 +247,16 @@ describe('OutletOptions', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = { compareInputsByValue: false };
-    comp.ngOnChanges({content: true, context: true, options: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
     simpleObject = loadedComp.simpleObject;
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
     // Without compareByValue: Expect ngOnChanges to trigger and inputs to be replaced if reference changes
     comp.context = newContext;
-    comp.ngOnChanges({context: true});
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(1);
+    comp.ngOnChanges({context: true} as any);
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
     expect(Object.keys(loadedComp.ngOnChanges['calls'].mostRecent().args[0]).length).toBe(1);
     expect(loadedComp.ngOnChanges['calls'].mostRecent().args[0]['simpleObject']).toBeDefined();
@@ -279,7 +279,7 @@ describe('OutletOptions', () => {
     };
 
     const changedBindings = componentUpdater.getChangedBindings(testHook as any, 'inputs', true, 5);
-    expect(changedBindings.testInput).not.toBeUndefined();
+    expect(changedBindings['testInput']).not.toBeUndefined();
   });
 
   it('#should warn if inputs cannot be compared by value', () => {
@@ -325,13 +325,13 @@ describe('OutletOptions', () => {
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 3 };
-    comp.ngOnChanges({content: true, context: true, options: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
     // Expect ngOnChanges not to trigger if changed value is out of reach
     comp.context = secondContext;
-    comp.ngOnChanges({context: true});
+    comp.ngOnChanges({context: true} as any);
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(0);
 
     // Reset
@@ -339,13 +339,13 @@ describe('OutletOptions', () => {
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 4 };
-    comp.ngOnChanges({content: true, context: true, options: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
     // Expect ngOnChanges to trigger if changed value is within reach
     comp.context = secondContext;
-    comp.ngOnChanges({context: true});
+    comp.ngOnChanges({context: true} as any);
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
   });
 
@@ -353,8 +353,8 @@ describe('OutletOptions', () => {
     const testText = `<dynhooks-singletagtest [stringPropAlias]="'Hello there'" [stringProp]="'General Kenobi'">`;
     comp.content = testText;
     comp.options = { ignoreInputAliases: true };
-    comp.ngOnChanges({content: true, options: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect input property to be set by its property name
     expect(loadedComp.stringProp).toBe('General Kenobi');
@@ -363,8 +363,8 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { ignoreInputAliases: false };
-    comp.ngOnChanges({content: true, options: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect input property to be set by its alias
     expect(loadedComp.stringProp).toBe('Hello there');
@@ -374,8 +374,8 @@ describe('OutletOptions', () => {
     const testText = `<dynhooks-singletagtest (eventTriggeredAlias)="123" (componentClicked)="456">`;
     comp.content = testText;
     comp.options = { ignoreOutputAliases: true };
-    comp.ngOnChanges({content: true, options: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect output property to be set by its property name
     expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeDefined();
@@ -385,8 +385,8 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { ignoreOutputAliases: false };
-    comp.ngOnChanges({content: true, options: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect output property to be set by its alias
     expect(comp.hookIndex[1].outputSubscriptions['componentClicked']).toBeUndefined();
@@ -397,8 +397,8 @@ describe('OutletOptions', () => {
     const testText = `<dynhooks-singletagtest [thisPropertyDoesNotExist]="123">`;
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: true };
-    comp.ngOnChanges({content: true, options: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect property to be set regardless of whether or not it is declared as @Input() or not
     expect(loadedComp.thisPropertyDoesNotExist).toBe(123);
@@ -407,8 +407,8 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: false };
-    comp.ngOnChanges({content: true, options: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, options: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     // Expect property not to be set when not declared as @Input()
     expect(loadedComp.thisPropertyDoesNotExist).toBeUndefined();
@@ -418,7 +418,7 @@ describe('OutletOptions', () => {
     const testText = `<dynhooks-singletagtest (nonOutputEventEmitter)="123">`;
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: true };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Expect property to be set regardless of whether or not it is declared as @Output() or not
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeDefined();
@@ -427,7 +427,7 @@ describe('OutletOptions', () => {
     ({fixture, comp} = prepareTestingModule(testParsers));
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: false };
-    comp.ngOnChanges({content: true, options: true});
+    comp.ngOnChanges({content: true, options: true} as any);
 
     // Expect property not to be set when not declared as @Output()
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeUndefined();

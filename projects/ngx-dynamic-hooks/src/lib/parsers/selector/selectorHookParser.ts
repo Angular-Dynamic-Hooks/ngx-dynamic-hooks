@@ -9,7 +9,7 @@ import { SelectorHookParserConfigResolver } from './config/selectorHookParserCon
  * A powerful parser for standard Angular component selectors that comes with this library
  */
 export class SelectorHookParser implements HookParser {
-  name: string;
+  name: string|undefined;
   config: SelectorHookParserConfig;
   // Keep track of all hooks and their current bindings to keep references on updates
   currentBindings: {[key: number]: {
@@ -28,8 +28,8 @@ export class SelectorHookParser implements HookParser {
 
   public findHooks(content: string, context: any): Array<HookPosition> {
     return this.config.enclosing ?
-      this.selectorFinder.findEnclosingSelectors(content, this.config.selector, this.config.bracketStyle) :
-      this.selectorFinder.findStandaloneSelectors(content, this.config.selector, this.config.bracketStyle);
+      this.selectorFinder.findEnclosingSelectors(content, this.config.selector!, this.config.bracketStyle) :
+      this.selectorFinder.findStandaloneSelectors(content, this.config.selector!, this.config.bracketStyle);
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
@@ -64,7 +64,7 @@ export class SelectorHookParser implements HookParser {
    * @param richBindingsObject - The object containing the RichBindingData
    */
   private getValuesFromBindings(richBindingsObject: {[key: string]: RichBindingData}): {[key: string]: any} {
-    const result = {};
+    const result: {[key: string]: any} = {};
     for (const [key, value] of Object.entries(richBindingsObject)) {
       result[key] = value.value;
     }

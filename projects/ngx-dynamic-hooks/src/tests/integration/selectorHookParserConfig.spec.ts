@@ -31,7 +31,7 @@ describe('SelectorHookParserConfig', () => {
       component: SingleTagTestComponent,
       selector: true
     } as any];
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     expect(comp.activeParsers.length).toBe(0);
     expect((<any>console.error)['calls'].count()).toBe(1);
@@ -135,7 +135,6 @@ describe('SelectorHookParserConfig', () => {
     config = { component: SingleTagTestComponent, allowContextFunctionCalls: 'true' };
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "allowContextFunctionCalls" property in the SelectorHookParserConfig must be of type boolean, was string'));
-
   });
 
   it('#should recognize custom selectors', () => {
@@ -146,7 +145,7 @@ describe('SelectorHookParserConfig', () => {
 
     const testText = `<p>This is a custom selector: <atotallycustomselector [someInput]="true">for the multitag component</atotallycustomselector>.</p>`;
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('for the multitag component');
@@ -157,13 +156,13 @@ describe('SelectorHookParserConfig', () => {
 
     // As OutletComponentService is provided directly on OutletComponent, it should be available
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    expect(comp.hookIndex[1].componentRef.instance.outletComponentService).toEqual({name: 'OutletComponentService'});
+    comp.ngOnChanges({content: true} as any);
+    expect(comp.hookIndex[1].componentRef!.instance.outletComponentService).toEqual({name: 'OutletComponentService'});
 
     // Use OutletService.parse() without injector param to force usage of root injector, so OutletComponentService should not be available
     const outletService: any = TestBed.inject(OutletService);
     outletService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
-      expect(outletParseResult.hookIndex[1].componentRef.instance.outletComponentService).toBeNull();
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.outletComponentService).toBeNull();
       done();
     });
   });
@@ -177,8 +176,8 @@ describe('SelectorHookParserConfig', () => {
       enclosing: false,
     }]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    expect(comp.hookIndex[1].componentRef.instance.fakeTestService).toBeNull();
+    comp.ngOnChanges({content: true} as any);
+    expect(comp.hookIndex[1].componentRef!.instance.fakeTestService).toBeNull();
 
     // With custom injector, fakeTestService should be set
     const customInjector = Injector.create({
@@ -190,8 +189,8 @@ describe('SelectorHookParserConfig', () => {
       injector: customInjector
     }]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    expect(comp.hookIndex[1].componentRef.instance.fakeTestService).toEqual({ name: 'test value' });
+    comp.ngOnChanges({content: true} as any);
+    expect(comp.hookIndex[1].componentRef!.instance.fakeTestService).toEqual({ name: 'test value' });
   });
 
   it('#should recognize singletag hooks', () => {
@@ -202,15 +201,15 @@ describe('SelectorHookParserConfig', () => {
 
     const testText = `<p>Here the multitag hook is set to be single tag instead: <dynhooks-multitagtest [fonts]="['arial', 'calibri']">text within hook</dynhooks-multitagtest></p>`;
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('');
     expect(fixture.nativeElement.children[0].children[0].innerHTML).not.toContain('text within hook');
     expect(fixture.nativeElement.children[0].innerHTML).toContain('text within hook');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
   });
 
   it('#should recognize unique bracket styles', () => {
@@ -221,13 +220,13 @@ describe('SelectorHookParserConfig', () => {
 
     const testText = `<p>Here is a hook with a unique bracket style: [[dynhooks-multitagtest [fonts]="['arial', 'calibri']"]]text within hook[[/dynhooks-multitagtest]]</p>`;
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('text within hook');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.fonts).toEqual(['arial', 'calibri']);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
   });
 
   it('#should refrain from parsing inputs, if requested', () => {
@@ -239,22 +238,22 @@ describe('SelectorHookParserConfig', () => {
 
     const testText = `<p>Here is a hook whose input shall not be parsed: <dynhooks-multitagtest [nr]="123" [fonts]="['arial', {prop: true}]">text within hook</dynhooks-multitagtest></p>`;
     comp.content = testText;
-    comp.ngOnChanges({content: true});
+    comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('text within hook');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.nr).toEqual('123');                          // <-- Must be string, not number
-    expect(comp.hookIndex[1].componentRef.instance.fonts).toEqual("['arial', {prop: true}]");   // <-- Must be string, not array
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.nr).toEqual('123');                          // <-- Must be string, not number
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual("['arial', {prop: true}]");   // <-- Must be string, not array
 
     // Expect them to still be unparsed after update
     spyOn(comp['componentUpdater'], 'refresh').and.callThrough();
     comp.ngDoCheck();
-    expect(comp['componentUpdater'].refresh['calls'].count()).toBe(1);
-    expect(comp.hookIndex[1].componentRef.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef.instance.nr).toEqual('123');
-    expect(comp.hookIndex[1].componentRef.instance.fonts).toEqual("['arial', {prop: true}]");
+    expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.nr).toEqual('123');
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual("['arial', {prop: true}]");
   });
 
   it('#should unescapeStrings, if requested', () => {
@@ -273,8 +272,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe("This is a 'test' string.");
     expect(loadedComp.simpleObject).toEqual({someProp: "His name was O'Hara."});
@@ -289,8 +288,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe("This is a \\'test\\' string.");
     expect(loadedComp.simpleObject).toEqual({someProp: "His name was O\\'Hara."});
@@ -312,8 +311,8 @@ describe('SelectorHookParserConfig', () => {
     // a) Test inputBlacklist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, inputsBlacklist: ['numberProp']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBeUndefined();
@@ -325,8 +324,8 @@ describe('SelectorHookParserConfig', () => {
     // b) Test inputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, inputsWhitelist: ['simpleArray']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBeUndefined();
     expect(loadedComp.numberProp).toBeUndefined();
@@ -338,8 +337,8 @@ describe('SelectorHookParserConfig', () => {
     // c) Test inputBlacklist + inputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, inputsBlacklist: ['simpleArray'], inputsWhitelist: ['simpleArray', 'numberProp']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBeUndefined();
     expect(loadedComp.numberProp).toBe(917);
@@ -351,8 +350,8 @@ describe('SelectorHookParserConfig', () => {
     // d) Test outputBlacklist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsBlacklist: ['eventTriggeredAlias']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
@@ -364,8 +363,8 @@ describe('SelectorHookParserConfig', () => {
     // e) Test outputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsWhitelist: ['httpResponseReceived']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
@@ -377,8 +376,8 @@ describe('SelectorHookParserConfig', () => {
     // f) Test outputBlacklist + outputWhitelist
     ({fixture, comp} = prepareTestingModule([{component: SingleTagTestComponent, enclosing: false, outputsBlacklist: ['httpResponseReceived'], outputsWhitelist: ['eventTriggeredAlias', 'httpResponseReceived']}]));
     comp.content = testText;
-    comp.ngOnChanges({content: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe('this is an example string');
     expect(loadedComp.numberProp).toBe(917);
@@ -400,8 +399,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
     spyOn(context.maneuvers, 'meditate').and.callThrough();
 
     expect(loadedComp.numberProp).toBe(66);
@@ -417,8 +416,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.numberProp).toBe(undefined);
     loadedComp.httpResponseReceived.emit(300);
@@ -437,8 +436,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    let loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    let loadedComp = comp.hookIndex[1].componentRef!.instance;
     spyOn(context.maneuvers, 'meditate').and.callThrough();
 
     expect(loadedComp.stringProp).toBe('defending the innocent!');
@@ -454,8 +453,8 @@ describe('SelectorHookParserConfig', () => {
 
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    loadedComp = comp.hookIndex[1].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    loadedComp = comp.hookIndex[1].componentRef!.instance;
 
     expect(loadedComp.stringProp).toBe(undefined);
     loadedComp.httpResponseReceived.emit(200);

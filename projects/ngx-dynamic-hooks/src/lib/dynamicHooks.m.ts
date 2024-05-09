@@ -27,9 +27,6 @@ export class DynamicHooksChildModule {}
   declarations: [
     OutletComponent
   ],
-  entryComponents: [
-    OutletComponent
-  ],
   exports: [
     OutletComponent
   ]

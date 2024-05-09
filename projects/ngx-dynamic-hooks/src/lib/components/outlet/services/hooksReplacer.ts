@@ -28,8 +28,8 @@ interface HookSegments {
   enclosing: boolean;
   textBefore: string;
   openingTag: string;
-  innerValue: string;
-  closingTag: string;
+  innerValue: string|null;
+  closingTag: string|null;
   textAfter: string;
 }
 
@@ -65,7 +65,7 @@ export class HooksReplacer {
     let hookCount = 1;
 
     // Collect all parser results (before changing content), sort by startIndex
-    let parserResults: Array<ParserResult> = [];
+    let parserResults: ParserResult[] = [];
     for (const parser of parsers) {
       for (const hookPosition of parser.findHooks(content, context)) {
         parserResults.push({parser, hookPosition});
@@ -80,7 +80,7 @@ export class HooksReplacer {
     // a) Create an array of simple ReplaceInstructions to replace the hooks with the component placeholders
     // b) Enter each found hook into hookIndex
     // c) Replace tag artifacts
-    const selectorReplaceInstructions: Array<ReplaceInstruction> = [];
+    const selectorReplaceInstructions: ReplaceInstruction[] = [];
     for (const pr of parserResults) {
 
       // Some info about this hook
@@ -97,8 +97,8 @@ export class HooksReplacer {
         endIndex: pr.hookPosition.openingTagEndIndex,
         replacement: this.encodeComponentPlaceholderElement('<dynamic-component-placeholder hookid="' + hookCount + '" parsetoken="' + token + '" ' + (pr.parser.name ? 'parser="' + pr.parser.name + '"' : '') + '>')});
       selectorReplaceInstructions.push({
-        startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex : pr.hookPosition.openingTagEndIndex,
-        endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex : pr.hookPosition.openingTagEndIndex,
+        startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex! : pr.hookPosition.openingTagEndIndex,
+        endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex! : pr.hookPosition.openingTagEndIndex,
         replacement: this.encodeComponentPlaceholderElement('</dynamic-component-placeholder>')
       });
 
@@ -121,7 +121,7 @@ export class HooksReplacer {
 
       // Remove tag artifacts (does not change parser results indexes)
       if (hookSegments.enclosing && options.fixParagraphTags) {
-        const firstResult = this.removeTagArtifacts(hookSegments.textBefore, '<p>', '</p>', hookSegments.innerValue, '</p>', '<p>');
+        const firstResult = this.removeTagArtifacts(hookSegments.textBefore, '<p>', '</p>', hookSegments.innerValue!, '</p>', '<p>');
         hookSegments.textBefore = firstResult.firstText;
         hookSegments.innerValue = firstResult.secondText;
 
@@ -150,7 +150,7 @@ export class HooksReplacer {
 
     // Sanitize? (ignores the encoded component selector elements)
     if (options.sanitize) {
-      content = this.platform.sanitize(content);
+      content = this.platform.sanitize(content) || '';
     }
 
     // Decode component selector elements again
@@ -174,9 +174,9 @@ export class HooksReplacer {
       enclosing: enclosing,
       textBefore: content.substr(0, hookPosition.openingTagStartIndex),
       openingTag: content.substr(hookPosition.openingTagStartIndex, hookPosition.openingTagEndIndex - hookPosition.openingTagStartIndex),
-      innerValue: enclosing ? content.substr(hookPosition.openingTagEndIndex, hookPosition.closingTagStartIndex - hookPosition.openingTagEndIndex) : null,
-      closingTag: enclosing ? content.substr(hookPosition.closingTagStartIndex, hookPosition.closingTagEndIndex - hookPosition.closingTagStartIndex) : null,
-      textAfter: enclosing ? content.substr(hookPosition.closingTagEndIndex) : content.substr(hookPosition.openingTagEndIndex)
+      innerValue: enclosing ? content.substr(hookPosition.openingTagEndIndex, hookPosition.closingTagStartIndex! - hookPosition.openingTagEndIndex) : null,
+      closingTag: enclosing ? content.substr(hookPosition.closingTagStartIndex!, hookPosition.closingTagEndIndex! - hookPosition.closingTagStartIndex!) : null,
+      textAfter: enclosing ? content.substr(hookPosition.closingTagEndIndex!) : content.substr(hookPosition.openingTagEndIndex)
     };
   }
 
@@ -199,11 +199,11 @@ export class HooksReplacer {
         if (isDevMode()) { console.warn('Error when checking hook positions - openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
-      if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex) {
+      if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex!) {
         if (isDevMode()) { console.warn('Error when checking hook positions - The closing tag must start after the opening tag has concluded. Ignoring.', hookPos); }
         continue;
       }
-      if (enclosing && hookPos.closingTagStartIndex >= hookPos.closingTagEndIndex) {
+      if (enclosing && hookPos.closingTagStartIndex! >= hookPos.closingTagEndIndex!) {
         if (isDevMode()) { console.warn('Error when checking hook positions - closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
@@ -235,8 +235,8 @@ export class HooksReplacer {
 
         // Opening tag must not overlap with previous closing tag
         if (prevIsEnclosing && !(
-          hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex ||
-          hookPos.openingTagStartIndex >= prevHookPos.closingTagEndIndex
+          hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! ||
+          hookPos.openingTagStartIndex >= prevHookPos.closingTagEndIndex!
         )) {
           this.generateHookPosWarning('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
@@ -244,8 +244,8 @@ export class HooksReplacer {
 
         // Closing tag must not overlap with previous closing tag
         if (prevIsEnclosing && enclosing && !(
-          hookPos.closingTagEndIndex <= prevHookPos.closingTagStartIndex ||
-          hookPos.closingTagStartIndex >= prevHookPos.closingTagEndIndex
+          hookPos.closingTagEndIndex! <= prevHookPos.closingTagStartIndex! ||
+          hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
         )) {
           this.generateHookPosWarning('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
@@ -253,8 +253,8 @@ export class HooksReplacer {
 
         // Check if hooks are incorrectly nested, e.g. "<outer-hook><inner-hook></outer-hook></inner-hook>"
         if (enclosing && prevIsEnclosing &&
-          hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex &&
-          hookPos.closingTagStartIndex >= prevHookPos.closingTagEndIndex
+          hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! &&
+          hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
           ) {
             this.generateHookPosWarning('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
             continue outerloop;
@@ -321,7 +321,7 @@ export class HooksReplacer {
    * @param secondArtifact - A string that should be removed from secondText...
    * @param secondRemoveIfBefore - ...if it appears before the first occurrence of this string
    */
-  private removeTagArtifacts(firstText: string, firstArtifact: string, firstRemoveIfAfter: string, secondText: string, secondArtifact: string = null, secondRemoveIfBefore: string): {firstText: string, secondText: string} {
+  private removeTagArtifacts(firstText: string, firstArtifact: string, firstRemoveIfAfter: string, secondText: string, secondArtifact: string, secondRemoveIfBefore: string): {firstText: string, secondText: string} {
     let firstArtifactFound = false;
     let secondArtifactFound = false;
 

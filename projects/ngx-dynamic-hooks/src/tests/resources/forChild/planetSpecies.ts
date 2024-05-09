@@ -17,7 +17,7 @@ export class DynamicPlanetSpeciesComponent {}
   </div>`
 })
 export class PlanetSpeciesComponent {
-  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString) {}
+  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
 export function createPlanetSpeciesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {

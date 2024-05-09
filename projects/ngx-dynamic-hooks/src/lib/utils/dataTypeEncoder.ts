@@ -307,7 +307,7 @@ export class DataTypeEncoder {
     const allTextSegments = [];
     for (const specialTextSegment of specialTextSegments) {
       // Push normal text segment since last special segment
-      const lastSegmentEndIndex = allTextSegments.length === 0 ? 0 : allTextSegments[allTextSegments.length - 1].endIndex;
+      const lastSegmentEndIndex: number = allTextSegments.length === 0 ? 0 : allTextSegments[allTextSegments.length - 1].endIndex;
       allTextSegments.push({
         type: 'text',
         startIndex: lastSegmentEndIndex,

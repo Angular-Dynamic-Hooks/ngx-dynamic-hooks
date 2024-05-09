@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './options/options';
@@ -34,12 +34,12 @@ import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';
   styles: []
 })
 export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
-  @Input() content: string;
-  @Input() context: any;
-  @Input() globalParsersBlacklist: Array<string>;
-  @Input() globalParsersWhitelist: Array<string>;
-  @Input() parsers: Array<HookParserEntry>;
-  @Input() options: OutletOptions;
+  @Input() content: string|null = null;
+  @Input() context: any = null;
+  @Input() globalParsersBlacklist: Array<string>|null = null;
+  @Input() globalParsersWhitelist: Array<string>|null = null;
+  @Input() parsers: Array<HookParserEntry>|null = null;
+  @Input() options: OutletOptions|null = null;
   @Output() componentsLoaded: EventEmitter<LoadedComponent[]> = new EventEmitter();
   hookIndex: HookIndex = {};
   activeOptions: OutletOptions = outletOptionDefaults;
@@ -52,7 +52,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
 
   constructor(
     // Just needs to request injecting this to ensure that forRoot was called
-    @Optional() @Inject(DYNAMICHOOKS_FORROOTCHECK) private check,
+    @Optional() @Inject(DYNAMICHOOKS_FORROOTCHECK) private forRootCheck: boolean,
     private hostElement: ElementRef,
     private outletService: OutletService,
     private componentUpdater: ComponentUpdater,
@@ -63,7 +63,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
 
   ngDoCheck(): void {
     // Update bindings on every change detection run?
-    if (this.initialized && !this.activeOptions.updateOnPushOnly) {
+    if (!this.activeOptions.updateOnPushOnly) {
       this.refresh(false);
     }
   }
@@ -71,7 +71,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
   ngOnInit(): void {
   }
 
-  ngOnChanges(changes): void {
+  ngOnChanges(changes: SimpleChanges): void {
     // If text or options change, reset and parse from scratch
     if (
       changes.hasOwnProperty('content') ||
@@ -111,8 +111,8 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
     // Reset state
     this.platform.setInnerContent(this.hostElement.nativeElement, '');
     this.hookIndex = {};
-    this.activeOptions = undefined;
-    this.activeParsers = undefined;
+    this.activeOptions = outletOptionDefaults;
+    this.activeParsers = [];
     this.initialized = false;
   }
 
@@ -121,7 +121,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
    *
    * @param content - The input content to parse
    */
-  parse(content: string): void {
+  parse(content: string|null): void {
     this.outletService.parse(
       content,
       this.context,
@@ -144,7 +144,7 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
           hookId: hook.id,
           hookValue: hook.value,
           hookParser: hook.parser,
-          componentRef: hook.componentRef
+          componentRef: hook.componentRef!
         };
       });
       this.componentsLoaded.emit(loadedComponents);
@@ -157,6 +157,8 @@ export class OutletComponent implements DoCheck, OnInit, OnChanges, AfterViewIni
    * @param triggerOnDynamicChanges - Whether to trigger the OnDynamicChanges method of dynamically loaded components
    */
   refresh(triggerOnDynamicChanges: boolean): void {
-    this.componentUpdater.refresh(this.hookIndex, this.context, this.activeOptions, triggerOnDynamicChanges);
+    if (this.initialized) {
+      this.componentUpdater.refresh(this.hookIndex, this.context, this.activeOptions, triggerOnDynamicChanges);
+    }
   }
 }

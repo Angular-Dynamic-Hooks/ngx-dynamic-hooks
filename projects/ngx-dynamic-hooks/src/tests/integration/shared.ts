@@ -61,7 +61,7 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   if (options) { globalSettings.globalOptions = options; }
 
   // Generate declarations
-  let declarations = [];
+  let declarations: any = [];
   if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
   declarations = declarations.concat(extraComponents);
 
@@ -90,13 +90,13 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   .overrideModule(DynamicHooksModule, {
     add: {
       declarations: [OutletComponentWithProviders],
-      entryComponents: [OutletComponentWithProviders],
+      // entryComponents: [OutletComponentWithProviders],
       exports: [OutletComponentWithProviders]
     }
   })
   .overrideModule(BrowserDynamicTestingModule, {
     set: {
-      entryComponents
+      // entryComponents
     }
   });
 

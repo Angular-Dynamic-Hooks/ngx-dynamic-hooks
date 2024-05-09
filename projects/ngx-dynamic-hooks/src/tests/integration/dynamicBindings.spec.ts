@@ -5,9 +5,11 @@ import { SingleTagTestComponent } from '../resources/components/singleTag/single
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
 import { OutletService } from '../testing-api';
+import { SimpleChanges } from '@angular/core';
+import { TestBedStatic } from '@angular/core/testing';
 
 describe('Loading dynamic bindings', () => {
-  let testBed;
+  let testBed: TestBedStatic;
   let fixture: any;
   let comp: OutletComponentWithProviders;
   let context: any;
@@ -76,10 +78,10 @@ describe('Loading dynamic bindings', () => {
     <dynhooks-inlinetest [nr]="123" [config]="{name: 'test', supportedValues: [1, 2, 3], active: true}"></dynhooks-inlinetest>`;
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
-    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef.instance;
-    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef.instance;
-    const thirdComp: InlineTestComponent = comp.hookIndex[3].componentRef.instance;
+    comp.ngOnChanges({content: true, context: true} as any);
+    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+    const thirdComp: InlineTestComponent = comp.hookIndex[3].componentRef!.instance;
 
     // Make sure components are loaded properly
     expect(Object.keys(comp.hookIndex).length).toBe(3);
@@ -160,9 +162,9 @@ describe('Loading dynamic bindings', () => {
     comp.content = testText;
     comp.context = context;
     comp.options = {acceptInputsForAnyProperty: true};
-    comp.ngOnChanges({content: true, context: true, options: true});
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
 
-    const loadedComp: SingleTagTestComponent = comp.hookIndex[1].componentRef.instance;
+    const loadedComp: SingleTagTestComponent = comp.hookIndex[1].componentRef!.instance;
     expect(loadedComp as any['prototype']).not.toBe(false);
   });
 
@@ -170,10 +172,10 @@ describe('Loading dynamic bindings', () => {
     const testText = `<dynhooks-singletagtest [numberProp]="123" (componentClickedAlias)="context.maneuvers.modifyParent($event)">`;
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     expect((comp as any)['completelyNewProperty']).toBeUndefined();
-    comp.hookIndex[1].componentRef.instance.componentClicked.emit(555);
+    comp.hookIndex[1].componentRef!.instance.componentClicked.emit(555);
     expect((comp as any)['completelyNewProperty']).toBe(555);
   });
 
@@ -182,10 +184,10 @@ describe('Loading dynamic bindings', () => {
     const testText = `<dynhooks-singletagtest (componentClickedAlias)="context.maneuvers.modifyParent($event">`; // Missing final bracket
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     expect((comp as any)['completelyNewProperty']).toBeUndefined();
-    comp.hookIndex[1].componentRef.instance.componentClicked.emit(555);
+    comp.hookIndex[1].componentRef!.instance.componentClicked.emit(555);
     expect((comp as any)['completelyNewProperty']).toBe(undefined);
     expect((<any>console.error)['calls'].count(1));
   });
@@ -194,7 +196,7 @@ describe('Loading dynamic bindings', () => {
     const testText = `<dynhooks-singletagtest (onDestroyEmitter)="context.maneuvers.modifyParent($event)">`;
     comp.content = testText;
     comp.context = context;
-    comp.ngOnChanges({content: true, context: true});
+    comp.ngOnChanges({content: true, context: true} as any);
 
     const outletService: OutletService = testBed.inject(OutletService);
 
