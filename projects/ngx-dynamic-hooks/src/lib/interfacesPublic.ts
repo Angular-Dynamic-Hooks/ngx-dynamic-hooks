@@ -96,8 +96,8 @@ export interface HookParser {
 export interface HookPosition {
     openingTagStartIndex: number;
     openingTagEndIndex: number;
-    closingTagStartIndex?: number;
-    closingTagEndIndex?: number;
+    closingTagStartIndex?: number|null;
+    closingTagEndIndex?: number|null;
 }
 
 /**

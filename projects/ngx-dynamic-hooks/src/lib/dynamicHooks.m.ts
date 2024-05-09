@@ -20,9 +20,6 @@ import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_F
 
 const allSettings: DynamicHooksGlobalSettings[] = [];
 
-@NgModule()
-export class DynamicHooksChildModule {}
-
 @NgModule({
   declarations: [
     OutletComponent
@@ -37,7 +34,10 @@ export class DynamicHooksModule {
   // Make sure to set the optional function signature "ModuleWithProviders<T>".
   // Note: This will break Angular 5 backwards compatibility, but enable compatibility with newer versions (13+?).
   static forRoot(rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>): ModuleWithProviders<DynamicHooksModule> {
+    
+    this.reset();
     allSettings.push(rootSettings);
+
     return {
       ngModule: DynamicHooksModule,
       providers: [

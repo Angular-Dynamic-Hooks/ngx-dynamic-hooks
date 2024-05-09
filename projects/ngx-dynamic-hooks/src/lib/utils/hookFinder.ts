@@ -24,8 +24,8 @@ export class HookFinder {
       result.push({
         openingTagStartIndex: match.index,
         openingTagEndIndex: match.index + match[0].length,
-        closingTagStartIndex: undefined,
-        closingTagEndIndex: undefined,
+        closingTagStartIndex: null,
+        closingTagEndIndex: null,
       });
     }
 
