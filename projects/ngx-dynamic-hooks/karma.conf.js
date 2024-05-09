@@ -39,6 +39,7 @@ module.exports = function (config) {
       'coverage'
     ],
     browsers: ['Chrome'],
+    retryLimit: -1,
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',

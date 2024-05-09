@@ -11,7 +11,7 @@ describe('forRoot', () => {
 
   // ----------------------------------------------------------------------------
 
-  fit('#should reset all settings when calling forRoot', () => {
+  it('#should reset all settings when calling forRoot', () => {
     // Run forRoot once
     TestBed.configureTestingModule({
       imports: [

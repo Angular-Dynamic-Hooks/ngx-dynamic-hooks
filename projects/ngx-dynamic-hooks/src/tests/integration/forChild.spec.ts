@@ -3,17 +3,17 @@ import { TestBed, TestBedStatic, ComponentFixtureAutoDetect, fakeAsync, tick, Co
 import { By } from '@angular/platform-browser';
 
 // Testing api resources
-import { DynamicHooksModule, OutletService, DYNAMICHOOKS_ALLSETTINGS, SelectorHookParserConfig, DYNAMICHOOKS_ANCESTORSETTINGS } from '../testing-api';
+import { DynamicHooksModule, OutletService, DYNAMICHOOKS_ALLSETTINGS, SelectorHookParserConfig, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../testing-api';
 
 // Resources
 import { CONTENT_STRING, contentString } from '../resources/forChild/contentString';
 import { RootComponent, DynamicRootComponent } from '../resources/forChild/root';
-import { createPlanetsModuleHooksImport, PlanetsModuleSync, PlanetsComponent, PlanetsModuleLazy, DynamicPlanetsComponent } from '../resources/forChild/planets';
-import { createPlanetCountriesModuleHooksImport, DynamicPlanetCountriesComponent, PlanetCountriesComponent } from '../resources/forChild/planetCountries';
-import { createPlanetCitiesModuleHooksImport, DynamicPlanetCitiesComponent, PlanetCitiesComponent } from '../resources/forChild/planetCities';
-import { createPlanetSpeciesModuleHooksImport, DynamicPlanetSpeciesComponent, PlanetSpeciesComponent } from '../resources/forChild/planetSpecies';
-import { createStarsModuleHooksImport, StarsModuleSync, StarsModuleLazy, StarsComponent, DynamicStarsComponent } from '../resources/forChild/stars';
-import { createHyperlanesModuleHooksImport, HyperlanesModuleSync, DynamicHyperlanesComponent } from '../resources/forChild/hyperlanes';
+import { PlanetsComponent, DynamicPlanetsComponent, createPlanetsModuleSync, createPlanetsModuleLazy } from '../resources/forChild/planets';
+import { DynamicPlanetCountriesComponent, PlanetCountriesComponent } from '../resources/forChild/planetCountries';
+import { DynamicPlanetCitiesComponent, PlanetCitiesComponent } from '../resources/forChild/planetCities';
+import { DynamicPlanetSpeciesComponent, PlanetSpeciesComponent } from '../resources/forChild/planetSpecies';
+import { StarsComponent, DynamicStarsComponent, createStarsModuleSync, createStarsModuleLazy } from '../resources/forChild/stars';
+import { DynamicHyperlanesComponent, createHyperlanesModuleSync } from '../resources/forChild/hyperlanes';
 
 interface TestSetup {
   testBed: TestBedStatic;
@@ -22,22 +22,10 @@ interface TestSetup {
 }
 
 const createTestingModuleSync: () => TestSetup = () => {
-  // Rerun DynamicHooksModule.forChild()s of child modules to internally re-add settings to allSettings again after reset
-  createHyperlanesModuleHooksImport();
-  createStarsModuleHooksImport();
-  createPlanetsModuleHooksImport();
-  createPlanetCountriesModuleHooksImport();
-  createPlanetCitiesModuleHooksImport();
-  createPlanetSpeciesModuleHooksImport();
-
   // Load child modules synchronously via imports
   // When using normal module imports, the child module routing definitions are ABSOLUTE and simply added/merged at the top level to the already other existing routing config
-
   TestBed.configureTestingModule({
     imports: [
-      HyperlanesModuleSync,
-      PlanetsModuleSync,
-      StarsModuleSync,
       RouterModule.forRoot([
         // All routes loaded via importing child modules
       ]),
@@ -45,7 +33,11 @@ const createTestingModuleSync: () => TestSetup = () => {
         globalParsers: [
           {component: DynamicRootComponent}
         ]
-      })
+      }),
+      // Use create functions instead of direct imports so the child modules and their forChild-functions are fully recreated from scratch each time
+      createHyperlanesModuleSync(),
+      createStarsModuleSync(),
+      createPlanetsModuleSync()      
     ],
     declarations: [
       RootComponent,
@@ -68,20 +60,7 @@ const createTestingModuleSync: () => TestSetup = () => {
 const createTestingModuleLazy: (rootSettings?: 'include'|'empty'|'none') => TestSetup = (rootSettings: 'include'|'empty'|'none' = 'include') => {
   // Load modules lazily via routing config
   // When using lazy-loading via routing, the child module routing definitions are RELATIVE to the path they are loaded under in the parent component. The first route is therefore typically '' and points to the main component
-
-  // Hyperlanes is always a sync module even in lazy setup to test mixed child modules, so add settings to allSettings again after reset
-  createHyperlanesModuleHooksImport();
-
-  const imports = [
-    HyperlanesModuleSync,
-    RouterModule.forRoot([
-      // Much like at start of in createTestingModuleSync, have to manually call createXModuleHooksImport() when lazy-loading a route like this, b/c we're not really using the import() syntax normally used in lazy-loaded routes.
-      // In testing, we just create a promise and return the module to simulate that - but the module is already loaded of course. This is a problem b/c when running multiple tests and you call
-      // DynamicHooksModule.reset() after each one, all settings are deleted for all modules. On the next test, if you didn't call createXModuleHooksImport() manually, the module settings wouldn't be repopulated again.
-      { path: 'planets', loadChildren: () => new Promise(resolve => { createPlanetsModuleHooksImport(); resolve(PlanetsModuleLazy); }) },
-      { path: 'stars', loadChildren: () => new Promise(resolve => { createStarsModuleHooksImport(); resolve(StarsModuleLazy); }) }
-    ]),
-  ];
+  const imports = [];
 
   if (rootSettings !== 'none') {
     imports.push(
@@ -95,6 +74,13 @@ const createTestingModuleLazy: (rootSettings?: 'include'|'empty'|'none') => Test
     // Don't even init forRoot (for test with only calling forChild, which should throw error)
     imports.push({ngModule: DynamicHooksModule, providers: []});
   }
+
+  // Hyperlanes is always a sync module even in lazy setup to test mixed child modules, so add settings to allSettings again after reset
+  imports.push(createHyperlanesModuleSync());
+  imports.push(RouterModule.forRoot([
+    { path: 'planets', loadChildren: () => new Promise(resolve => resolve(createPlanetsModuleLazy())) },
+    { path: 'stars', loadChildren: () => new Promise(resolve => resolve(createStarsModuleLazy())) }
+  ]));
 
   TestBed.configureTestingModule({
     imports,
@@ -127,9 +113,11 @@ describe('forChild', () => {
     DynamicHooksModule.reset();
   });
 
+  /*
   afterAll(() => {
     DynamicHooksModule.reset();
   });
+  */
 
   it('#should set up the sync child modules correctly', fakeAsync(() => {
     const setup = createTestingModuleSync();
@@ -263,6 +251,7 @@ describe('forChild', () => {
     // Therefore, when merging options, it will be in the order of importing the modules / calling forRoot/forChild.
     // This is the expected merged options object based on the module import order used at the start of createTestingModuleSync():
     // stars > planets > countries > cities
+    console.log(outletService['resolveSettings']().globalOptions);
     expect(outletService['resolveSettings']().globalOptions).toEqual({
       sanitize: false,
       convertHTMLEntities: true,
@@ -276,6 +265,8 @@ describe('forChild', () => {
   it('#should merge child parsers based on inheritance in lazy config', fakeAsync(() => {
     const setup = createTestingModuleLazy();
     const router = setup.testBed.inject(Router);
+    const allSettings = setup.testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
+    console.log(allSettings);
 
     // Without specific route, should have loaded root settings and synchronously imported hyperlanes settings
     let html = setup.rootComp.hostElement.nativeElement.innerHTML;
@@ -436,13 +427,13 @@ describe('forChild', () => {
     const setup = createTestingModuleSync();
     const allSettings = setup.testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(Object.keys(allSettings).length).toBe(7);
-    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicHyperlanesComponent);
-    expect((allSettings[1].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicStarsComponent);
-    expect((allSettings[2].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetsComponent);
-    expect((allSettings[3].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCountriesComponent);
-    expect((allSettings[4].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCitiesComponent);
-    expect((allSettings[5].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetSpeciesComponent);
-    expect((allSettings[6].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
+    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
+    expect((allSettings[1].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicHyperlanesComponent);
+    expect((allSettings[2].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicStarsComponent);
+    expect((allSettings[3].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetsComponent);
+    expect((allSettings[4].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCountriesComponent);
+    expect((allSettings[5].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetCitiesComponent);
+    expect((allSettings[6].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetSpeciesComponent);
 
     let html = setup.rootComp.hostElement.nativeElement.innerHTML;
     expect(html).toContain('DYNAMIC ROOT COMPONENT');
@@ -459,20 +450,23 @@ describe('forChild', () => {
     const router = setup.testBed.inject(Router);
     const allSettings = setup.testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     const ancestorSettings = setup.testBed.inject(DYNAMICHOOKS_ANCESTORSETTINGS);
+    const moduleSettings = setup.testBed.inject(DYNAMICHOOKS_MODULESETTINGS);
 
     router.navigate(['planets', {outlets: {nestedOutlet: 'countries'}} ]);
     tick(1000);
     setup.fixture.detectChanges();
 
-    // When loading child settings synchronously, all providers are merged into the root injector, so the last ones loaded overwrites the previous ones
-    // This has several implications
     const countriesComponent = setup.fixture.debugElement.query(By.directive(PlanetCountriesComponent)).componentInstance;
     let html = countriesComponent.hostElement.nativeElement.innerHTML;
 
-    // Root moduleSettings are loaded last in test module. And b/c they're loaded last, they overwrite all other moduleSettings
-    expect((allSettings[allSettings.length - 1].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
-    expect((countriesComponent.moduleSettings.globalParsers[0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
-
+    // When loading child settings synchronously, all providers are applied to the same (root) injector. How Angular combines them is a bit confusing and unsafe for use.
+    // Currently, it seems that child module providers added later overwrite previous ones with the same name. 
+    // However, they will never overwrite a provider with the same name that was added directly to the root module.
+    
+    // Even though DynamicPlanetSpeciesComponent was added last with its providers, the root providers have priority.
+    expect((allSettings[allSettings.length - 1].globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicPlanetSpeciesComponent);
+    expect((moduleSettings.globalParsers![0] as SelectorHookParserConfig).component).toBe(DynamicRootComponent);
+    
     // The same goes for ancestorSettings. There will only be a single ancestor settings object in the injector, and it will be that of the module which was loaded last (root in this case)
     expect(countriesComponent.ancestorSettings.length).toBe(1);
     expect(ancestorSettings.length).toBe(1);

@@ -4,11 +4,46 @@ import { RouterModule } from '@angular/router';
 import { DynamicHooksModule, DynamicHooksInheritance } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
-@Component({
-  selector: 'app-dynamicplanetcities',
-  template: `<div class="citiesDynamic">DYNAMIC PLANET CITIES COMPONENT</div>`
-})
-export class DynamicPlanetCitiesComponent {}
+export function createPlanetCitiesModuleSync() {
+  @NgModule({
+    declarations: [PlanetCitiesComponent],
+    exports: [PlanetCitiesComponent],
+    imports: [
+      createPlanetCitiesModuleHooksImport()
+    ]
+  })
+  class PlanetCitiesModuleSync {}
+
+  return PlanetCitiesModuleSync;
+}
+
+export function createPlanetCitiesModuleLazy() {
+  @NgModule({
+    declarations: [PlanetCitiesComponent],
+    exports: [PlanetCitiesComponent],
+    imports: [
+      RouterModule.forChild([
+        { path: '', component: PlanetCitiesComponent }
+      ]),
+      createPlanetCitiesModuleHooksImport()
+    ]
+  })
+  class PlanetCitiesModuleLazy {}
+
+  return PlanetCitiesModuleLazy;
+}
+
+function createPlanetCitiesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
+  return DynamicHooksModule.forChild({
+    globalParsers: [
+      {component: DynamicPlanetCitiesComponent}
+    ],
+    globalOptions: {
+      sanitize: false
+    },
+    lazyInheritance: DynamicHooksInheritance.Linear
+  });
+}
 
 @Component({
   selector: 'app-planetcities',
@@ -24,37 +59,8 @@ export class PlanetCitiesComponent {
   ) {}
 }
 
-export function createPlanetCitiesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
-    globalParsers: [
-      {component: DynamicPlanetCitiesComponent}
-    ],
-    globalOptions: {
-      sanitize: false
-    },
-    lazyInheritance: DynamicHooksInheritance.Linear
-  });
-}
-
-@NgModule({
-  declarations: [PlanetCitiesComponent],
-  exports: [PlanetCitiesComponent],
-  imports: [
-    createPlanetCitiesModuleHooksImport()
-  ]
+@Component({
+  selector: 'app-dynamicplanetcities',
+  template: `<div class="citiesDynamic">DYNAMIC PLANET CITIES COMPONENT</div>`
 })
-export class PlanetCitiesModuleSync {}
-
-@NgModule({
-  declarations: [PlanetCitiesComponent],
-  exports: [PlanetCitiesComponent],
-  imports: [
-    RouterModule.forChild([
-      { path: '', component: PlanetCitiesComponent }
-    ]),
-    createPlanetCitiesModuleHooksImport()
-  ]
-})
-export class PlanetCitiesModuleLazy {}
-
-
+export class DynamicPlanetCitiesComponent {}

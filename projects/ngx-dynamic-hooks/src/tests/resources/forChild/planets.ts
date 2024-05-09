@@ -2,15 +2,68 @@ import { NgModule, ModuleWithProviders, Component, Optional, Inject, ElementRef,
 import { RouterModule } from '@angular/router';
 import { DynamicHooksModule } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
-import { PlanetCitiesModuleSync, PlanetCitiesModuleLazy, createPlanetCitiesModuleHooksImport, PlanetCitiesComponent } from './planetCities';
-import { PlanetCountriesModuleSync, PlanetContriesModuleLazy, createPlanetCountriesModuleHooksImport, PlanetCountriesComponent } from './planetCountries';
-import { PlanetSpeciesModuleSync, PlanetSpeciesModuleLazy, createPlanetSpeciesModuleHooksImport, PlanetSpeciesComponent } from './planetSpecies';
+import { PlanetCitiesComponent, createPlanetCitiesModuleSync, createPlanetCitiesModuleLazy } from './planetCities';
+import { PlanetCountriesComponent, createPlanetCountriesModuleLazy, createPlanetCountriesModuleSync } from './planetCountries';
+import { PlanetSpeciesComponent, createPlanetSpeciesModuleLazy, createPlanetSpeciesModuleSync } from './planetSpecies';
 
-@Component({
-  selector: 'app-dynamicplanets',
-  template: `<div class="planetsDynamic">DYNAMIC PLANETS COMPONENT</div>`
-})
-export class DynamicPlanetsComponent {}
+export function createPlanetsModuleSync() {
+  @NgModule({
+    declarations: [PlanetsComponent],
+    exports: [PlanetsComponent],
+    imports: [
+      createPlanetsModuleHooksImport(),
+      createPlanetCountriesModuleSync(),
+      createPlanetCitiesModuleSync(),
+      createPlanetSpeciesModuleSync(),
+      RouterModule.forChild([{
+        path: 'planets', component: PlanetsComponent,
+        children: [
+          { path: 'countries', outlet: 'nestedOutlet', component: PlanetCountriesComponent },
+          { path: 'cities', outlet: 'nestedOutlet', component: PlanetCitiesComponent },
+          { path: 'species', outlet: 'nestedOutlet', component: PlanetSpeciesComponent }
+        ]
+      }])
+    ]
+  })
+  class PlanetsModuleSync {}
+
+  return PlanetsModuleSync;
+}
+
+export function createPlanetsModuleLazy() {
+  @NgModule({
+    declarations: [PlanetsComponent],
+    exports: [PlanetsComponent],
+    imports: [
+      RouterModule.forChild([{
+        path: '',
+        component: PlanetsComponent,
+        children: [
+          { path: 'countries', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => resolve(createPlanetCountriesModuleLazy())) },
+          { path: 'cities', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => resolve(createPlanetCitiesModuleLazy())) },
+          { path: 'species', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => resolve(createPlanetSpeciesModuleLazy())) }
+        ]
+      }]),
+      createPlanetsModuleHooksImport()
+    ]
+  })
+  class PlanetsModuleLazy {}
+
+  return PlanetsModuleLazy;
+}
+
+function createPlanetsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
+  return DynamicHooksModule.forChild({
+    globalParsers: [
+      {component: DynamicPlanetsComponent}
+    ],
+    globalOptions: {
+      sanitize: true,
+      updateOnPushOnly: false,
+      compareInputsByValue: true
+    }
+  });
+}
 
 @Component({
   selector: 'app-planets',
@@ -24,53 +77,8 @@ export class PlanetsComponent {
   constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
-export function createPlanetsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
-    globalParsers: [
-      {component: DynamicPlanetsComponent}
-    ],
-    globalOptions: {
-      sanitize: true,
-      updateOnPushOnly: false,
-      compareInputsByValue: true
-    }
-  });
-}
-
-@NgModule({
-  declarations: [PlanetsComponent],
-  exports: [PlanetsComponent],
-  imports: [
-    PlanetCountriesModuleSync,
-    PlanetCitiesModuleSync,
-    PlanetSpeciesModuleSync,
-    RouterModule.forChild([{
-      path: 'planets', component: PlanetsComponent,
-      children: [
-        { path: 'countries', outlet: 'nestedOutlet', component: PlanetCountriesComponent },
-        { path: 'cities', outlet: 'nestedOutlet', component: PlanetCitiesComponent },
-        { path: 'species', outlet: 'nestedOutlet', component: PlanetSpeciesComponent }
-      ]
-    }]),
-    createPlanetsModuleHooksImport()
-  ]
+@Component({
+  selector: 'app-dynamicplanets',
+  template: `<div class="planetsDynamic">DYNAMIC PLANETS COMPONENT</div>`
 })
-export class PlanetsModuleSync {}
-
-@NgModule({
-  declarations: [PlanetsComponent],
-  exports: [PlanetsComponent],
-  imports: [
-    RouterModule.forChild([{
-      path: '',
-      component: PlanetsComponent,
-      children: [
-        { path: 'countries', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => { createPlanetCountriesModuleHooksImport(); resolve(PlanetContriesModuleLazy); }) },
-        { path: 'cities', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => { createPlanetCitiesModuleHooksImport(); resolve(PlanetCitiesModuleLazy); }) },
-        { path: 'species', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => { createPlanetSpeciesModuleHooksImport(); resolve(PlanetSpeciesModuleLazy); }) }
-      ]
-    }]),
-    createPlanetsModuleHooksImport()
-  ]
-})
-export class PlanetsModuleLazy {}
+export class DynamicPlanetsComponent {}
