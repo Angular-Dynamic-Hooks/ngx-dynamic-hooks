@@ -5,13 +5,15 @@
 // General
 export * from './lib/dynamicHooks.m';
 export * from './lib/interfacesPublic';
-export * from './lib/globalSettings';
 
-// Main component
+// Settings
+export * from './lib/components/outlet/settings/options';
+export * from './lib/components/outlet/settings/parserEntry';
+
+// Main logic
 export * from './lib/components/outlet/outletComponent.c';
-export * from './lib/components/outlet/options/options';
-export * from './lib/components/outlet/options/parserEntry';
 export * from './lib/components/outlet/services/outletService';
+export * from './lib/components/outlet/settings/settings';
 
 // SelectorHookParser
 export * from './lib/parsers/selector/selectorHookParser';

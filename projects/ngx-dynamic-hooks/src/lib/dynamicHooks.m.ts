@@ -1,24 +1,38 @@
-import { NgModule, InjectionToken, Type, ModuleWithProviders, Injector, SkipSelf, Optional } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
+import { NgModule, InjectionToken, Type, ModuleWithProviders, Injector, SkipSelf, Optional, EnvironmentProviders } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
 import { OutletComponent } from './components/outlet/outletComponent.c';
 import { ComponentCreator } from './components/outlet/services/componentCreator';
 import { ComponentUpdater } from './components/outlet/services/componentUpdater';
 import { HooksReplacer } from './components/outlet/services/hooksReplacer';
 import { BindingStateManager } from './parsers/selector/services/bindingStateManager';
 import { SelectorHookFinder } from './parsers/selector/services/selectorHookFinder';
-import { DynamicHooksGlobalSettings } from './globalSettings';
+import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
 import { DataTypeEncoder } from './utils/dataTypeEncoder';
 import { DataTypeParser } from './utils/dataTypeParser';
 import { DeepComparer } from './utils/deepComparer';
 import { HookFinder } from './utils/hookFinder';
-import { OptionsResolver } from './components/outlet/options/optionsResolver';
-import { ParserEntryResolver } from './components/outlet/options/parserEntryResolver';
+import { OptionsResolver } from './components/outlet/settings/optionsResolver';
+import { ParserEntryResolver } from './components/outlet/settings/parserEntryResolver';
 import { SelectorHookParserConfigResolver } from './parsers/selector/config/selectorHookParserConfigResolver';
 import { OutletService } from './components/outlet/services/outletService';
 import { PlatformService } from './platform/platformService';
 import { PlatformBrowserService } from './platform/platformBrowserService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from './interfaces';
+import { SettingsResolver } from './components/outlet/settings/settingsResolver';
 
 const allSettings: DynamicHooksGlobalSettings[] = [];
+
+export const provideDynamicHooksForRoot: (rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) => any = (rootSettings, platformService) => {
+  allSettings.length = 0;
+  allSettings.push(rootSettings);
+
+  return [
+    { provide: DYNAMICHOOKS_FORROOTCALLED, useValue: true },
+    { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
+    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
+    { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
+    { provide: PlatformService, useClass: platformService || PlatformBrowserService }
+  ];
+}
 
 @NgModule({
   declarations: [
@@ -44,21 +58,7 @@ export class DynamicHooksModule {
         { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
         { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
         { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
-        { provide: PlatformService, useClass: platformService || PlatformBrowserService },
-        OutletService,
-        DataTypeEncoder,
-        DataTypeParser,
-        DeepComparer,
-        HookFinder,
-        // Internal services that are not part of public-api.ts
-        OptionsResolver,
-        ParserEntryResolver,
-        ComponentCreator,
-        ComponentUpdater,
-        HooksReplacer,
-        SelectorHookParserConfigResolver,
-        BindingStateManager,
-        SelectorHookFinder
+        { provide: PlatformService, useClass: platformService || PlatformBrowserService }
       ]
     };
   }
@@ -92,8 +92,8 @@ export class DynamicHooksModule {
           },
           deps: [[new SkipSelf(), new Optional(), DYNAMICHOOKS_ANCESTORSETTINGS]]
         },
-        // Also provice a separate instance of OutletService for the child module (root OutletService can't see child settings)
-        OutletService,
+        // Also provice a separate instance of SettingsResolver for each child module (so gets injected module-specific "ModuleSettings", not root settings)
+        OutletService
       ]
     };
   }

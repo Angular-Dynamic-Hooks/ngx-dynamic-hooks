@@ -6,11 +6,11 @@
 
 // Public module resources
 export { DynamicHooksModule } from '../lib/dynamicHooks.m';
-export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/globalSettings';
+export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/components/outlet/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
 export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
-export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
-export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';
+export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/settings/options';
+export { HookParserEntry } from '../lib/components/outlet/settings/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
 export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
 export { OutletService } from '../lib/components/outlet/services/outletService';
@@ -25,8 +25,8 @@ export { matchAll } from '../lib/polyfills/matchAll';
 
 // Private module resources
 export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
-export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
-export { ParserEntryResolver } from '../lib/components/outlet/options/parserEntryResolver';
+export { OptionsResolver } from '../lib/components/outlet/settings/optionsResolver';
+export { ParserEntryResolver } from '../lib/components/outlet/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/components/outlet/services/componentCreator';
 export { ComponentUpdater } from '../lib/components/outlet/services/componentUpdater';
 export { HooksReplacer } from '../lib/components/outlet/services/hooksReplacer';

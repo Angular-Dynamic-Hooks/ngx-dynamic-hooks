@@ -1,9 +1,9 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
-import { OutletOptions, outletOptionDefaults } from './options/options';
+import { OutletOptions, outletOptionDefaults } from './settings/options';
 import { OutletService } from './services/outletService';
-import { HookParserEntry } from './options/parserEntry';
+import { HookParserEntry } from './settings/parserEntry';
 import { ComponentUpdater } from './services/componentUpdater';
 import { PlatformService } from '../../platform/platformService';
 import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';

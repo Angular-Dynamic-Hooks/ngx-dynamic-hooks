@@ -11,7 +11,9 @@ import { matchAll } from '../../../polyfills/matchAll';
  * A service for the SelectorHookParser, responsible for creating @Input()/@Output() bindings from opening tags and updating them,
  * keeping all previous references, if possible
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class BindingStateManager {
 
   constructor(private dataTypeParser: DataTypeParser) {

@@ -5,7 +5,9 @@ import { matchAll } from '../polyfills/matchAll';
 /**
  * A utility service to easily parse hooks from a string of text
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HookFinder {
 
   /**

@@ -4,7 +4,9 @@ import { OutletOptions, outletOptionDefaults } from './options';
 /**
  * A helper class for resolving OutletOptions
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class OptionsResolver {
 
   /**

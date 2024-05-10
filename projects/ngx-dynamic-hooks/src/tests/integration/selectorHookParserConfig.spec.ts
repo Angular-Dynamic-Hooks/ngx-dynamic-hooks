@@ -2,7 +2,7 @@ import { Injector } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
-import { OutletParseResult } from '../testing-api';
+import { OutletParseResult, ParserEntryResolver } from '../testing-api';
 import { OutletService } from '../testing-api';
 
 // Custom testing resources
@@ -37,7 +37,7 @@ describe('SelectorHookParserConfig', () => {
     expect((<any>console.error)['calls'].count()).toBe(1);
 
     // Get instance of SelectorHookParserConfigResolver for faster, more detailed tests
-    const configResolver = comp['outletService']['parserEntryResolver']['parserResolver'];
+    const configResolver = TestBed.inject(ParserEntryResolver)['parserResolver'];
 
     // No config
     let config: any = null;

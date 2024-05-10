@@ -14,6 +14,7 @@ import { DynamicPlanetCitiesComponent, PlanetCitiesComponent } from '../resource
 import { DynamicPlanetSpeciesComponent, PlanetSpeciesComponent } from '../resources/forChild/planetSpecies';
 import { StarsComponent, DynamicStarsComponent, createStarsModuleSync, createStarsModuleLazy } from '../resources/forChild/stars';
 import { DynamicHyperlanesComponent, createHyperlanesModuleSync } from '../resources/forChild/hyperlanes';
+import { SettingsResolver } from '../../lib/components/outlet/settings/settingsResolver';
 
 interface TestSetup {
   testBed: TestBedStatic;
@@ -187,7 +188,7 @@ describe('forChild', () => {
 
   it('#should correctly merge an array of settings objects into a single combined settings object', () => {
     const setup = createTestingModuleSync();
-    const outletService = setup.testBed.inject(OutletService);
+    const settingsResolver = setup.testBed.inject(SettingsResolver);
     const settingsArray = [
       {
         globalParsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}],
@@ -202,7 +203,7 @@ describe('forChild', () => {
         globalOptions: {convertHTMLEntities: true, fixParagraphTags: false, ignoreOutputAliases: true}
       }
     ];
-    const mergedSettings = (outletService as any).mergeSettings(settingsArray);
+    const mergedSettings = settingsResolver['mergeSettings'](settingsArray);
     expect(mergedSettings).toEqual(
       {
         globalParsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetCountriesComponent}, {component: DynamicStarsComponent}],
@@ -230,36 +231,40 @@ describe('forChild', () => {
     tick(1000);
     setup.fixture.detectChanges();
 
+    // Get different instance of outletService from lazily-loaded child module and resolve options
+    const outletService = setup.fixture.debugElement.query(By.directive(PlanetCountriesComponent)).componentInstance.outletService as OutletService;
+    const options = outletService['settingsResolver'].resolve(outletService['allSettings'], outletService['ancestorSettings'], outletService['moduleSettings'], null, null, null, null, null).options;
+
     // Now, despite the settings of stars being the last ones added to allSettings and countries using DynamicHooksInheritance.All,
     // countries should still overwrite stars options with its ancestor (and finally its own) options
-    const countriesComponent = setup.fixture.debugElement.query(By.directive(PlanetCountriesComponent)).componentInstance;
-    expect(countriesComponent.outletService['resolveSettings']().globalOptions).toEqual({
+    expect(options).toEqual(jasmine.objectContaining({
       sanitize: true,
       convertHTMLEntities: true,
       fixParagraphTags: true,
       updateOnPushOnly: true,
       compareInputsByValue: true,
       compareOutputsByValue: true
-    });
+    }));
   }));
 
   it('#should correctly merge sync child options when using DynamicHooksInheritance.All', fakeAsync(() => {
     const setup = createTestingModuleSync();
     const outletService = setup.testBed.inject(OutletService);
 
+    const options = outletService['settingsResolver'].resolve(outletService['allSettings'], outletService['ancestorSettings'], outletService['moduleSettings'], null, null, null, null, null).options;
+
     // In sync configs, all the settings of all child modules are added immediately to allSettings
     // Therefore, when merging options, it will be in the order of importing the modules / calling forRoot/forChild.
     // This is the expected merged options object based on the module import order used at the start of createTestingModuleSync():
     // stars > planets > countries > cities
-    console.log(outletService['resolveSettings']().globalOptions);
-    expect(outletService['resolveSettings']().globalOptions).toEqual({
+    expect(options).toEqual(jasmine.objectContaining({
       sanitize: false,
       convertHTMLEntities: true,
       fixParagraphTags: true,
       updateOnPushOnly: true,
       compareInputsByValue: true,
       compareOutputsByValue: true
-    });
+    }));
   }));
 
   it('#should merge child parsers based on inheritance in lazy config', fakeAsync(() => {

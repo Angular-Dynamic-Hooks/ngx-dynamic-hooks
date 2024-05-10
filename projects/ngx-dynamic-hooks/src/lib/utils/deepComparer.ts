@@ -13,7 +13,9 @@ export interface DetailedStringifyResult {
 /**
  * This services can be used to compare two variables by value instead of reference
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DeepComparer {
 
   // 1. Inputs

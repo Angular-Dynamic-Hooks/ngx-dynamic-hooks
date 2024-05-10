@@ -10,7 +10,9 @@ import { HookParserEntry } from './parserEntry';
 /**
  * A helper class for resolving HookParserEntries
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ParserEntryResolver {
 
   constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private selectorFinder: SelectorHookFinder, private bindingStateManager: BindingStateManager) {

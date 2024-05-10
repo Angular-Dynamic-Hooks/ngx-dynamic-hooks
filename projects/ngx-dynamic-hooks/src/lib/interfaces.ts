@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { DynamicHooksGlobalSettings } from './globalSettings';
+import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
 
 /**
  * Custom injector tokens that are used for varous internal communication purposes

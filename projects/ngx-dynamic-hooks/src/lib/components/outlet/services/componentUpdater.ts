@@ -2,13 +2,15 @@ import { ComponentFactoryResolver, SimpleChange, isDevMode, Injectable} from '@a
 import { Observable } from 'rxjs';
 
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
-import { OutletOptions } from '../options/options';
+import { OutletOptions } from '../settings/options';
 import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepComparer';
 
 /**
  * The service responsible for updating dynamically created components
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ComponentUpdater {
 
   constructor(private cfr: ComponentFactoryResolver, private deepComparer: DeepComparer) {

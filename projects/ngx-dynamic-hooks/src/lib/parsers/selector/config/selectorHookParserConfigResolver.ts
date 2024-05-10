@@ -4,7 +4,9 @@ import { SelectorHookParserConfig, SelectorHookParserConfigDefaults, selectorHoo
 /**
  * A helper class for resolving SelectorHookParserConfig
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class SelectorHookParserConfigResolver {
 
   constructor(private cfr: ComponentFactoryResolver) {

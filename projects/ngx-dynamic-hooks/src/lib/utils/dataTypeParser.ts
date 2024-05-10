@@ -8,7 +8,9 @@ import { matchAll } from '../polyfills/matchAll';
 /**
  * A parser that can evaluate Javascript data types from strings and turn them into live variables
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DataTypeParser {
 
   constructor(private dataTypeEncoder: DataTypeEncoder) {

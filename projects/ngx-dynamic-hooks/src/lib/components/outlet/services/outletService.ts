@@ -4,20 +4,23 @@ import { first, map } from 'rxjs/operators';
 
 import { HookIndex } from '../../../interfacesPublic';
 import { HookParser, OutletParseResult } from '../../../interfacesPublic';
-import { OutletOptions, outletOptionDefaults } from '../options/options';
+import { OutletOptions, outletOptionDefaults } from '../settings/options';
 import { HooksReplacer } from './hooksReplacer';
 import { ComponentCreator } from './componentCreator';
-import { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../../../globalSettings';
-import { ParserEntryResolver } from '../options/parserEntryResolver';
-import { OptionsResolver } from '../options/optionsResolver';
-import { HookParserEntry } from '../options/parserEntry';
+import { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../settings/settings';
+import { ParserEntryResolver } from '../settings/parserEntryResolver';
+import { OptionsResolver } from '../settings/optionsResolver';
+import { HookParserEntry } from '../settings/parserEntry';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
+import { SettingsResolver } from '../settings/settingsResolver';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in OutletComponent, so that its
  * functionality can also be used without actually inserting the <ngx-dynamic-hooks>-component
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class OutletService {
   private renderer: Renderer2;
 
@@ -25,8 +28,7 @@ export class OutletService {
     @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksGlobalSettings[],
     @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksGlobalSettings[],
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksGlobalSettings,
-    private parserEntryResolver: ParserEntryResolver,
-    private optionsResolver: OptionsResolver,
+    private settingsResolver: SettingsResolver,
     private hooksReplacer: HooksReplacer,
     private componentCreator: ComponentCreator,
     private rendererFactory: RendererFactory2,
@@ -67,9 +69,16 @@ export class OutletService {
     }
 
     // Resolve options and parsers
-    const resolvedSettings = this.resolveSettings();
-    const resolvedOptions = this.resolveOptions(resolvedSettings.globalOptions || null, options);
-    const resolvedParsers = this.resolveParsers(resolvedSettings.globalParsers || null, parsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
+    const {parsers: resolvedParsers, options: resolvedOptions } = this.settingsResolver.resolve(
+      this.allSettings, 
+      this.ancestorSettings, 
+      this.moduleSettings, 
+      parsers, 
+      options, 
+      globalParsersBlacklist, 
+      globalParsersWhitelist, 
+      injector
+    );
 
     // Needs a content string
     if (!content || typeof content !== 'string') {
@@ -132,103 +141,5 @@ export class OutletService {
       }
     }
   }
-
-  // ----------------------------------------------------------------------------------------------------------
-
-  private resolveSettings(): DynamicHooksGlobalSettings {
-    let resolvedSettings: DynamicHooksGlobalSettings = {};
-
-    if (!this.moduleSettings.hasOwnProperty('lazyInheritance') || this.moduleSettings.lazyInheritance === DynamicHooksInheritance.All) {
-      // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
-      // This is in case other settings were added to the back of allSettings after registering this module
-      const ancestorOptions = this.ancestorSettings.map(ancestorSettings => ancestorSettings.hasOwnProperty('globalOptions') ? {globalOptions: ancestorSettings.globalOptions} : {});
-      const allSettings = [...this.allSettings, ...ancestorOptions];
-
-      resolvedSettings = this.mergeSettings(allSettings);
-    } else if (this.moduleSettings.lazyInheritance === DynamicHooksInheritance.Linear) {
-      resolvedSettings = this.mergeSettings(this.ancestorSettings);
-    } else if (this.moduleSettings.lazyInheritance === DynamicHooksInheritance.None) {
-      resolvedSettings = this.moduleSettings;
-    } else {
-      throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${this.moduleSettings.lazyInheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
-    }
-
-    return resolvedSettings;
-  }
-
-  /**
-   * Merges multiple settings objects, overwriting previous ones with later ones in the provided array
-   *
-   * @param settingsArray - The settings objects to merge
-   */
-  private mergeSettings(settingsArray: DynamicHooksGlobalSettings[]): DynamicHooksGlobalSettings {
-    const mergedSettings: DynamicHooksGlobalSettings = {};
-
-    for (const settings of settingsArray) {
-      // Parsers are simply all collected, not overwritten
-      if (settings.globalParsers !== undefined) {
-        if (mergedSettings.globalParsers === undefined) {
-          mergedSettings.globalParsers = [];
-        }
-        for (const parserEntry of settings.globalParsers) {
-          mergedSettings.globalParsers.push(parserEntry);
-        }
-      }
-      // Options are individually overwritten
-      if (settings.globalOptions !== undefined) {
-        if (mergedSettings.globalOptions === undefined) {
-          mergedSettings.globalOptions = {};
-        }
-
-        mergedSettings.globalOptions = Object.assign(mergedSettings.globalOptions, settings.globalOptions);
-      }
-    }
-
-    return mergedSettings;
-  }
-
-  /**
-   * Loads the relevant outlet options
-   */
-  private resolveOptions(globalOptions: OutletOptions|null, localOptions: OutletOptions|null): OutletOptions {
-    let resolvedOptions: OutletOptions;
-
-    // If local
-    if (localOptions) {
-      resolvedOptions = this.optionsResolver.resolve(localOptions);
-    // If global
-    } else if (globalOptions) {
-      resolvedOptions = this.optionsResolver.resolve(globalOptions);
-    // If none given
-    } else {
-      resolvedOptions = outletOptionDefaults;
-    }
-
-    return resolvedOptions;
-  }
-
-  /**
-   * Loads the relevant parser configuration
-   */
-  private resolveParsers(globalParsers: HookParserEntry[]|null, localParsers: HookParserEntry[]|null, injector: Injector, globalParsersBlacklist: string[]|null, globalParsersWhitelist: string[]|null): Array<HookParser> {
-    let resolvedParsers: Array<HookParser>;
-
-    // If local
-    if (localParsers) {
-      resolvedParsers = this.parserEntryResolver.resolve(localParsers, injector);
-    // If global
-    } else if (globalParsers) {
-      resolvedParsers = this.parserEntryResolver.resolve(globalParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
-    // If none given
-    } else {
-      resolvedParsers = [];
-    }
-
-    return resolvedParsers;
-  }
-
-
-
-
 
 }

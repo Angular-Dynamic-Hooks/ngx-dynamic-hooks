@@ -1,6 +1,6 @@
 import { HookIndex } from '../../../interfacesPublic';
 import { HookParser, HookPosition } from '../../../interfacesPublic';
-import { OutletOptions } from '../options/options';
+import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { PlatformService } from '../../../platform/platformService';
 
@@ -37,7 +37,9 @@ interface HookSegments {
  * The service responsible for finding all Hooks in the content, replacing them with component placeholders
  * and creating the HookIndex
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HooksReplacer {
   private renderer: Renderer2;
 

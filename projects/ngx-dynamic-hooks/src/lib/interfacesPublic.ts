@@ -1,5 +1,5 @@
 import { ComponentRef, Injector } from '@angular/core';
-import { OutletOptions } from '../lib/components/outlet/options/options';
+import { OutletOptions } from './components/outlet/settings/options';
 import { Subscription } from 'rxjs';
 import { DetailedStringifyResult } from './utils/deepComparer';
 

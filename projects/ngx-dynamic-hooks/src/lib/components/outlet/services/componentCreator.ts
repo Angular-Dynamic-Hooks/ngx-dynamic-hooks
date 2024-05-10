@@ -6,13 +6,15 @@ import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 import { Hook, HookIndex } from '../../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../../interfacesPublic';
 import { PlatformService } from '../../../platform/platformService';
-import { OutletOptions } from '../options/options';
+import { OutletOptions } from '../settings/options';
 import { ComponentUpdater } from './componentUpdater';
 
 /**
  * The service responsible for dynamically creating components for all found Hooks
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ComponentCreator {
   private renderer: Renderer2;
 

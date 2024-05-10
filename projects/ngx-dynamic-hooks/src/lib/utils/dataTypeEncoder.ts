@@ -10,7 +10,9 @@ interface TextSegment {
  * A service that provides various functions for en- and decoding data type strings in order to make them
  * meaningfully parseable by regex
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DataTypeEncoder {
 
   constructor() {

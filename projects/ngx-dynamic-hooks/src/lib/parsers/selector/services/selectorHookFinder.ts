@@ -8,7 +8,9 @@ import { HookFinder } from '../../../utils/hookFinder';
 /**
  * A service for SelectorHookParser, responsible for finding Angular component selectors in the content
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class SelectorHookFinder {
 
   constructor(private hookFinder: HookFinder) {
