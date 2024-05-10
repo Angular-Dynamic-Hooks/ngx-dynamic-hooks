@@ -6,7 +6,7 @@ import { LoadedComponent } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
 import { ChildTestComponent } from '../resources/components/parentTest/childTest/childTest.c';
 import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
@@ -21,7 +21,7 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 describe('Loading dynamic components', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -98,7 +98,7 @@ describe('Loading dynamic components', () => {
   it('#should remove components if they fail to load', () => {
     const testText = `<dynHooks-multitagtest>This is the inner content.</dynHooks-multitagtest>`;
     comp.content = testText;
-    spyOn(comp['outletService']['componentCreator'], 'createComponent').and.throwError('Test error');
+    spyOn(comp['dynamicHooksService']['componentCreator'], 'createComponent').and.throwError('Test error');
     spyOn(console, 'error');
     comp.ngOnChanges({content: true} as any);
 

@@ -1,16 +1,16 @@
-import { NgModule, ModuleWithProviders, Component, Inject, ElementRef } from '@angular/core';
+import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DynamicHooksModule, DynamicHooksInheritance } from '../../testing-api';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooksForChild } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 export function createPlanetSpeciesModuleSync() {
   @NgModule({
-    declarations: [PlanetSpeciesComponent],
-    exports: [PlanetSpeciesComponent],
     imports: [
       RouterModule.forChild([
         { path: 'species', component: PlanetSpeciesComponent }
-      ]),
+      ])
+    ],
+    providers: [
       createPlanetSpeciesModuleHooksImport()
     ]
   })
@@ -21,12 +21,12 @@ export function createPlanetSpeciesModuleSync() {
 
 export function createPlanetSpeciesModuleLazy() {
   @NgModule({
-    declarations: [PlanetSpeciesComponent],
-    exports: [PlanetSpeciesComponent],
     imports: [
       RouterModule.forChild([
         { path: '', component: PlanetSpeciesComponent }
-      ]),
+      ])      
+    ],
+    providers: [
       createPlanetSpeciesModuleHooksImport()
     ]
   })
@@ -35,8 +35,8 @@ export function createPlanetSpeciesModuleLazy() {
   return PlanetSpeciesModuleLazy;
 }
 
-function createPlanetSpeciesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
+function createPlanetSpeciesModuleHooksImport(): Provider[] {
+  return provideDynamicHooksForChild({
     globalParsers: [
       {component: DynamicPlanetSpeciesComponent}
     ],
@@ -46,10 +46,12 @@ function createPlanetSpeciesModuleHooksImport(): ModuleWithProviders<DynamicHook
 
 @Component({
   selector: 'app-planetspecies',
+  imports: [DynamicHooksComponent],
   template: `<div class="species">
     Planet species component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class PlanetSpeciesComponent {
   constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}

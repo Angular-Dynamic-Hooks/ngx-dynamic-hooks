@@ -3,7 +3,7 @@
  */
 
 // General
-export * from './lib/dynamicHooks.m';
+export * from './lib/dynamicHooksProviders';
 export * from './lib/interfacesPublic';
 
 // Settings
@@ -11,8 +11,8 @@ export * from './lib/components/outlet/settings/options';
 export * from './lib/components/outlet/settings/parserEntry';
 
 // Main logic
-export * from './lib/components/outlet/outletComponent.c';
-export * from './lib/components/outlet/services/outletService';
+export * from './lib/components/outlet/dynamicHooksComponent';
+export * from './lib/components/outlet/services/dynamicHooksService';
 export * from './lib/components/outlet/settings/settings';
 
 // SelectorHookParser

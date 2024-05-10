@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../../testing-api';
 import { TestService, TESTSERVICETOKEN } from '../../services/testService';
-import { OUTLETCOMPONENTSERVICE } from '../OutletComponentWithProviders';
+import { COMPONENTONLYSERVICE } from '../dynamicHooksComponentWithProviders';
 
 
 @Component({
@@ -45,7 +45,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   changesContentChildren!: Array<DynamicContentChild>;
 
 
-  constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(OUTLETCOMPONENTSERVICE) private outletComponentService: any, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {
+  constructor (private cd: ChangeDetectorRef, private testService: TestService, @Optional() @Inject(COMPONENTONLYSERVICE) private componentOnlyService: any, @Optional() @Inject(TESTSERVICETOKEN) private fakeTestService: any) {
   }
 
   ngDoCheck() {

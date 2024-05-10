@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeStyle, SafeUrl } from '@angular/platform-browser';
-import { PlatformBrowserService, OutletComponent } from '../testing-api';
+import { PlatformBrowserService } from '../testing-api';
 import { EmptyTestComponent } from '../resources/components/emptyTest/emptyTest.c';
 
 class MockDomSanitizer implements DomSanitizer {

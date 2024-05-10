@@ -15,13 +15,13 @@ import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_M
 import { SettingsResolver } from '../settings/settingsResolver';
 
 /**
- * Serves as a programmatic layer of abstraction of the functionality used in OutletComponent, so that its
+ * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
  * functionality can also be used without actually inserting the <ngx-dynamic-hooks>-component
  */
 @Injectable({
   providedIn: 'root'
 })
-export class OutletService {
+export class DynamicHooksService {
   private renderer: Renderer2;
 
   constructor(

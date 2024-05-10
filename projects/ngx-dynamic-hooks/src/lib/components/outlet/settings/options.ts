@@ -1,5 +1,5 @@
 /**
- * Several options for the OutletComponent
+ * Several options for the DynamicHooksComponent
  */
 export interface OutletOptions {
     sanitize?: boolean;

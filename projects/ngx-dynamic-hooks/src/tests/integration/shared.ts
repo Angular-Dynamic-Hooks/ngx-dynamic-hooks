@@ -13,10 +13,10 @@ import { first } from 'rxjs/operators';
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
-import { DynamicHooksGlobalSettings, DynamicHooksModule, HookParserEntry } from '../testing-api';
+import { provideDynamicHooks, DynamicHooksGlobalSettings, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
 
 // Custom testing resources
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
@@ -49,8 +49,8 @@ export const testParsers: Array<HookParserEntry> = [
 
 export interface TestingModuleAndComponent {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<OutletComponentWithProviders>;
-  comp: OutletComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponentWithProviders>;
+  comp: DynamicHooksComponentWithProviders;
 }
 
 // A simple function to reset and prepare the testing module
@@ -71,14 +71,12 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   entryComponents = entryComponents.concat(extraComponents);
 
   // Create testing module
-  DynamicHooksModule.reset();
+  resetDynamicHooks();
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
-    imports: [
-      DynamicHooksModule.forRoot(globalSettings)
-    ],
     declarations,
     providers: [
+      provideDynamicHooks(globalSettings),
       {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
       {provide: ElementRef, useClass: MockElementRef},
       TestService,
@@ -86,21 +84,9 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
       EnclosingCustomParser,
       NgContentTestParser
     ]
-  })
-  .overrideModule(DynamicHooksModule, {
-    add: {
-      declarations: [OutletComponentWithProviders],
-      // entryComponents: [OutletComponentWithProviders],
-      exports: [OutletComponentWithProviders]
-    }
-  })
-  .overrideModule(BrowserDynamicTestingModule, {
-    set: {
-      // entryComponents
-    }
   });
 
-  const fixture = TestBed.createComponent(OutletComponentWithProviders);
+  const fixture = TestBed.createComponent(DynamicHooksComponent);
   return {
     testBed: TestBed,
     fixture,
@@ -110,8 +96,8 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
 
 export interface TestingModuleComponentAndContext {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<OutletComponentWithProviders>;
-  comp: OutletComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponentWithProviders>;
+  comp: DynamicHooksComponentWithProviders;
   context: any;
 }
 

@@ -1,17 +1,16 @@
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
-import { OutletService } from '../testing-api';
-import { SimpleChanges } from '@angular/core';
 import { TestBedStatic } from '@angular/core/testing';
+import { DynamicHooksService } from '../testing-api';
 
 describe('Loading dynamic bindings', () => {
   let testBed: TestBedStatic;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -198,10 +197,10 @@ describe('Loading dynamic bindings', () => {
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
 
-    const outletService: OutletService = testBed.inject(OutletService);
+    const dynamicHooksService: DynamicHooksService = testBed.inject(DynamicHooksService);
 
     expect((comp as any)['completelyNewProperty']).toBeUndefined();
-    outletService.destroy(comp.hookIndex);
+    dynamicHooksService.destroy(comp.hookIndex);
     expect((comp as any)['completelyNewProperty']).toBe('Event triggered from onDestroy!');
   });
 

@@ -1,16 +1,14 @@
-import { Component, ElementRef, Inject, ModuleWithProviders } from '@angular/core';
+import { Component, ElementRef, Inject, ModuleWithProviders, Provider } from '@angular/core';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DynamicHooksModule, DynamicHooksInheritance } from '../../testing-api';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooksForChild } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 export function createPlanetCitiesModuleSync() {
   @NgModule({
-    declarations: [PlanetCitiesComponent],
-    exports: [PlanetCitiesComponent],
-    imports: [
+    providers: [
       createPlanetCitiesModuleHooksImport()
-    ]
+    ],
   })
   class PlanetCitiesModuleSync {}
 
@@ -19,12 +17,12 @@ export function createPlanetCitiesModuleSync() {
 
 export function createPlanetCitiesModuleLazy() {
   @NgModule({
-    declarations: [PlanetCitiesComponent],
-    exports: [PlanetCitiesComponent],
     imports: [
       RouterModule.forChild([
         { path: '', component: PlanetCitiesComponent }
-      ]),
+      ])
+    ],
+    providers: [
       createPlanetCitiesModuleHooksImport()
     ]
   })
@@ -33,8 +31,8 @@ export function createPlanetCitiesModuleLazy() {
   return PlanetCitiesModuleLazy;
 }
 
-function createPlanetCitiesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
+function createPlanetCitiesModuleHooksImport(): Provider[] {
+  return provideDynamicHooksForChild({
     globalParsers: [
       {component: DynamicPlanetCitiesComponent}
     ],
@@ -47,10 +45,12 @@ function createPlanetCitiesModuleHooksImport(): ModuleWithProviders<DynamicHooks
 
 @Component({
   selector: 'app-planetcities',
+  imports: [DynamicHooksComponent],
   template: `<div class="cities">
     Planet cities component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class PlanetCitiesComponent {
   constructor(

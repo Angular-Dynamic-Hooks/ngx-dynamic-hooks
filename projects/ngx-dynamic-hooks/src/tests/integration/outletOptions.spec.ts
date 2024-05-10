@@ -3,12 +3,12 @@ import { OutletOptions, outletOptionDefaults } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 
 describe('OutletOptions', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {

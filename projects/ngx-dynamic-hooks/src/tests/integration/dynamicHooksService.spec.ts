@@ -1,20 +1,20 @@
 import { TestBed } from '@angular/core/testing';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 
 // Testing api resources
 import { OutletParseResult } from '../testing-api';
-import { OutletService } from '../testing-api';
+import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
 
 /**
- * OutletService tests
+ * DynamicHooksService tests
  */
-describe('OutletService', () => {
+describe('DynamicHooksService', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -23,15 +23,15 @@ describe('OutletService', () => {
 
   // ----------------------------------------------------------------------------
 
-  it('#should create and fill a new HTML-Element by using the OutletService directly', () => {
-    const outletService: any = TestBed.inject(OutletService);
+  it('#should create and fill a new HTML-Element by using the DynamicHooksService directly', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
     const testText = `
       <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
       <p>Here's another one: <dynHooks-multiTagTest [fonts]="['arial', 'calibri']"></dynHooks-multiTagTest></p>
     `;
 
-    outletService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
       expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
 
       expect(outletParseResult.element.querySelector('.singletag-component')).not.toBe(null);
@@ -45,8 +45,8 @@ describe('OutletService', () => {
     });
   });
 
-  it('#should fill an existing HTML-Element by using the OutletService directly', () => {
-    const outletService: OutletService = TestBed.inject(OutletService);
+  it('#should fill an existing HTML-Element by using the DynamicHooksService directly', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
     const testText = `
       <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
@@ -56,7 +56,7 @@ describe('OutletService', () => {
     const existingElement = document.createElement('article');
     existingElement.setAttribute('id', 'myExistingElement');
 
-    outletService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((outletParseResult: OutletParseResult) => {
+    dynamicHooksService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((outletParseResult: OutletParseResult) => {
       expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
 
       expect(existingElement.getAttribute('id')).toBe('myExistingElement');

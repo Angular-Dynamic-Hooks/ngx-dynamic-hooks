@@ -5,15 +5,15 @@
  */
 
 // Public module resources
-export { DynamicHooksModule } from '../lib/dynamicHooks.m';
+export { provideDynamicHooks, provideDynamicHooksForChild, resetDynamicHooks } from '../lib/dynamicHooksProviders';
 export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/components/outlet/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
-export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
+export { DynamicHooksComponent } from '../lib/components/outlet/dynamicHooksComponent';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/settings/options';
 export { HookParserEntry } from '../lib/components/outlet/settings/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
 export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
-export { OutletService } from '../lib/components/outlet/services/outletService';
+export { DynamicHooksService } from '../lib/components/outlet/services/dynamicHooksService';
 export { PlatformService } from '../lib/platform/platformService';
 export { PlatformBrowserService } from '../lib/platform/platformBrowserService';
 export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';

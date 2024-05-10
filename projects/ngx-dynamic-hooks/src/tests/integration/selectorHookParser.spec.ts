@@ -1,11 +1,11 @@
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 
 describe('SelectorHookParser', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {

@@ -3,7 +3,7 @@ import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
@@ -13,7 +13,7 @@ import { NonServiceTestParser } from '../resources/parsers/nonServiceTestParser'
 describe('Parsers', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -236,7 +236,7 @@ describe('Parsers', () => {
 
   it('#should ensure the component field of a parser is correct', () => {
     // Load with nonsensical componentConfig
-    expect(() => comp['outletService']['componentCreator'].loadComponentClass(true as any))
+    expect(() => comp['dynamicHooksService']['componentCreator'].loadComponentClass(true as any))
       .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig'));
   });
 
@@ -300,7 +300,7 @@ describe('Parsers', () => {
   });
 
   it('#should validate the HookPositions of parsers', () => {
-    const hooksReplacer = comp['outletService']['hooksReplacer'];
+    const hooksReplacer = comp['dynamicHooksService']['hooksReplacer'];
     spyOn(console, 'warn').and.callThrough();
 
     // 1. Every hook must be in itself well-formed

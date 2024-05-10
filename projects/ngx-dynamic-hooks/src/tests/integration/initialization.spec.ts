@@ -4,7 +4,7 @@ import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 
@@ -12,7 +12,7 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 describe('Initialization', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -62,9 +62,9 @@ describe('Initialization', () => {
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
-    expect(comp['outletService']['allSettings'].length).toBe(1);
-    expect(comp['outletService']['allSettings'][0]).toEqual({});
-    expect(comp['outletService']['moduleSettings']).toEqual({});
+    expect(comp['dynamicHooksService']['allSettings'].length).toBe(1);
+    expect(comp['dynamicHooksService']['allSettings'][0]).toEqual({});
+    expect(comp['dynamicHooksService']['moduleSettings']).toEqual({});
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default

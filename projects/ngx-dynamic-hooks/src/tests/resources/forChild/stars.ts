@@ -1,16 +1,16 @@
-import { NgModule, ModuleWithProviders, Component, Inject, ElementRef } from '@angular/core';
+import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DynamicHooksModule } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
+import { DynamicHooksComponent, provideDynamicHooksForChild } from '../../testing-api';
 
 export function createStarsModuleSync() {
   @NgModule({
-    declarations: [StarsComponent],
-    exports: [StarsComponent],
     imports: [
       RouterModule.forChild([
         { path: 'stars', component: StarsComponent }
-      ]),
+      ])
+    ],
+    providers: [
       createStarsModuleHooksImport()
     ]
   })
@@ -21,12 +21,12 @@ export function createStarsModuleSync() {
 
 export function createStarsModuleLazy() {
   @NgModule({
-    declarations: [StarsComponent],
-    exports: [StarsComponent],
     imports: [
       RouterModule.forChild([
         { path: '', component: StarsComponent }
-      ]),
+      ])      
+    ],
+    providers: [
       createStarsModuleHooksImport()
     ]
   })
@@ -35,8 +35,8 @@ export function createStarsModuleLazy() {
   return StarsModuleLazy;
 }
 
-function createStarsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
+function createStarsModuleHooksImport(): Provider[] {
+  return provideDynamicHooksForChild({
     globalParsers: [
       {component: DynamicStarsComponent}
     ],
@@ -50,10 +50,12 @@ function createStarsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule>
 
 @Component({
   selector: 'app-stars',
+  imports: [DynamicHooksComponent],
   template: `<div class="stars">
     Stars component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class StarsComponent {
   constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}

@@ -3,11 +3,11 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
 import { OutletParseResult, ParserEntryResolver } from '../testing-api';
-import { OutletService } from '../testing-api';
+import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
+import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { TESTSERVICETOKEN } from '../resources/services/testService';
@@ -15,7 +15,7 @@ import { TESTSERVICETOKEN } from '../resources/services/testService';
 describe('SelectorHookParserConfig', () => {
   let testBed;
   let fixture: any;
-  let comp: OutletComponentWithProviders;
+  let comp: DynamicHooksComponentWithProviders;
   let context: any;
 
   beforeEach(() => {
@@ -151,18 +151,19 @@ describe('SelectorHookParserConfig', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('for the multitag component');
   });
 
-  it('#should use the OutletComponent injector by default', (done) => {
+  it('#should use the DynamicHooksComponent injector by default', (done) => {
     const testText = `<dynhooks-singletagtest>`;
 
-    // As OutletComponentService is provided directly on OutletComponent, it should be available
+    // As componentOnlyService is provided directly on DynamicHooksComponent, it should be available
+    comp = TestBed.createComponent(DynamicHooksComponentWithProviders).componentInstance;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
-    expect(comp.hookIndex[1].componentRef!.instance.outletComponentService).toEqual({name: 'OutletComponentService'});
+    expect(comp.hookIndex[1].componentRef!.instance.componentOnlyService).toEqual({name: 'ComponentOnlyService'});
 
-    // Use OutletService.parse() without injector param to force usage of root injector, so OutletComponentService should not be available
-    const outletService: any = TestBed.inject(OutletService);
-    outletService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.outletComponentService).toBeNull();
+    // Use DynamicHooksService.parse() without injector param to force usage of root injector, so OutletComponentService should not be available
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+      expect(outletParseResult.hookIndex[1].componentRef!.instance.componentOnlyService).toBeNull();
       done();
     });
   });

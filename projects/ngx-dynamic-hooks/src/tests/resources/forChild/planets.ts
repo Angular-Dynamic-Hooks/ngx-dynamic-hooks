@@ -1,17 +1,17 @@
-import { NgModule, ModuleWithProviders, Component, Optional, Inject, ElementRef, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { DynamicHooksModule } from '../../testing-api';
+import { NgModule, ModuleWithProviders, Component, Optional, Inject, ElementRef, OnInit, AfterViewInit, OnDestroy, Provider } from '@angular/core';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { CONTENT_STRING } from './contentString';
 import { PlanetCitiesComponent, createPlanetCitiesModuleSync, createPlanetCitiesModuleLazy } from './planetCities';
 import { PlanetCountriesComponent, createPlanetCountriesModuleLazy, createPlanetCountriesModuleSync } from './planetCountries';
 import { PlanetSpeciesComponent, createPlanetSpeciesModuleLazy, createPlanetSpeciesModuleSync } from './planetSpecies';
+import { DynamicHooksComponent, provideDynamicHooksForChild } from '../../testing-api';
 
 export function createPlanetsModuleSync() {
+  // To register with allSettings before loading child imports
+  const childModuleProviders = createPlanetsModuleHooksImport();
+
   @NgModule({
-    declarations: [PlanetsComponent],
-    exports: [PlanetsComponent],
     imports: [
-      createPlanetsModuleHooksImport(),
       createPlanetCountriesModuleSync(),
       createPlanetCitiesModuleSync(),
       createPlanetSpeciesModuleSync(),
@@ -23,6 +23,9 @@ export function createPlanetsModuleSync() {
           { path: 'species', outlet: 'nestedOutlet', component: PlanetSpeciesComponent }
         ]
       }])
+    ],
+    providers: [
+      childModuleProviders
     ]
   })
   class PlanetsModuleSync {}
@@ -32,8 +35,6 @@ export function createPlanetsModuleSync() {
 
 export function createPlanetsModuleLazy() {
   @NgModule({
-    declarations: [PlanetsComponent],
-    exports: [PlanetsComponent],
     imports: [
       RouterModule.forChild([{
         path: '',
@@ -43,7 +44,9 @@ export function createPlanetsModuleLazy() {
           { path: 'cities', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => resolve(createPlanetCitiesModuleLazy())) },
           { path: 'species', outlet: 'nestedOutlet', loadChildren: () => new Promise(resolve => resolve(createPlanetSpeciesModuleLazy())) }
         ]
-      }]),
+      }])
+    ],
+    providers: [
       createPlanetsModuleHooksImport()
     ]
   })
@@ -52,8 +55,8 @@ export function createPlanetsModuleLazy() {
   return PlanetsModuleLazy;
 }
 
-function createPlanetsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
+function createPlanetsModuleHooksImport(): Provider[] {
+  return provideDynamicHooksForChild({
     globalParsers: [
       {component: DynamicPlanetsComponent}
     ],
@@ -67,11 +70,13 @@ function createPlanetsModuleHooksImport(): ModuleWithProviders<DynamicHooksModul
 
 @Component({
   selector: 'app-planets',
+  imports: [DynamicHooksComponent, RouterOutlet],
   template: `<div class="planets">
     <span>Planets component exists</span>
     <!-- Intentionally not rendering ngx-dynamic-hooks to test that Planets config is still included in DynamicHooksInheritance.All and DynamicHooksInheritance.Linear -->
     <router-outlet name="nestedOutlet"></router-outlet>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class PlanetsComponent {
   constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
