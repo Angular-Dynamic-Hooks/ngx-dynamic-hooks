@@ -16,14 +16,13 @@ import { first } from 'rxjs/operators';
 import { provideDynamicHooks, DynamicHooksGlobalSettings, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
 
 // Custom testing resources
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
-import { TestService } from '../resources/services/testService';
 import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
 import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
 import { ServiceTestParser } from '../resources/parsers/serviceTestParser';
+import { RootTestService } from '../resources/services/rootTestService';
 
 
 export class MockElementRef {
@@ -49,8 +48,8 @@ export const testParsers: Array<HookParserEntry> = [
 
 export interface TestingModuleAndComponent {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<DynamicHooksComponentWithProviders>;
-  comp: DynamicHooksComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponent>;
+  comp: DynamicHooksComponent;
 }
 
 // A simple function to reset and prepare the testing module
@@ -65,11 +64,6 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
   if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
   declarations = declarations.concat(extraComponents);
 
-  // Generate entryComponents
-  let entryComponents: any = [];
-  if (parsers) { entryComponents = entryComponents.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
-  entryComponents = entryComponents.concat(extraComponents);
-
   // Create testing module
   resetDynamicHooks();
   TestBed.resetTestingModule();
@@ -79,7 +73,7 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
       provideDynamicHooks(globalSettings),
       {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
       {provide: ElementRef, useClass: MockElementRef},
-      TestService,
+      RootTestService,
       ServiceTestParser,
       EnclosingCustomParser,
       NgContentTestParser
@@ -96,8 +90,8 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
 
 export interface TestingModuleComponentAndContext {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<DynamicHooksComponentWithProviders>;
-  comp: DynamicHooksComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponent>;
+  comp: DynamicHooksComponent;
   context: any;
 }
 

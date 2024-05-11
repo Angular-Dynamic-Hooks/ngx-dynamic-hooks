@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
@@ -20,7 +20,6 @@ export class ComponentCreator {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: number,
-    private cfr: ComponentFactoryResolver, 
     private appRef: ApplicationRef, 
     private rendererFactory: RendererFactory2, 
     private componentUpdater: ComponentUpdater, 
@@ -39,7 +38,7 @@ export class ComponentCreator {
    * @param options - The current HookComponentOptions
    * @param injector - The injector to use for the dynamically-created components
    */
-  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, injector: Injector): ReplaySubject<boolean> {
+  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
     const hookHostElements: {[key: string]: Element} = {};
@@ -84,7 +83,7 @@ export class ComponentCreator {
           // Get projectableNodes from the content slots
           const projectableNodes = this.getContentSlotElements(hookHostElements[hookId], token);
           // Instantiate component
-          this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass, injector);
+          this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass, environmentInjector, injector);
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
@@ -152,7 +151,7 @@ export class ComponentCreator {
   replacePlaceholderElement(placeholderElement: any, hook: Hook): Element {
     let selector;
     if (hook.data!.component.hasOwnProperty('prototype')) {
-      selector = this.cfr.resolveComponentFactory(hook.data!.component as (new(...args: any[]) => any)).selector;
+      selector = reflectComponentType(hook.data!.component as (new(...args: any[]) => any))?.selector!;
     } else {
       selector = 'dynamic-component-anchor';
     }
@@ -183,9 +182,9 @@ export class ComponentCreator {
    * a placeholder (anchor) is inserted in the meantime.
    *
    * When the component class has been loaded, we can't safely replace that placeholder anymore with the real selector element, however, due
-   * to how componentFactory.create() works. If a parent component has been handed a child component placeholder node in projectableNodes on creation,
+   * to how programmatically creating components works. If a parent component has been handed a child component placeholder node in projectableNodes on creation,
    * but doesn't render it right away (due to *ngIf, for example), you have no way to replace that placeholder anymore as it exists in a limbo and Angular
-   * will simply render the node references it was given in componentFactory.create() once the parent component renders its children.
+   * will simply render the node references it was given when creating the component once the parent component renders its children.
    *
    * Due to this, the selector elements of lazily-loaded components are instead simply inserted into the placeholders/anchors as children when
    * they are ready.
@@ -195,7 +194,7 @@ export class ComponentCreator {
    */
   handleAnchorElement(componentHostElement: any, compClass: new(...args: any[]) => any): any {
     if (this.platform.getTagName(componentHostElement) === 'DYNAMIC-COMPONENT-ANCHOR') {
-      const selector = this.cfr.resolveComponentFactory(compClass).selector;
+      const selector = reflectComponentType(compClass)!.selector;
       const selectorElement = this.renderer.createElement(selector);
 
       // Move attributes to selector
@@ -341,15 +340,18 @@ export class ComponentCreator {
    * @param compClass - The component's class
    * @param injector - The default injector to use for the component
    */
-  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any, injector: Injector): void {
+  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
     
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
     // The order of component creation or injection via projectableNodes does not seem to matter.
-    const dynamicComponentFactory = this.cfr.resolveComponentFactory(compClass);
-    const chosenInjector = hook.data!.injector || injector;
-    const dynamicComponentRef = dynamicComponentFactory.create(chosenInjector, projectableNodes, componentHostElement);
-
+    const dynamicComponentRef = createComponent(compClass, {
+      hostElement: componentHostElement,
+      environmentInjector: hook.data!.environmentInjector || environmentInjector,
+      elementInjector: hook.data!.injector || injector, 
+      projectableNodes: projectableNodes
+    });
+    
     // Track component
     hook.componentRef = dynamicComponentRef;
 

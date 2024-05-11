@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges, EnvironmentInjector } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
 import { OutletOptions, outletOptionDefaults } from './settings/options';
@@ -20,7 +20,7 @@ import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';
 *     OutletComponent.
 *
 *  4. The corresponding components for each hook are dynamically loaded into the previously created placeholder elements as fully-functional
-*     Angular components via ComponentFactory.create().
+*     Angular components via createComponent().
 *
 *  5. Any @Inputs() & @Outputs() for the components will be registered with them and automatically updated on following change detection runs.
 */
@@ -60,7 +60,8 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     private dynamicHooksService: DynamicHooksService,
     private componentUpdater: ComponentUpdater,
     private platform: PlatformService,
-    private injector: Injector,
+    private environmentInjector: EnvironmentInjector,
+    private injector: Injector
   ) {
   }
 
@@ -134,6 +135,7 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
       this.options,
       this.hostElement.nativeElement,
       this.hookIndex,
+      this.environmentInjector,
       this.injector
     ).subscribe((outletParseResult: OutletParseResult) => {
       // hostElement and hookIndex are automatically filled

@@ -1,9 +1,8 @@
 // Testing api resources
-import { SelectorHookParser } from '../testing-api';
+import { DynamicHooksComponent, SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
@@ -13,7 +12,7 @@ import { NonServiceTestParser } from '../resources/parsers/nonServiceTestParser'
 describe('Parsers', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {

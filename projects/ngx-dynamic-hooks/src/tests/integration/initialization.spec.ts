@@ -1,10 +1,9 @@
 // Testing api resources
-import { outletOptionDefaults } from '../testing-api';
+import { DynamicHooksComponent, outletOptionDefaults } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 
@@ -12,7 +11,7 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 describe('Initialization', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {

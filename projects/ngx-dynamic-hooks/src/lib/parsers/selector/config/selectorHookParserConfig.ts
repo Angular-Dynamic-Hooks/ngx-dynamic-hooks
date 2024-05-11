@@ -1,3 +1,4 @@
+import { EnvironmentInjector, Injector } from '@angular/core';
 import { ComponentConfig } from '../../../interfacesPublic';
 
 /**
@@ -7,7 +8,8 @@ export interface SelectorHookParserConfig {
     component: ComponentConfig;
     name?: string;
     selector?: string;
-    injector?: any;
+    injector?: Injector;
+    environmentInjector?: EnvironmentInjector,
     enclosing?: boolean;
     bracketStyle?: {opening: string, closing: string};
     parseInputs?: boolean;

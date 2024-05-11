@@ -1,16 +1,15 @@
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
 import { TestBedStatic } from '@angular/core/testing';
-import { DynamicHooksService } from '../testing-api';
+import { DynamicHooksComponent, DynamicHooksService } from '../testing-api';
 
 describe('Loading dynamic bindings', () => {
   let testBed: TestBedStatic;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {

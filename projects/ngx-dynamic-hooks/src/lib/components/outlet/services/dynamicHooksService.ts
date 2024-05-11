@@ -1,4 +1,4 @@
-import { Injectable, Renderer2, RendererFactory2, Optional, Inject, Injector } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2, Optional, Inject, Injector, EnvironmentInjector } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
@@ -32,6 +32,7 @@ export class DynamicHooksService {
     private hooksReplacer: HooksReplacer,
     private componentCreator: ComponentCreator,
     private rendererFactory: RendererFactory2,
+    private environmentInjector: EnvironmentInjector,
     private injector: Injector
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
@@ -59,6 +60,7 @@ export class DynamicHooksService {
     options: OutletOptions|null = null,
     targetElement: HTMLElement|null = null,
     targetHookIndex: HookIndex = {},
+    environmentInjector: EnvironmentInjector|null = null,
     injector: Injector|null = null
   ): Observable<OutletParseResult> {
 
@@ -77,7 +79,7 @@ export class DynamicHooksService {
       options, 
       globalParsersBlacklist, 
       globalParsersWhitelist, 
-      injector
+      injector // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
     );
 
     // Needs a content string
@@ -104,7 +106,7 @@ export class DynamicHooksService {
     targetElement.innerHTML = content;
 
     // Dynamically create components in component selector elements
-    return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, injector || this.injector)
+    return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)
     .pipe(first())
     .pipe(map((allComponentsLoaded: boolean) => {
       // Everything done! Return finished hookIndex and resolved parsers and options

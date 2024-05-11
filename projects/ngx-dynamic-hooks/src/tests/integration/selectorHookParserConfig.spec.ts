@@ -1,21 +1,23 @@
-import { Injector } from '@angular/core';
+import { Component, EnvironmentInjector, Injector, NgModule } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
-import { OutletParseResult, ParserEntryResolver } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, OutletParseResult, ParserEntryResolver, SelectorHookParserConfig, provideDynamicHooks } from '../testing-api';
 import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { TESTSERVICETOKEN } from '../resources/services/testService';
+import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { RootTestService } from '../resources/services/rootTestService';
+import { By } from '@angular/platform-browser';
 
 describe('SelectorHookParserConfig', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {
@@ -151,48 +153,58 @@ describe('SelectorHookParserConfig', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('for the multitag component');
   });
 
-  it('#should use the DynamicHooksComponent injector by default', (done) => {
+  it('#should recognize custom injectors', fakeAsync(() => {
+
+    // Without custom element injectors, genericInjectionValue should be null
     const testText = `<dynhooks-singletagtest>`;
-
-    // As componentOnlyService is provided directly on DynamicHooksComponent, it should be available
-    comp = TestBed.createComponent(DynamicHooksComponentWithProviders).componentInstance;
-    comp.content = testText;
-    comp.ngOnChanges({content: true} as any);
-    expect(comp.hookIndex[1].componentRef!.instance.componentOnlyService).toEqual({name: 'ComponentOnlyService'});
-
-    // Use DynamicHooksService.parse() without injector param to force usage of root injector, so OutletComponentService should not be available
-    const dynamicHooksService = TestBed.inject(DynamicHooksService);
-    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.componentOnlyService).toBeNull();
-      done();
-    });
-  });
-
-  it('#should recognize custom injectors', () => {
-    const testText = `<dynhooks-singletagtest>`;
-
-    // Without custom injector, fakeTestService should be null
-    ({fixture, comp} = prepareTestingModule([{
+    const config: SelectorHookParserConfig = {
       component: SingleTagTestComponent,
       enclosing: false,
-    }]));
+      injector: undefined,
+      environmentInjector: undefined
+    };
+    
+    ({fixture, comp} = prepareTestingModule([config]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
-    expect(comp.hookIndex[1].componentRef!.instance.fakeTestService).toBeNull();
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toBeNull();
 
-    // With custom injector, fakeTestService should be set
-    const customInjector = Injector.create({
-      providers: [{provide: TESTSERVICETOKEN, useValue: { name: 'test value' } }]
+    // With a custom injector, genericInjectionValue should now be found
+    ({fixture, comp} = prepareTestingModule([config]));
+    config.injector = Injector.create({
+      providers: [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'test value' } }]
     });
-    ({fixture, comp} = prepareTestingModule([{
-      component: SingleTagTestComponent,
-      enclosing: false,
-      injector: customInjector
-    }]));
+
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
-    expect(comp.hookIndex[1].componentRef!.instance.fakeTestService).toEqual({ name: 'test value' });
-  });
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toEqual({ name: 'test value' });
+
+    // The same should also work with a custom environment injector
+    config.injector = undefined;
+    config.environmentInjector = Injector.create({
+      parent: TestBed.inject(EnvironmentInjector),
+      providers: [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'test value' } }]
+    }) as EnvironmentInjector;
+
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toEqual({ name: 'test value' });
+
+    // However, be careful to set a valid parent field on a custom environment injector, 
+    // otherwise it will break DI hierarchy and result in an error
+    config.injector = undefined;
+    config.environmentInjector = Injector.create({
+      providers: [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'test value' } }]
+    }) as EnvironmentInjector;
+
+    comp.content = testText;
+
+    spyOn(console, 'error');
+    try {
+      comp.ngOnChanges({content: true} as any);
+    } catch (e) {}
+    expect((<any>console.error)['calls'].count()).toBe(1);
+  }));
 
   it('#should recognize singletag hooks', () => {
     ({fixture, comp} = prepareTestingModule([{

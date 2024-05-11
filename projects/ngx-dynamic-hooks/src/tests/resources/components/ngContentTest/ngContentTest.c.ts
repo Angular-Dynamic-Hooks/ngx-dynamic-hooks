@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
-import { TestService } from '../../services/testService';
+import { RootTestService } from '../../services/rootTestService';
 
 
 @Component({
@@ -14,7 +14,7 @@ export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges 
   changesContext: any;
   changesContentChildren!: Array<DynamicContentChild>;
 
-  constructor(private cd: ChangeDetectorRef, private testService: TestService) {
+  constructor(private cd: ChangeDetectorRef, private rootTestService: RootTestService) {
   }
 
   onDynamicMount(data: OnDynamicData) {

@@ -1,14 +1,13 @@
 // Testing api resources
-import { OutletOptions, outletOptionDefaults } from '../testing-api';
+import { DynamicHooksComponent, OutletOptions, outletOptionDefaults } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 
 describe('OutletOptions', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {

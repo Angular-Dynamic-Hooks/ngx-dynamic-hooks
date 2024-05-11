@@ -1,4 +1,4 @@
-import { ComponentRef, Injector } from '@angular/core';
+import { ComponentRef, EnvironmentInjector, Injector } from '@angular/core';
 import { OutletOptions } from './components/outlet/settings/options';
 import { Subscription } from 'rxjs';
 import { DetailedStringifyResult } from './utils/deepComparer';
@@ -114,6 +114,7 @@ export interface HookValue {
 export interface HookComponentData {
     component: ComponentConfig;
     injector?: Injector;
+    environmentInjector?: EnvironmentInjector;
     content?: Node[][];
 }
 

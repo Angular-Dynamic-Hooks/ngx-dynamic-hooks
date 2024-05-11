@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../../testing-api';
 import { SelectorHookFinder } from '../../testing-api';
 import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
@@ -11,7 +11,7 @@ export class ServiceTestParser implements HookParser {
   name: string = 'ServiceTestParser';
   component = SingleTagTestComponent;
 
-  constructor(private selectorFinder: SelectorHookFinder, private cfr: ComponentFactoryResolver) {
+  constructor(private selectorFinder: SelectorHookFinder) {
   }
 
   public findHooks(content: string, context: any): Array<HookPosition> {

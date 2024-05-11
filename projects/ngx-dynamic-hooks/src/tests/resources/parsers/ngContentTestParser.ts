@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Injectable } from '@angular/core';
+import { Injectable, reflectComponentType } from '@angular/core';
 import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../../testing-api';
 import { SelectorHookFinder } from '../../testing-api';
 import { NgContentTestComponent } from '../components/ngContentTest/ngContentTest.c';
@@ -13,11 +13,11 @@ export class NgContentTestParser implements HookParser {
   name: string = 'NgContentTestComponentParser';
   component = NgContentTestComponent;
 
-  constructor(private selectorFinder: SelectorHookFinder, private cfr: ComponentFactoryResolver) {
+  constructor(private selectorFinder: SelectorHookFinder) {
   }
 
   public findHooks(content: string, context: any): Array<HookPosition> {
-    const selector = this.cfr.resolveComponentFactory(this.component).selector;
+    const selector = reflectComponentType(this.component)!.selector;
     const bracketStyle = {opening: '<', closing: '>'};
     return this.selectorFinder.findEnclosingSelectors(content, selector, bracketStyle);
   }

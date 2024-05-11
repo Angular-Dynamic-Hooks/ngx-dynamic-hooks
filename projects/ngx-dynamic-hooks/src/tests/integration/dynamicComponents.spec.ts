@@ -2,11 +2,10 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { first } from 'rxjs/operators';
 
 // Testing api resources
-import { LoadedComponent } from '../testing-api';
+import { DynamicHooksComponent, LoadedComponent } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
 import { ChildTestComponent } from '../resources/components/parentTest/childTest/childTest.c';
 import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
@@ -21,7 +20,7 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 describe('Loading dynamic components', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {
@@ -510,15 +509,15 @@ describe('Loading dynamic components', () => {
     // Should be loaded in both
     expect(firstComp['cd']).not.toBeFalsy();
     expect(secondComp['cd']).not.toBeFalsy();
-    expect(firstComp['testService']['someString']).toBe('The TestService has loaded!');
-    expect(secondComp['testService']['someString']).toBe('The TestService has loaded!');
+    expect(firstComp['rootTestService']['someString']).toBe('RootTestService works!');
+    expect(secondComp['rootTestService']['someString']).toBe('RootTestService works!');
 
     // Change value in service
-    firstComp['testService']['someString'] = 'Value has changed!';
+    firstComp['rootTestService']['someString'] = 'Value has changed!';
 
     // Should be reflected in both
-    expect(firstComp['testService']['someString']).toBe('Value has changed!');
-    expect(secondComp['testService']['someString']).toBe('Value has changed!');
+    expect(firstComp['rootTestService']['someString']).toBe('Value has changed!');
+    expect(secondComp['rootTestService']['someString']).toBe('Value has changed!');
   });
 
   it('#should trigger componentsLoaded when all components have loaded', () => {

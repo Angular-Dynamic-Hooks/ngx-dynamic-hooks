@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { DynamicHooksComponentWithProviders } from '../resources/components/dynamicHooksComponentWithProviders';
 
 // Testing api resources
-import { OutletParseResult } from '../testing-api';
+import { DynamicHooksComponent, OutletParseResult } from '../testing-api';
 import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
@@ -14,7 +13,7 @@ import { defaultBeforeEach } from './shared';
 describe('DynamicHooksService', () => {
   let testBed;
   let fixture: any;
-  let comp: DynamicHooksComponentWithProviders;
+  let comp: DynamicHooksComponent;
   let context: any;
 
   beforeEach(() => {

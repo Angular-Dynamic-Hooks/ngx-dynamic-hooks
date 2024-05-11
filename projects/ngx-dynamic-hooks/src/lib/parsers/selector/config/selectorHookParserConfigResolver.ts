@@ -1,4 +1,4 @@
-import { Injectable, ComponentFactoryResolver } from '@angular/core';
+import { Injectable, reflectComponentType } from '@angular/core';
 import { SelectorHookParserConfig, SelectorHookParserConfigDefaults, selectorHookParserConfigDefaults } from './selectorHookParserConfig';
 
 /**
@@ -9,7 +9,7 @@ import { SelectorHookParserConfig, SelectorHookParserConfigDefaults, selectorHoo
 })
 export class SelectorHookParserConfigResolver {
 
-  constructor(private cfr: ComponentFactoryResolver) {
+  constructor() {
   }
 
   /**
@@ -28,7 +28,8 @@ export class SelectorHookParserConfigResolver {
 
     // If is class
     if (userParserConfig.component.hasOwnProperty('prototype')) {
-      parserConfig.selector = this.cfr.resolveComponentFactory(userParserConfig.component as (new(...args: any[]) => any)).selector;
+      const compMeta = reflectComponentType(userParserConfig.component as (new(...args: any[]) => any))!;
+      parserConfig.selector = compMeta.selector;
 
     // If is LazyLoadingComponentConfig
     } else if (userParserConfig.component.hasOwnProperty('importPromise') && userParserConfig.component.hasOwnProperty('importName')) {
@@ -55,6 +56,11 @@ export class SelectorHookParserConfigResolver {
     // injector (defaults to undefined)
     if (userParserConfig.hasOwnProperty('injector')) {
       parserConfig.injector = userParserConfig.injector;
+    }
+
+    // environmentInjector (defaults to undefined)
+    if (userParserConfig.hasOwnProperty('environmentInjector')) {
+      parserConfig.environmentInjector = userParserConfig.environmentInjector;
     }
 
     // enclosing

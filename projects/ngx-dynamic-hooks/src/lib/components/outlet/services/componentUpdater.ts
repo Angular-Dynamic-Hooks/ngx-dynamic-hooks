@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, SimpleChange, isDevMode, Injectable} from '@angular/core';
+import { SimpleChange, isDevMode, Injectable, reflectComponentType} from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
@@ -13,7 +13,7 @@ import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepCompar
 })
 export class ComponentUpdater {
 
-  constructor(private cfr: ComponentFactoryResolver, private deepComparer: DeepComparer) {
+  constructor(private deepComparer: DeepComparer) {
   }
 
   /**
@@ -101,9 +101,9 @@ export class ComponentUpdater {
         }
       }
     } else {
-      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef!.componentType);
+      const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
-        const outputEntry = compFactory.outputs.filter(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName));
+        const outputEntry = compMeta.outputs.filter(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName));
         if (outputEntry.length > 0) {
           // Save in existingInputs with actual property name, not alias
           existingOutputs[outputEntry[0].propName] = outputCallback;
@@ -142,9 +142,9 @@ export class ComponentUpdater {
         }
       }
     } else {
-      const compFactory = this.cfr.resolveComponentFactory(hook.componentRef!.componentType);
+      const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {
-        const inputEntry = compFactory.inputs.filter(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName));
+        const inputEntry = compMeta.inputs.filter(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName));
         if (inputEntry.length > 0) {
           // Save in existingInputs with actual property name, not alias
           existingInputs[inputEntry[0].propName] = inputValue;
