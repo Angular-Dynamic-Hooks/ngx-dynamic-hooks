@@ -1,7 +1,8 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../../testing-api';
 import { RootTestService } from '../../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../../services/genericInjectionToken';
+import { CommonModule } from '@angular/common';
 
 export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that is only provided directly on the SingleTagTestComponent');
 
@@ -9,9 +10,11 @@ export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that
   selector: 'dynhooks-singletagtest',
   templateUrl: './singleTagTest.c.html',
   styleUrls: ['./singleTagTest.c.scss'],
+  imports: [CommonModule],
   providers: [
     {provide: SINGLETAGCOMPONENTSERVICE, useValue: { name: 'SingleTagComponentService works!' } }
-  ]
+  ],
+  standalone: true
 })
 export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   nonInputProperty: string = 'this is the default value';
@@ -53,11 +56,13 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
     public cd: ChangeDetectorRef, 
     public rootTestService: RootTestService,
     @Optional() @Inject(SINGLETAGCOMPONENTSERVICE) private singleTagComponentService: any,
-    @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any
+    @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any,
+    public environmentInjector: EnvironmentInjector
   ) {
-    console.log(rootTestService);
-    console.log(genericInjectionValue);
-    console.log(singleTagComponentService);
+    //console.log(environmentInjector);
+    //console.log(rootTestService);
+    //console.log(genericInjectionValue);
+    //console.log(singleTagComponentService);
   }
 
   ngDoCheck() {

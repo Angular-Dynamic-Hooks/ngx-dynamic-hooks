@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, OutletOptions, outletOptionDefaults } from '../testing-api';
+import { DynamicHooksComponent, OutletOptions, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
@@ -25,7 +25,12 @@ describe('OutletOptions', () => {
       else {  differentOptions[key] = null; }
     }
 
-    ({fixture, comp} = prepareTestingModule(testParsers, differentOptions));
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers,
+        globalOptions: differentOptions
+      })
+    ]);
 
     comp.content = 'something';
     comp.ngOnChanges({content: true} as any);
@@ -66,7 +71,11 @@ describe('OutletOptions', () => {
   });
 
   it('#should load fine without options', () => {
-    ({fixture, comp} = prepareTestingModule(testParsers, []));
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]);
 
     comp.content = 'something';
     comp.ngOnChanges({content: true} as any);
@@ -102,7 +111,12 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
+
     comp.content = testText;
     comp.options = { sanitize: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -137,7 +151,12 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].componentRef!.instance.simpleArray).toEqual(['enrico', 'susanne']);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
+
     comp.content = testText;
     comp.options = { convertHTMLEntities: false, sanitize: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -174,7 +193,11 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.options = { fixParagraphTags: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -203,7 +226,11 @@ describe('OutletOptions', () => {
     expect((comp['componentUpdater'].refresh as any)['calls'].count()).toBe(1);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
@@ -242,7 +269,11 @@ describe('OutletOptions', () => {
     expect(loadedComp.simpleObject.lightsabers).toBe(context.$lightSaberCollection);    // Should NOT have been replaced
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.context = context;
     comp.options = { compareInputsByValue: false };
@@ -334,7 +365,11 @@ describe('OutletOptions', () => {
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(0);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 4 };
@@ -359,7 +394,11 @@ describe('OutletOptions', () => {
     expect(loadedComp.stringProp).toBe('General Kenobi');
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.options = { ignoreInputAliases: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -381,7 +420,11 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeUndefined();
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.options = { ignoreOutputAliases: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -403,7 +446,11 @@ describe('OutletOptions', () => {
     expect(loadedComp.thisPropertyDoesNotExist).toBe(123);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -423,7 +470,11 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeDefined();
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: false };
     comp.ngOnChanges({content: true, options: true} as any);

@@ -4,7 +4,8 @@ import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } 
 @Component({
   selector: 'dynhooks-lazytest',
   templateUrl: './lazyTest.c.html',
-  styleUrls: ['./lazyTest.c.scss']
+  styleUrls: ['./lazyTest.c.scss'],
+  standalone: true
 })
 export class LazyTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() name!: string;

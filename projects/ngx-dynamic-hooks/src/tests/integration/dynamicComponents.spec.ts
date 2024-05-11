@@ -2,16 +2,14 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { first } from 'rxjs/operators';
 
 // Testing api resources
-import { DynamicHooksComponent, LoadedComponent } from '../testing-api';
+import { DynamicHooksComponent, LoadedComponent, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
-import { ChildTestComponent } from '../resources/components/parentTest/childTest/childTest.c';
 import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
 import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
 import { NonServiceTestParser } from '../resources/parsers/nonServiceTestParser';
-import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
 import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { ComponentRef } from '@angular/core';
@@ -109,7 +107,10 @@ describe('Loading dynamic components', () => {
     const parsersWithParentComponentParser = testParsers.concat([{
       component: ParentTestComponent
     }]);
-    ({fixture, comp} = prepareTestingModule(parsersWithParentComponentParser, undefined, [ParentTestComponent, ChildTestComponent]));
+
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({globalParsers: parsersWithParentComponentParser})
+    ]);
 
     const testText = `
     <p>Here's a normal parent component, which should contain its child component as declared in the template: <dynhooks-parenttest></dynhooks-parenttest></p>`;
@@ -249,7 +250,10 @@ describe('Loading dynamic components', () => {
     // instead of the actual childNodes. Check that this hardcoded content is correctly rendered.
 
     const parsersWithNgContentParser = testParsers.concat([NgContentTestParser]);
-    ({fixture, comp} = prepareTestingModule(parsersWithNgContentParser, undefined, [NgContentTestComponent]));
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({globalParsers: parsersWithNgContentParser})
+    ]);
+
     const testText = `<dynhooks-ngcontenttest><p>original content</p><dynhooks-singletagtest></dynhooks-ngcontenttest>`;
     comp.content = testText;
     comp.context = {};
@@ -562,13 +566,19 @@ describe('Loading dynamic components', () => {
   it('#should lazy-load components', fakeAsync(() => {
     const parsersWithLazyParser = testParsers.concat([{
       component: {
-        importPromise: () => import('../resources/components/lazyTest/lazyTest.c'),
+        // Simulate that loading this component takes 100ms
+        importPromise: () => new Promise(resolve => setTimeout(() => {
+          resolve({LazyTestComponent: LazyTestComponent})
+        }, 100)),
         importName: 'LazyTestComponent'
       },
       name: 'lazyParser',
       selector: 'dynhooks-lazytest'
     }]);
-    ({fixture, comp} = prepareTestingModule(parsersWithLazyParser, undefined, [LazyTestComponent]));
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({globalParsers: parsersWithLazyParser})
+    ]);
+
     const testText = `
       <p>
         A couple of components:
@@ -593,6 +603,7 @@ describe('Loading dynamic components', () => {
     if (version && version < 9) {
       expect(true).toBe(true);
     } else {
+      console.log(fixture.nativeElement.childNodes[1].childNodes);
 
       // Everything except the lazy-loaded component should be loaded
       expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);

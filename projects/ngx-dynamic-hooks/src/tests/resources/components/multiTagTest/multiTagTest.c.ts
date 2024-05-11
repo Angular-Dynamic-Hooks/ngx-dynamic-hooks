@@ -6,7 +6,8 @@ import { RootTestService } from '../../services/rootTestService';
 @Component({
   selector: 'dynhooks-multitagtest',
   templateUrl: './multiTagTest.c.html',
-  styleUrls: ['./multiTagTest.c.scss']
+  styleUrls: ['./multiTagTest.c.scss'],
+  standalone: true
 })
 export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() backgroundColor: string = '#4493ff40';

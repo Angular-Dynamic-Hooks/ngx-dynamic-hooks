@@ -1,9 +1,5 @@
-import { ElementRef, Injector } from '@angular/core';
+import { ElementRef, Provider } from '@angular/core';
 import { TestBed, ComponentFixtureAutoDetect, TestBedStatic, ComponentFixture } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { DomSanitizer } from '@angular/platform-browser';
-
-import { first } from 'rxjs/operators';
 
 // Importing files through testing-api file here instead of their own paths.
 // This way, we can add easily add the testing-api file as an import to public-api if we want to
@@ -53,24 +49,12 @@ export interface TestingModuleAndComponent {
 }
 
 // A simple function to reset and prepare the testing module
-export function prepareTestingModule(parsers?: any, options?: any, extraComponents: Array<any> = []): TestingModuleAndComponent {
-  // Generate settings
-  const globalSettings: DynamicHooksGlobalSettings = {};
-  if (parsers) { globalSettings.globalParsers = parsers; }
-  if (options) { globalSettings.globalOptions = options; }
-
-  // Generate declarations
-  let declarations: any = [];
-  if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
-  declarations = declarations.concat(extraComponents);
-
+export function prepareTestingModule(providers: Provider[]): TestingModuleAndComponent {
   // Create testing module
-  resetDynamicHooks();
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
-    declarations,
     providers: [
-      provideDynamicHooks(globalSettings),
+      ...providers,
       {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
       {provide: ElementRef, useClass: MockElementRef},
       RootTestService,
@@ -96,38 +80,42 @@ export interface TestingModuleComponentAndContext {
 }
 
 export function defaultBeforeEach(): TestingModuleComponentAndContext {
-    const {testBed, fixture, comp} = prepareTestingModule(testParsers);
-    const context = {
-      parent: comp,
-      greeting: 'Hello there!',
-      order: 66,
-      maneuvers: {
-        modifyParent: (event: any) => (comp as any)['completelyNewProperty'] = event,
-        getMentalState: () => 'angry',
-        findAppropriateAction: (mentalState: any) => mentalState === 'angry' ? 'meditate' : 'protectDemocracy',
-        meditate: () => { return {action:'meditating!', state: 'calm'}; },
-        protectDemocracy: () => { return {action: 'hunting sith!', state: 'vigilant'}; },
-        attack: (enemy: any) => 'attacking ' + enemy + '!',
-        generateEnemy: (name: any) => { return {name: 'the evil ' + name, type: 'monster'}; },
-        defend: (person: any) => 'defending ' + person + '!',
-        readJediCode: () => 'dont fall in love with pricesses from naboo',
-        goIntoExile: () => 'into exile, i must go!',
-        combo: (param1: any, param2: any) => 'Combo: ' + param1 + ' and ' + param2
-      },
-      $lightSaberCollection: [
-        'blue', 'green', 'orange', 'purple'
-      ],
-      _jediCouncil: {
-        yoda900: 'there is no try',
-        windu: 'take a seat',
-        kenobi: 'wretched hive of scum and villainy',
-        kiAdiMundi: ['but', 'what', 'about', 'the', 'droid', 'attack', 'on', 'the', {
-          name: 'wookies',
-          planet: 'kashyyyk'
-        }],
-        skywalker: undefined
-      }
-    };
+  resetDynamicHooks();
 
-    return {testBed, fixture, comp, context};
+  const {testBed, fixture, comp} = prepareTestingModule([
+    provideDynamicHooks({globalParsers: testParsers})
+  ]);
+  const context = {
+    parent: comp,
+    greeting: 'Hello there!',
+    order: 66,
+    maneuvers: {
+      modifyParent: (event: any) => (comp as any)['completelyNewProperty'] = event,
+      getMentalState: () => 'angry',
+      findAppropriateAction: (mentalState: any) => mentalState === 'angry' ? 'meditate' : 'protectDemocracy',
+      meditate: () => { return {action:'meditating!', state: 'calm'}; },
+      protectDemocracy: () => { return {action: 'hunting sith!', state: 'vigilant'}; },
+      attack: (enemy: any) => 'attacking ' + enemy + '!',
+      generateEnemy: (name: any) => { return {name: 'the evil ' + name, type: 'monster'}; },
+      defend: (person: any) => 'defending ' + person + '!',
+      readJediCode: () => 'dont fall in love with pricesses from naboo',
+      goIntoExile: () => 'into exile, i must go!',
+      combo: (param1: any, param2: any) => 'Combo: ' + param1 + ' and ' + param2
+    },
+    $lightSaberCollection: [
+      'blue', 'green', 'orange', 'purple'
+    ],
+    _jediCouncil: {
+      yoda900: 'there is no try',
+      windu: 'take a seat',
+      kenobi: 'wretched hive of scum and villainy',
+      kiAdiMundi: ['but', 'what', 'about', 'the', 'droid', 'attack', 'on', 'the', {
+        name: 'wookies',
+        planet: 'kashyyyk'
+      }],
+      skywalker: undefined
+    }
+  };
+
+  return {testBed, fixture, comp, context};
 }

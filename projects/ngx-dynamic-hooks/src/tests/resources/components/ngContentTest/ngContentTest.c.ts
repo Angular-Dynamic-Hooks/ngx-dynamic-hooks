@@ -6,7 +6,8 @@ import { RootTestService } from '../../services/rootTestService';
 @Component({
   selector: 'dynhooks-ngcontenttest',
   templateUrl: './ngContentTest.c.html',
-  styleUrls: ['./ngContentTest.c.scss']
+  styleUrls: ['./ngContentTest.c.scss'],
+  standalone: true
 })
 export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges {
   mountContext: any;

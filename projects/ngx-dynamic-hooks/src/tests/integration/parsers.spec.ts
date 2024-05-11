@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, SelectorHookParser } from '../testing-api';
+import { DynamicHooksComponent, SelectorHookParser, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
@@ -149,7 +149,11 @@ describe('Parsers', () => {
   });
 
   it('#should load fine without parsers', () => {
-    ({fixture, comp} = prepareTestingModule([]));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: []
+      })
+    ]));
 
     comp.content = 'something';
     comp.ngOnChanges({content: true} as any);
@@ -179,7 +183,11 @@ describe('Parsers', () => {
     expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Blacklist: Expect that MultiTagComponentParser is not loaded
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.globalParsersBlacklist = ['MultiTagTestComponentParser'];
     (comp as any).globalParsersWhitelist = null;
@@ -193,7 +201,11 @@ describe('Parsers', () => {
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // WhiteList: Expect that only InlineTestComponentParser is loaded
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     (comp as any).globalParsersBlacklist = null;
     comp.globalParsersWhitelist = ['InlineTestComponentParser'];
@@ -206,7 +218,11 @@ describe('Parsers', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Both: Expect that only SingleTagTestComponentParser is loaded
-    ({fixture, comp} = prepareTestingModule(testParsers));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: testParsers
+      })
+    ]));
     comp.content = testText;
     comp.globalParsersBlacklist = ['MultiTagTestComponentParser'];
     comp.globalParsersWhitelist = ['SingleTagTestComponentParser', 'MultiTagTestComponentParser'];

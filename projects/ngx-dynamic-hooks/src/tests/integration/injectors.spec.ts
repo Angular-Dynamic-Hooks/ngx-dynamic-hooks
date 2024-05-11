@@ -3,9 +3,8 @@ import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, OutletPar
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
-import { defaultBeforeEach, prepareTestingModule } from './shared';
+import { defaultBeforeEach } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { Component, EnvironmentInjector, Injector, NgModule } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
@@ -47,9 +46,6 @@ describe('Injectors logic', () => {
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      declarations: [
-        SingleTagTestComponent
-      ],
       imports: [
         RouterModule.forRoot([
           { path: 'lazyRoute', loadChildren: () => new Promise(resolve => resolve(ChildModuleLazy)) },

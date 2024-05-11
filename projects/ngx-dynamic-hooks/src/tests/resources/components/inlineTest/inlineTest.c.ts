@@ -5,6 +5,7 @@ import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } 
   selector: 'dynhooks-inlinetest',
   templateUrl: './inlineTest.c.html',
   styleUrls: ['./inlineTest.c.scss'],
+  standalone: true
 })
 export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() backgroundColor: string = '#25436c';

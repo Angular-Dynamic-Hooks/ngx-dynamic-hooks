@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, outletOptionDefaults } from '../testing-api';
+import { DynamicHooksComponent, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
@@ -28,10 +28,14 @@ describe('Initialization', () => {
     const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest></span> within it.</p>`;
 
     // Test with config for SingleTagTestComponent
-    ({fixture, comp} = prepareTestingModule([{
-      component: SingleTagTestComponent,
-      enclosing: false
-    }]));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({
+        globalParsers: [{
+          component: SingleTagTestComponent,
+          enclosing: false
+        }]
+      })
+    ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -40,11 +44,13 @@ describe('Initialization', () => {
     expect((comp.activeParsers[0] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-
+    
     // Test with config for MultiTagTestComponent
-    ({fixture, comp} = prepareTestingModule([{
-      component: MultiTagTestComponent
-    }]));
+    ({fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({globalParsers: [{
+        component: MultiTagTestComponent
+      }]})
+    ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -57,7 +63,10 @@ describe('Initialization', () => {
   it('#should not crash if the user passes an empty object as global settings', () => {
     const testText = `<p>This is just a bit of text.</p>`;
 
-    ({fixture, comp} = prepareTestingModule());
+    let {fixture, comp} = prepareTestingModule([
+      provideDynamicHooks({})
+    ]);
+
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 

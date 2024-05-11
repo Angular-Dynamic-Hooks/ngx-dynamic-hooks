@@ -1,5 +1,5 @@
 // Testing api resources
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksGlobalSettings, PlatformBrowserService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksGlobalSettings, PlatformBrowserService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
@@ -9,12 +9,13 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 
 describe('forRoot', () => {
 
+  afterEach(() => {
+    resetDynamicHooks();
+  });
+
   it('#should reset all settings when calling provideDynamicHooks', () => {
     // Run forRoot once
     TestBed.configureTestingModule({
-      declarations: [
-        SingleTagTestComponent
-      ],
       providers: [
         provideDynamicHooks({
           globalParsers: [
@@ -31,9 +32,6 @@ describe('forRoot', () => {
     // Run forRoot again
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      declarations: [
-        MultiTagTestComponent
-      ],
       providers: [
         provideDynamicHooks({
           globalParsers: [
