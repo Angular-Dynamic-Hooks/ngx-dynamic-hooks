@@ -1,12 +1,13 @@
-import { NgModule, Type, ModuleWithProviders, SkipSelf, Optional, Provider } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
+import { NgModule, Type, ModuleWithProviders, SkipSelf, Optional, Provider, APP_INITIALIZER, ENVIRONMENT_INITIALIZER, Injectable, OnDestroy } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
 import { DynamicHooksComponent } from './components/outlet/dynamicHooksComponent';
 import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
 import { DynamicHooksService } from './components/outlet/services/dynamicHooksService';
 import { PlatformService } from './platform/platformService';
 import { PlatformBrowserService } from './platform/platformBrowserService';
-import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from './interfaces';
+import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
+import { SelectorHookParserConfig } from '../public-api';
 
-const allSettings: DynamicHooksGlobalSettings[] = [];
+export const allSettings: DynamicHooksGlobalSettings[] = [];
 
 /**
  * Configures the root settings for running the ngx-dynamic-hooks library
@@ -15,16 +16,38 @@ const allSettings: DynamicHooksGlobalSettings[] = [];
  * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
  */
 export const provideDynamicHooks: (rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
-  allSettings.length = 0;
   allSettings.push(rootSettings);
-
+  console.log('forRoot', rootSettings)
+  
   return [
-    { provide: DYNAMICHOOKS_FORROOTCALLED, useValue: true },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      multi: true,
+      deps: [DynamicHooksInitService]
+    },
+    { provide: DYNAMICHOOKS_PROVIDERS_REGISTERED, useValue: true },
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
     { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
     { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
     { provide: PlatformService, useClass: platformService || PlatformBrowserService }
   ];
+}
+
+/**
+ * A service that will always be created on app init, even without using a DynamicHooksComponent
+ */
+@Injectable({
+  providedIn: 'root'
+})
+export class DynamicHooksInitService implements OnDestroy {
+  ngOnDestroy(): void {
+    // Reset allSettings on app close for the benefit of vite live reloads and tests (does not destroy allSettings reference between app reloads)
+    // Safer to do this only on app close rather than on app start (in provideDynamicHooks), as this allows you to call provideDynamicHooksForChild before provideDynamicHooks
+    // without losing the child settings
+    allSettings.length = 0;    
+    console.log('[Resetting allSettings]');
+  }
 }
 
 /**
@@ -35,18 +58,9 @@ export const provideDynamicHooks: (rootSettings: DynamicHooksGlobalSettings, pla
  */
 export const provideDynamicHooksForChild: (childSettings: DynamicHooksGlobalSettings) => Provider[] = childSettings => {
   allSettings.push(childSettings);
+  console.log('forChild', (childSettings.globalParsers![0] as SelectorHookParserConfig).component)
 
   return [
-    {
-      provide: DYNAMICHOOKS_FORROOTCHECK,
-      useFactory: (forRootCalled: boolean) => {
-        if (!forRootCalled) {
-          throw new Error('It seems you\'re trying to use ngx-dynamic-hooks without calling forRoot() on the main module first. Make sure to include this to register all needed services.');
-        }
-        return true;
-      },
-      deps: [[new Optional(), DYNAMICHOOKS_FORROOTCALLED]]
-    },
     // Provide the child settings
     { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: childSettings },
     // Also add child settings to hierarchical array of child settings
@@ -65,6 +79,7 @@ export const provideDynamicHooksForChild: (childSettings: DynamicHooksGlobalSett
     DynamicHooksService
   ];
 }
+
 
 export const resetDynamicHooks: () => void = () => {
   allSettings.length = 0;

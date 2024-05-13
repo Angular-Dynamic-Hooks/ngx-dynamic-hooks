@@ -6,7 +6,7 @@ import { SelectorHookParser } from '../testing-api';
 import { defaultBeforeEach } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { Component, EnvironmentInjector, Injector, NgModule } from '@angular/core';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { Route, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RootTestService } from '../resources/services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
@@ -48,15 +48,14 @@ describe('Injectors logic', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterModule.forRoot([
-          { path: 'lazyRoute', loadChildren: () => new Promise(resolve => resolve(ChildModuleLazy)) },
+          { path: 'lazyRoute', loadChildren: () => new Promise(resolve => resolve(lazyRoute)) },
         ])
       ],
       providers: [
         provideDynamicHooks({globalParsers: [{
           component: SingleTagTestComponent,
           enclosing: false
-        }]}),
-        RootTestService
+        }]})
       ]
     });
 
@@ -73,17 +72,11 @@ describe('Injectors logic', () => {
       constructor() {}
     }
 
-    @NgModule({
-      imports: [
-        RouterModule.forChild([
-          { path: '', component: LazyChildComponent }
-        ])      
-      ],
-      providers: [
+    const lazyRoute: Route[] = [
+      { path: '', component: LazyChildComponent, providers: [
         {provide: GENERICINJECTIONTOKEN, useValue: { name: 'ChildModuleService works!' } }
-      ]
-    })
-    class ChildModuleLazy {}
+      ] }
+    ];
 
     // Create app
     const fixture = TestBed.createComponent(RootComponent);

@@ -14,7 +14,7 @@ export enum DynamicHooksInheritance {
 export interface DynamicHooksGlobalSettings {
     globalParsers?: HookParserEntry[];
     globalOptions?: OutletOptions;
-    lazyInheritance?: DynamicHooksInheritance;
+    inheritance?: DynamicHooksInheritance;
 }
 
 /**

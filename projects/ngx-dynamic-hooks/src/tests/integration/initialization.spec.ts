@@ -1,15 +1,16 @@
 // Testing api resources
-import { DynamicHooksComponent, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
+import { TestBed } from '@angular/core/testing';
 
 
 describe('Initialization', () => {
-  let testBed;
+  let testBed: TestBed;
   let fixture: any;
   let comp: DynamicHooksComponent;
   let context: any;
@@ -20,6 +21,12 @@ describe('Initialization', () => {
 
   // ----------------------------------------------------------------------------
 
+  it('#should throw error if not registered main providers before using DynamicHooksComponent', (async () => {
+    expect(() => {
+      ({fixture, comp} = prepareTestingModule(() => []));
+    }).toThrow(new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.'));
+  }));
+
   it('#should have created the main component correctly', () => {
     expect(comp).toBeDefined();
   });
@@ -28,7 +35,7 @@ describe('Initialization', () => {
     const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest></span> within it.</p>`;
 
     // Test with config for SingleTagTestComponent
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -46,7 +53,7 @@ describe('Initialization', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     
     // Test with config for MultiTagTestComponent
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({globalParsers: [{
         component: MultiTagTestComponent
       }]})
@@ -60,10 +67,40 @@ describe('Initialization', () => {
     expect(Object.keys(comp.hookIndex).length).toBe(0);
   });
 
+  it('#should reset allSettings on app reloads', (async () => {
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        globalParsers: [
+          {component: SingleTagTestComponent}
+        ]
+      })
+    ]));
+
+    let allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
+    expect(allSettings.length).toBe(1);
+    expect(allSettings[0].globalParsers?.length).toBe(1);
+    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+
+    // Reset and reload with different settings
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        globalParsers: [
+          {component: MultiTagTestComponent}
+        ]
+      })
+    ]));
+
+    allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
+    expect(allSettings.length).toBe(1);
+    expect(allSettings[0].globalParsers?.length).toBe(1);
+    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
+  }));
+
   it('#should not crash if the user passes an empty object as global settings', () => {
     const testText = `<p>This is just a bit of text.</p>`;
 
-    let {fixture, comp} = prepareTestingModule([
+    testBed.resetTestingModule();
+    let {fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({})
     ]);
 

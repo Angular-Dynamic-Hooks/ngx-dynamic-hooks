@@ -49,6 +49,11 @@ describe('Parsers', () => {
   });
 
   it('#should be able to load parsers in their various forms', () => {
+    ({comp, fixture} = prepareTestingModule(() => [
+      provideDynamicHooks({globalParsers: []}),
+      ServiceTestParser
+    ]))
+
     // Should be able to load parsers that are object literals
     comp.content = 'This is a sentence with a <dynhooks-singletagtest>.';
     comp.parsers = [{component: SingleTagTestComponent, enclosing: false}];
@@ -149,7 +154,7 @@ describe('Parsers', () => {
   });
 
   it('#should load fine without parsers', () => {
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: []
       })
@@ -183,7 +188,7 @@ describe('Parsers', () => {
     expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Blacklist: Expect that MultiTagComponentParser is not loaded
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: testParsers
       })
@@ -201,7 +206,7 @@ describe('Parsers', () => {
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // WhiteList: Expect that only InlineTestComponentParser is loaded
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: testParsers
       })
@@ -218,7 +223,7 @@ describe('Parsers', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
     // Both: Expect that only SingleTagTestComponentParser is loaded
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: testParsers
       })

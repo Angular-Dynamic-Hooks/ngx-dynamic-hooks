@@ -1,11 +1,12 @@
-import { InjectionToken } from '@angular/core';
+import { InjectionToken, Optional } from '@angular/core';
 import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
 
 /**
  * Custom injector tokens that are used for varous internal communication purposes
  */
-export const DYNAMICHOOKS_FORROOTCALLED = new InjectionToken<DynamicHooksGlobalSettings[]>('A provider that is set in forRoot, so forChild can see if forRoot was called first');
-export const DYNAMICHOOKS_FORROOTCHECK = new InjectionToken<DynamicHooksGlobalSettings[]>('Inject this anywhere to check whether or not forRoot was called and throw an error if not');
+export const DYNAMICHOOKS_PROVIDERS_REGISTERED = new InjectionToken<DynamicHooksGlobalSettings[]>('Part of the standard providers of this library. Is used to check if they have been registered.');
+export const DYNAMICHOOKS_PROVIDERS_CHECK = new InjectionToken<DynamicHooksGlobalSettings[]>('Inject this anywhere to check whether or not the providers of this library were loaded or not.');
+
 export const DYNAMICHOOKS_ALLSETTINGS = new InjectionToken<DynamicHooksGlobalSettings[]>('All of the settings registered in the whole app.');
 export const DYNAMICHOOKS_ANCESTORSETTINGS = new InjectionToken<DynamicHooksGlobalSettings[]>('The settings collected from all ancestor injectors');
 export const DYNAMICHOOKS_MODULESETTINGS = new InjectionToken<DynamicHooksGlobalSettings>('The settings for the currently loaded module.');

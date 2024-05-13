@@ -14,6 +14,7 @@ import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { ComponentRef } from '@angular/core';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
+import { RootTestService } from '../resources/services/rootTestService';
 
 describe('Loading dynamic components', () => {
   let testBed;
@@ -108,7 +109,7 @@ describe('Loading dynamic components', () => {
       component: ParentTestComponent
     }]);
 
-    let {fixture, comp} = prepareTestingModule([
+    let {fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({globalParsers: parsersWithParentComponentParser})
     ]);
 
@@ -250,7 +251,8 @@ describe('Loading dynamic components', () => {
     // instead of the actual childNodes. Check that this hardcoded content is correctly rendered.
 
     const parsersWithNgContentParser = testParsers.concat([NgContentTestParser]);
-    let {fixture, comp} = prepareTestingModule([
+    let {fixture, comp} = prepareTestingModule(() => [
+      NgContentTestParser,
       provideDynamicHooks({globalParsers: parsersWithNgContentParser})
     ]);
 
@@ -305,6 +307,13 @@ describe('Loading dynamic components', () => {
   });
 
   it('#should correctly trigger onDynamicMount() on init', () => {
+    ({comp, fixture} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        globalParsers: testParsers,
+      }),
+      EnclosingCustomParser
+    ]))
+
     const testText = `
     <dynhooks-multitagtest id="outercomp">
       bla bla
@@ -497,6 +506,11 @@ describe('Loading dynamic components', () => {
   });
 
   it('#should activate dependency injection for dynamically loaded components', () => {
+    ({comp} = prepareTestingModule(() => [
+      provideDynamicHooks({globalParsers: testParsers}),
+      RootTestService
+    ]))
+
     const testText = `
     <p>
       This is the first component: <dynhooks-singletagtest>.
@@ -575,7 +589,7 @@ describe('Loading dynamic components', () => {
       name: 'lazyParser',
       selector: 'dynhooks-lazytest'
     }]);
-    let {fixture, comp} = prepareTestingModule([
+    let {fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({globalParsers: parsersWithLazyParser})
     ]);
 

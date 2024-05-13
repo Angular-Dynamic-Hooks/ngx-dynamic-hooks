@@ -1,51 +1,13 @@
-import { NgModule, Component, ElementRef, Inject, ModuleWithProviders, Optional, Provider } from '@angular/core';
-import { ComponentFixtureAutoDetect } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { DynamicHooksGlobalSettings, DynamicHooksInheritance, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooksForChild, DynamicHooksComponent } from '../../testing-api';
+import { Component, ElementRef, Inject } from '@angular/core';
+import { Route } from '@angular/router';
+import { DynamicHooksGlobalSettings, DynamicHooksInheritance, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooksForChild, DynamicHooksComponent, DYNAMICHOOKS_MODULESETTINGS } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
-export function createPlanetCountriesModuleSync() {
-  @NgModule({
-    providers: [
-      createPlanetCountriesModuleHooksImport()
-    ]
-  })
-  class PlanetCountriesModuleSync {}
-
-  return PlanetCountriesModuleSync;
-}
-
-export function createPlanetCountriesModuleLazy() {
-  @NgModule({
-    imports: [
-      RouterModule.forChild([
-        { path: '', component: PlanetCountriesComponent }
-      ])
-      
-    ],
-    providers: [
-      createPlanetCountriesModuleHooksImport(),
-      { provide: ComponentFixtureAutoDetect, useValue: true },
-    ]
-  })
-  class PlanetContriesModuleLazy {}
-
-  return PlanetContriesModuleLazy;
-}
-
-function createPlanetCountriesModuleHooksImport(): Provider[] {
-  return provideDynamicHooksForChild({
-    globalParsers: [
-      {component: DynamicPlanetCountriesComponent}
-    ],
-    globalOptions: {
-      convertHTMLEntities: true,
-      updateOnPushOnly: true,
-      compareOutputsByValue: true
-    },
-    lazyInheritance: DynamicHooksInheritance.All
-  });
-}
+@Component({
+  selector: 'app-dynamicplanetcountries',
+  template: `<div class="countriesDynamic">DYNAMIC PLANET COUNTRIES COMPONENT</div>`
+})
+export class DynamicPlanetCountriesComponent {}
 
 @Component({
   selector: 'app-planetcountries',
@@ -68,9 +30,21 @@ export class PlanetCountriesComponent {
   }
 }
 
-@Component({
-  selector: 'app-dynamicplanetcountries',
-  template: `<div class="countriesDynamic">DYNAMIC PLANET COUNTRIES COMPONENT</div>`
-})
-export class DynamicPlanetCountriesComponent {}
+export const getPlanetCountriesRoutes: () => Route[] = () => {
+  return [
+    { path: '', component: PlanetCountriesComponent, providers: [
+      provideDynamicHooksForChild({
+        globalParsers: [
+          {component: DynamicPlanetCountriesComponent}
+        ],
+        globalOptions: {
+          convertHTMLEntities: true,
+          updateOnPushOnly: true,
+          compareOutputsByValue: true
+        },
+        inheritance: DynamicHooksInheritance.All
+      })
+    ]}
+  ];
+}
 

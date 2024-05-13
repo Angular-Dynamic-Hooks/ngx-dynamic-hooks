@@ -54,7 +54,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
 
   constructor (
     public cd: ChangeDetectorRef, 
-    public rootTestService: RootTestService,
+    @Optional() public rootTestService: RootTestService,
     @Optional() @Inject(SINGLETAGCOMPONENTSERVICE) private singleTagComponentService: any,
     @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any,
     public environmentInjector: EnvironmentInjector

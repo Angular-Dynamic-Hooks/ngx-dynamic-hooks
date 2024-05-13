@@ -15,7 +15,7 @@ export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges 
   changesContext: any;
   changesContentChildren!: Array<DynamicContentChild>;
 
-  constructor(private cd: ChangeDetectorRef, private rootTestService: RootTestService) {
+  constructor(private cd: ChangeDetectorRef) {
   }
 
   onDynamicMount(data: OnDynamicData) {

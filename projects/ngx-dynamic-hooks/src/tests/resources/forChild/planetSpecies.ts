@@ -1,48 +1,13 @@
-import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, Inject, ElementRef } from '@angular/core';
+import { Route } from '@angular/router';
 import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooksForChild } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
-export function createPlanetSpeciesModuleSync() {
-  @NgModule({
-    imports: [
-      RouterModule.forChild([
-        { path: 'species', component: PlanetSpeciesComponent }
-      ])
-    ],
-    providers: [
-      createPlanetSpeciesModuleHooksImport()
-    ]
-  })
-  class PlanetSpeciesModuleSync {}
-
-  return PlanetSpeciesModuleSync;
-}
-
-export function createPlanetSpeciesModuleLazy() {
-  @NgModule({
-    imports: [
-      RouterModule.forChild([
-        { path: '', component: PlanetSpeciesComponent }
-      ])      
-    ],
-    providers: [
-      createPlanetSpeciesModuleHooksImport()
-    ]
-  })
-  class PlanetSpeciesModuleLazy {}
-
-  return PlanetSpeciesModuleLazy;
-}
-
-function createPlanetSpeciesModuleHooksImport(): Provider[] {
-  return provideDynamicHooksForChild({
-    globalParsers: [
-      {component: DynamicPlanetSpeciesComponent}
-    ],
-    lazyInheritance: DynamicHooksInheritance.None
-  });
-}
+@Component({
+  selector: 'app-dynamicplanetspecies',
+  template: `<div class="speciesDynamic">DYNAMIC PLANET SPECIES COMPONENT</div>`
+})
+export class DynamicPlanetSpeciesComponent {}
 
 @Component({
   selector: 'app-planetspecies',
@@ -57,8 +22,15 @@ export class PlanetSpeciesComponent {
   constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
-@Component({
-  selector: 'app-dynamicplanetspecies',
-  template: `<div class="speciesDynamic">DYNAMIC PLANET SPECIES COMPONENT</div>`
-})
-export class DynamicPlanetSpeciesComponent {}
+export const getPlanetSpeciesRoutes: () => Route[] = () => {
+  return [
+    { path: '', component: PlanetSpeciesComponent, providers: [
+      provideDynamicHooksForChild({
+        globalParsers: [
+          {component: DynamicPlanetSpeciesComponent}
+        ],
+        inheritance: DynamicHooksInheritance.None
+      })
+    ]}
+  ];
+}

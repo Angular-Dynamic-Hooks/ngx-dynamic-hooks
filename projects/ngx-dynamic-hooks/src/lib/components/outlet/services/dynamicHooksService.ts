@@ -3,16 +3,15 @@ import { of, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 import { HookIndex } from '../../../interfacesPublic';
-import { HookParser, OutletParseResult } from '../../../interfacesPublic';
-import { OutletOptions, outletOptionDefaults } from '../settings/options';
+import { OutletParseResult } from '../../../interfacesPublic';
+import { OutletOptions } from '../settings/options';
 import { HooksReplacer } from './hooksReplacer';
 import { ComponentCreator } from './componentCreator';
-import { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../settings/settings';
-import { ParserEntryResolver } from '../settings/parserEntryResolver';
-import { OptionsResolver } from '../settings/optionsResolver';
+import { DynamicHooksGlobalSettings } from '../settings/settings';
 import { HookParserEntry } from '../settings/parserEntry';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
 import { SettingsResolver } from '../settings/settingsResolver';
+import { SelectorHookParser } from '../../../../public-api';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
@@ -80,6 +79,12 @@ export class DynamicHooksService {
       globalParsersWhitelist, 
       injector // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
     );
+
+    /*
+    console.log(this.allSettings)
+    console.log(this.ancestorSettings)
+    console.log(this.moduleSettings)
+    */
 
     // Needs a content string
     if (!content || typeof content !== 'string') {

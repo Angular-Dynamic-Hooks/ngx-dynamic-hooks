@@ -6,7 +6,7 @@ import { DynamicHooksService } from './services/dynamicHooksService';
 import { HookParserEntry } from './settings/parserEntry';
 import { ComponentUpdater } from './services/componentUpdater';
 import { PlatformService } from '../../platform/platformService';
-import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';
+import { DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_PROVIDERS_REGISTERED } from '../../interfaces';
 
 /**
 * Explanation in a nutshell:
@@ -34,7 +34,17 @@ import { DYNAMICHOOKS_FORROOTCHECK } from '../../interfaces';
   selector: 'ngx-dynamic-hooks',
   template: '',
   standalone: true,
-  styles: []
+  styles: [],
+  providers: [{
+    provide: DYNAMICHOOKS_PROVIDERS_CHECK,
+    useFactory: (providersRegistered: boolean) => {
+      if (!providersRegistered) {
+        throw new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.');
+      }
+      return true;
+    },
+    deps: [[new Optional(), DYNAMICHOOKS_PROVIDERS_REGISTERED]]
+}]
 })
 export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
   @Input() content: string|null = null;
@@ -54,8 +64,8 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
   // ----------------------------------------------------------------------
 
   constructor(
-    // Just needs to request injecting this to ensure that forRoot was called
-    @Optional() @Inject(DYNAMICHOOKS_FORROOTCHECK) private forRootCheck: boolean,
+    // Just needs to request injecting this to ensure that providers are registered
+    @Optional() @Inject(DYNAMICHOOKS_PROVIDERS_CHECK) private providersCheck: boolean,
     private hostElement: ElementRef,
     private dynamicHooksService: DynamicHooksService,
     private componentUpdater: ComponentUpdater,

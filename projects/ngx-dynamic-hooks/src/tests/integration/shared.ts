@@ -15,15 +15,7 @@ import { provideDynamicHooks, DynamicHooksGlobalSettings, HookParserEntry, reset
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
-import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
-import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
-import { ServiceTestParser } from '../resources/parsers/serviceTestParser';
-import { RootTestService } from '../resources/services/rootTestService';
 
-
-export class MockElementRef {
-  nativeElement!: {};
-}
 
 // The standard parsers to be used for most tests
 export const testParsers: Array<HookParserEntry> = [
@@ -49,18 +41,13 @@ export interface TestingModuleAndComponent {
 }
 
 // A simple function to reset and prepare the testing module
-export function prepareTestingModule(providers: Provider[]): TestingModuleAndComponent {
+export function prepareTestingModule(providers: () => Provider[]): TestingModuleAndComponent {
   // Create testing module
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
     providers: [
-      ...providers,
       {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
-      {provide: ElementRef, useClass: MockElementRef},
-      RootTestService,
-      ServiceTestParser,
-      EnclosingCustomParser,
-      NgContentTestParser
+      ...providers()
     ]
   });
 
@@ -80,11 +67,10 @@ export interface TestingModuleComponentAndContext {
 }
 
 export function defaultBeforeEach(): TestingModuleComponentAndContext {
-  resetDynamicHooks();
-
-  const {testBed, fixture, comp} = prepareTestingModule([
+  const {testBed, fixture, comp} = prepareTestingModule(() => [
     provideDynamicHooks({globalParsers: testParsers})
   ]);
+  
   const context = {
     parent: comp,
     greeting: 'Hello there!',

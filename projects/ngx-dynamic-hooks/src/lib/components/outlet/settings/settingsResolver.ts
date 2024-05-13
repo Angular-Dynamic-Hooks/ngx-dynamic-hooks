@@ -34,20 +34,19 @@ export class SettingsResolver {
   ): ResolvedSettings {
     let resolvedSettings: DynamicHooksGlobalSettings = {};
 
-    if (!moduleSettings.hasOwnProperty('lazyInheritance') || moduleSettings.lazyInheritance === DynamicHooksInheritance.All) {
+    if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
       // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
       // This is in case other settings were added to the back of allSettings after registering this module
-      const ancestorOptions = ancestorSettings.map(ancestorSettings => ancestorSettings.hasOwnProperty('globalOptions') ? {globalOptions: ancestorSettings.globalOptions} : {});
-      resolvedSettings = this.mergeSettings([...allSettings, ...ancestorOptions]);
+      resolvedSettings = this.mergeSettings([...allSettings, ...ancestorSettings]);
 
-    } else if (moduleSettings.lazyInheritance === DynamicHooksInheritance.Linear) {
+    } else if (moduleSettings.inheritance === DynamicHooksInheritance.Linear) {
       resolvedSettings = this.mergeSettings(ancestorSettings);
 
-    } else if (moduleSettings.lazyInheritance === DynamicHooksInheritance.None) {
+    } else if (moduleSettings.inheritance === DynamicHooksInheritance.None) {
       resolvedSettings = moduleSettings;
       
     } else {
-      throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${moduleSettings.lazyInheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
+      throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${moduleSettings.inheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
     }
 
     const resolvedParsers = this.resolveParsers(resolvedSettings.globalParsers || null, localParsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
@@ -68,13 +67,15 @@ export class SettingsResolver {
     const mergedSettings: DynamicHooksGlobalSettings = {};
 
     for (const settings of settingsArray) {
-      // Parsers are simply all collected, not overwritten
+      // Unique parsers are simply all collected, not overwritten
       if (settings.globalParsers !== undefined) {
         if (mergedSettings.globalParsers === undefined) {
           mergedSettings.globalParsers = [];
         }
         for (const parserEntry of settings.globalParsers) {
-          mergedSettings.globalParsers.push(parserEntry);
+          if (!mergedSettings.globalParsers.includes(parserEntry)) {
+            mergedSettings.globalParsers.push(parserEntry);
+          }
         }
       }
       // Options are individually overwritten

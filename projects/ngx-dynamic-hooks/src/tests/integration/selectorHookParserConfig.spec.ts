@@ -2,8 +2,7 @@ import { Component, EnvironmentInjector, Injector, NgModule, createEnvironmentIn
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
-import { ComponentCreator, DynamicHooksComponent, OutletParseResult, ParserEntryResolver, SelectorHookParserConfig, provideDynamicHooks } from '../testing-api';
-import { DynamicHooksService } from '../testing-api';
+import { DynamicHooksComponent, ParserEntryResolver, SelectorHookParserConfig, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
@@ -137,7 +136,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should recognize custom selectors', () => {
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: MultiTagTestComponent,
@@ -165,7 +164,7 @@ describe('SelectorHookParserConfig', () => {
       environmentInjector: undefined
     };
     
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [config]
       })
@@ -175,11 +174,6 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toBeNull();
 
     // With a custom injector, genericInjectionValue should now be found
-    ({fixture, comp} = prepareTestingModule([
-      provideDynamicHooks({
-        globalParsers: [config]
-      })
-    ]));
     config.injector = Injector.create({
       providers: [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'injector test value' } }]
     });
@@ -218,7 +212,7 @@ describe('SelectorHookParserConfig', () => {
   }));
 
   it('#should recognize singletag hooks', () => {
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: MultiTagTestComponent,
@@ -241,7 +235,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should recognize unique bracket styles', () => {
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: MultiTagTestComponent,
@@ -262,7 +256,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should refrain from parsing inputs, if requested', () => {
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: MultiTagTestComponent,
@@ -300,7 +294,7 @@ describe('SelectorHookParserConfig', () => {
     >`;
 
     // Unescape strings
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -320,7 +314,7 @@ describe('SelectorHookParserConfig', () => {
     expect(loadedComp.simpleArray).toEqual(["defending O'Hara!"]);
 
     // Leave strings as they are
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -353,7 +347,7 @@ describe('SelectorHookParserConfig', () => {
     `;
 
     // a) Test inputBlacklist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -374,7 +368,7 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // b) Test inputWhitelist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -395,7 +389,7 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // c) Test inputBlacklist + inputWhitelist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -417,7 +411,7 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // d) Test outputBlacklist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -438,7 +432,7 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // e) Test outputWhitelist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -459,7 +453,7 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[1].outputSubscriptions['httpResponseReceived']).toBeDefined();
 
     // f) Test outputBlacklist + outputWhitelist
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -485,7 +479,7 @@ describe('SelectorHookParserConfig', () => {
     const testText = `<dynhooks-singletagtest [numberProp]="context.order" (httpResponseReceived)="context.maneuvers.meditate()">`;
 
     // Context access allowed
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -506,7 +500,7 @@ describe('SelectorHookParserConfig', () => {
     expect(context.maneuvers.meditate['calls'].count()).toBe(1);
 
     // Context access not allowed
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -530,7 +524,7 @@ describe('SelectorHookParserConfig', () => {
     const testText = `<dynhooks-singletagtest [stringPropAlias]="context.maneuvers.defend('the innocent')" (httpResponseReceived)="context.maneuvers.meditate()">`;
 
     // Context access allowed
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,
@@ -551,7 +545,7 @@ describe('SelectorHookParserConfig', () => {
     expect(context.maneuvers.meditate['calls'].count()).toBe(1);
 
     // Context access not allowed
-    ({fixture, comp} = prepareTestingModule([
+    ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         globalParsers: [{
           component: SingleTagTestComponent,

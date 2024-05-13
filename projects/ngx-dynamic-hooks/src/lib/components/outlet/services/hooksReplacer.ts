@@ -1,7 +1,7 @@
 import { HookIndex } from '../../../interfacesPublic';
 import { HookParser, HookPosition } from '../../../interfacesPublic';
 import { OutletOptions } from '../settings/options';
-import { isDevMode, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { isDevMode, Injectable, Renderer2, RendererFactory2, Optional } from '@angular/core';
 import { PlatformService } from '../../../platform/platformService';
 
 /**

@@ -1,4 +1,4 @@
-import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
+import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, Renderer2, RendererFactory2, createComponent, EnvironmentInjector, reflectComponentType, Optional } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
