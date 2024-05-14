@@ -217,7 +217,7 @@ describe('forChild', () => {
     }));
   }));
 
-  fit('#should prioritize settings from ElementInjectors to those from EnvironmentInjectors', fakeAsync(() => {
+  it('#should prioritize settings from ElementInjectors to those from EnvironmentInjectors', fakeAsync(() => {
     const setup = createForChildTestingModule('lazy');
     const router = setup.testBed.inject(Router);
 

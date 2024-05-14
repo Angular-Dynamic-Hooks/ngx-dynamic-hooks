@@ -21,6 +21,7 @@ export interface Hook {
     parser: HookParser;
     value: HookValue;
     data: HookComponentData|null;
+    isLazy: boolean;
     componentRef: ComponentRef<any>|null;
     bindings: HookBindings|null;
     previousBindings: PreviousHookBindings|null;

@@ -54,19 +54,20 @@ export class ComponentCreator {
       }
 
       hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platform.getChildNodes(placeholderElement));
+      hook.isLazy = hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName');
 
       // Skip loading lazy components during SSR
-      if (!isPlatformBrowser(this.platformId) && hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName')) {
+      if (!isPlatformBrowser(this.platformId) && hook.isLazy) {
         delete hookIndex[hook.id];
         continue;
       }
 
       // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
-      hookHostElements[hookId] = this.replacePlaceholderElement(placeholderElement, hook);
+      hookHostElements[hookId] = hook.isLazy ? placeholderElement : this.replaceAnchorElement(placeholderElement, hook.data.component as new(...args: any[]) => any);
 
-      // Also replace child nodes with all desired ng-content slots
-      // Note: Doing this immediately after the evaluation of each hook so that succeeding hooks that are
-      // removed by the previous' hooks ng-content don't even need to be evaluated (let alone loaded below)
+      // Insert child content according to hook.data immediately
+      // This has the benefit that if the child content is custom, the next iterations of this loop will throw out all hooks whose placeholder elements 
+      // can no longer be found (b/c they were in the discarded child content) so their component won't be unnecessarily loaded.
       this.createContentSlotElements(hookHostElements[hookId], hook, token);
     }
 
@@ -79,7 +80,7 @@ export class ComponentCreator {
         .pipe(mergeMap(() => this.loadComponentClass(hook.data!.component)))
         .pipe(tap((compClass) => {
           // Check if the host element is simply an anchor for a lazily-loaded component. If so, insert proper selector now.
-          hookHostElements[hookId] = this.handleAnchorElement(hookHostElements[hookId], compClass);
+          hookHostElements[hookId] = hook.isLazy ? this.replaceAnchorElement(hookHostElements[hookId], compClass, true) : hookHostElements[hookId];
           // Get projectableNodes from the content slots
           const projectableNodes = this.getContentSlotElements(hookHostElements[hookId], token);
           // Instantiate component
@@ -142,87 +143,51 @@ export class ComponentCreator {
   // ----------------------------------------------------------------------------------------------------------------
 
   /**
-   * Replaces a placeholder element created in HooksReplacer with the actual component selector elements.
-   * Note: If a component is being lazily-loaded, replace with generic anchor elements for now (see handleAnchorElements())
+   * Replaces a placeholder anchor element created in HooksReplacer with the actual component selector elements.
+   * If a component is lazily-loaded however, the selector element is instead inserted as a child
    *
-   * @param placeholderElement - The placeholder to replace
-   * @param hook - The corresponding hook object
-   */
-  replacePlaceholderElement(placeholderElement: any, hook: Hook): Element {
-    let selector;
-    if (hook.data!.component.hasOwnProperty('prototype')) {
-      selector = reflectComponentType(hook.data!.component as (new(...args: any[]) => any))?.selector!;
-    } else {
-      selector = 'dynamic-component-anchor';
-    }
-
-    const hostElement = this.renderer.createElement(selector);
-    this.renderer.setAttribute(hostElement, 'hookid', this.platform.getAttribute(placeholderElement, 'hookid')!);
-    this.renderer.setAttribute(hostElement, 'parsetoken', this.platform.getAttribute(placeholderElement, 'parsetoken')!);
-    if (this.platform.getAttribute(placeholderElement, 'parser')) {
-      this.renderer.setAttribute(hostElement, 'parser', this.platform.getAttribute(placeholderElement, 'parser')!);
-    }
-
-    const childNodes = this.platform.getChildNodes(placeholderElement);
-    for (const node of childNodes) {
-      this.renderer.appendChild(hostElement, node);
-    }
-
-    this.renderer.insertBefore(this.platform.getParentNode(placeholderElement), hostElement, placeholderElement);
-    this.platform.removeChild(this.platform.getParentNode(placeholderElement), placeholderElement);
-
-    return hostElement;
-  }
-
-  /**
-   * Once the component class has been loaded, check if the targeted host element is simply a generic anchor for a lazily-loaded component.
-   * If so, insert real component selector into anchor and use that as the actual host element.
+   * Explanation: 
+   * When a component is created, one of its projectableNodes happens to be a placeholder element, but that component doesn't render the placeholder right away
+   * (due to *ngIf, for example), you can't replace that placeholder anymore as it now exclusively exists in Angular's memory as a reference. And that exact reference will 
+   * be rendered when the component decides to show it. The only thing you can do is insert children into that reference.
    *
-   * Explanation: Anchors are necessary for lazily-loaded components b/c we can't know the selector before loading the component class, so
-   * a placeholder (anchor) is inserted in the meantime.
-   *
-   * When the component class has been loaded, we can't safely replace that placeholder anymore with the real selector element, however, due
-   * to how programmatically creating components works. If a parent component has been handed a child component placeholder node in projectableNodes on creation,
-   * but doesn't render it right away (due to *ngIf, for example), you have no way to replace that placeholder anymore as it exists in a limbo and Angular
-   * will simply render the node references it was given when creating the component once the parent component renders its children.
-   *
-   * Due to this, the selector elements of lazily-loaded components are instead simply inserted into the placeholders/anchors as children when
-   * they are ready.
-   *
-   * @param componentHostElement - The preliminary host element which might be an anchor
+   * @param anchorElement - The preliminary anchor placeholder element
    * @param compClass - The loaded component class
+   * @param insertAsChild - Whether to replace the anchor element with the new selector element or insert it as a child
    */
-  handleAnchorElement(componentHostElement: any, compClass: new(...args: any[]) => any): any {
-    if (this.platform.getTagName(componentHostElement) === 'DYNAMIC-COMPONENT-ANCHOR') {
-      const selector = reflectComponentType(compClass)!.selector;
-      const selectorElement = this.renderer.createElement(selector);
+  replaceAnchorElement(anchorElement: any, compClass: new(...args: any[]) => any, insertAsChild: boolean = false): any {
+    const selector = reflectComponentType(compClass)!.selector;
+    const selectorElement = this.renderer.createElement(selector);
 
-      // Move attributes to selector
-      this.renderer.setAttribute(selectorElement, 'hookid', this.platform.getAttribute(componentHostElement, 'hookid')!);
-      this.renderer.setAttribute(selectorElement, 'parsetoken', this.platform.getAttribute(componentHostElement, 'parsetoken')!);
-      if (this.platform.getAttribute(componentHostElement, 'parser')) {
-        this.renderer.setAttribute(selectorElement, 'parser', this.platform.getAttribute(componentHostElement, 'parser')!);
-      }
-
-      this.renderer.removeAttribute(componentHostElement, 'hookid');
-      this.renderer.removeAttribute(componentHostElement, 'parsetoken');
-      this.renderer.removeAttribute(componentHostElement, 'parser');
-
-      // Move child nodes to selector
-      const childNodes = this.platform.getChildNodes(componentHostElement);
-      for (const node of childNodes) {
-        this.renderer.appendChild(selectorElement, node);
-      }
-
-      // Add selector name as class to anchor (for easier identification via css and such)
-      this.renderer.addClass(componentHostElement, selector + '-anchor');
-
-      // Insert
-      this.renderer.appendChild(componentHostElement, selectorElement);
-      componentHostElement = selectorElement;
+    // Move attributes to selector
+    this.renderer.setAttribute(selectorElement, 'hookid', this.platform.getAttribute(anchorElement, 'hookid')!);
+    this.renderer.setAttribute(selectorElement, 'parsetoken', this.platform.getAttribute(anchorElement, 'parsetoken')!);
+    if (this.platform.getAttribute(anchorElement, 'parser')) {
+      this.renderer.setAttribute(selectorElement, 'parser', this.platform.getAttribute(anchorElement, 'parser')!);
     }
 
-    return componentHostElement;
+    this.renderer.removeAttribute(anchorElement, 'hookid');
+    this.renderer.removeAttribute(anchorElement, 'parsetoken');
+    this.renderer.removeAttribute(anchorElement, 'parser');
+
+    // Move child nodes to selector
+    const childNodes = this.platform.getChildNodes(anchorElement);
+    for (const node of childNodes) {
+      this.renderer.appendChild(selectorElement, node);
+    }
+
+    // Replace anchorElement or insert as child of anchorElement
+    if (insertAsChild) {
+      // Add selector name as class to anchor (for easier identification via css and such)
+      this.renderer.addClass(anchorElement, selector + '-anchor');
+      this.renderer.appendChild(anchorElement, selectorElement);
+
+    } else {
+      this.renderer.insertBefore(this.platform.getParentNode(anchorElement), selectorElement, anchorElement);
+      this.platform.removeChild(this.platform.getParentNode(anchorElement), anchorElement);
+    }
+
+    return selectorElement;
   }
 
   /**
@@ -251,18 +216,16 @@ export class ComponentCreator {
     this.platform.clearChildNodes(hostElement);
 
     // Insert new ones
-    let slotIndex = 0;
-    for (const contentSlot of content) {
+    for (const [index, contentSlot] of content.entries()) {
       if (contentSlot !== undefined && contentSlot !== null) {
         const contentSlotElement = this.renderer.createElement('dynamic-component-contentslot');
-        this.renderer.setAttribute(contentSlotElement, 'slotIndex', slotIndex.toString());
+        this.renderer.setAttribute(contentSlotElement, 'slotIndex', index.toString());
         this.renderer.setAttribute(contentSlotElement, 'parsetoken', token);
         for (const node of contentSlot) {
           this.renderer.appendChild(contentSlotElement, node);
         }
         this.renderer.appendChild(hostElement, contentSlotElement);
       }
-      slotIndex++;
     }
   }
 

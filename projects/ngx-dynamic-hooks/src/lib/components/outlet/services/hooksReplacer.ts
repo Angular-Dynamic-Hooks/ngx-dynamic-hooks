@@ -97,11 +97,11 @@ export class HooksReplacer {
       selectorReplaceInstructions.push({
         startIndex: pr.hookPosition.openingTagStartIndex,
         endIndex: pr.hookPosition.openingTagEndIndex,
-        replacement: this.encodeComponentPlaceholderElement('<dynamic-component-placeholder hookid="' + hookCount + '" parsetoken="' + token + '" ' + (pr.parser.name ? 'parser="' + pr.parser.name + '"' : '') + '>')});
+        replacement: this.encodeComponentPlaceholderElement('<dynamic-component-anchor hookid="' + hookCount + '" parsetoken="' + token + '" ' + (pr.parser.name ? 'parser="' + pr.parser.name + '"' : '') + '>')});
       selectorReplaceInstructions.push({
         startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex! : pr.hookPosition.openingTagEndIndex,
         endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex! : pr.hookPosition.openingTagEndIndex,
-        replacement: this.encodeComponentPlaceholderElement('</dynamic-component-placeholder>')
+        replacement: this.encodeComponentPlaceholderElement('</dynamic-component-anchor>')
       });
 
       // Enter hook into index
@@ -113,6 +113,7 @@ export class HooksReplacer {
           closingTag: hookSegments.closingTag
         },
         data: null,
+        isLazy: false,
         bindings: null,
         previousBindings: null,
         componentRef: null,
