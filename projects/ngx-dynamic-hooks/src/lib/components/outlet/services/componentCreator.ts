@@ -272,12 +272,6 @@ export class ComponentCreator {
       if ((componentConfig as LazyLoadComponentConfig).importPromise instanceof Promise) {
         throw Error(`When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.`);
       }
-      // Warning if using old Angular version
-      const ngVersion = this.platform.getNgVersion();
-
-      if (ngVersion > 0 && ngVersion < 9 && isDevMode()) {
-          console.warn('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
-      }
 
       (componentConfig as LazyLoadComponentConfig).importPromise().then((m) =>  {
         const importName = (componentConfig as LazyLoadComponentConfig).importName;

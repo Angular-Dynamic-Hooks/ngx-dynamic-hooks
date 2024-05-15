@@ -85,7 +85,6 @@ export class ParserEntryResolver {
     if (parserEntry.hasOwnProperty('prototype')) {
       // Check if service
       try {
-        console.log(injector);
         return injector.get(parserEntry);
       // Otherwise instantiate manually
       } catch (e) {

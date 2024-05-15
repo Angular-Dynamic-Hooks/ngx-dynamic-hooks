@@ -1,11 +1,9 @@
-import { NgModule, Type, ModuleWithProviders, SkipSelf, Optional, Provider, APP_INITIALIZER, ENVIRONMENT_INITIALIZER, Injectable, OnDestroy } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
-import { DynamicHooksComponent } from './components/outlet/dynamicHooksComponent';
+import { Type, SkipSelf, Optional, Provider, APP_INITIALIZER, Injectable, OnDestroy } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
 import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
 import { DynamicHooksService } from './components/outlet/services/dynamicHooksService';
 import { PlatformService } from './platform/platformService';
-import { PlatformBrowserService } from './platform/platformBrowserService';
+import { GeneralPlatformService } from './platform/generalPlatformService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
-import { SelectorHookParserConfig } from '../public-api';
 
 export const allSettings: DynamicHooksGlobalSettings[] = [];
 
@@ -17,7 +15,6 @@ export const allSettings: DynamicHooksGlobalSettings[] = [];
  */
 export const provideDynamicHooks: (rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
   allSettings.push(rootSettings);
-  console.log('forRoot', rootSettings)
   
   return [
     {
@@ -30,7 +27,7 @@ export const provideDynamicHooks: (rootSettings: DynamicHooksGlobalSettings, pla
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
     { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
     { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
-    { provide: PlatformService, useClass: platformService || PlatformBrowserService }
+    { provide: PlatformService, useClass: platformService || GeneralPlatformService }
   ];
 }
 
@@ -45,8 +42,7 @@ export class DynamicHooksInitService implements OnDestroy {
     // Reset allSettings on app close for the benefit of vite live reloads and tests (does not destroy allSettings reference between app reloads)
     // Safer to do this only on app close rather than on app start (in provideDynamicHooks), as this allows you to call provideDynamicHooksForChild before provideDynamicHooks
     // without losing the child settings
-    allSettings.length = 0;    
-    console.log('[Resetting allSettings]');
+    allSettings.length = 0;
   }
 }
 
@@ -58,7 +54,6 @@ export class DynamicHooksInitService implements OnDestroy {
  */
 export const provideDynamicHooksForChild: (childSettings: DynamicHooksGlobalSettings) => Provider[] = childSettings => {
   allSettings.push(childSettings);
-  console.log('forChild', (childSettings.globalParsers![0] as SelectorHookParserConfig).component)
 
   return [
     // Provide the child settings

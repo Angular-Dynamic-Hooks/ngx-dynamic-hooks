@@ -80,12 +80,6 @@ export class DynamicHooksService {
       injector // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
     );
 
-    /*
-    console.log(this.allSettings)
-    console.log(this.ancestorSettings)
-    console.log(this.moduleSettings)
-    */
-
     // Needs a content string
     if (!content || typeof content !== 'string') {
       return of({

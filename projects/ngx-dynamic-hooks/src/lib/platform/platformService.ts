@@ -4,14 +4,13 @@
 export abstract class PlatformService {
   /**
    * Clears the child nodes of an element.
-   * The mehod does not throw an exception when there's an error.
    * @param element An Element
    */
   abstract clearChildNodes(element: any): void;
 
   /**
    * Returns a (placeholder) element with a particular token- and hookId-attribute in a given contentElement
-   * Returns null when such an element cannot be found
+   * Returns null when such an element couldn't be retrieved
    * @param contentElement - The content/container element to search
    * @param token - A string that appears as the "token"-attribute on the element
    * @param hookId - A string that appears as the "hookId"-attribute on the element
@@ -20,7 +19,7 @@ export abstract class PlatformService {
 
   /**
    * Returns the value of an element attribute.
-   * Returns null when attribute doesn't exist or there's an error.
+   * Returns null when the attribute couldn't be retrieved
    * @param element The element
    * @param attributeName Attribute Name
    */
@@ -28,34 +27,34 @@ export abstract class PlatformService {
 
   /**
    * Returns an array of child nodes.
-   * Returns an empty array if there's no child and null when there's an error.
+   * Returns an empty array if there's no child nodes and null when child node information couldn't be retrieved
    * @param node A node
    */
   abstract getChildNodes(node: any): any[];
 
   /**
    * Returns Angular Version.
-   * Returns 0 when there's an error.
+   * Returns null when it couldn't be retrieved
    */
-  abstract getNgVersion(): number;
+  abstract getNgVersion(): number|null;
 
   /**
    * Returns the tag name of an element.
-   * Returns null when there's an error.
+   * Returns null when it couldn't be retrieved.
    * @param element An element
    */
   abstract getTagName(element: any): string;
 
   /**
    * Returns the parent of an element.
-   * Returns null when there'a an error.
+   * Returns null when it couldn't be retrieved
    * @param element An element
    */
   abstract getParentNode(element: any): any|null;
 
   /**
    * Returns the inner text of an element.
-   * Returns null when there's an error.
+   * Returns null when it couldn't be retrieved
    * @param element An element
    */
   abstract getInnerText(element: any): string;
@@ -68,7 +67,8 @@ export abstract class PlatformService {
   abstract removeChild(parentElement: any, childElement: any): void;
 
   /**
-   * Sanitizes a dynamic component content.
+   * Sanitizes a string of arbitrary html content to be safe for use in innerHTML
+   * Returns the sanitized html string
    * @param content The content to be sanitized.
    */
   abstract sanitize(content: string): string|null;

@@ -12,7 +12,7 @@ import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
 import { NonServiceTestParser } from '../resources/parsers/nonServiceTestParser';
 import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { ComponentRef } from '@angular/core';
+import { ComponentRef, PLATFORM_ID } from '@angular/core';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { RootTestService } from '../resources/services/rootTestService';
 
@@ -610,92 +610,126 @@ describe('Loading dynamic components', () => {
     comp.componentsLoaded.pipe(first()).subscribe((lc: any) => loadedComponents = lc);
     comp.ngOnChanges({content: true, context: true} as any);
 
-    // Only run this test if ng-version is 9+ (ivy enabled)
-    const versionElement = document.querySelector('[ng-version]');
-    const versionAttr = versionElement ? versionElement.getAttribute('ng-version') : null;
-    const version = versionAttr !== null ? parseInt(versionAttr, 10) : null;
-    if (version && version < 9) {
-      expect(true).toBe(true);
-    } else {
-      console.log(fixture.nativeElement.childNodes[1].childNodes);
+    // Everything except the lazy-loaded component should be loaded
+    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('.inline-component')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
 
-      // Everything except the lazy-loaded component should be loaded
-      expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
-      expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-      expect(fixture.nativeElement.querySelector('.inline-component')).not.toBe(null);
-      expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
-      expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
+    expect(Object.values(comp.hookIndex).length).toBe(4);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[3].componentRef).toBeNull();
+    expect(comp.hookIndex[4].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
 
-      expect(Object.values(comp.hookIndex).length).toBe(4);
-      expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-      expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(comp.hookIndex[3].componentRef).toBeNull();
-      expect(comp.hookIndex[4].componentRef!.instance.constructor.name).toBe('InlineTestComponent');
+    // Make sure that onDynamicChanges has triggered on component init
+    spyOn(comp.hookIndex[2].componentRef!.instance, 'onDynamicChanges').and.callThrough();
+    expect(comp.hookIndex[2].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(0);
+    expect(comp.hookIndex[2].componentRef!.instance.changesContext).toEqual(context);
+    expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren).toBeUndefined();
 
-      // Make sure that onDynamicChanges has triggered on component init
-      spyOn(comp.hookIndex[2].componentRef!.instance, 'onDynamicChanges').and.callThrough();
-      expect(comp.hookIndex[2].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(0);
-      expect(comp.hookIndex[2].componentRef!.instance.changesContext).toEqual(context);
-      expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren).toBeUndefined();
+    // Make sure that onDynamicMount has not yet triggered
+    spyOn(comp.hookIndex[2].componentRef!.instance, 'onDynamicMount').and.callThrough();
+    expect(comp.hookIndex[2].componentRef!.instance.onDynamicMount['calls'].count()).toBe(0);
+    expect(comp.hookIndex[2].componentRef!.instance.mountContext).toBeUndefined();
+    expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren).toBeUndefined();
 
-      // Make sure that onDynamicMount has not yet triggered
-      spyOn(comp.hookIndex[2].componentRef!.instance, 'onDynamicMount').and.callThrough();
-      expect(comp.hookIndex[2].componentRef!.instance.onDynamicMount['calls'].count()).toBe(0);
-      expect(comp.hookIndex[2].componentRef!.instance.mountContext).toBeUndefined();
-      expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren).toBeUndefined();
+    // Also, componentsLoaded should not yet have triggered
+    expect(loadedComponents).toEqual([]);
 
-      // Also, componentsLoaded should not yet have triggered
-      expect(loadedComponents).toEqual([]);
+    // Wait for imports via fakeAsync()'s tick() that synchronously advances time for testing
+    // This didn't always work. Used to have to manually wait by using (done) => {} as the testing wrapper function isntead of faceAsync,
+    // then wait via setTimeout() and call done() when testing is finished. This had the disadvantage of actually having to wait for the timeout
+    tick(500);
 
-      // Wait for imports via fakeAsync()'s tick() that synchronously advances time for testing
-      // This didn't always work. Used to have to manually wait by using (done) => {} as the testing wrapper function isntead of faceAsync,
-      // then wait via setTimeout() and call done() when testing is finished. This had the disadvantage of actually having to wait for the timeout
-      tick(500);
+    // Lazy-loaded component should be loaded by now in anchor
+    expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).toBe('dynhooks-lazytest-anchor');    // Anchor should have comp class
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes[0].tagName).toBe('DYNHOOKS-LAZYTEST');  // Selector element should be loaded in anchor
+    expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('LazyTestComponent');
+    expect(comp.hookIndex[3].componentRef!.instance.name).toBe('sleepy');
 
-      // Lazy-loaded component should be loaded by now in anchor
-      expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
-      expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
-      expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).toBe('dynhooks-lazytest-anchor');    // Anchor should have comp class
-      expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes[0].tagName).toBe('DYNHOOKS-LAZYTEST');  // Selector element should be loaded in anchor
-      expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('LazyTestComponent');
-      expect(comp.hookIndex[3].componentRef!.instance.name).toBe('sleepy');
+    // Make sure that onDynamicChanges has triggered again (with contentChildren)
+    expect(comp.hookIndex[2].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(1);
+    expect(comp.hookIndex[2].componentRef!.instance.changesContext).toEqual(context);
+    expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren.length).toBe(1);
+    expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren[0].componentSelector).toBe('dynhooks-lazytest');
 
-      // Make sure that onDynamicChanges has triggered again (with contentChildren)
-      expect(comp.hookIndex[2].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(1);
-      expect(comp.hookIndex[2].componentRef!.instance.changesContext).toEqual(context);
-      expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren.length).toBe(1);
-      expect(comp.hookIndex[2].componentRef!.instance.changesContentChildren[0].componentSelector).toBe('dynhooks-lazytest');
+    // Make sure that onDynamicMount has triggered
+    expect(comp.hookIndex[2].componentRef!.instance.onDynamicMount['calls'].count()).toBe(1);
+    expect(comp.hookIndex[2].componentRef!.instance.mountContext).toEqual(context);
+    expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren.length).toBe(1);
+    expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren[0].componentSelector).toBe('dynhooks-lazytest');
 
-      // Make sure that onDynamicMount has triggered
-      expect(comp.hookIndex[2].componentRef!.instance.onDynamicMount['calls'].count()).toBe(1);
-      expect(comp.hookIndex[2].componentRef!.instance.mountContext).toEqual(context);
-      expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren.length).toBe(1);
-      expect(comp.hookIndex[2].componentRef!.instance.mountContentChildren[0].componentSelector).toBe('dynhooks-lazytest');
+    // ComponentsLoaded should have emitted now and contain the lazy-loaded component
+    expect(loadedComponents.length).toBe(4);
 
-      // ComponentsLoaded should have emitted now and contain the lazy-loaded component
-      expect(loadedComponents.length).toBe(4);
+    expect(loadedComponents[0].hookId).toBe(1);
+    expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `<dynhooks-singletagtest [stringPropAlias]="'something'">`, closingTag: null});
+    expect(loadedComponents[0].hookParser).toBeDefined();
+    expect(loadedComponents[0].componentRef.instance.stringProp).toBe('something');
 
-      expect(loadedComponents[0].hookId).toBe(1);
-      expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `<dynhooks-singletagtest [stringPropAlias]="'something'">`, closingTag: null});
-      expect(loadedComponents[0].hookParser).toBeDefined();
-      expect(loadedComponents[0].componentRef.instance.stringProp).toBe('something');
+    expect(loadedComponents[1].hookId).toBe(2);
+    expect(loadedComponents[1].hookValue).toEqual({openingTag: `<dynhooks-multitagtest [nr]="4">`, closingTag: `</dynHooks-multitagtest>`});
+    expect(loadedComponents[1].hookParser).toBeDefined();
+    expect(loadedComponents[1].componentRef.instance.nr).toBe(4);
 
-      expect(loadedComponents[1].hookId).toBe(2);
-      expect(loadedComponents[1].hookValue).toEqual({openingTag: `<dynhooks-multitagtest [nr]="4">`, closingTag: `</dynHooks-multitagtest>`});
-      expect(loadedComponents[1].hookParser).toBeDefined();
-      expect(loadedComponents[1].componentRef.instance.nr).toBe(4);
+    expect(loadedComponents[2].hookId).toBe(3);
+    expect(loadedComponents[2].hookValue).toEqual({openingTag: `<dynhooks-lazytest [name]="'sleepy'">`, closingTag: `</dynhooks-lazytest>`});
+    expect(loadedComponents[2].hookParser).toBeDefined();
+    expect(loadedComponents[2].componentRef.instance.name).toBe('sleepy');
 
-      expect(loadedComponents[2].hookId).toBe(3);
-      expect(loadedComponents[2].hookValue).toEqual({openingTag: `<dynhooks-lazytest [name]="'sleepy'">`, closingTag: `</dynhooks-lazytest>`});
-      expect(loadedComponents[2].hookParser).toBeDefined();
-      expect(loadedComponents[2].componentRef.instance.name).toBe('sleepy');
-
-      expect(loadedComponents[3].hookId).toBe(4);
-      expect(loadedComponents[3].hookValue).toEqual({openingTag: `<dynhooks-inlinetest [nr]="87">`, closingTag: `</dynhooks-inlinetest>`});
-      expect(loadedComponents[3].hookParser).toBeDefined();
-      expect(loadedComponents[3].componentRef.instance.nr).toBe(87);
-    }
+    expect(loadedComponents[3].hookId).toBe(4);
+    expect(loadedComponents[3].hookValue).toEqual({openingTag: `<dynhooks-inlinetest [nr]="87">`, closingTag: `</dynhooks-inlinetest>`});
+    expect(loadedComponents[3].hookParser).toBeDefined();
+    expect(loadedComponents[3].componentRef.instance.nr).toBe(87);
   }));
+
+  it('#should not lazy-load components during SSR', fakeAsync(() => {
+    const parsersWithLazyParser = testParsers.concat([{
+      component: {
+        // Simulate that loading this component takes 100ms
+        importPromise: () => new Promise(resolve => setTimeout(() => {
+          resolve({LazyTestComponent: LazyTestComponent})
+        }, 100)),
+        importName: 'LazyTestComponent'
+      },
+      name: 'lazyParser',
+      selector: 'dynhooks-lazytest'
+    }]);
+    let {fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({globalParsers: parsersWithLazyParser}),
+      {provide: PLATFORM_ID, useValue: 'server'}
+    ]);
+
+    const testText = `<dynhooks-lazytest [name]="'sleepy'"></dynhooks-lazytest>`;
+
+    comp.content = testText;
+    comp.context = context;
+    let loadedComponents: LoadedComponent[] = [];
+    comp.componentsLoaded.pipe(first()).subscribe((lc: any) => loadedComponents = lc);
+    comp.ngOnChanges({content: true, context: true} as any);
+
+    // Should not be loaded at all, not even entered into hookIndex
+    expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
+    expect(Object.values(comp.hookIndex).length).toBe(0);
+    expect(loadedComponents).toEqual([]);
+
+    tick(500);
+
+    // Same even after waiting
+    expect(Object.values(comp.hookIndex).length).toBe(0);
+    expect(loadedComponents).toEqual([]);
+
+    // Placeholder anchor should be created, but nothing further
+    expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).not.toBe('dynhooks-lazytest-anchor');
+    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes.length).toBe(0);
+  }));
+
 
   it('#should destroy loaded components when destroyed itself', () => {
     const testText = `

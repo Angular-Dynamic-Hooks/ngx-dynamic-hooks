@@ -31,7 +31,7 @@ export * from './lib/polyfills/matchAll';
 
 // Platform
 export * from './lib/platform/platformService';
-export * from './lib/platform/platformBrowserService';
+export * from './lib/platform/generalPlatformService';
 
 // Testing
 // export * from './tests/testing-api';

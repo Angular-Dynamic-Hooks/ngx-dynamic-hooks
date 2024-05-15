@@ -584,7 +584,8 @@ This example is a bit more advanced than the `EmojiParser` from before, as we ar
 Let's assume we have prepared a simple `DynamicRouterLinkComponent` that is supposed to replace the normal links in the dynamic content string. It renders a single `[routerLink]`-element based on the inputs `link` (the relative part of the url), `queryParams` and `anchorFragment`. Here then, would be our custom `HookParser` to load it:
 
 ```ts
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings, HookFinder } from 'ngx-dynamic-hooks';
 import { DynamicRouterLinkComponent } from './dynamicRouterLink.c';
 
@@ -596,9 +597,9 @@ export class DynamicRouterLinkParser implements HookParser {
     linkClosingTagRegex;
     hrefAttrRegex;
 
-    constructor(private hookFinder: HookFinder) {
+    constructor(@Inject(DOCUMENT) private document, private hookFinder: HookFinder) {
         // Lets assemble a regex that finds the opening <a>-tags for internal links
-        const domainName = this.escapeRegExp(window.location.hostname.replace('www.', '')); // <-- This is our website name
+        const domainName = this.escapeRegExp(document.location.hostname.replace('www.', '')); // <-- This is our website name
         const internalUrl = '(?:(?:https:)?\\/\\/(?:www\\.)?' + domainName + '|(?!(?:https:)?\\/\\/))([^\\"]*?)';
         const hrefAttr = '\\s+href\=\\"' + internalUrl + '\\"';
         const anyOtherAttr = '\\s+[a-zA-Z]+\\=\\"[^\\"]*?\\"';
