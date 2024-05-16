@@ -67,6 +67,9 @@ export interface TestingModuleComponentAndContext {
 }
 
 export function defaultBeforeEach(): TestingModuleComponentAndContext {
+  // Just in case
+  resetDynamicHooks();
+
   const {testBed, fixture, comp} = prepareTestingModule(() => [
     provideDynamicHooks({globalParsers: testParsers})
   ]);

@@ -15,7 +15,7 @@ export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
 export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
 export { DynamicHooksService } from '../lib/components/outlet/services/dynamicHooksService';
 export { PlatformService } from '../lib/platform/platformService';
-export { PlatformBrowserService } from '../lib/platform/generalPlatformService';
+export { GeneralPlatformService } from '../lib/platform/generalPlatformService';
 export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
 export { DataTypeParser } from '../lib/utils/dataTypeParser';
 export { DeepComparer } from '../lib/utils/deepComparer';

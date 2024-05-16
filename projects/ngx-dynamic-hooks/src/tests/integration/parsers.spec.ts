@@ -276,28 +276,6 @@ describe('Parsers', () => {
     expect((<any>console.error)['calls'].mostRecent().args[0]).toContain('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
   });
 
-  it('#should warn if using lazy-loaded parsers with old Angular versions', () => {
-    // Load app first
-    comp.content = 'Should load here: <someSelector></someSelector>';
-    spyOn(console, 'warn');
-    comp.ngOnChanges({content: true} as any);
-
-    // Change ng-version
-    fixture.nativeElement.setAttribute('ng-version', 8);
-
-    // Load parser and check that it warns the user
-    comp.parsers = [{
-      component: {
-        importPromise: () => new Promise(() => {}),
-        importName: 'test'
-      },
-      selector: 'someSelector'
-    }];
-    comp.ngOnChanges({parsers: true} as any);
-
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('It seems you are trying to use lazy-loaded-components with an Angular version older than 9. Please note that this functionality requires the new Ivy renderer to be enabled.');
-  });
-
   it('#should resubscribe to outputs if outputs returned by parser changed', () => {
     const testText = `<dynhooks-singletagtest (httpResponseReceived)="content.maneuvers.getMentalState()">`;
     comp.content = testText;

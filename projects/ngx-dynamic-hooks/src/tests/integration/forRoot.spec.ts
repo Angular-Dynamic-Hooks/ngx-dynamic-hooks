@@ -1,5 +1,5 @@
 // Testing api resources
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksGlobalSettings, PlatformBrowserService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksGlobalSettings, GeneralPlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
@@ -9,12 +9,14 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 
 describe('forRoot', () => {
 
-  afterEach(() => {
+  beforeEach(() => {
     resetDynamicHooks();
+    TestBed.resetTestingModule();
   });
 
   it('#should reset all settings when calling provideDynamicHooks', () => {
     // Run forRoot once
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideDynamicHooks({
@@ -57,7 +59,7 @@ describe('forRoot', () => {
 
   it('#should set platformService to PlatformBrowserService if custom platform not passed', () => {
     const providers = provideDynamicHooks({});
-    const platformServiceProvider = providers.find((p: any) => p.useClass === PlatformBrowserService);
+    const platformServiceProvider = providers.find((p: any) => p.useClass === GeneralPlatformService);
     expect(platformServiceProvider).not.toBeUndefined();
   });
 

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeStyle, SafeUrl } from '@angular/platform-browser';
-import { PlatformBrowserService } from '../testing-api';
+import { GeneralPlatformService } from '../testing-api';
 import { EmptyTestComponent } from '../resources/components/emptyTest/emptyTest.c';
 
 class MockDomSanitizer implements DomSanitizer {
@@ -30,7 +30,7 @@ class MockDomSanitizer implements DomSanitizer {
 }
 
 function getPlatformService() {
-  return new PlatformBrowserService(new MockDomSanitizer());
+  return new GeneralPlatformService(document, new MockDomSanitizer());
 }
 
 describe('PlatformBrowserService', () => {
@@ -253,7 +253,7 @@ describe('PlatformBrowserService', () => {
     expect(actualNgVersion).toBe(expectedNgversion);
   });
 
-  it(`#should return 0 as Angular version there's no ng-version`, () => {
+  it(`#should return null as Angular version there's no ng-version`, () => {
     const comp = TestBed.createComponent(EmptyTestComponent);
     const platformService = getPlatformService();
 
@@ -261,7 +261,7 @@ describe('PlatformBrowserService', () => {
 
     const actualNgVersion = platformService.getNgVersion();
 
-    expect(actualNgVersion).toBe(0);
+    expect(actualNgVersion).toBeNull();
   });
 
   it(`#should return parent node an element`, () => {
