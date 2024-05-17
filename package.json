@@ -7,7 +7,7 @@
     "build": "ng build",
     "test": "ng test",
     "watch": "ng build --watch --configuration development",
-    "ci:build": "ng build --configuration production",
+    "ci:build": "ng build --configuration production && cp ./README.md ./dist/ngx-dynamic-hooks/README.md",
     "ci:test": "ng test --no-watch --no-progress --browsers=ChromeHeadlessCI --code-coverage",
     "ci:reportCoverage": "codecov"
   },
