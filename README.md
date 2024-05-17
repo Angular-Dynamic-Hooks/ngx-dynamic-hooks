@@ -7,6 +7,10 @@
 
 Automatically insert live Angular components into dynamic strings (based on their selector or **any pattern of your choice**) and render the result in the DOM.
 
+![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/331b830b-0f98-4c64-917a-9e1b9cf63f22)
+
+
+
 ## Table of contents
 1. [Installation](#1-installation)
 2. [Compatibility](#2-compatibility)
