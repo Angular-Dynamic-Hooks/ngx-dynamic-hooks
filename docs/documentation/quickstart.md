@@ -1,3 +1,10 @@
+---
+---
+
+{% for page in site.pages %}
+  {{ page.title | json }}
+{% endfor %}
+
 ## 4. Quick start
 Import `DynamicHooksModule` into your main app module and configure via `forRoot()`:
 

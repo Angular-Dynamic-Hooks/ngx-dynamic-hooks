@@ -1,0 +1,24 @@
+{
+  "name": "ngx-dynamic-hooks-docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "jekyll-serve": "bundle exec jekyll serve",
+    "jekyll-build": "bundle exec jekyll build",
+    "webpack": "webpack",
+    "webpack-prod": "NODE_ENV=production webpack",
+    "watch": "webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "css-minimizer-webpack-plugin": "^7.0.0",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.91.0",
+    "webpack-remove-empty-scripts": "^1.0.4"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
+  }
+}

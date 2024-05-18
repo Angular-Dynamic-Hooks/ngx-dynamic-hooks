@@ -1,3 +1,6 @@
+---
+---
+
 # ngx-dynamic-hooks
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MTobisch/ngx-dynamic-hooks/ci-test.yml?style=flat-square&logo=github&label=CI%20tests)](https://github.com/MTobisch/ngx-dynamic-hooks/actions/workflows/ci-test.yml)
@@ -23,6 +26,7 @@ yarn add ngx-dynamic-hooks
 ```
 
 ## 2. Compatibility
+
 | Angular | Version | JiT | AoT | Ivy | NPM |
 | --- | --- | --- | --- | --- | --- |
 | 6 - 12  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1` |

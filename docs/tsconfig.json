@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+      // Note: Webpack config overrides this anyways
+      "outDir": "./assets/js",
+      // React compatibility
+      "jsx": "react-jsx",
+      // We want ESM supported in the output, because WebPack is going to bundle this anyways,
+      // and we want the tree-shaking support and some other benefits
+      "module": "ESNext",
+      "target": "ES2020",
+      // == Now for some settings that are not *strictly* required, but I recommend:
+      // Embrace strong-typing!
+      "strict": true,
+      // Not strictly necessary, but nice
+      "allowSyntheticDefaultImports": true,
+      // Recommended
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "noImplicitAny": false
+  }
+}

@@ -1,3 +1,6 @@
+---
+---
+
 ## 3. What it does
 In Angular, components are loaded when their selector appears in a template. But what if you wanted to load components not just in fixed templates, but in dynamic content as well - such as in text from a database, markdown files or even just string variables?
 

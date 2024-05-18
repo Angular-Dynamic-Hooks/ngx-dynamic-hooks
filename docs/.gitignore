@@ -1,0 +1,14 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Ruby
+Gemfile.lock
+
+# Compiled output
+/_site
+/assets/build
+
+# Node
+/node_modules
+/package-lock.json
+npm-debug.log
+yarn-error.log
