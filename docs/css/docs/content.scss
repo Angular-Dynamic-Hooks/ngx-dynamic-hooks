@@ -64,3 +64,19 @@
         position: sticky;
         top: calc(var(--header-height) + 30px);
       }
+
+      .article-toc-wrapper {
+        margin: 0px 0px 30px 0px;
+      }
+
+      .article-edit {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+        .article-edit-img {
+          height: 14px;
+          margin: 0px 8px 0px 0px;
+        }

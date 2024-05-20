@@ -21,6 +21,15 @@
         <aside class="article-sidebar">
           <div class="article-sidebar-inner">
             <div class="article-toc-wrapper"></div>
+            {% if page.url contains '.html' %}
+              {% assign editUrl = "https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/docs" | append: page.url |  replace: ".html", ".md" %}
+            {% else %}
+              {% assign editUrl = "https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/docs" | append: page.url |  append: "index.md" %}
+            {% endif %}
+            <a class="article-edit" href="{{ editUrl }}" target="_blank">
+              <img class="article-edit-img" src="{{ "/assets/images/github-mark.svg" | relative_url }}">
+              <span>Edit on Github</span>
+            </a>
           </div>
         </aside>
       </div>
