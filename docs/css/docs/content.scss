@@ -1,0 +1,66 @@
+@import "../vars.scss";
+
+.content {
+  display: flex;
+}
+
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    width: calc(100% - 300px);
+  }
+
+  .wrapper {
+    max-width: 600px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: calc(var(--spacing-unit) * .5);
+    padding-left: calc(var(--spacing-unit) * .5);
+    padding-top: calc(var(--spacing-unit) * .5);
+    padding-bottom: var(--spacing-unit);
+
+    @include minWidth($md) {
+      max-width: 1100px;
+      padding-right: var(--spacing-unit);
+      padding-left: var(--spacing-unit);
+      padding-top: var(--spacing-unit);
+      padding-bottom: calc(2* var(--spacing-unit));
+    }
+  }
+
+    .article {
+      width: calc(100% - 350px);
+      margin: 0px 100px 0px 0px;
+    }
+
+      // Trick to give anchor links vertical offset b/c of fixed header
+      .article h1[id]::before, 
+      .article h2[id]::before,
+      .article h3[id]::before,
+      .article h4[id]::before {
+        content: '';
+        display: block;
+        height: 75px;
+        margin-top: -75px;
+        visibility: hidden;
+      }
+        
+      .highlight {
+        border-radius: 3px;
+        background: var(--code-background-color);
+        margin-bottom: calc(var(--spacing-unit) * .5);
+
+        .highlighter-rouge & {
+          background: var(--code-background-color);
+        }
+      }
+
+    .article-sidebar {
+      width: 250px;
+      padding: 40px 0px 0px 0px;
+    }
+
+      .article-sidebar-inner {
+        position: sticky;
+        top: calc(var(--header-height) + 30px);
+      }

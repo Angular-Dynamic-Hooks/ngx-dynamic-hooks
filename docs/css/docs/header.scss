@@ -1,0 +1,42 @@
+.header {
+  position: sticky;
+  top: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--header-height);
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: white;
+  border-bottom: 1px solid rgb(210, 210, 210);
+  z-index: 10;
+}
+
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+
+    .site-title {
+      display: flex;
+      align-items: center;
+      margin: 0px 30px 0px 0px;
+      text-decoration: none !important;
+    }
+
+      .site-logo {
+        display: block;
+        height: 30px;
+        margin: 0px 10px 0px 0px;
+        filter: hue-rotate(315deg);
+      }
+
+      .site-name {
+        font-size: 18px;
+        color: black;
+        
+      }
+
+  .header-right {
+
+  }

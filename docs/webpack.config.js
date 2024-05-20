@@ -4,16 +4,14 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-// This configuration allows to also compile scss files, though jekyll does that by default, so currently not needed
 module.exports = {
   mode: mode,
   entry: {
-    main: './js/index.ts',
-    // css: './_sass/example.scss',
+    main: './js/main.ts',
+    styles: './css/main.scss',
   },
   output: {
     path: resolve(__dirname, 'assets/build'),

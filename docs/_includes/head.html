@@ -1,0 +1,14 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {%- seo -%}
+  
+  {% for file in site.static_files %}
+    {% if file.path contains "/assets/build" and file.path contains ".css" %}
+      <link rel="stylesheet" href="{{ file.path | relative_url }}">
+    {% endif %}
+  {% endfor %}
+
+  {%- feed_meta -%}  
+</head>

@@ -1,0 +1,24 @@
+<aside class="sidebar">
+  <div class="sidebar-scroll">
+    <nav class="sidebar-content">
+
+      {% for item in site.data[page.sidenav] %}
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">
+            <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+          </h3>
+          <ul class="sidebar-ul">
+            {% for child in item.children %}
+              <li class="sidebar-li">
+                <h4 class="sidebar-subtitle">
+                  <a href="{{ child.url | relative_url }}">{{ child.title }}</a>
+                </h4>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+
+    </nav>
+  </div>
+</aside>

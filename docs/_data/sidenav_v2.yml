@@ -1,0 +1,82 @@
+
+- title: Introduction
+  url: /documentation/v2
+  children:
+    - title: Installation
+      url: /documentation/v2#installation
+    - title: Compatibility
+      url: /documentation/v2#compatibility
+
+- title: What it does
+  url: /documentation/v2/what-it-does
+
+- title: Quick start
+  url: /documentation/v2/quickstart
+
+- title: Features
+  url: /documentation/v2/features
+  children:
+    - title: Context & Dependency Injection
+      url: /documentation/v2/features#context--dependency-injection
+    - title: Inputs
+      url: /documentation/v2/features#inputs
+    - title: Outputs
+      url: /documentation/v2/features#outputs
+    - title: Content projection
+      url: /documentation/v2/features#54-content-projection
+    - title: Lifecycle methods
+      url: /documentation/v2/features#lifecycle-methods
+    - title: Change detection
+      url: /documentation/v2/features#change-detection
+
+- title: Configuration
+  url: /documentation/v2/configuration
+  children:
+    - title: Global settings
+      url: /documentation/v2/configuration#global-settings
+    - title: Outlet component bindings
+      url: /documentation/v2/configuration#component-bindings
+    - title: HookParserEntry
+      url: /documentation/v2/configuration#hookparserentry
+    - title: OutletOptions
+      url: /documentation/v2/configuration#outletoptions
+    - title: Child modules (forChild) methods
+      url: /documentation/v2/configuration#child-modules-forchild
+    - title: Lazy-loading components
+      url: /documentation/v2/configuration#lazy-loading-components
+
+- title: Parsers
+  url: /documentation/v2/parsers
+  children:
+  - title: What makes a parser
+    url: /documentation/v2/parsers#what-makes-a-parser
+  - title: Emoji parser (standalone)
+    url: /documentation/v2/parsers#example-emoji-parser-standalone
+  - title: Internal link parser (enclosing)
+    url: /documentation/v2/parsers#example-internal-link-parser-enclosing
+
+- title: Advanced notes
+  url: /documentation/v2/advanced-notes
+  children:
+  - title: Programmatic usage (without component)
+    url: /documentation/v2/advanced-notes#programmatic-usage-without-component
+  - title: Non-browser Platforms implemention
+    url: /documentation/v2/advanced-notes#non-browser-platforms-implemention
+
+- title: Trivia
+  url: /documentation/v2/trivia
+  children:
+    - title: How it works
+      url: /documentation/v2/trivia#how-it-works
+    - title: Security
+      url: /documentation/v2/trivia#security
+    - title: Caveats
+      url: /documentation/v2/trivia#caveats
+    - title: Comparison with similar libraries
+      url: /documentation/v2/trivia#comparison-with-similar-libraries
+
+- title: Troubleshooting
+  url: /documentation/v2/troubleshooting
+
+- title: Special thanks
+  url: /documentation/v2/special-thanks

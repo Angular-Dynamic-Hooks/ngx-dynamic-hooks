@@ -1,0 +1,271 @@
+@import "./vars.scss";
+
+html {
+}
+
+/**
+  * Reset some basic elements
+  */
+body, h1, h2, h3, h4, h5, h6,
+p, blockquote, pre, hr,
+dl, dd, ol, ul, figure {
+  margin: 0;
+  padding: 0;
+
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-feature-settings: "kern" 1;
+      -moz-font-feature-settings: "kern" 1;
+        -o-font-feature-settings: "kern" 1;
+          font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  overflow-wrap: break-word;
+}
+
+::-webkit-scrollbar {
+  background-color: 
+  color-mix(in srgb, black, transparent 98%);
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, black, transparent 70%);
+  border-radius: 10px;
+}
+
+
+/**
+  * Set `margin-bottom` to maintain vertical rhythm
+  */
+h1, h2, h3, h4, h5, h6,
+p, blockquote, pre,
+ul, ol, dl, figure {
+  margin-bottom: calc(var(--spacing-unit) * .5);
+}
+
+hr {
+  margin-top: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+}
+
+/**
+  * `main` element
+  */
+main {
+  display: block; /* Default value of `display` of `main` element is 'inline' in IE 11. */
+}
+
+
+
+/**
+  * Images
+  */
+img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+
+
+/**
+  * Figures
+  */
+figure > img {
+  display: block;
+}
+
+figcaption {
+  font-size: 14px;
+}
+
+
+
+/**
+  * Lists
+  */
+ul, ol {
+  margin-left: var(--spacing-unit);
+}
+
+li {
+  > ul,
+  > ol {
+    margin-bottom: 0;
+  }
+}
+
+
+
+/**
+  * Headings
+  */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+}
+
+
+
+/**
+  * Links
+  */
+a {
+  color: var(--link-base-color);
+  text-decoration: none;
+
+  &:visited {
+    color: var(--link-visited-color);
+  }
+
+  &:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+
+  .social-media-list &:hover {
+    text-decoration: none;
+
+    .username {
+      text-decoration: underline;
+    }
+  }
+}
+
+
+/**
+  * Blockquotes
+  */
+blockquote {
+  color: var(--brand-color);
+  border-left: 4px solid var(--brand-color-light);
+  padding-left: calc(var(--spacing-unit) * .5);
+  font-size: 1.125rem;
+  font-style: italic;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  i, em {
+    font-style: normal;
+  }
+}
+
+
+
+/**
+  * Code formatting
+  */
+pre,
+code {
+  font-family: "Menlo", "Inconsolata", "Consolas", "Roboto Mono", "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9375em;
+  border-radius: 3px;
+  background-color: var(--code-background-color);
+}
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 8px 12px;
+  overflow-x: auto;
+
+  > code {
+    border: 0;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+
+/**
+  * Tables
+  */
+table {
+  margin-bottom: var(--spacing-unit);
+  width: 100%;
+  text-align: left;
+  border-spacing: 0px;
+
+  th, td {
+    padding: calc(var(--spacing-unit) * 33.3333333333 * .01) calc(var(--spacing-unit) * .5);
+  }
+
+  // Colors
+  th {
+    background-color: var(--table-header-bg-color);
+  }
+
+  tr {
+    &:nth-child(odd) {
+      background-color: var(--table-zebra-color-1);
+    }
+    &:nth-child(even) {
+      background-color: var(--table-zebra-color-2);
+    }
+  }
+
+  // Borders
+  th {
+    border-left: 1px solid var(--table-border-color);
+  }
+
+  th:first-of-type {
+    border-radius: 10px 0px 0px 0px;
+  }
+
+  th:last-of-type {
+    border-right: 1px solid var(--table-border-color);
+    border-radius: 0px 10px 0px 0px;
+  }
+ 
+  td {
+    border-top: 1px solid var(--table-border-color);
+    border-left: 1px solid var(--table-border-color);
+  }
+
+  tr td:last-of-type {
+    border-right: 1px solid var(--table-border-color);
+  }
+  
+  tr:last-of-type td {
+    border-bottom: 1px solid var(--table-border-color);
+  }
+
+  tr:last-of-type td:first-of-type {
+    border-radius: 0px 0px 0px 10px;
+  }
+
+  tr:last-of-type td:last-of-type {
+    border-radius: 0px 0px 10px 0px;
+  }
+
+  @include minWidth($md) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+}
+
+/**
+  * Clearfix
+  */
+  .clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+  }

@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Ngx-dynamic-hooks documentation
+title: ngx-dynamic-hooks docs
 description: >- # this means to ignore newlines until "baseurl:"
   The documentation for the ngx-dynamic-hooks library for Angular
 domain: mtobisch.github.io                          # if you want to force HTTPS, specify the domain without the http at the start, e.g. example.com
@@ -29,17 +29,21 @@ kramdown:
 theme: null
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 sass:
   sass_dir: _sass
 
 # Front matter defaults
 defaults:
--
-  scope:
-    path: "documentation" # Under which path prefix to set these defaults
-    type: "pages"
-  values:
-    layout: "mydefault"
+  - scope:
+      path: "documentation" # Under which path prefix to set these defaults
+      type: "pages"
+    values:
+      layout: "docs"
+  - scope:
+      path: "documentation/v2"
+    values:
+      sidenav: "sidenav_v2"
 
 # Exclude from processing to dist folder
 exclude:
@@ -54,4 +58,5 @@ exclude:
   - node_modules
   - webpack.config.js
   - tsconfig.json
-  - assets/js
+  - css
+  - js

@@ -1,0 +1,46 @@
+@import './lm';
+@import './dm';
+
+// Breakpoints
+$sm: 640px;
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
+$xxl: 1536px;
+
+@mixin minWidth($breakpoint) {
+  @media screen and (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+// Light- or Dark-mode
+// -------------------
+
+:root {
+  @include lightmode-colors;
+}
+
+// Use dark mode when user preference or when manually set dark mode theme attribute
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include darkmode-colors;
+  }  
+}
+[data-theme="dark"] {
+  :root {
+    @include darkmode-colors;
+  }
+}
+
+// Misc variables
+// -------------------
+
+:root {
+  --spacing-unit: 30px;
+  --header-height: 60px;
+
+  @include minWidth($xl) {
+    --spacing-unit: 60px;
+  }
+}

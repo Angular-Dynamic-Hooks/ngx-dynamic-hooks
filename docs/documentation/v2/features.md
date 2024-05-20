@@ -1,9 +1,10 @@
 ---
 ---
 
-## 5. Features
+# Features
 
-### 5.1 Context & Dependency Injection:
+## Context & Dependency Injection
+
 Often, you may want to communicate with the dynamically-loaded components or pass data to them from the rest of the app. To do so, you have two options:
 
 1. **The context object**
@@ -35,7 +36,8 @@ The context object is typically a simple object literal that provides some value
 
 ![Communication flow](https://i.imgur.com/K63SQGU.jpg)
 
-### 5.2 Inputs:
+## Inputs
+
 You can pass data of almost any type to @Inputs() in selector hooks, such as:
 
 | Type | Example |
@@ -54,7 +56,8 @@ If using []-brackets, the inputs will be safely parsed into their corresponding 
 
 Alternatively, you may also write inputs without []-brackets as normal HTML-attributes, in which case they won't be parsed at all and will simply be considered strings.
 
-### 5.3 Outputs:
+## Outputs
+
 You can subscribe to @Output() events from selector hooks with functions from the context object like:
 
 ```html
@@ -62,13 +65,15 @@ You can subscribe to @Output() events from selector hooks with functions from th
 ```
 As with normal Angular @Output() bindings, the special `$event`-keyword can optionally be used to pass the emitted event object as a parameter to the function.
 
-#### A note about `this`:
+### A note about `this`
+
 A function directly assigned to the context object will have `this` pointing to the context object itself when called, as per standard JavaScript behaviour. This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
 
 * Assign the parent of the function to the context object (instead of the function itself) and call via `context.parent.func()`
 * If you don't want to expose the parent, assign a [bound function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) to the context object like `const contextObj = {func: this.func.bind(this)}`.
 
-### 5.4 Content projection:
+## Content projection
+
 Hooks can be nested without limitations. The loaded components will correctly be rendered in each others `<ng-content>`-slots. When using selector hooks, it will look and work identical as in normal Angular templates:
 ```html
 '...some dynamic content... 
@@ -82,7 +87,8 @@ There are two small caveats, however:
 1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods](#55-lifecycle-methods)). 
 2. Multiple named `<ng-content>` outlets are currently not supported in component selector hooks. 
 
-### 5.5 Lifecycle methods:
+## Lifecycle methods
+
 All of Angular's lifecycle methods work normally in dynamically-loaded components. In addition, this library introduces two new lifecycle methods that you can optionally implement: 
 
 * `onDynamicMount()` is called once as soon as **all** dynamic components have rendered (including [lazy-loaded ones](#65-lazy-loading-components)). It is given an `OnDynamicData`-object as its parameter, containing the context object as well as the content children of the component.
@@ -119,7 +125,8 @@ export class DynamicComponent implements OnDynamicMount, OnDynamicChanges {
 
 **Also:** As normal, make sure to still include an `<ng-content>` block in each parent component so Angular knows where to render the child content.
 
-### 5.6 Change detection:
+## Change detection
+
 Dynamically-loaded components are connected to Angular change detection and will be checked when it is triggered like any other part of the app. Setting `ChangeDetectionStrategy.OnPush` on them to limit change detection will work as well. 
 
 The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. This way, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger ` ngOnChanges()`. Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [OutletOptions](#64-outletoptions)).
