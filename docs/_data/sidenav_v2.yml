@@ -1,6 +1,6 @@
 
 - title: Introduction
-  url: /documentation/v2
+  url: /documentation/v2/
   children:
     - title: Installation
       url: /documentation/v2#installation
@@ -23,7 +23,7 @@
     - title: Outputs
       url: /documentation/v2/features#outputs
     - title: Content projection
-      url: /documentation/v2/features#54-content-projection
+      url: /documentation/v2/features#content-projection
     - title: Lifecycle methods
       url: /documentation/v2/features#lifecycle-methods
     - title: Change detection

@@ -3,19 +3,37 @@
     <nav class="sidebar-content">
 
       {% for item in site.data[page.sidenav] %}
-        <div class="sidebar-section">
+        {% assign currentBaseUrl = page.url | split: "#" | first | split: '.html' | first %}
+        {% assign sectionBaseUrl = item.url | split: "#" | first | split: '.html' | first %}
+        {% if currentBaseUrl == sectionBaseUrl %}
+          {% assign isCurrentSection = true %}
+        {% else %}
+          {% assign isCurrentSection = false %}
+        {% endif %}
+
+        <div class="sidebar-section {% if item.children %}hasChildren{% endif %} {% if isCurrentSection %}active toggled{% endif %}">
+
           <h3 class="sidebar-title">
-            <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+            <a class="sidebar-link" href="{{ item.url | relative_url }}">{{ item.title }}</a>
+            {% if item.children %}
+            <div class="sidebar-title-toggle">
+              <img class="sidebar-title-toggle-icon" src="{{ "/assets/images/narrow_arrow_down.png" | relative_url }}">
+            </div>
+            {% endif %}
           </h3>
-          <ul class="sidebar-ul">
-            {% for child in item.children %}
-              <li class="sidebar-li">
-                <h4 class="sidebar-subtitle">
-                  <a href="{{ child.url | relative_url }}">{{ child.title }}</a>
-                </h4>
-              </li>
-            {% endfor %}
-          </ul>
+
+          {% if item.children %}
+            <ul class="sidebar-ul">
+              {% for child in item.children %}
+                <li class="sidebar-li">
+                  <h4 class="sidebar-subtitle">
+                    <a class="sidebar-link" href="{{ child.url | relative_url }}">{{ child.title }}</a>
+                  </h4>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
         </div>
       {% endfor %}
 

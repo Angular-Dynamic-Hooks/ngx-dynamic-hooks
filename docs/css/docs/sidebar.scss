@@ -28,7 +28,7 @@
     }
 
       .sidebar-section {
-
+        margin: 0px 0px 10px 0px;
       }
 
         .sidebar-section a {
@@ -37,23 +37,62 @@
         }
 
         .sidebar-title {
-          margin: 0px 0px 15px 0px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0px;
           color: black;
           font-size: 13px;
           font-weight: 500;
           text-transform: uppercase;
         }
-        .sidebar-title:hover {
-          background-color: #00000008;
+        .sidebar-section.active .sidebar-title {
+          color: var(--brand-color-light);
         }
 
+          .sidebar-link {
+            display: block;
+            padding: 10px;
+            border-radius: 10px;
+          }
+          .sidebar-title .sidebar-link {
+            width: 100%;
+          }
+          .sidebar-link:hover {
+            background-color: #00000008;
+          }
+
+          .sidebar-title-toggle {
+            padding: 10px 14px;
+            margin: 0px 0px 0px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+          }
+          .sidebar-title-toggle:hover {
+            background-color: #00000008;
+          }
+
+            .sidebar-title-toggle-icon {
+              width: 15px;
+              filter: brightness(0.6);
+              transition: transform 0.2s ease;
+            }
+            .sidebar-section.toggled .sidebar-title-toggle-icon {
+              transform: rotate(180deg);
+            }
+
         .sidebar-ul {
-          margin: 0px 0px 0px 10px;
+          margin: 0px 0px 0px 15px;
           list-style: none;
+          height: 0px;
+          overflow: hidden;
+        }
+        .sidebar-section.toggled .sidebar-ul {
+          height: auto;
         }
 
           .sidebar-li {
-            margin: 0px 0px 12px 0px;
           }
 
             .sidebar-subtitle {
@@ -61,4 +100,6 @@
               font-size: 14px;
               color: #464646;
             }
-
+            .sidebar-li.active .sidebar-subtitle {
+              color: var(--brand-color-light);
+            }
