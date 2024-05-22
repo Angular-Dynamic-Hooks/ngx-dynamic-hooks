@@ -1,65 +1,72 @@
-const createTocHtml = (titleElements: NodeListOf<Element>, tocWrapperElement: Element) => {
-  // Create toc html
-  const tocElement = `
-  <div class='toc'>
-    <ul class="toc-list">
-      ${ Array.from(titleElements).map(titleElement => {
-        return `
-        <li id='toc-${ titleElement.id }' class='toc-entry'>
-          <a class='toc-entry-link' href="${ location.href.split('#')[0] + '#' + titleElement.id }">
-            <div class='toc-entry-slider'>
-              <div class='toc-entry-slider-thumb'></div>
-            </div>
-            <div class='toc-entry-content ${ titleElement.tagName.toLowerCase() }'>${titleElement.textContent}</div>
-          </a>
-        </li>`
-      }).join('') }
-    </ul>
-  </div>`;
+import { GenericWidgetController, Widget } from "../widgetBootstrap";
 
-  tocWrapperElement.innerHTML = tocElement;
-}
+export class ArticleTocWidget implements Widget {
+  static selector: string = '.article-toc-wrapper';
+  public tocWrapperElement: HTMLElement|null = null;
+  public articleElement: HTMLElement|null = null;
+  public titleElements: NodeListOf<HTMLElement>|null = null;
 
-const initTocScrollListener = (titleElements: NodeListOf<Element>, tocWrapperElement: Element) => {
-  const visibilityStates: Map<string, boolean> = new Map();
-  for (const titleElement of titleElements) {
-    visibilityStates.set(titleElement.id, false);
-  }
-
-  const observer = new IntersectionObserver(onVisiblityChange, {
-    rootMargin: "0px",
-    threshold: 1.0,
-  });
-
-  for (const titleElement of titleElements) {
-    observer.observe(titleElement);
-  }
-
-  function onVisiblityChange (entries: IntersectionObserverEntry[]) {
-    for (const entry of entries) {
-      visibilityStates.set(entry.target.id, entry.isIntersecting);
-    }
-
-    const firstVisibleTitle = Array.from(visibilityStates).find(entry => entry[1] === true);
-    if (firstVisibleTitle) {
-      // Reset all
-      tocWrapperElement!.querySelectorAll('.toc-entry').forEach(element => element.classList.remove('active'));
+  onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
+    this.tocWrapperElement = hostElement as HTMLElement;
+    this.articleElement = document.querySelector('.article');
+    this.titleElements = this.articleElement?.querySelectorAll('h1, h2, h3, h4') || null;
     
-      // Set new title to active
-      // console.log(firstVisibleTitle[1].element)
-      tocWrapperElement!.querySelector('#toc-' + firstVisibleTitle[0])!.classList.add('active');
+    if (this.articleElement && this.titleElements) {  
+      this.createTocHtml();
+      this.initTocScrollListener();
+    }
+  }
+
+  createTocHtml() {
+    // Create toc html
+    const tocElement = `
+    <div class='toc'>
+      <ul class="toc-list">
+        ${ Array.from(this.titleElements!).map(titleElement => {
+          return `
+          <li id='toc-${ titleElement.id }' class='toc-entry'>
+            <a class='toc-entry-link' href="${ location.href.split('#')[0] + '#' + titleElement.id }">
+              <div class='toc-entry-slider'>
+                <div class='toc-entry-slider-thumb'></div>
+              </div>
+              <div class='toc-entry-content ${ titleElement.tagName.toLowerCase() }'>${titleElement.textContent}</div>
+            </a>
+          </li>`
+        }).join('') }
+      </ul>
+    </div>`;
+
+    this.tocWrapperElement!.innerHTML = tocElement;
+  }
+
+  initTocScrollListener() {
+    const visibilityStates: Map<string, boolean> = new Map();
+    for (const titleElement of this.titleElements!) {
+      visibilityStates.set(titleElement.id, false);
+    }
+  
+    const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+      for (const entry of entries) {
+        visibilityStates.set(entry.target.id, entry.isIntersecting);
+      }
+  
+      const firstVisibleTitle = Array.from(visibilityStates).find(entry => entry[1] === true);
+      if (firstVisibleTitle) {
+        // Reset all
+        this.tocWrapperElement!.querySelectorAll('.toc-entry').forEach(element => element.classList.remove('active'));
+      
+        // Set new title to active
+        // console.log(firstVisibleTitle[1].element)
+        this.tocWrapperElement!.querySelector('#toc-' + firstVisibleTitle[0])!.classList.add('active');
+      }
+    }, {
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
+  
+    for (const titleElement of this.titleElements!) {
+      observer.observe(titleElement);
     }
   }
 }
 
-export const loadArticleToc = () => {
-  const articleElement = document.querySelector('.article');
-  const tocWrapperElement = document.querySelector('.article-toc-wrapper');
-  
-  if (articleElement && tocWrapperElement) {
-    const titleElements = articleElement.querySelectorAll('h1, h2, h3, h4');
-
-    createTocHtml(titleElements, tocWrapperElement);
-    initTocScrollListener(titleElements, tocWrapperElement);
-  }
-}

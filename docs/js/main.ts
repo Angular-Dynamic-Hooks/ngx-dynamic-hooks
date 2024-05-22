@@ -1,6 +1,9 @@
-import { initSidebar } from './widgets/sidebar';
-import { loadArticleToc } from './widgets/article-toc';
+import { SidebarWidget } from './widgets/sidebar';
+import { ArticleTocWidget } from './widgets/article-toc';
+import { bootstrapWidgets } from './widgetBootstrap';
 
-// Init services
-initSidebar();
-loadArticleToc();
+// Init widgets
+const widgets = bootstrapWidgets(document.body, [
+  SidebarWidget,
+  ArticleTocWidget
+]);
