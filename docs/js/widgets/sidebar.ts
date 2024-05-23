@@ -17,7 +17,7 @@ export class SidebarWidget implements Widget {
     this.registerActiveSectionScrollListener();
   }
 
-  registerToggleButton() {      
+  private registerToggleButton() {      
     if (!this.toggleButtonElement) {
       return;
     }
@@ -31,7 +31,7 @@ export class SidebarWidget implements Widget {
     });
   }
 
-  registerActiveSectionScrollListener() {
+  private registerActiveSectionScrollListener() {
     if (!this.section!.classList.contains('active') || !this.titleElements) {
       return;
     }

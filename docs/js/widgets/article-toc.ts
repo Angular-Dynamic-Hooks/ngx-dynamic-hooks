@@ -17,7 +17,7 @@ export class ArticleTocWidget implements Widget {
     }
   }
 
-  createTocHtml() {
+  private createTocHtml() {
     // Create toc html
     const tocElement = `
     <div class='toc'>
@@ -39,7 +39,7 @@ export class ArticleTocWidget implements Widget {
     this.tocWrapperElement!.innerHTML = tocElement;
   }
 
-  initTocScrollListener() {
+  private initTocScrollListener() {
     const visibilityStates: Map<string, boolean> = new Map();
     for (const titleElement of this.titleElements!) {
       visibilityStates.set(titleElement.id, false);

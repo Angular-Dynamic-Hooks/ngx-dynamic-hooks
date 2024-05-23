@@ -18,13 +18,14 @@ export interface WidgetController<T extends WidgetConstructor> {
   registeredWidgets: T[];
   loadedWidgets: {[key: string]: LoadedWidget<T>[]};
   load: (container: Element) => void;
+  context: any;
 }
 
 export type GenericWidgetController = WidgetController<any>;
 
-export function bootstrapWidgets<T extends WidgetConstructor> (container: Element, widgets: T[]): WidgetController<T> {
+export function bootstrapWidgets<T extends WidgetConstructor> (container: Element, widgets: T[], context: any = {}): WidgetController<T> {
   const loadedFlag = 'wgt-loaded';
-  const controller: WidgetController<T> = {registeredWidgets: widgets, loadedWidgets: {}, load: () => {}};
+  const controller: WidgetController<T> = {registeredWidgets: widgets, loadedWidgets: {}, load: () => {}, context: context};
   controller.load = container => {
     for (const widget of widgets) {
       const selector = widget.selector;
