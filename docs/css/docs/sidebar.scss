@@ -1,19 +1,18 @@
 .sidebar {
-  position: sticky;
-  top: var(--header-height);
   width: 300px;
-  height: calc(100vh - var(--header-height));
   background-color: white;
   border-right: 1px solid rgb(210, 210, 210);
 }
 
   .sidebar-scroll {
+    position: sticky;
+    top: var(--header-height);
+    max-height: calc(100vh - var(--header-height));
     display: flex;
     flex-direction: column;
-    height: 100%;
     box-sizing: border-box;
     padding: 20px;
-    overflow-y: scroll;
+    overflow-y: auto;
     visibility: hidden;
   }
   .sidebar-scroll:hover {
@@ -43,7 +42,7 @@
           margin: 0px;
           color: black;
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 600;
           text-transform: uppercase;
         }
         .sidebar-section.active .sidebar-title {
@@ -52,7 +51,7 @@
 
           .sidebar-link {
             display: block;
-            padding: 10px;
+            padding: 10px 10px;
             border-radius: 10px;
           }
           .sidebar-title .sidebar-link {
@@ -63,7 +62,7 @@
           }
 
           .sidebar-title-toggle {
-            padding: 10px 14px;
+            padding: 8px 14px;
             margin: 0px 0px 0px 10px;
             border-radius: 10px;
             cursor: pointer;

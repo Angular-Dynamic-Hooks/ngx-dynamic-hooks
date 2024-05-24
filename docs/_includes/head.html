@@ -5,10 +5,14 @@
   {%- seo -%}
   
   {% for file in site.static_files %}
-    {% if file.path contains "/assets/build" and file.path contains ".css" %}
+    {% if file.path contains "/assets" and file.path contains ".css" %}
       <link rel="stylesheet" href="{{ file.path | relative_url }}">
     {% endif %}
   {% endfor %}
 
   {%- feed_meta -%}  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 </head>

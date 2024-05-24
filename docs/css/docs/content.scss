@@ -2,6 +2,7 @@
 
 .content {
   display: flex;
+  min-height: calc(100vh - var(--header-height));
 }
 
   .wrapper {
@@ -31,6 +32,7 @@
     .article {
       width: calc(100% - 350px);
       margin: 0px 100px 0px 0px;
+      line-height: 2;
     }
 
       // Trick to give anchor links vertical offset b/c of fixed header
