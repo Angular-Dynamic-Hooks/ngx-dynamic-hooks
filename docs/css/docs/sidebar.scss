@@ -47,7 +47,7 @@
           text-transform: uppercase;
         }
         .sidebar-section.active .sidebar-title {
-          color: var(--brand-color-light);
+          color: var(--brand-color);
         }
 
           .sidebar-link {
@@ -101,5 +101,5 @@
               color: #464646;
             }
             .sidebar-li.active .sidebar-subtitle {
-              color: var(--brand-color-light);
+              color: var(--brand-color);
             }

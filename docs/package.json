@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@floating-ui/dom": "^1.6.5",
     "css-minimizer-webpack-plugin": "^7.0.0",
     "ts-loader": "^9.5.1",
     "webpack": "^5.91.0",

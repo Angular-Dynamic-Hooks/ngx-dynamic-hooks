@@ -21,6 +21,7 @@
         <aside class="article-sidebar">
           <div class="article-sidebar-inner">
             <div class="article-toc-wrapper"></div>
+            
             {% if page.url contains '.html' %}
               {% assign editUrl = "https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/docs" | append: page.url |  replace: ".html", ".md" %}
             {% else %}
