@@ -20,7 +20,7 @@ describe('forChild', () => {
 
   beforeAll(() => {
     // This is specifically for preventing PlanetCitiesComponent from immediately adding its component-level provider to allSettings when its esmodule is imported (before running any logic)
-    // Instead, simply add the componen-level provider when getPlanetCitiesRoutes() is called, which is realistic and can be controlled easily.
+    // Instead, simply add the component-level provider when getPlanetCitiesRoutes() is called, which is realistic and can be controlled easily.
     allSettings.length = 0;
   });
 

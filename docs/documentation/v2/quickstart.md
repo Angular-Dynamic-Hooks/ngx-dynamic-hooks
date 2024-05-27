@@ -4,14 +4,6 @@
 ## 4. Quick start
 Import `DynamicHooksModule` into your main app module and configure via `forRoot()`:
 
-{% for file in site.static_files %}
-  {{ file.path | json }}
-{% endfor %}
-
-<div class='myCustomBox'>
-  It works with almost all markdown flavours (the below blank line matters).
-</div>
-
 ```ts
 import { DynamicHooksModule, HookParserEntry } from 'ngx-dynamic-hooks';
 import { ExampleComponent } from 'somewhere';

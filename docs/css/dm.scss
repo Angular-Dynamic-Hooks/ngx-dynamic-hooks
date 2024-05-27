@@ -1,34 +1,28 @@
+@import "./code_themes/dark.scss";
 
 // Dark mode
 // ---------
 
-$dm-brand-color:           #999999 !default;
-$dm-brand-color-faint:     lighten($dm-brand-color, 65%) !default;
-$dm-brand-color-light:     lighten($dm-brand-color, 5%) !default;
-$dm-brand-color-dark:      darken($dm-brand-color, 35%) !default;
+$dm-brand-color:           #d5339d !default;
+$dm-brand-color-faint:     transparentize($dm-brand-color, 0.8) !default;
+$dm-brand-color-light:     lighten($dm-brand-color, 38%) !default;
+$dm-brand-color-dark:      darken($dm-brand-color, 15%) !default;
 
-$dm-site-title-color:      $dm-brand-color-light !default;
+$dm-text-color:               #d4d3df !default;
+$dm-title-color:              #eee !default;
+$dm-background-color-1:       #27272e !default;
+$dm-background-color-2:       #3e3e48 !default;
+$dm-background-color-code:    #343640 !default;
+$dm-background-color-hover:   #dddddd0f !default;
 
-$dm-text-color:            #bbbbbb !default;
-$dm-background-color:      #181818 !default;
-$dm-code-background-color: #212121 !default;
-
-$dm-link-base-color:       #79b8ff !default;
+$dm-link-base-color:       lighten($dm-brand-color, 5%) !default;
 $dm-link-visited-color:    $dm-link-base-color !default;
 $dm-link-hover-color:      $dm-text-color !default;
 
-$dm-table-header-bg-color: lighten($dm-background-color, 10%) !default;
-$dm-table-zebra-color-1:     lighten($dm-background-color, 4%) !default;
-$dm-table-zebra-color-2:     lighten($dm-background-color, 4%) !default;
+$dm-table-header-bg-color:  lighten($dm-background-color-1, 10%) !default;
+$dm-table-zebra-color-1:    lighten($dm-background-color-1, 4%) !default;
+$dm-table-zebra-color-2:    lighten($dm-background-color-1, 4%) !default;
 $dm-table-border-color:   #00000014 !default;
-
-
-// Syntax highlighting styles should be adjusted appropriately for every "skin"
-// List of tokens: https://github.com/rouge-ruby/rouge/wiki/List-of-tokens
-// Some colors come from Material Theme Darker:
-// https://github.com/material-theme/vsc-material-theme/blob/master/scripts/generator/settings/specific/darker-hc.ts
-// https://github.com/material-theme/vsc-material-theme/blob/master/scripts/generator/color-set.ts
-// ----------------------------------------------------------------------------
 
 @mixin darkmode-colors {
   --brand-color: #{$lm-brand-color};
@@ -36,11 +30,12 @@ $dm-table-border-color:   #00000014 !default;
   --brand-color-light: #{$dm-brand-color-light};
   --brand-color-dark: #{$dm-brand-color-dark};
 
-  --site-title-color: #{$dm-site-title-color};
-
   --text-color: #{$dm-text-color};
-  --background-color: #{$dm-background-color};
-  --code-background-color: #{$dm-code-background-color};
+  --title-color: #{$dm-title-color};
+  --background-color-1: #{$dm-background-color-1};
+  --background-color-2: #{$dm-background-color-2};
+  --background-color-code: #{$dm-background-color-code};
+  --background-color-hover: #{$dm-background-color-hover};
 
   --link-base-color: #{$dm-link-base-color};
   --link-visited-color: #{$dm-link-visited-color};
@@ -51,66 +46,5 @@ $dm-table-border-color:   #00000014 !default;
   --table-zebra-color-2: #{$dm-table-zebra-color-2};
   --table-border-color: #{$dm-table-border-color};
 
-  .highlight {
-    .c     { color: #545454; font-style: italic } // Comment
-    .err   { color: #f07178; background-color: #e3d2d2 } // Error
-    .k     { color: #89DDFF; font-weight: bold } // Keyword
-    .o     { font-weight: bold } // Operator
-    .cm    { color: #545454; font-style: italic } // Comment.Multiline
-    .cp    { color: #545454; font-weight: bold } // Comment.Preproc
-    .c1    { color: #545454; font-style: italic } // Comment.Single
-    .cs    { color: #545454; font-weight: bold; font-style: italic } // Comment.Special
-    .gd    { color: #000; background-color: #fdd } // Generic.Deleted
-    .gd .x { color: #000; background-color: #faa } // Generic.Deleted.Specific
-    .ge    { font-style: italic } // Generic.Emph
-    .gr    { color: #f07178 } // Generic.Error
-    .gh    { color: #999 } // Generic.Heading
-    .gi    { color: #000; background-color: #dfd } // Generic.Inserted
-    .gi .x { color: #000; background-color: #afa } // Generic.Inserted.Specific
-    .go    { color: #888 } // Generic.Output
-    .gp    { color: #555 } // Generic.Prompt
-    .gs    { font-weight: bold } // Generic.Strong
-    .gu    { color: #aaa } // Generic.Subheading
-    .gt    { color: #f07178 } // Generic.Traceback
-    .kc    { font-weight: bold } // Keyword.Constant
-    .kd    { font-weight: bold } // Keyword.Declaration
-    .kp    { font-weight: bold } // Keyword.Pseudo
-    .kr    { font-weight: bold } // Keyword.Reserved
-    .kt    { color: #FFCB6B; font-weight: bold } // Keyword.Type
-    .m     { color: #F78C6C } // Literal.Number
-    .s     { color: #C3E88D } // Literal.String
-    .na    { color: #008080 } // Name.Attribute
-    .nb    { color: #EEFFFF } // Name.Builtin
-    .nc    { color: #FFCB6B; font-weight: bold } // Name.Class
-    .no    { color: #008080 } // Name.Constant
-    .ni    { color: #800080 } // Name.Entity
-    .ne    { color: #900; font-weight: bold } // Name.Exception
-    .nf    { color: #82AAFF; font-weight: bold } // Name.Function
-    .nn    { color: #555 } // Name.Namespace
-    .nt    { color: #FFCB6B } // Name.Tag
-    .nv    { color: #EEFFFF } // Name.Variable
-    .nx    { color: #9d6123 }
-    .ow    { font-weight: bold } // Operator.Word
-    .w     { color: #EEFFFF } // Text.Whitespace
-    .mf    { color: #F78C6C } // Literal.Number.Float
-    .mh    { color: #F78C6C } // Literal.Number.Hex
-    .mi    { color: #F78C6C } // Literal.Number.Integer
-    .mo    { color: #F78C6C } // Literal.Number.Oct
-    .sb    { color: #C3E88D } // Literal.String.Backtick
-    .sc    { color: #C3E88D } // Literal.String.Char
-    .sd    { color: #C3E88D } // Literal.String.Doc
-    .s2    { color: #C3E88D } // Literal.String.Double
-    .se    { color: #EEFFFF } // Literal.String.Escape
-    .sh    { color: #C3E88D } // Literal.String.Heredoc
-    .si    { color: #C3E88D } // Literal.String.Interpol
-    .sx    { color: #C3E88D } // Literal.String.Other
-    .sr    { color: #C3E88D } // Literal.String.Regex
-    .s1    { color: #C3E88D } // Literal.String.Single
-    .ss    { color: #C3E88D } // Literal.String.Symbol
-    .bp    { color: #999 } // Name.Builtin.Pseudo
-    .vc    { color: #FFCB6B } // Name.Variable.Class
-    .vg    { color: #EEFFFF } // Name.Variable.Global
-    .vi    { color: #EEFFFF } // Name.Variable.Instance
-    .il    { color: #F78C6C } // Literal.Number.Integer.Long
-  }
+  @include code-theme-dark;
 }

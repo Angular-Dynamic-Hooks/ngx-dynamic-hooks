@@ -26,6 +26,8 @@ markdown: kramdown
 kramdown:
   input: GFM
   gfm_quirks: [paragraph_end]
+  syntax_highlighter_opts:
+      default_lang: ts
 theme: null
 plugins:
   - jekyll-feed

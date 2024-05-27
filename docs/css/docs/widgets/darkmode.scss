@@ -1,0 +1,38 @@
+.darkmode {
+  display: flex;
+  align-items: center;
+  margin: 0px 20px 0px 0px;
+  --diameter: 15px;
+}
+
+  .darkmode-icon {
+    height: 14px;
+    margin: 0px 7px 0px 0px;
+  }
+
+  .darkmode-toggle {
+    position: relative;
+    width: calc(var(--diameter) * 2.2);
+    border-radius: var(--diameter);
+    background-color: #0f0f0f;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+  }
+  .darkmode-toggle.active {
+    // background-color: #4f4f4f;
+  }
+
+    .darkmode-toggle-slider {
+      position: relative;
+      left: 0px;
+      height: var(--diameter);
+      width: var(--diameter);
+      background-color: grey;
+      border-radius: var(--diameter);
+      transition: left 0.1s ease, background-color 0.1s ease;
+    }
+    .darkmode-toggle.active .darkmode-toggle-slider {
+      left: calc(var(--diameter) * 1.2);
+      background-color: var(--brand-color);
+      opacity: 0.9;
+    }

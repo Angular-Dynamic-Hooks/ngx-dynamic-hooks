@@ -1,7 +1,7 @@
 .sidebar {
   width: 300px;
-  background-color: white;
-  border-right: 1px solid rgb(210, 210, 210);
+  background-color: var(--background-color-2);
+  box-shadow: -3px 0 8px 0 rgb(0 0 0 / 50%);
 }
 
   .sidebar-scroll {
@@ -40,7 +40,6 @@
           align-items: center;
           justify-content: space-between;
           margin: 0px;
-          color: black;
           font-size: 13px;
           font-weight: 600;
           text-transform: uppercase;
@@ -58,7 +57,10 @@
             width: 100%;
           }
           .sidebar-link:hover {
-            background-color: #00000008;
+            background-color: var(--background-color-hover);
+          }
+          :root[data-theme="dark"] .sidebar-link:hover {
+            background-color: #ffffff0a;
           }
 
           .sidebar-title-toggle {
@@ -96,8 +98,7 @@
 
             .sidebar-subtitle {
               margin: 0px;
-              font-size: 14px;
-              color: #464646;
+              font-size: 13px;
             }
             .sidebar-li.active .sidebar-subtitle {
               color: var(--brand-color);

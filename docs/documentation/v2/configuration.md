@@ -60,7 +60,7 @@ These mostly determine the details about how the component selector is parsed fr
 Property | Type | Default | Description
 --- | --- | --- | ---
 `component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig](#65-lazy-loading-components).
-`name` | `string` | - | The name of the parser. Required if you want to black- or whitelist it.
+`name` | `string` | - | The name of the parser. Only required if you want to black- or whitelist it.
 `selector` | `string` | The component selector | The selector to use for the hook
 `injector` | `Injector` | The nearest injector | The injector to create the component with
 `enclosing` | `boolean` | `true` | Whether the selector is enclosing (`<app-hook>...</app-hook>`) or not (`<app-hook>`)

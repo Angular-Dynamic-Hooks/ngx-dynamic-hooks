@@ -27,10 +27,8 @@ $xxl: 1536px;
     @include darkmode-colors;
   }  
 }
-[data-theme="dark"] {
-  :root {
-    @include darkmode-colors;
-  }
+:root[data-theme="dark"] {
+  @include darkmode-colors;
 }
 
 // Misc variables

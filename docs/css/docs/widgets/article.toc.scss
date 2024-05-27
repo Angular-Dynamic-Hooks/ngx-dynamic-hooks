@@ -12,7 +12,7 @@
       cursor: pointer;
     }
     .toc-entry:hover {
-      background-color: var(--brand-color-faint);
+      background-color: var(--background-color-hover);
     }
 
       .toc-entry-link {
@@ -26,7 +26,10 @@
           display: flex;
           width: 2px;
           margin: 0px 15px 0px 0px;
-          background-color: rgb(237 237 237);
+          background-color: #0000000f;
+        }
+        :root[data-theme="dark"] .toc-entry-slider {
+          background-color: #ffffff1c;
         }
       
           .toc-entry-slider-thumb {

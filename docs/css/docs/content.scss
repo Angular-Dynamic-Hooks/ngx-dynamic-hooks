@@ -35,26 +35,12 @@
       line-height: 2;
     }
 
-      // Trick to give anchor links vertical offset b/c of fixed header
-      .article h1[id]::before, 
-      .article h2[id]::before,
-      .article h3[id]::before,
-      .article h4[id]::before {
-        content: '';
-        display: block;
-        height: 75px;
-        margin-top: -75px;
-        visibility: hidden;
+      .article .badges img {
+        border-radius: 0px;
       }
-        
-      .highlight {
-        border-radius: 3px;
-        background: var(--code-background-color);
-        margin-bottom: calc(var(--spacing-unit) * .5);
 
-        .highlighter-rouge & {
-          background: var(--code-background-color);
-        }
+      .article img {
+        border-radius: 10px;
       }
 
     .article-sidebar {
