@@ -19,10 +19,11 @@ $lm-link-base-color:       $lm-brand-color !default;
 $lm-link-visited-color:    darken($lm-link-base-color, 15%) !default;
 $lm-link-hover-color:      $lm-text-color !default;
 
-$lm-table-header-bg-color:  lighten($lm-brand-color, 39%) !default;
-$lm-table-zebra-color-1:    lighten($lm-brand-color, 45%) !default;
-$lm-table-zebra-color-2:    lighten($lm-brand-color, 47%) !default;
-$lm-table-border-color:   #00000014 !default;
+$lm-table-header-text-color:  white !default;
+$lm-table-header-bg-color:      #555561 !default;
+$lm-table-zebra-color-1:        darken($lm-background-color-1, 4%) !default;
+$lm-table-zebra-color-2:        darken($lm-background-color-1, 2%) !default;
+$lm-table-border-color:       #00000014 !default;
 
 @mixin lightmode-colors {
   --brand-color: #{$lm-brand-color};
@@ -41,6 +42,7 @@ $lm-table-border-color:   #00000014 !default;
   --link-visited-color: #{$lm-link-visited-color};
   --link-hover-color: #{$lm-link-hover-color};
 
+  --table-header-text-color: #{$lm-table-header-text-color};
   --table-header-bg-color: #{$lm-table-header-bg-color};
   --table-zebra-color-1: #{$lm-table-zebra-color-1};
   --table-zebra-color-2: #{$lm-table-zebra-color-2};

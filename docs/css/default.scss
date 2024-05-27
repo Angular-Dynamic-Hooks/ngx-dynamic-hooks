@@ -234,12 +234,13 @@ table {
   border-spacing: 0px;
 
   th, td {
-    padding: calc(var(--spacing-unit) * 20 * .01) calc(var(--spacing-unit) * .5);
+    padding: calc(var(--spacing-unit) * 18 * .01) calc(var(--spacing-unit) * .5);
     font-size: 0.9em;
   }
 
   // Colors
   th {
+    color:  var(--table-header-text-color);
     background-color: var(--table-header-bg-color);
   }
 
