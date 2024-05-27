@@ -1,6 +1,10 @@
 name: CI tests
 run-name: Running automated tests
-on: [push, workflow_dispatch]
+on: 
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 jobs:
   Running-automated-tests:
     runs-on: ubuntu-latest
