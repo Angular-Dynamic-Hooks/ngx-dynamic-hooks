@@ -1,6 +1,7 @@
-import { infoService } from "../infoService";
-import { GenericWidgetController, Widget } from "../widgetBootstrap";
+import { infoService } from "../../infoService";
+import { GenericWidgetController, Widget } from "../../widgetBootstrap";
 import { arrow, autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
+import { versionService } from "./versionService";
 
 export class VersionSelectWidget implements Widget {
   static selector: string = '.version-select';
@@ -10,7 +11,7 @@ export class VersionSelectWidget implements Widget {
   dropdownElement: HTMLElement|null = null;
   // const tooltipArrow = (subMenuWrapper.querySelector('.tooltip-arrow') as HTMLElement);
   // Figure out version of current page (removes letters, keeps numbers)
-  currentVersion: number = this.extractDocsVersionFromUrl(location.pathname);
+  currentVersion: number = versionService.extractDocsVersionFromUrl(location.pathname)!;
   dropdownIsOpen: boolean = false;
   autoUpdateCleanup: (() => void)|null= null;
 
@@ -47,7 +48,7 @@ export class VersionSelectWidget implements Widget {
     const versions: number[] = [];
     for (const page of infoJson.pages) {
       if (page.url.startsWith('/documentation/')) {
-        const versionNr = this.extractDocsVersionFromUrl(page.url);
+        const versionNr = versionService.extractDocsVersionFromUrl(page.url)!;
         if (!versions.includes(versionNr)) {
           versions.push(versionNr);
         }
@@ -160,38 +161,9 @@ export class VersionSelectWidget implements Widget {
       return;
     }
 
-    // Get current url adjusted for selected version
-    const targetUrl = this.transformUrlForDocsVersion(location.pathname.split(infoService.baseUrl)[1], version);
-
-    // Try to find it in list of existing docs pages
-    const infoJson = await infoService.getInfoJson();
-    let matchingUrl: string|null = null;
-    for (const page of infoJson.pages) {
-      if (page.url.replace('.html', '') === targetUrl) {
-        matchingUrl = page.url.replace('.html', '');
-        break;
-      }
-    }
-
-    // If found, navigate there. Otherwise navigate to index page of other docs version
-    location.pathname = matchingUrl ? (infoService.baseUrl + matchingUrl) : this.generateDocsUrl(version);
+    // Navigate to equivalent url of different version, if possible
+    location.pathname = await versionService.matchUrlForDocsVersion(location.pathname.split(infoService.baseUrl)[1], version);
   }
-
-  // Utility
-  // --------------------------
-
-  private extractDocsVersionFromUrl(url: string) {
-    return parseInt(url.split('/documentation/')[1].split('/')[0].replace(/\D/g,''));
-  }
-
-  private transformUrlForDocsVersion(url: string, version: number) {
-    return url.replace(/documentation\/.*\//, "documentation/v" + version + "/");
-  }
-
-  private generateDocsUrl(version: number, docsPath: string = '') {
-    return infoService.baseUrl + '/documentation/v' + version + '/' + docsPath;
-  }
-
 }
 
 

@@ -46,6 +46,7 @@ defaults:
       path: "documentation/v2"
     values:
       structure: "structure_v2"
+      deprecated: true
 
 # Exclude from processing to dist folder
 exclude:

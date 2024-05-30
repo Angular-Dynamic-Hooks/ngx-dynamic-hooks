@@ -6,11 +6,11 @@
 $dm-text-color:               #d4d3df !default;
 $dm-title-color:              #eee !default;
 $dm-background-color-1:       #2b2b32 !default;
-$dm-background-color-2:       #3e3e48 !default;
+$dm-background-color-2:       #3e4048 !default;
 $dm-background-color-code:    #343640 !default;
 $dm-background-color-hover:   #dddddd0f !default;
 
-$dm-link-base-color:       lighten($brand-color, 5%) !default;
+$dm-link-base-color:       lighten($brand-color, 0%) !default;
 $dm-link-visited-color:    $dm-link-base-color !default;
 $dm-link-hover-color:      $dm-text-color !default;
 

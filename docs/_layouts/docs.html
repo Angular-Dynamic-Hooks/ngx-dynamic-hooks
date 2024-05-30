@@ -8,57 +8,18 @@
 
   <body>
 
-    {%- include header.html -%}
+    {%- include docs/header.html -%}
 
     <main class="content" aria-label="Content">
 
-      {%- include sidebar.html -%}
+      {%- include docs/sidebar.html -%}
       
       <div class="wrapper">
 
         <article class="article">
+          {%- include docs/widgets/versionWarning.html -%}
           {{ content }}
-
-          <div class="chapter-select">
-            {% assign previousPageTitle = nil %}
-            {% assign previousPageUrl = nil %}
-            {% assign nextPageTitle = nil %}
-            {% assign nextPageUrl = nil %}
-            {% assign currentBaseUrl = page.url | split: "#" | first | split: '.html' | first %}
-            {% assign structure = site.data[page.structure] %}
-            {% for item in structure %}
-              {% assign sectionBaseUrl = item.url | split: "#" | first | split: '.html' | first %}
-              {% assign previousIndex = forloop.index0 | minus: 1 %}
-              {% assign nextIndex = forloop.index0 | plus: 1 %}
-  
-              {% if currentBaseUrl == sectionBaseUrl %}
-                
-                {% if forloop.first == false and structure[previousIndex] != nil %}
-                  {% assign previousPageTitle = structure[previousIndex].title %}
-                  {% assign previousPageUrl = structure[previousIndex].url %}
-                {% endif %}
-  
-                {% if forloop.last == false and structure[nextIndex] != nil %}
-                  {% assign nextPageTitle = structure[nextIndex].title %}
-                  {% assign nextPageUrl = structure[nextIndex].url %}
-                {% endif %}
-  
-              {% endif %}
-            {% endfor %}
-  
-            {% if previousPageTitle != nil %}
-              <a class="chapter-select-button" href="{{ previousPageUrl | relative_url }}">
-                <span class="chapter-select-button-label">← Previous section</span>
-                <span class="chapter-select-button-content">{{ previousPageTitle }}</span>
-              </a>
-            {% endif %}
-            {% if nextPageTitle != nil %}
-              <a class="chapter-select-button" href="{{ nextPageUrl | relative_url }}">
-                <span class="chapter-select-button-label">Next section →</span>
-                <span class="chapter-select-button-content">{{ nextPageTitle }}</span>
-              </a>
-            {% endif %}
-          </div>
+          {%- include docs/widgets/chapterSelect.html -%}
         </article>
 
         <aside class="article-sidebar">
@@ -81,7 +42,7 @@
       
     </main>
 
-    {%- include footer.html -%}
+    {%- include docs/footer.html -%}
 
   </body>
 

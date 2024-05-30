@@ -1,0 +1,47 @@
+#version-warning {
+  display: flex;
+  align-items: center;
+  background-color: #ffd087;
+  color: #444444;
+  margin: 0px 0px 30px 0px;
+  padding: 15px 0px;
+  border-radius: 10px;
+
+  .version-warning-left {
+    margin: 0px 20px;
+  }
+
+    .version-warning-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 25px;
+      width: 25px;
+      box-shadow: none !important;
+      background-color: #00000026;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+      color: white;
+      font-family: 'Roboto Mono';
+    }
+
+  .version-warning-right {
+    padding: 0px 0px 0px 20px;
+    border-left: 2px solid #ffffff30;
+    font-size: 14px;
+    
+    p {
+      margin: 0px;
+    }
+
+    .version-warning-link {
+      // color: white;
+    }
+  }
+}
+
+:root[data-theme="dark"] #version-warning {
+  background-color: var(--background-color-2);
+  color:  var(--text-color);
+}
