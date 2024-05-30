@@ -88,6 +88,42 @@
         scroll-margin-top: calc(var(--header-height) + 20px);
       }
 
+      .chapter-select {
+        display: flex;
+        justify-content: space-between;
+        margin: var(--spacing-unit) 0px 0px 0px;
+      }
+
+        .chapter-select-button {
+          position: relative;
+          top: 0px;
+          display: flex;
+          flex-direction: column;
+          width: 45%;
+          padding: 12px;
+          background-color: var(--background-color-2);
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.0705882353);
+          border-radius: 10px;
+          color: unset;
+          text-decoration: none !important;
+          transition: 0.1s ease top, 0.1s ease box-shadow;
+        }
+        .chapter-select-button:hover {
+          top: -2px;
+          box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.0705882353);
+        }
+
+          .chapter-select-button-label {
+            color: grey;
+            font-size: 14px;
+          }
+
+          .chapter-select-button-content {
+            text-transform: uppercase;
+            font-weight: 600;
+            margin: 0px 0px 0px 5px;
+          }
+
     .article-sidebar {
       width: 250px;
       padding: 40px 0px 0px 0px;

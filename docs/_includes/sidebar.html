@@ -2,8 +2,8 @@
   <div class="sidebar-scroll">
     <nav class="sidebar-content">
 
-      {% for item in site.data[page.sidenav] %}
-        {% assign currentBaseUrl = page.url | split: "#" | first | split: '.html' | first %}
+      {% assign currentBaseUrl = page.url | split: "#" | first | split: '.html' | first %}
+      {% for item in site.data[page.sidenav] %}        
         {% assign sectionBaseUrl = item.url | split: "#" | first | split: '.html' | first %}
         {% if currentBaseUrl == sectionBaseUrl %}
           {% assign isCurrentSection = true %}
