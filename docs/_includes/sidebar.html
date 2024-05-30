@@ -3,7 +3,7 @@
     <nav class="sidebar-content">
 
       {% assign currentBaseUrl = page.url | split: "#" | first | split: '.html' | first %}
-      {% for item in site.data[page.sidenav] %}        
+      {% for item in site.data[page.structure] %}        
         {% assign sectionBaseUrl = item.url | split: "#" | first | split: '.html' | first %}
         {% if currentBaseUrl == sectionBaseUrl %}
           {% assign isCurrentSection = true %}

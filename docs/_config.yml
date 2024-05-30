@@ -45,7 +45,7 @@ defaults:
   - scope:
       path: "documentation/v2"
     values:
-      sidenav: "sidenav_v2"
+      structure: "structure_v2"
 
 # Exclude from processing to dist folder
 exclude:
