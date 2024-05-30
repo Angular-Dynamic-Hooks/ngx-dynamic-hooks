@@ -32,13 +32,13 @@ And then use the `context`-keyword to use its data in selector hooks:
 
 The context object is typically a simple object literal that provides some values of interest from the parent component, but it can technically be anything - even the parent component itself. You can also use alternative notations to access its properties like `context['name']`, call functions like `context.someFunc()` and even use nested expressions like `context[context.someProp].someFunc(context.someParam)`.
 
-**Note:** The context object is the only piece of live code that can accessed from within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure. Simply put whatever you want to make available to the author of the text into the context object.
+**Note:** The context object is the only piece of live code that can accessed directly within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure. Simply put whatever you want to make available to the author of the content string into the context object.
 
 ![Communication flow](https://i.imgur.com/K63SQGU.jpg)
 
 ## Inputs
 
-You can pass data of almost any type to @Inputs() in selector hooks, such as:
+You can pass data of almost any type to component `@Input()`s in selector hooks, such as:
 
 | Type | Example |
 | --- | --- | 
@@ -58,7 +58,7 @@ Alternatively, you may also write inputs without []-brackets as normal HTML-attr
 
 ## Outputs
 
-You can subscribe to @Output() events from selector hooks with functions from the context object like:
+You can subscribe to `@Output()` events from selector hooks with functions from the context object like:
 
 ```html
 '...some dynamic content... <app-jedi (wasDefeated)="context.goIntoExile($event)"></app-jedi> ...more dynamic content...'
@@ -74,14 +74,16 @@ A function directly assigned to the context object will have `this` pointing to 
 
 ## Content projection
 
-Hooks can be nested without limitations. The loaded components will correctly be rendered in each others `<ng-content>`-slots. When using selector hooks, it will look and work identical as in normal Angular templates:
+Hooks can be nested without limitations. When using selector hooks, it will look and work identical as in normal Angular templates:
 ```html
 '...some dynamic content... 
 <app-parent>
-    <app-content-child></app-content-child>
+    <app-child></app-child>
 </app-parent>
 ...more dynamic content...'
 ```
+
+As normal, make sure to include an `<ng-content>` in your parent components so Angular knows where to render the child content.
 
 There are two small caveats, however: 
 1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods](#55-lifecycle-methods)). 
@@ -123,10 +125,10 @@ export class DynamicComponent implements OnDynamicMount, OnDynamicChanges {
 
 **Note:** You may have spotted that content children are given as `DynamicContentChild`-arrays. Each `DynamicContentChild` consists of the `ComponentRef`, the selector and the `HookValue` of the component, as well as all of its own content children, again given as a `DynamicContentChild` array. It is therefore a hierarchical list of all content children, not a flat one.
 
-**Also:** As normal, make sure to still include an `<ng-content>` block in each parent component so Angular knows where to render the child content.
-
 ## Change detection
 
 Dynamically-loaded components are connected to Angular change detection and will be checked when it is triggered like any other part of the app. Setting `ChangeDetectionStrategy.OnPush` on them to limit change detection will work as well. 
 
-The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. This way, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger ` ngOnChanges()`. Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [OutletOptions](#64-outletoptions)).
+The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. This way, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger ` ngOnChanges()`.
+
+Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [OutletOptions](#64-outletoptions)).

@@ -1,13 +1,8 @@
+@import "./vars.scss";
 @import "./code_themes/dark.scss";
 
 // Dark mode
 // ---------
-
-$dm-brand-color:           #d5339d !default;
-$dm-brand-color-faint:     transparentize($dm-brand-color, 0.8) !default;
-$dm-brand-color-light:     lighten($dm-brand-color, 38%) !default;
-$dm-brand-color-dark:      darken($dm-brand-color, 15%) !default;
-
 $dm-text-color:               #d4d3df !default;
 $dm-title-color:              #eee !default;
 $dm-background-color-1:       #2b2b32 !default;
@@ -15,7 +10,7 @@ $dm-background-color-2:       #3e3e48 !default;
 $dm-background-color-code:    #343640 !default;
 $dm-background-color-hover:   #dddddd0f !default;
 
-$dm-link-base-color:       lighten($dm-brand-color, 5%) !default;
+$dm-link-base-color:       lighten($brand-color, 5%) !default;
 $dm-link-visited-color:    $dm-link-base-color !default;
 $dm-link-hover-color:      $dm-text-color !default;
 
@@ -26,11 +21,6 @@ $dm-table-zebra-color-2:      lighten($dm-background-color-1, 4%) !default;
 $dm-table-border-color:     #00000014 !default;
 
 @mixin darkmode-colors {
-  --brand-color: #{$lm-brand-color};
-  --brand-color-faint: #{$dm-brand-color-faint};
-  --brand-color-light: #{$dm-brand-color-light};
-  --brand-color-dark: #{$dm-brand-color-dark};
-
   --text-color: #{$dm-text-color};
   --title-color: #{$dm-title-color};
   --background-color-1: #{$dm-background-color-1};

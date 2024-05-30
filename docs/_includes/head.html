@@ -2,6 +2,16 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/favicons/apple-touch-icon.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/favicons/favicon-32x32.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ '/assets/favicons/favicon-16x16.png' | relative_url }}">
+  <link rel="manifest" href="{{ '/assets/favicons/site.webmanifest' | relative_url }}">
+  <link rel="mask-icon" href="{{ '/assets/favicons/safari-pinned-tab.svg' | relative_url }}" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#2b5797">
+  <link rel="shortcut icon" href="{{ '/assets/favicons/favicon.ico' | relative_url }}">
+  <meta name="msapplication-config" content="/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+  
   {%- seo -%}
   
   {% for file in site.static_files %}
@@ -11,10 +21,6 @@
   {% endfor %}
 
   {%- feed_meta -%}  
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
   
   <script>
     // Immediately apply darkmode styling if relevant to prevent flickering

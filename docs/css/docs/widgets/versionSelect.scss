@@ -11,6 +11,7 @@
   .version-select-display {
     padding: 4px 10px;
     background-color: var(--brand-color);
+    background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-secondary) 100%);
     color: white;
     border-radius: 5px;
     user-select: none;

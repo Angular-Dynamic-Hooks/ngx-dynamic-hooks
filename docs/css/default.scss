@@ -1,11 +1,45 @@
 @import "./vars.scss";
+@import './lm';
+@import './dm';
 
-html {
+
+// Colors (light & darkmode)
+// -------------------
+
+:root {
+  --brand-color: #{$brand-color};
+  --brand-color-secondary: #{$brand-color-secondary};
+  --brand-color-faint: #{$brand-color-faint};
+  --brand-color-light: #{$brand-color-light};
+  --brand-color-dark: #{$brand-color-dark};
+  @include lightmode-colors;
 }
 
-/**
-  * Reset some basic elements
-  */
+// Use dark mode when user preference or when manually set dark mode theme attribute
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include darkmode-colors;
+  }  
+}
+:root[data-theme="dark"] {
+  @include darkmode-colors;
+}
+
+// Misc variables
+// -------------------
+
+:root {
+  --spacing-unit: 30px;
+  --header-height: 60px;
+
+  @include minWidth($xl) {
+    --spacing-unit: 60px;
+  }
+}
+
+// Reset some basic elements
+// -------------------
+
 body, h1, h2, h3, h4, h5, h6,
 p, blockquote, pre, hr,
 dl, dd, ol, ul, figure {
@@ -108,47 +142,6 @@ li {
 
 
 /**
-  * Headings
-  */
-h1, h2, h3, h4 {
-  color: var(--title-color);
-}
-
-h1 {
-  font-size: 30px;
-  font-weight: 600;
-  color: var(--brand-color);
-  scroll-margin-top: calc(var(--header-height) + 20px);
-}
-h2 {
-  display: flex;
-  align-items: center;
-  margin-left: -20px;
-  font-size: 28px;
-  font-weight: 600;
-  scroll-margin-top: calc(var(--header-height) + 20px);
-}
-h2:before {
-  display: block;
-  content: "";
-  height: 18px;
-  width: 8px;
-  margin: 0px 20px 0px 0px;
-  background-color: var(--brand-color);
-}
-h3 {
-  font-size: 20px;
-  font-weight: 600;
-  scroll-margin-top: calc(var(--header-height) + 20px);
-}
-h4 {
-  font-size: 18px;
-  font-weight: 400;
-  scroll-margin-top: calc(var(--header-height) + 20px);
-}
-
-
-/**
   * Links
   */
 a {
@@ -235,7 +228,7 @@ table {
 
   th, td {
     padding: calc(var(--spacing-unit) * 18 * .01) calc(var(--spacing-unit) * .5);
-    font-size: 0.9em;
+    font-size: 0.95em;
   }
 
   // Colors

@@ -1,13 +1,8 @@
+@import "./vars.scss";
 @import "./code_themes/light.scss";
 
 // Light mode
 // ----------
-
-$lm-brand-color:           #d5339d !default;
-$lm-brand-color-faint:     transparentize($lm-brand-color, 0.9) !default;
-$lm-brand-color-light:     lighten($lm-brand-color, 38%) !default;
-$lm-brand-color-dark:      darken($lm-brand-color, 15%) !default;
-
 $lm-text-color:               #444 !default;
 $lm-title-color:              #222 !default;
 $lm-background-color-1:       #f5f5f8 !default;
@@ -15,22 +10,17 @@ $lm-background-color-2:       white !default;
 $lm-background-color-code:    white !default;
 $lm-background-color-hover:   #00000008 !default;
 
-$lm-link-base-color:       $lm-brand-color !default;
+$lm-link-base-color:       $brand-color !default;
 $lm-link-visited-color:    darken($lm-link-base-color, 15%) !default;
 $lm-link-hover-color:      $lm-text-color !default;
 
 $lm-table-header-text-color:  white !default;
-$lm-table-header-bg-color:      #555561 !default;
-$lm-table-zebra-color-1:        darken($lm-background-color-1, 4%) !default;
-$lm-table-zebra-color-2:        darken($lm-background-color-1, 2%) !default;
-$lm-table-border-color:       #00000014 !default;
+$lm-table-header-bg-color:    #555561 !default;
+$lm-table-zebra-color-1:        lighten($lm-background-color-1, 1%) !default;
+$lm-table-zebra-color-2:        lighten($lm-background-color-1, 4%) !default;
+$lm-table-border-color:       #00000026 !default;
 
 @mixin lightmode-colors {
-  --brand-color: #{$lm-brand-color};
-  --brand-color-faint: #{$lm-brand-color-faint};
-  --brand-color-light: #{$lm-brand-color-light};
-  --brand-color-dark: #{$lm-brand-color-dark};
-
   --text-color: #{$lm-text-color};
   --title-color: #{$lm-title-color};
   --background-color-1: #{$lm-background-color-1};

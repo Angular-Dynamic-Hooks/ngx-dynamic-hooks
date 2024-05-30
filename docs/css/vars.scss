@@ -1,5 +1,9 @@
-@import './lm';
-@import './dm';
+// Brand color
+$brand-color:           #d5339d !default;
+$brand-color-secondary: #c92e2e !default;
+$brand-color-faint:     transparentize($brand-color, 0.9) !default;
+$brand-color-light:     lighten($brand-color, 38%) !default;
+$brand-color-dark:      darken($brand-color, 15%) !default;
 
 // Breakpoints
 $sm: 640px;
@@ -11,34 +15,5 @@ $xxl: 1536px;
 @mixin minWidth($breakpoint) {
   @media screen and (min-width: $breakpoint) {
     @content;
-  }
-}
-
-// Light- or Dark-mode
-// -------------------
-
-:root {
-  @include lightmode-colors;
-}
-
-// Use dark mode when user preference or when manually set dark mode theme attribute
-@media (prefers-color-scheme: dark) {
-  :root {
-    @include darkmode-colors;
-  }  
-}
-:root[data-theme="dark"] {
-  @include darkmode-colors;
-}
-
-// Misc variables
-// -------------------
-
-:root {
-  --spacing-unit: 30px;
-  --header-height: 60px;
-
-  @include minWidth($xl) {
-    --spacing-unit: 60px;
   }
 }

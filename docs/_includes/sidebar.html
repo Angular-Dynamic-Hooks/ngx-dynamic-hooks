@@ -14,7 +14,12 @@
         <div class="sidebar-section {% if item.children %}hasChildren{% endif %} {% if isCurrentSection %}active toggled{% endif %}">
 
           <h3 class="sidebar-title">
-            <a class="sidebar-link" href="{{ item.url | relative_url }}">{{ item.title }}</a>
+            <a class="sidebar-link" href="{{ item.url | relative_url }}">
+              {% if (item.icon )%}
+              <img class="sidebar-title-icon" src="{{ item.icon | relative_url }}">
+              {% endif %}
+              <span>{{ item.title }}</span>
+            </a>
             {% if item.children %}
             <div class="sidebar-title-toggle">
               <img class="sidebar-title-toggle-icon" src="{{ "/assets/images/narrow_arrow_down.png" | relative_url }}">
