@@ -17,3 +17,33 @@ $xxl: 1536px;
     @content;
   }
 }
+
+@mixin minSm() {
+  @include minWidth($sm) {
+    @content;
+  }
+}
+
+@mixin minMd() {
+  @include minWidth($md) {
+    @content;
+  }
+}
+
+@mixin minLg() {
+  @include minWidth($lg) {
+    @content;
+  }
+}
+
+@mixin minXl() {
+  @include minWidth($xl) {
+    @content;
+  }
+}
+
+@mixin minXxl() {
+  @include minWidth($xxl) {
+    @content;
+  }
+}

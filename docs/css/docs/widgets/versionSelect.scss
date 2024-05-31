@@ -9,7 +9,10 @@
   }
 
   .version-select-display {
-    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding: 0px 10px;
     background-color: var(--brand-color);
     background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-secondary) 100%);
     color: white;
@@ -21,12 +24,19 @@
   }
 
     .version-select-display-label {
+      display: none;
+      margin: 0px 5px 0px 0px;
       font-size: 0.9em;
       font-weight: 500;
-      color: #ffffffd6;
+      color: #ffffffd6;      
+
+      @include minLg() {
+        display: block;
+      }
     }
 
     .version-select-display-version {
+      margin: 0px 5px 0px 0px;
       font-weight: 500;
     }
 

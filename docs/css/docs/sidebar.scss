@@ -1,7 +1,16 @@
 .sidebar {
-  width: 300px;
+  display: none;
+  width: 250px;
   background-color: var(--background-color-2);
   box-shadow: -3px 0 8px 0 rgb(0 0 0 / 50%);
+
+  @include minLg() {
+    display: block;
+  }
+
+  @include minXl() {
+    width: 300px;
+  }
 }
 
   .sidebar-scroll {

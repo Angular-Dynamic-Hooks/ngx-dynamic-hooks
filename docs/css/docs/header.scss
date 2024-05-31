@@ -6,7 +6,6 @@
   align-items: center;
   height: var(--header-height);
   box-sizing: border-box;
-  padding: 10px 25px;
   background-color: #34363c;
   color: white;
   z-index: 10;
@@ -15,28 +14,57 @@
   .header-left {
     display: flex;
     align-items: center;
+    height: 100%;
   }
+
+    .sidebar-toggle {
+      display: block;
+      height: var(--header-height);
+      width: var(--header-height);
+      padding: 0px 10px;
+      margin: 0px 20px 0px 0px;
+      background-color: var(--brand-color);
+      background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-secondary) 100%);
+      border: none;
+
+      @include minLg() {
+        display: none;
+      }
+    }
+
+      .sidebar-toggle-img {
+        height: 15px;
+      }
 
     .site-title {
       display: flex;
       align-items: center;
-      margin: 0px 40px 0px 0px;
+      margin: 0px 25px 0px 0px;
       text-decoration: none !important;
+
+      @include minLg() {
+        margin: 0px 30px 0px 25px;
+      }
     }
 
       .site-logo {
         display: block;
         height: 30px;
-        margin: 0px 10px 0px 0px;
       }
 
       .site-name {
-        font-size: 18px;
+        margin: 0px 0px 0px 10px;
+        font-size: 13px;
         color: white;
         font-family: "Roboto Mono", monospace;
+
+        @include minLg() {
+          font-size: 18px;
+        }
       }
 
       .site-name-extra {
+        display: none;
         position: relative;
         margin: 0px 0px 0px 7px;
         top: -3px;
@@ -44,15 +72,29 @@
         font-size: 15px;
         text-transform: uppercase;
         font-family: monospace;
+
+        @include minLg() {
+          display: block;
+        }
       }
 
   .header-right {
     display: flex;
     align-items: center;
+    height: 100%;
+    margin: 0px;
+
+    @include minSm() {
+      margin: 0px 25px 0px 0px;
+    }
   }
 
     .site-links {
-      display: flex;
+      display: none;
+
+      @include minSm() {
+        display: flex;
+      }
     }
     .site-links > *:not(:last-child) {
       margin: 0px 25px 0px 0px;
@@ -66,9 +108,16 @@
       }
 
         .site-link-icon {
-          margin: 0px 6px 0px 0px;
-
           img {
             height: 12px;
+          }
+        }
+
+        .site-link-text {
+          display: none;
+          margin: 0px 0px 0px 6px;
+
+          @include minLg() {
+            display: block;
           }
         }

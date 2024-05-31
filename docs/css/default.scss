@@ -29,11 +29,11 @@
 // -------------------
 
 :root {
-  --spacing-unit: 30px;
-  --header-height: 60px;
+  --spacing-unit: 60px;
+  --header-height: 50px;
 
-  @include minWidth($xl) {
-    --spacing-unit: 60px;
+  @include minLg() {
+    --header-height: 60px;
   }
 }
 
@@ -221,10 +221,14 @@ pre {
   * Tables
   */
 table {
+  display: block;
   margin-bottom: var(--spacing-unit);
   width: 100%;
   text-align: left;
   border-spacing: 0px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
 
   th, td {
     padding: calc(var(--spacing-unit) * 18 * .01) calc(var(--spacing-unit) * .5);
@@ -279,13 +283,6 @@ table {
 
   tr:last-of-type td:last-of-type {
     border-radius: 0px 0px 10px 0px;
-  }
-
-  @include minWidth($md) {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-            -ms-overflow-style: -ms-autohiding-scrollbar;
   }
 }
 

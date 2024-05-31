@@ -6,26 +6,43 @@
   .footer-top {
     display: flex;
     justify-content: center;
-    padding: 35px 30px 20px 30px;
+    padding: 20px;
+
+    @include minSm() {
+      padding: 35px 30px 20px 30px;
+    }
   }
 
     .footer-wrapper {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-evenly;
       width: 100%;
-      max-width: 1000px;
+      max-width: 700px;
+
+      @include minMd() {
+        justify-content: space-between;
+      }
+
+      @include minLg() {
+        max-width: 1000px;
+      }
     }
+
+      .footer-col {
+        padding: 0px 10px;
+
+        @include minSm() {
+          padding: 0px;
+        }
+      }
+      .footer-col:not(:first-of-type):not(:last-of-type) {
+        padding: 0px 100px;
+      }
 
       .footer-col.brand {
         display: flex;
         align-items: center;
         flex-shrink: 0;
-      }
-      .footer-col.links {
-        flex-shrink: 0;
-      }
-      .footer-col:not(:first-of-type):not(:last-of-type) {
-        padding: 0px 100px;
       }
 
         .footer-brand {
@@ -36,21 +53,46 @@
 
           .footer-brand-main {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            margin: 0px 0px 15px 0px;
+            text-decoration: none !important;
+
+            @include minLg() {
+              flex-direction: row;
+              margin: 0px 0px 15px 0px;
+            }
           }
 
             .footer-logo {
               display: block;
-              height: 50px;
-              margin: 0px 20px 0px 0px;
+              height: 70px;
+
+              @include minLg() {
+                height: 50px;
+              }
             }
 
             .footer-name {
-              font-size: 18px;
+              margin: 20px 0px 0px 0px;
+              font-size: 16px;
               color: white;
               font-family: "Roboto Mono", monospace;
+
+              @include minLg() {
+                margin: 0px 0px 0px 20px; 
+                font-size: 18px;      
+              }
             }
+
+          .footer-brand-desc {
+            display: none;
+            color: #a2a2a2;
+            font-size: 14px;
+
+            @include minLg() {
+              display: block;
+            }
+          }
 
         .footer-title {
           display: flex;
@@ -65,48 +107,59 @@
             margin: 0px 10px 0px 0px;
           }
 
-        .footer-desc {
+        .footer-text {
           color: #a2a2a2;
           font-size: 14px;
           line-height: 1.8;
         }
-        .footer-desc:not(:last-of-type) {
+        .footer-text:not(:last-of-type) {
           margin: 0px 0px 10px 0px;
         }
 
-          
-      .footer-links {
-      }
-      .footer-links > *:not(:last-child) {
-        margin: 0px 0px 5px 0px;
+      .footer-col.contributing {
+        display: none;
+        
+        @include minMd() {
+          display: block;
+        }
       }
 
-        .footer-link {
-          display: flex;
-          align-items: center;
-          color: white !important;
-          font-size: 14px;
-
-          span {
-            white-space: nowrap;
-          }
+      .footer-col.links {
+        flex-shrink: 0;
+      }
+            
+        .footer-links {
+        }
+        .footer-links > *:not(:last-child) {
+          margin: 0px 0px 5px 0px;
         }
 
-          .footer-link-icon {
-            margin: 0px 6px 0px 0px;
+          .footer-link {
+            display: flex;
+            align-items: center;
+            color: white !important;
+            font-size: 14px;
 
-            img {
-              height: 12px;
-              width: 12px;
+            span {
+              white-space: nowrap;
             }
           }
+
+            .footer-link-icon {
+              margin: 0px 6px 0px 0px;
+
+              img {
+                height: 12px;
+                width: 12px;
+              }
+            }
 
   .footer-bottom {
     display: flex;
     background-color: #222224;
     width: 100%;
     justify-content: center;
-    padding: 5px;
+    padding: 5px 30px;
     box-sizing: border-box;
     font-size: 11px;
     color: darkgrey;
@@ -120,3 +173,11 @@
     .copyright-desc {
 
     }
+
+      .copyright-desc-span {
+        display: none;
+
+        @include minMd() {
+          display: inline;
+        }
+      }
