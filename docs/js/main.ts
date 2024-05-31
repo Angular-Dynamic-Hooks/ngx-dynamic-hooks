@@ -4,6 +4,10 @@ import { bootstrapWidgets } from './widgetBootstrap';
 import { VersionSelectWidget } from './widgets/version/versionSelect';
 import { DarkmodeWidget } from './widgets/darkmode';
 import { VersionWarningWidget } from './widgets/version/versionWarning';
+import { initCopyrightDate } from './misc';
+
+// Init misc logic
+initCopyrightDate();
 
 // Init widgets
 const widgets = bootstrapWidgets(document.body, [

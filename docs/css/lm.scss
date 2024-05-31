@@ -11,7 +11,7 @@ $lm-background-color-code:    white !default;
 $lm-background-color-hover:   #00000008 !default;
 
 $lm-link-base-color:       $brand-color !default;
-$lm-link-visited-color:    darken($lm-link-base-color, 15%) !default;
+$lm-link-visited-color:    lighten($lm-link-base-color, 5%) !default;
 $lm-link-hover-color:      $lm-text-color !default;
 
 $lm-table-header-text-color:  white !default;

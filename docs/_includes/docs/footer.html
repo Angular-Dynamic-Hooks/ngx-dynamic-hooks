@@ -1,26 +1,53 @@
-<footer class="footer h-card">
-  <data class="u-url" href="{{ "/" | relative_url }}"></data>
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-wrapper">
 
-  <div class="wrapper">
+      <div class="footer-col brand">
+        <div class="footer-brand">
+          <div class="footer-brand-main">
+            <img class="footer-logo" src="{{ "/assets/images/ngx-dynamic-hooks-logo.svg" | relative_url }}">
+            <span class="footer-name">ngx-dynamic-hooks</span>
+          </div>
+          <p class="footer-desc">Dynamic component loading for Angular made easy</p>  
+        </div>              
+      </div>
 
-    <div class="footer-col-wrapper">
-      <div class="footer-col">
-        {%- if site.author %}
-          <ul class="contact-list">
-            {% if site.author.name -%}
-              <li class="p-name">{{ site.author.name | escape }}</li>
-            {% endif -%}
-            {% if site.author.email -%}
-              <li><a class="u-email" href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></li>
-            {%- endif %}
-          </ul>
-        {%- endif %}
+      <div class="footer-col contributing">
+        <h4 class="footer-title"><img class="footer-title-img" src="{{ "/assets/images/icons/applause.png" | relative_url }}">Contributing</h4>
+        <p class="footer-desc">If you'd like to contribute, discuss ideas or bring up issues, head on over to the <a href="https://github.com/MTobisch/ngx-dynamic-hooks" target="_blank">project site</a>.</p>
       </div>
-      <div class="footer-col">
-        <p>{{ site.description | escape }}</p>
+
+      <div class="footer-col links">
+        <h4 class="footer-title">Useful links</h4>
+        <div class="footer-links">
+          <a class="footer-link" href="{{ '/' | relative_url }}" target="_blank">
+            <div class="footer-link-icon">⌂</div>
+            <span>Home</span>
+          </a>
+          <a class="footer-link" href="https://github.com/MTobisch/ngx-dynamic-hooks/issues" target="_blank">
+            <div class="footer-link-icon">
+              <img src="{{ "/assets/images/github-mark-white.svg" | relative_url }}">
+            </div>
+            <span>Current issues</span>
+          </a>
+          <a class="footer-link" href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">
+            <div class="footer-link-icon">
+              <img src="{{ "/assets/images/npm.svg" | relative_url }}">
+            </div>
+            <span>npm</span>
+          </a>
+        </div>
       </div>
+
+
     </div>
+  </div>
 
+  <div class="footer-bottom">
+    <div class="footer-wrapper">
+      <span class="copyright-title">Copyright (c) <span class="copyright-date">2020</span> <a href="https://github.com/MTobisch" target="_blank">Marvin Tobisch</a></span>
+      <span class="copyright-desc">Both ngx-dynamic-hooks and the documentation use the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md" target="_blank">MIT License</a></span>
+    </div>
   </div>
 </footer>
 
