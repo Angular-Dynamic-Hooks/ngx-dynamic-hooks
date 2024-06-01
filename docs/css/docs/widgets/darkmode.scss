@@ -6,8 +6,13 @@
 }
 
   .darkmode-icon {
+    display: none;
     height: 14px;
     margin: 0px 7px 0px 0px;
+
+    @include minSm() {
+      display: block;
+    }
   }
 
   .darkmode-toggle {

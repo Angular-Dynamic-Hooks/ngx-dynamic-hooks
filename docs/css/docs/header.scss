@@ -8,7 +8,7 @@
   box-sizing: border-box;
   background-color: #34363c;
   color: white;
-  z-index: 10;
+  z-index: 100;
 }
 
   .header-left {
@@ -17,7 +17,7 @@
     height: 100%;
   }
 
-    .sidebar-toggle {
+    #sidebar-toggle {
       display: block;
       height: var(--header-height);
       width: var(--header-height);
@@ -32,14 +32,14 @@
       }
     }
 
-      .sidebar-toggle-img {
+      #sidebar-toggle-img {
         height: 15px;
       }
 
     .site-title {
       display: flex;
       align-items: center;
-      margin: 0px 25px 0px 0px;
+      margin: 0px 15px 0px 0px;
       text-decoration: none !important;
 
       @include minLg() {
@@ -48,12 +48,17 @@
     }
 
       .site-logo {
-        display: block;
+        display: none;
         height: 30px;
+        margin: 0px 10px 0px 0px;
+
+        @include minSm() {
+          display: block;
+          font-size: 18px;
+        }
       }
 
       .site-name {
-        margin: 0px 0px 0px 10px;
         font-size: 13px;
         color: white;
         font-family: "Roboto Mono", monospace;
@@ -82,7 +87,7 @@
     display: flex;
     align-items: center;
     height: 100%;
-    margin: 0px;
+    margin: 0px 15px 0px 0px;
 
     @include minSm() {
       margin: 0px 25px 0px 0px;
@@ -90,11 +95,7 @@
   }
 
     .site-links {
-      display: none;
-
-      @include minSm() {
-        display: flex;
-      }
+      display: flex;
     }
     .site-links > *:not(:last-child) {
       margin: 0px 25px 0px 0px;
@@ -106,8 +107,25 @@
         color: white !important;
         font-size: 15px;
       }
+      .site-link.home {
+        display: none;
+
+        @include minSm() {
+          display: flex;
+        }
+      }
+      .site-link.npm {
+        display: none;
+        
+        @include minSm() {
+          display: flex;
+        }
+      }
 
         .site-link-icon {
+          display: flex;
+          align-items: center;
+
           img {
             height: 12px;
           }

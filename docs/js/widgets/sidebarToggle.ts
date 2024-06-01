@@ -1,36 +1,59 @@
-import { GenericWidgetController, Widget, WidgetController } from "../widgetBootstrap";
+import { GenericWidgetController, Widget } from "../widgetBootstrap";
 
-export class SidebarWidget implements Widget {
-  static selector: string = '.sidebar-section.hasChildren';
-  public section: HTMLElement|null = null;
-  public toggleButtonElement: HTMLElement|null = null;
-  public articleElement: HTMLElement|null = null;
-  public titleElements: NodeListOf<HTMLElement>|null = null;
+export class SidebarToggleWidget implements Widget {
+  static selector: string = '.sidebar';
+  sidebarElement: HTMLElement|null = null;
+  toggleButtonElement: HTMLElement|null = null;
+  wrapperElement: HTMLElement|null = null;
+  sidebarIsToggled: boolean = false;
 
   onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
-    this.section = hostElement as HTMLElement;
-    this.toggleButtonElement = this.section!.querySelector('.sidebar-title-toggle');
-    this.articleElement = document.querySelector('.article');
-    this.titleElements = this.articleElement?.querySelectorAll('h1, h2, h3, h4') || null;
+    this.sidebarElement = hostElement as HTMLElement;
+    this.toggleButtonElement = document.querySelector('#sidebar-toggle');
+    this.wrapperElement = document.querySelector('#wrapper');
 
-    this.registerToggleButton();
-    this.registerActiveSectionScrollListener();
+    this.registerToggleFunctionality();
   }
 
-  private registerToggleButton() {      
-    if (!this.toggleButtonElement) {
+  private registerToggleFunctionality() {      
+    if (!this.toggleButtonElement || !this.wrapperElement) {
       return;
     }
 
     this.toggleButtonElement.addEventListener('click', () => {
-      if (this.section!.classList.contains('toggled')) {
-        this.section!.classList.remove('toggled');
+      if (this.sidebarIsToggled) {
+        this.hideSidebar();
       } else {
-        this.section!.classList.add('toggled');
+        this.showSidebar();
+      }
+    });
+
+    document.addEventListener('click', event => {
+      if (!this.toggleButtonElement!.contains(event.target as Node) && !this.sidebarElement!.contains(event.target as Node)) {
+        this.hideSidebar();
+      }
+    });
+
+    window.addEventListener('resize', event => {
+      if (this.sidebarIsToggled && window.innerWidth >= 1024) {
+        this.hideSidebar();
       }
     });
   }
 
+  private showSidebar() {
+    this.sidebarIsToggled = true;
+    this.sidebarElement!.classList.add('toggled');
+    this.wrapperElement!.classList.add('locked');
+  }
+
+  private hideSidebar() {
+    this.sidebarIsToggled = false;
+    this.sidebarElement!.classList.remove('toggled');
+    this.wrapperElement!.classList.remove('locked');
+  }
+
+  /*
   private registerActiveSectionScrollListener() {
     if (!this.section!.classList.contains('active') || !this.titleElements) {
       return;
@@ -68,4 +91,6 @@ export class SidebarWidget implements Widget {
       observer.observe(titleElement);
     }
   }
+
+  */
 }

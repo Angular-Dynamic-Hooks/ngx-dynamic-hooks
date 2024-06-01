@@ -5,7 +5,7 @@
   min-height: calc(100vh - var(--header-height));
 }
 
-  .wrapper {
+  #wrapper {
     display: flex;
     justify-content: center;
     width: 100%;
@@ -17,6 +17,7 @@
     padding-left: calc(var(--spacing-unit) * .5);
     padding-top: calc(var(--spacing-unit) * .5);
     padding-bottom: var(--spacing-unit);
+    transition: filter 0.15s ease;
 
     @include minMd() {
       max-width: 1200px;
@@ -33,6 +34,9 @@
     @include minXl() {
       width: calc(100% - 300px);
     }
+  }
+  #wrapper.locked {
+    filter: blur(3px);
   }
 
     .article {
@@ -62,40 +66,66 @@
       }
 
       .article h1 {
-        font-size: 30px;
+        font-size: 25px;
         font-weight: 600;
         color: var(--brand-color);
         scroll-margin-top: calc(var(--header-height) + 20px);
         // background: -webkit-linear-gradient(var(--brand-color), var(--brand-color-secondary));
         // -webkit-background-clip: text;
         // -webkit-text-fill-color: transparent;
+
+        @include minSm() {
+          font-size: 30px;
+        }
       }
       .article h2 {
         display: flex;
         align-items: center;
-        margin-left: -20px;
-        font-size: 28px;
+        margin-left: 0px;
+        font-size: 22px;
         font-weight: 600;
         scroll-margin-top: calc(var(--header-height) + 20px);
+
+        @include minSm() {
+          margin-left: -20px;
+          font-size: 28px;
+        }
       }
       .article h2:before {
         display: block;
         content: "";
         height: 18px;
         width: 8px;
-        margin: 0px 20px 0px 0px;
+        margin: 0px 15px 0px 0px;
         background-color: var(--brand-color);
         // background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-secondary) 100%);
+
+        @include minSm() {
+          font-size: margin 0px 20px 0px 0px;
+        }
       }
       .article h3 {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 600;
         scroll-margin-top: calc(var(--header-height) + 20px);
+
+        @include minSm() {
+          font-size: 22px;
+        }
       }
       .article h4 {
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 400;
         scroll-margin-top: calc(var(--header-height) + 20px);
+
+        @include minSm() {
+          font-size: 18px;
+        }
+      }
+
+      // Lists
+      .article li:not(:last-of-type) {
+        margin: 0px 0px 5px 0px;
       }
 
     .article-sidebar {

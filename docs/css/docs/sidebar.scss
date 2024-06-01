@@ -1,32 +1,52 @@
 .sidebar {
-  display: none;
-  width: 250px;
+  position: fixed;
+  width: 0px;
+  height: 100%;
   background-color: var(--background-color-2);
   box-shadow: -3px 0 8px 0 rgb(0 0 0 / 50%);
+  z-index: 10;
+  transition: 0.15s width ease;
+  overflow: hidden;
 
   @include minLg() {
-    display: block;
-  }
-
-  @include minXl() {
-    width: 300px;
+    position: initial;
+    width: auto;
+    height: auto;
+    overflow: initial;
   }
 }
 
+.sidebar.toggled {
+  width: 300px;
+}
+
   .sidebar-scroll {
-    position: sticky;
+    position: ini;
     top: var(--header-height);
-    max-height: calc(100vh - var(--header-height));
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    max-height: calc(100vh - var(--header-height));
+    width: 300px;
     padding: 20px;
     overflow-y: auto;
-    visibility: hidden;
+      
+    @include minLg() {
+      position: sticky;
+      width: 250px;
+      visibility: hidden;
+    }
+
+    @include minXl() {
+      width: 300px;
+    }
   }
-  .sidebar-scroll:hover {
-    visibility: visible;
+  @include minLg() {
+    .sidebar-scroll:hover {
+      visibility: visible;
+    }
   }
+  
   .sidebar-scroll::-webkit-scrollbar-thumb {
     background-color: color-mix(in srgb, black, transparent 90%);
   }

@@ -29,10 +29,11 @@
 // -------------------
 
 :root {
-  --spacing-unit: 60px;
+  --spacing-unit: 50px;
   --header-height: 50px;
 
   @include minLg() {
+    --spacing-unit: 60px;
     --header-height: 60px;
   }
 }
@@ -49,7 +50,7 @@ dl, dd, ol, ul, figure {
 }
 
 body {
-  font-size: 15px;
+  font-size: 13.5px;
   line-height: 1.5;
   font-weight: 400;
   font-family: "Open Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", Roboto, Helvetica, Arial, sans-serif;
@@ -65,6 +66,10 @@ body {
   min-height: 100vh;
   flex-direction: column;
   overflow-wrap: break-word;
+
+  @include minSm() {
+    font-size: 15px;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -130,7 +135,7 @@ figcaption {
   * Lists
   */
 ul, ol {
-  margin-left: calc(var(--spacing-unit) * 0.8);
+  margin-left: calc(var(--spacing-unit) * 0.5);
 }
 
 li {
@@ -174,6 +179,7 @@ blockquote {
   border-left: 2px solid var(--brand-color);
   padding-left: calc(var(--spacing-unit)* 0.5);
   font-style: italic;
+  font-size: 0.95em;
 
   > :last-child {
     margin-bottom: 0;
