@@ -25,14 +25,14 @@ Input name | Type | Description
 `context` | `any` | An optional object to pass data to the dynamically-loaded components
 `globalParsersBlacklist` | `string[]` | An optional list of global parsers to blacklist, identified by their name
 `globalParsersWhitelist` | `string[]` | An optional list of global parsers to whitelist, identified by their name
-`parsers` | `HookParserEntry[]` | An optional list of hook parsers to use instead of the global parsers (see [HookParserEntry](#63-hookparserentry))
-`options` | `OutletOptions` | An optional options object to use instead of the global options (see [OutletOptions](#64-outletoptions))
+`parsers` | `HookParserEntry[]` | An optional list of hook parsers to use instead of the global parsers (see [Parsers]({{ "documentation/v2/parsers" | relative_url }}))
+`options` | `OutletOptions` | An optional options object to use instead of the global options (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }}))
 
 There is also an output you may subscribe to:
 
 Output name | Type | Description
 --- | --- | ---
-`componentsLoaded` | `Observable<LoadedComponent[]>` | Will trigger once all components have loaded (including [lazy-loaded ones](#65-lazy-loading-components))
+`componentsLoaded` | `Observable<LoadedComponent[]>` | Will trigger once all components have loaded (including [lazy-loaded ones]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}))
 
 Each `LoadedComponent` from the output represents a dynamically-created component and contains some information you may find interesting:
 
