@@ -1,23 +1,8 @@
 @mixin code-theme-dark {
 
   code {
-    .c, .ch, .cd, .cpf {
-      color: #75715e;
-      font-style: italic;
-    }
-    .cm {
-      color: #75715e;
-      font-style: italic;
-    }
-    .c1 {
+    .c, .ch, .cd, .cm, .cpf, .c1, .cs {
       color: #888992;
-      font-style: italic;
-    }
-    .cp {
-      color: #75715e;
-    }
-    .cs {
-      color: #75715e;
       font-style: italic;
     }
     .err {

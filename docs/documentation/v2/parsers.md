@@ -1,13 +1,50 @@
 ---
 ---
 
-## 7. Writing your own HookParser
+# Parsers
+
+## Introduction
+
+To load components from the content string, each hook needs a corresponding `HookParser`. These are the most important thing that you configure in the [settings]({{ "documentation/v2/configuration#global-settings" | relative_url }}) via the `globalParsers` field when importing the library. It expects a `HookParserEntry`-array, which is just a fancy alias for several kinds of possible values. Each can either be:
+
+1. A `SelectorHookParserConfig` object literal.
+2. A custom `HookParser` instance.
+3. A custom `HookParser` class. If this class is registered as a provider in the nearest injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
+
+Option 1 is the easiest and meant to be used if you simply want to load components like in Angular templates. We have actually already used it in the [Quick Start Example]({{ "documentation/v2/quickstart" | relative_url }})!
+
+Option 2 and 3 are only needed if you want to write your own parser. See the section [Writing your own HookParser]({{ "documentation/v2/parsers#writing-your-own-hookparser" | relative_url }}) for more info about that.
+
+## SelectorHookParserConfig
+
+Each `SelectorHookParserConfig` is an object literal that automatically creates a `SelectorHookParser` for you, which loads components by their selectors similarly to Angular. In its simplest form, it just contains the component class like `{component: ExampleComponent}`, but it also accepts additional properties: 
+
+These mostly determine the details about how the component selector is parsed from the content string. The only required property is `component`.
+
+Property | Type | Default | Description
+--- | --- | --- | ---
+`component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}).
+`name` | `string` | - | The name of the parser. Only required if you want to black- or whitelist it.
+`selector` | `string` | The component selector | The selector to use for the hook. Please note that currently only tag names are supported.
+`injector` | `Injector` | The nearest injector | The injector to create the component with
+`enclosing` | `boolean` | `true` | Whether the selector is enclosing (`<app-hook>...</app-hook>`) or not (`<app-hook>`)
+`bracketStyle` | `{opening: string, closing: string}` | `{opening: '<', closing: '>'}` | The brackets to use for the selector
+`parseInputs` | `boolean` | `true` | Whether to parse inputs into live variables or leave them as strings
+`unescapeStrings` | `boolean` | `true` | Whether to remove escaping backslashes from inputs strings
+`inputsBlacklist` | `string[]` | `null` | A list of inputs to ignore when parsing the selector
+`inputsWhitelist` | `string[]` | `null` | A list of inputs to allow exclusively when parsing the selector
+`outputsBlacklist` | `string[]` | `null` | A list of outputs to ignore when parsing the selector
+`outputsWhitelist` | `string[]` | `null` | A list of outputs to allow exclusively when parsing the selector
+`allowContextInBindings` | `boolean` | `true` | Whether to allow the use of context object variables in inputs and outputs
+`allowContextFunctionCalls` | `boolean` | `true` | Whether to allow calling context object functions in inputs and outputs
+
+## Writing your own HookParser
 
 ![Custom hook](https://i.imgur.com/9J9t5ze.png)
 
-In all of the examples above, we have used the standard `SelectorHookParser`, which comes with this library and is easy to use if all you need is to load components by their selectors. However, by creating custom parsers, any text pattern you want can be replaced by an Angular component.
+So far, we have only used the standard `SelectorHookParser`, which is included in this library for convenience and is easy to use if all you need is to load components by their selectors. However, by creating custom parsers, any text pattern you want can be replaced by an Angular component.
 
-### 7.1 What makes a parser:
+### What makes a parser
 
 A hook parser is a class that follows the `HookParser` interface, which may look daunting at first, but is actually pretty simple:
 
@@ -22,13 +59,13 @@ interface HookParser {
 
 * The `name` property is optional and only used for black/whitelisting the parser.
 * `findHooks()` is called once per parser. Its job is to find all of its hooks in the content string.
-* `loadComponent()` is called once for each hook. Its job is to say how to dynamically create the component.
-* `getBindings()` is called any time the inputs and outputs for the component are requested. Its job is to return their names and current values.
+* `loadComponent()` is called once for each hook. Its job is to specify how to create the component.
+* `getBindings()` is called any time the inputs and outputs for the component are to be determined. Its job is to return their names and current values.
 
-It is recommended to create a dedicated `HookParser` for each custom hook you are looking for (handling multiple different hooks with the same parser is messy and difficult). Here are some more details about the three main functions:
+It is recommended to create a dedicated `HookParser` for each custom hook (handling multiple different hooks with the same parser is messy and difficult). Here are some more details about the three main functions:
 
-#### `findHooks()`
-Is given the content string as well as the context object as parameters and is expected to return a `HookPosition` array. Each `HookPosition` represents a found hook and lists its indexes within the content string with the form:
+### `findHooks()`
+Is given the content string as well as the context object as parameters and is expected to return a `HookPosition` array. Each `HookPosition` represents a found hook and specifies its position within the content string with the form:
 
 ```ts
 interface HookPosition {
@@ -41,11 +78,11 @@ interface HookPosition {
 
 The opening and closing tags simply refer to the text patterns that signal the start and end of the hook and thereby also define the `<ng-content>` for the loaded component (think `[HOOK_OPENINGTAG]...content...[HOOK_CLOSINGTAG]`). If you are looking for a standalone rather than an enclosing hook (`...[HOOK]....`), you can just omit the two closing tag indexes.
 
-How your hook looks like and how you find these indexes is completely up to you. You may look for them using Regex patterns or any other parsing method. Though, as a word of warning, do not try to parse enclosing hooks with Regex alone. [It is a road that leads to madness](https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454).
+How your hook looks like and how you find these indexes is completely up to you. You may look for them using Regex patterns or any other parsing method. Though, as a word of warning, do not try to parse enclosing hooks with Regex alone. <a href="https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454" target="_blank">It is a road that leads to madness</a>.
 
-To make your life easier, you can just use the `HookFinder` service that comes with this library (which the `SelectorHookParser` uses internally as well). Its easy-to-use and safely finds both standalone and enclosing patterns in a string. You can see it in action [in the examples below](#72-example-emoji-parser-standalone).
+To make your life easier, you can just use the `HookFinder` service that comes with this library (which the `SelectorHookParser` uses internally as well). Its easy-to-use and safely finds both standalone and enclosing patterns in a string. You can see it in action [in the examples below]({{ "documentation/v2/parsers#example-1-emoji-parser-standalone" | relative_url }}).
 
-#### `loadComponent()`
+### `loadComponent()`
 Is given the (unique) id of this hook, the `HookValue` (the hook as it appears in the text), the context object as well as all child nodes of the hook as parameters. It is expected to return a `HookComponentData` object, which tells the library how to create the component for this hook:
 
 ```ts
@@ -56,9 +93,9 @@ interface HookComponentData {
 }
 ```
 
-You usually only need to fill out the `component` field, which can be the component class or a `LazyLoadComponentConfig` (see [Lazy-loading components](#65-lazy-loading-components)). You may optionally also provide your own injector and custom nodes to replace the existing `<ng-content>` of the component (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
+You usually only need to fill out the `component` field, which can be the component class or a `LazyLoadComponentConfig` (see [Lazy-loading components]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }})). You may optionally also provide your own injector and custom nodes to replace the existing `<ng-content>` of the component (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
 
-#### `getBindings()`
+### `getBindings()`
 Is given the (unique) id of this hook, the `HookValue` (the hook as it appears in the text) and the context object as parameters. It is expected to return a `HookBindings` object, which lists all the inputs to set and outputs to subscribe to in the loaded component:
 
 ```ts
@@ -68,13 +105,17 @@ interface HookBindings {
 }
 ```
 
-Both `inputs` and `outputs` must contain an object where each key is the name of the binding and each value what should be used for it. The functions you deposit in `outputs` as values will be called when the corresponding @Output() triggers and are automatically given the event object as well as the current context object as parameters. To disallow or ignore inputs/outputs, simply don't include them here.
+Both `inputs` and `outputs` must contain an object where each key is the name of the binding and each value what should be used for it. The functions you put in `outputs` will be called when the corresponding @Output() triggers and are automatically given the event object as well as the current context object as parameters. To disallow or ignore inputs/outputs, simply don't include them here.
 
-How you determine the values for the component bindings is - again - completely up to you. You could for example have a look at the `HookValue` and read them from the hook itself (like property bindings in selector hooks, e.g. `[input]="'Hello!'`"). You could of course also just pass static values into the component here - regardless of the hook's appearance.
+How you determine the values for the component bindings is - again - completely up to you. You could for example have a look at the `HookValue` and read them from the hook itself (like property bindings in selector hooks, e.g. `[input]="'Hello!'`"). You could of course also just pass static values into the component.
 
-**Warning:** Don't use JavaScript's `eval()` function to evaluate bindings from text into live code, if you can help it. It can create massive security loopholes. If all you need is a way to safely parse strings into standard JavaScript data types like strings, numbers, arrays, object literals etc., you can simply use the `evaluate()` method from the `DataTypeParser` service that you can also import from this library (which, again, the `SelectorHookParser` uses internally as well).
+{% include docs/widgets/notice.html content="
+  <h4>Warning</h4>
+  <p>Don't use JavaScript's <code>eval()</code> function to parse values from text into code, if you can help it. It can create massive security loopholes. If all you need is a way to safely parse strings into standard JavaScript data types like strings, numbers, arrays, object literals etc., you can simply use the <code>evaluate()</code> method from the <code>DataTypeParser</code> service that you can also import from this library.</p>
+" %}
 
-### 7.2 Example: Emoji parser (standalone)
+## Example 1: Emoji parser (standalone)
+
 Let's say we want to automatically replace all emoticons (smileys etc.) in the content string with an `EmojiComponent` that renders proper emojis for them. In this simple example, the `EmojiComponent` supports three emojis and has a `type`-string-input that that determines which one to load (can be either `laugh`, `wow` or `love`). 
 
 What we need then, is to write a custom `HookParser` that finds the corresponding emoticons `:-D`, `:-O` and `:-*` in the content string, replaces them with `EmojiComponent`s and sets the correct `type` input depending on the emoticon replaced. This isn't very hard at all. Let's start with the parser:
@@ -126,11 +167,11 @@ export class EmojiHookParser implements HookParser {
 }
 ```
 
-* In `findHooks()`, we create a regex for the three emoticons we want to replace and (out of convenience) hand it over to the injected `HookFinder` service, which finds their indexes in the content string for us and returns them as a `HookPosition` array.
+* In `findHooks()`, we create a regex for the three emoticons we want to replace and (for convenience) hand it over to the `HookFinder` service, which finds their indexes in the content string for us and returns them as a `HookPosition` array.
 * In `loadComponent()`, we simply tell the library which component class to load for each hook/emoticon.
 * In `getBindings()`, we have a look at each found hook/emoticon and infer the corresponding emoji-type for it, which we then set as the `type`-input for the `EmojiComponent`.
 
-All that's left is to do is to add our `EmojiHookParser` to the list of active parsers, either on the `OutletComponent` itself or as a global parser in `forRoot()` like here:
+All that's left is to do is to add our `EmojiHookParser` to the list of active parsers as usual:
 
 ```ts
 const componentParsers: Array<HookParserEntry> = [
@@ -158,16 +199,14 @@ export class AppModule { }
 
 That's it! If you now hand a content string like this to the `OutletComponent`, the emoticons will be automatically replaced by their matching `EmojiComponent`s:
 
-```html
-<ngx-dynamic-hooks [content]="'What a big lightsaber :-O! Let's meet up later :-*.'"></ngx-dynamic-hooks>
-```
+Have a look at this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone" target="_blank">Stackblitz</a> to see our `EmojiHookParser` in action. 
 
-Have a look at this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone) to see our `EmojiHookParser` in action. 
+<iframe src="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone?embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1"></iframe>
 
-### 7.3 Example: Internal link parser (enclosing)
-Normally, when we include links to other pages on our app, we use the neat `[routerLink]`-directive that allows us to navigate smoothly within the single-page-app. However, this is not usually possible in dynamic content (inserted via `[innerHTML]` for example): Contained `<a>`-elements are rendered without Angular routing functionality and will request the whole app to reload from the server under a different url, which is slow and costs needless bandwidth.
+## Example 2: Internal link parser (enclosing)
+Normally, when we include links to other parts of our app, we use the neat `[routerLink]`-directive that allows us to navigate smoothly within the single-page-app. However, this is not usually possible in dynamic content (inserted via `[innerHTML]` for example): Contained `<a>`-elements are rendered without Angular magic and clicking on them will reload the whole app, which is slow and costly.
 
-**The solution:** Let's write a custom `HookParser` that looks for internal links in dynamic content and automatically replaces them with proper `[RouterLink]`s, so that they behave just like any other link in the app.
+**The solution:** Let's write a custom `HookParser` that looks for internal links in dynamic content and automatically replaces them with proper `[routerLink]`s, so that they behave just like any other link in the app.
 
 This example is a bit more advanced than the `EmojiParser` from before, as we are now looking for **enclosing** (rather than **standalone**) hooks: Each link naturally consists of an opening (`<a href="internalUrl">`) and a closing (`</a>`) tag and we have to correctly find both of them. Don't worry, though, we can once again use the `HookFinder` service to do the actual searching. We just need to write two regexes for the opening and closing tag and hand them over.
 
@@ -270,4 +309,6 @@ export class DynamicRouterLinkParser implements HookParser {
 
 Just register the parser with the library as in other examples and that's it! All `<a>`-elements that point to internal urls will now automatically replaced by `[DynamicRouterLinkComponent]`s.
 
-Have a look at the full, working example in this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed).
+Have a look at the full, working example in this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed" target="_blank">Stackblitz</a>.
+
+<iframe src="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed?embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1"></iframe>

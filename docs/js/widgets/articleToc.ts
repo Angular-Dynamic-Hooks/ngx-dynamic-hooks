@@ -9,7 +9,7 @@ export class ArticleTocWidget implements Widget {
   onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
     this.tocWrapperElement = hostElement as HTMLElement;
     this.articleElement = document.querySelector('.article');
-    this.titleElements = this.articleElement?.querySelectorAll('h1, h2, h3, h4') || null;
+    this.titleElements = this.articleElement?.querySelectorAll('.article > h1, .article > h2, .article > h3, .article > h4') || null;
     
     if (this.articleElement && this.titleElements) {  
       this.createTocHtml();

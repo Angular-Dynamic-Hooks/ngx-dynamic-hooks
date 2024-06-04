@@ -11,10 +11,24 @@
 - title: What it does
   url: /documentation/v2/what-it-does
   icon: /assets/images/icons/info.svg
+  children:
+    - title: Introduction
+      url: /documentation/v2/what-it-does#introduction
+    - title: What's a hook?
+      url: /documentation/v2/what-it-does#whats-a-hook
+    - title: Do the components work normally?
+      url: /documentation/v2/what-it-does#do-the-components-work-normally
+    - title: What this library doesn't do
+      url: /documentation/v2/what-it-does#what-this-library-doesnt-do
 
 - title: Quick start
   url: /documentation/v2/quickstart
   icon: /assets/images/icons/rocket.svg
+  children:
+    - title: Minimal example
+      url: /documentation/v2/quickstart#minimal-example
+    - title: See it in action
+      url: /documentation/v2/quickstart#see-it-in-action
 
 - title: Features
   url: /documentation/v2/features
@@ -39,14 +53,12 @@
   children:
     - title: Global settings
       url: /documentation/v2/configuration#global-settings
-    - title: Outlet component bindings
+    - title: Component bindings
       url: /documentation/v2/configuration#component-bindings
-    - title: HookParserEntry
-      url: /documentation/v2/configuration#hookparserentry
     - title: OutletOptions
       url: /documentation/v2/configuration#outletoptions
-    - title: Child modules (forChild) methods
-      url: /documentation/v2/configuration#child-modules-forchild
+    - title: Child modules
+      url: /documentation/v2/configuration#child-modules
     - title: Lazy-loading components
       url: /documentation/v2/configuration#lazy-loading-components
 
@@ -54,21 +66,25 @@
   url: /documentation/v2/parsers
   icon: /assets/images/icons/brackets.svg
   children:
-  - title: What makes a parser
-    url: /documentation/v2/parsers#what-makes-a-parser
-  - title: Emoji parser (standalone)
-    url: /documentation/v2/parsers#example-emoji-parser-standalone
-  - title: Internal link parser (enclosing)
-    url: /documentation/v2/parsers#example-internal-link-parser-enclosing
+  - title: Introduction
+    url: /documentation/v2/parsers#introduction
+  - title: SelectorHookParserConfig
+    url: /documentation/v2/parsers#selectorhookparserconfig
+  - title: Writing your own HookParser
+    url: /documentation/v2/parsers#writing-your-own-hookparser
+  - title: Example 1 - Emoji parser (standalone)
+    url: /documentation/v2/parsers#example-1-emoji-parser-standalone
+  - title: Example 2 - Internal link parser (enclosing)
+    url: /documentation/v2/parsers#example-2-internal-link-parser-enclosing
 
-- title: Advanced notes
+- title: Advanced uses
   url: /documentation/v2/advanced-notes
   icon: /assets/images/icons/squiggly_brackets.svg
   children:
   - title: Programmatic usage (without component)
     url: /documentation/v2/advanced-notes#programmatic-usage-without-component
-  - title: Non-browser Platforms implemention
-    url: /documentation/v2/advanced-notes#non-browser-platforms-implemention
+  - title: Alternative platforms
+    url: /documentation/v2/advanced-notes#alternative-platforms
 
 - title: Trivia
   url: /documentation/v2/trivia

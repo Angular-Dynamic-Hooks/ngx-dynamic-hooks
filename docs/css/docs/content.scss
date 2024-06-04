@@ -68,6 +68,7 @@
       .article h1 {
         font-size: 25px;
         font-weight: 600;
+        line-height: 1.6;
         color: var(--brand-color);
         scroll-margin-top: calc(var(--header-height) + 20px);
         // background: -webkit-linear-gradient(var(--brand-color), var(--brand-color-secondary));
@@ -83,6 +84,7 @@
         align-items: center;
         margin-left: 0px;
         font-size: 22px;
+        line-height: 1.6;
         font-weight: 600;
         scroll-margin-top: calc(var(--header-height) + 20px);
 
@@ -107,6 +109,7 @@
       .article h3 {
         font-size: 18px;
         font-weight: 600;
+        line-height: 1.6;
         scroll-margin-top: calc(var(--header-height) + 20px);
 
         @include minSm() {
@@ -116,6 +119,7 @@
       .article h4 {
         font-size: 15px;
         font-weight: 400;
+        line-height: 1.6;
         scroll-margin-top: calc(var(--header-height) + 20px);
 
         @include minSm() {
@@ -125,7 +129,7 @@
 
       // Lists
       .article li:not(:last-of-type) {
-        margin: 0px 0px 5px 0px;
+        margin: 0px 0px 3px 0px;
       }
 
     .article-sidebar {

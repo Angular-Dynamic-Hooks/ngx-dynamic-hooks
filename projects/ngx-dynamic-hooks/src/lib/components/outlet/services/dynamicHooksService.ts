@@ -63,7 +63,7 @@ export class DynamicHooksService {
     injector: Injector|null = null
   ): Observable<OutletParseResult> {
 
-    // If no container element or hookIndex given, create them
+    // If no container element given, create one
     if (targetElement === null) {
       targetElement = this.renderer.createElement('div') as HTMLElement;
     }

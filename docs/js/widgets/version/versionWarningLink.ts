@@ -2,15 +2,13 @@ import { infoService } from "../../infoService";
 import { GenericWidgetController, Widget } from "../../widgetBootstrap";
 import { versionService } from "./versionService";
 
-export class VersionWarningWidget implements Widget {
-  static selector: string = '#version-warning';
-  hostElement: Element|null = null;
+export class VersionWarningLinkWidget implements Widget {
+  static selector: string = '.version-warning-link';
   linkElement: HTMLElement|null = null;
   currentVersion: number = versionService.extractDocsVersionFromUrl(location.pathname)!;
 
   onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
-    this.hostElement = hostElement;
-    this.linkElement = document.querySelector('.version-warning-link')!;
+    this.linkElement = hostElement as HTMLElement;
 
     this.addLink();
   }

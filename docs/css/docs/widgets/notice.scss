@@ -1,24 +1,24 @@
-#version-warning {
+.notice {
   display: flex;
   align-items: center;
-  background-color: #ffd087;
+  background-color: #ffdca4;
   color: #444444;
   margin: 0px 0px 30px 0px;
-  padding: 15px 0px;
+  padding: 14px 0px;
   border-radius: 10px;
 
-  .version-warning-left {
+  .notice-left {
     margin: 0px 20px;
   }
 
-    .version-warning-icon {
+    .notice-icon {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 25px;
       width: 25px;
       box-shadow: none !important;
-      background-color: #00000026;
+      background-color: rgb(0 0 0 / 30%);
       border-radius: 8px;
       font-weight: bold;
       font-size: 18px;
@@ -26,23 +26,27 @@
       font-family: 'Roboto Mono';
     }
 
-  .version-warning-right {
+  .notice-right {
     padding: 0px 20px 0px 20px;
     border-left: 2px solid #ffffff30;
     font-size: 14px;
     line-height: 1.8;
     
-    p {
-      margin: 0px;
+
+
+    h1, h2, h3, h4, h5, h6,
+    p, blockquote, pre,
+    ul, ol, dl, figure {
+      margin-bottom: calc(var(--spacing-unit) * .2);
     }
 
-    .version-warning-link {
+    .noticeversion-warning-link {
       // color: white;
     }
   }
 }
 
-:root[data-theme="dark"] #version-warning {
+:root[data-theme="dark"] .notice {
   background-color: var(--background-color-2);
   color:  var(--text-color);
 }

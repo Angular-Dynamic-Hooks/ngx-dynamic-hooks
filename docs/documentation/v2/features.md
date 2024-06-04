@@ -7,10 +7,12 @@
 
 Often, you may want to communicate with the dynamically-loaded components or pass data to them from the rest of the app. To do so, you have two options:
 
-1. **The context object**
-2. **Dependency injection**
+1. **Dependency injection**
+2. **The context object**
 
-The latter works just like in any other component. Simply [inject your services into the component constructor](https://angular.io/guide/dependency-injection) and you're good to go. However, this approach may seem like overkill at times, when you just want to pass in a variable from the parent component into the dynamically-loaded component, perhaps as an input. This is where the context object comes into play.
+The first works just like in any other component. Simply <a href="https://angular.dev/guide/di/dependency-injection" target="_blank">inject your services</a> and you're good to go. 
+
+However, this approach may seem like overkill at times, when you just want to pass in a variable from the parent component into the dynamically-loaded component, perhaps as an input. This is where the **context object** comes into play.
 
 The context object acts as a bridge between the parent component holding the `OutletComponent` and all dynamically loaded components within. Imagine a context object like:
 
@@ -24,7 +26,7 @@ You can provide it to the `OutletComponent` as an optional input:
 <ngx-dynamic-hooks [content]="..." [context]="contextObj"></ngx-dynamic-hooks>
 ```
 
-And then use the `context`-keyword to use its data in selector hooks:
+And then use the `context`-keyword to access it in selector hooks:
 
 ```html
 '...some dynamic content... <app-jedi [name]="context.name"></app-jedi> ...more dynamic content...'
@@ -32,9 +34,12 @@ And then use the `context`-keyword to use its data in selector hooks:
 
 The context object is typically a simple object literal that provides some values of interest from the parent component, but it can technically be anything - even the parent component itself. You can also use alternative notations to access its properties like `context['name']`, call functions like `context.someFunc()` and even use nested expressions like `context[context.someProp].someFunc(context.someParam)`.
 
-**Note:** The context object is the only piece of live code that can accessed directly within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure. Simply put whatever you want to make available to the author of the content string into the context object.
-
 ![Communication flow](https://i.imgur.com/K63SQGU.jpg)
+
+{% include docs/widgets/notice.html content="
+  <h4>About using code</h4>
+  <p>Please note that the context object is the <b>only</b> piece of live code that can accessed directly within the content string. No variables or functions, global or otherwise, can be used besides it. This is an intentional security measure.</p>
+" %}
 
 ## Inputs
 
@@ -48,7 +53,7 @@ You can pass data of almost any type to component `@Input()`s in selector hooks,
 | null/undefined | `[inputName]="null"` |
 | arrays | `[inputName]="['an', 'array', 'of', 'strings']"` |
 | object literals | `[inputName]="{planet: 'Tatooine', population: 200000}"` |
-| context variables (see [previous point](#51-context--dependency-injection)) | `[inputName]="context.someProp"` |
+| context variables (see [previous point]({{ "documentation/v2/features#context--dependency-injection" | relative_url }})) | `[inputName]="context.someProp"` |
 
 The inputs are automatically set in the dynamic component and will trigger `ngOnChanges()`/`ngOnInit()` normally.
 
@@ -67,10 +72,10 @@ As with normal Angular @Output() bindings, the special `$event`-keyword can opti
 
 ### A note about `this`
 
-A function directly assigned to the context object will have `this` pointing to the context object itself when called, as per standard JavaScript behaviour. This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
+A function directly assigned to the context object will have `this` pointing to the context object itself when called (standard JavaScript behaviour). This may be undesired when you would rather have `this` point to original parent object of the function. Two ways to achieve that: 
 
 * Assign the parent of the function to the context object (instead of the function itself) and call via `context.parent.func()`
-* If you don't want to expose the parent, assign a [bound function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) to the context object like `const contextObj = {func: this.func.bind(this)}`.
+* If you don't want to expose the parent, assign a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank">bound function</a> to the context object like `const contextObj = {func: this.func.bind(this)}`.
 
 ## Content projection
 
@@ -83,10 +88,10 @@ Hooks can be nested without limitations. When using selector hooks, it will look
 ...more dynamic content...'
 ```
 
-As normal, make sure to include an `<ng-content>` in your parent components so Angular knows where to render the child content.
+As usual, make sure to include an `<ng-content>` in your parent components so Angular knows where to render the child content.
 
 There are two small caveats, however: 
-1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods](#55-lifecycle-methods)). 
+1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods]( {{ "documentation/v2/features#lifecycle-methods" | relative_url }})). 
 2. Multiple named `<ng-content>` outlets are currently not supported in component selector hooks. 
 
 ## Lifecycle methods

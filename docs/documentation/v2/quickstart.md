@@ -1,7 +1,10 @@
 ---
 ---
 
-## 4. Quick start
+# Quick start
+
+## Minimal example
+
 Import `DynamicHooksModule` into your main app module and configure via `forRoot()`:
 
 ```ts
@@ -38,6 +41,10 @@ Then use the `OutletComponent` (`<ngx-dynamic-hooks>`) where you want to render 
 
 That's it! If `<app-example>` is the selector of `ExampleComponent`, it will automatically be loaded in its place, just like in a normal template.
 
-**See it in action** in this [Stackblitz](https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart). 
+## See it in action
+
+The following <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart" target="_blank">Stackblitz example</a> showcases how to load a couple of simple components from a string:
+
+<iframe src="https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart?embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1">
 
 This is a very minimalist example. Check out the [Configuration](#6-configuration) and [Writing your own HookParser](#7-writing-your-own-hookparser) sections to find out how to tailor everything to your exact needs.

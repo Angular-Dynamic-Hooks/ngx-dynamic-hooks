@@ -1,9 +1,11 @@
 ---
 ---
 
-## 8. Advanced notes
-### 8.1 Programmatic usage (without component)
-In some use cases, you might not actually need or want to insert the `<ngx-dynamic-hooks>`-component in your app and would rather have direct access to the parsed content to use programmatically. You can do so by injecting the `OutletService` and calling its `parse`-method directly (which the `OutletComponent` does internally as well):
+# Advanced notes
+
+## Programmatic usage (without component)
+
+You can bypass the `<ngx-dynamic-hooks>`-component and parse the dynamic content directly in Typescript by injecting the `OutletService` and calling its `parse`-method programmatically (which the `<ngx-dynamic-hooks>` component internally does as well):
 
 ```ts
 parse(
@@ -19,7 +21,9 @@ parse(
 ): Observable<OutletParseResult>;
 ```
 
-Don't worry, this isn't as bothersome as it looks. Most of the parameters are actually just [the inputs for the OutletComponent](#62-outlet-component-bindings) and therefore optional. You really only need to pass the `content` string as you would with the component. Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to the injector of the module that imported this library.
+Don't worry, most of the parameters are just [the inputs]({{ "documentation/v2/configuration#component-bindings" | relative_url }}) for the `<ngx-dynamic-hooks>` component and therefore optional. You really only need to pass the `content` string as you would with the component. 
+
+Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to module injector.
 
 The function will return an observable that contains an `OutletParseResult` with the form:
 
@@ -33,27 +37,29 @@ interface OutletParseResult {
 ```
 `element` is probably the most interesting part here as it contains the fully rendered content exactly as it would appear inside of the `<ngx-dynamic-hooks>`-component. `hookIndex` might also prove useful, as it is a fairly in-depth data object that holds various tidbits of info concerning the loaded components (as well as the componentRefs). 
 
-All in all, the whole process could then look like so:
+Calling this function could then look like so:
 
 ```ts
 import { OutletService } from 'ngx-dynamic-hooks';
 
 class SomeComponentOrService {
   constructor(outletService: OutletService) {
-    outletService.parse('Load a component here: <app-example></app-example>').subscribe((outletParseResult: OutletParseResult) => {
+    const content = 'Load a component here: <app-example></app-example>';
+    outletService.parse(content).subscribe(outletParseResult => {
         // Do whatever with it
     });
   }
 ```
 
-**Caution:** When loading components this way, keep in mind that the submitted content string is only parsed once. The inputs of contained components aren't automatically updated as they would be when using the `<ngx-dynamic-hooks>`-component normally.
+{% include docs/widgets/notice.html content="
+  <h4>About component lifecycles</h4>
+  <p>When loading components this way, keep in mind that the submitted content string is only parsed once. The inputs of contained components aren't automatically updated as they would be when using the component normally.</p>
+  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <code>OutletService.destroy(hookIndex: HookIndex)</code> for this purpose.</p>
+" %}
 
-Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use `OutletService.destroy(hookIndex: HookIndex)` for this purpose.
+## Alternative platforms
 
-### 8.2 Non-browser Platforms implemention
-The default implementation of `ngx-dynamic-hooks` only works in browsers ([platform-browser](https://angular.io/api/platform-browser)) since it relies on manipulating HTML DOM.
-
-There are cases when this approach doesn't work; for example when using Angular Universal ([platform-server](https://angular.io/api/platform-server)) or Angular with [NativeScript](https://nativescript.org/).
+The default implementation of `ngx-dynamic-hooks` should work in both [browsers](https://v17.angular.io/api/platform-browser) as well as during [server-side-rendering](https://v17.angular.io/guide/ssr). However, there may be more specialized use cases on platforms that are not directly supported.
 
 In such cases, all you need is to implement the `PlatformService` abstract class and pass it as the second parameter to the `DynamicHooksModule.forRoot` method:
 
