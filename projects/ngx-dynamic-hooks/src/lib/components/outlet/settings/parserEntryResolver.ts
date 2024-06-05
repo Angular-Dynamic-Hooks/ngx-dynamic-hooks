@@ -1,4 +1,4 @@
-import { isDevMode, Injectable, Injector } from '@angular/core';
+import { isDevMode, Injectable, Injector, reflectComponentType } from '@angular/core';
 import { HookParser } from '../../../interfacesPublic';
 import { SelectorHookParser } from '../../../parsers/selector/selectorHookParser';
 import { SelectorHookParserConfig } from '../../../parsers/selector/config/selectorHookParserConfig';
@@ -72,10 +72,11 @@ export class ParserEntryResolver {
    * Figures out what kind of config object (out of all possible types) the HookParserEntry is and loads it appropriately.
    *
    * The potential types are:
-   * - a service
-   * - a class
-   * - an instance
-   * - an object literal to configure SelectorHookParser with
+   * - 1. a component class (shorthand for nr. 5)
+   * - 2. a parser service
+   * - 3. a parser class
+   * - 4. a parser instance
+   * - 5. an object literal to configure SelectorHookParser with
    *
    * @param parserEntry - The HookParserEntry to process
    * @param injector - The injector to use for resolving this parser
@@ -83,12 +84,19 @@ export class ParserEntryResolver {
   resolveEntry(parserEntry: HookParserEntry, injector: Injector): HookParser|null {
     // Check if class
     if (parserEntry.hasOwnProperty('prototype')) {
-      // Check if service
-      try {
-        return injector.get(parserEntry);
-      // Otherwise instantiate manually
-      } catch (e) {
-        return new (parserEntry as new(...args: any[]) => any)();
+      // Check if component class
+      const componentMeta = reflectComponentType(parserEntry as any);
+      if (componentMeta) {
+        return new SelectorHookParser({component: parserEntry as any}, this.parserResolver, this.selectorFinder, this.bindingStateManager);
+      // Else must be parser class
+      } else {
+        // Check if service
+        try {
+          return injector.get(parserEntry);
+        // Otherwise instantiate manually
+        } catch (e) {
+          return new (parserEntry as new(...args: any[]) => any)();
+        }
       }
     }
 

@@ -52,7 +52,19 @@ describe('Parsers', () => {
     ({comp, fixture} = prepareTestingModule(() => [
       provideDynamicHooks({globalParsers: []}),
       ServiceTestParser
-    ]))
+    ]));
+
+    // Should be able to load parsers that are component classes
+    comp.content = 'This is a sentence with a <dynhooks-multitagtest></dynhooks-multitagtest>.';
+    comp.parsers = [MultiTagTestComponent];
+    comp.ngOnChanges({content: true, parsers: true} as any);
+    expect(comp.activeParsers.length).toBe(1);
+    expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <dynhooks-multitagtest');
+    expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-MULTITAGTEST');
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
 
     // Should be able to load parsers that are object literals
     comp.content = 'This is a sentence with a <dynhooks-singletagtest>.';

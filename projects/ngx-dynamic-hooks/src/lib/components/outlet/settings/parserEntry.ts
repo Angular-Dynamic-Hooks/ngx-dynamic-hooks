@@ -10,4 +10,4 @@ import { SelectorHookParserConfig } from '../../../parsers/selector/config/selec
  *    otherwise it will be manually instantiated without constructor arguments.
  *
  */
-export type HookParserEntry = SelectorHookParserConfig | HookParser | (new(...args: any[]) => HookParser);
+export type HookParserEntry = (new(...args: any[]) => any) | SelectorHookParserConfig | HookParser;
