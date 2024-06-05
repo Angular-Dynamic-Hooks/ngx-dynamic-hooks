@@ -132,7 +132,30 @@ describe('Loading dynamic components', () => {
     expect(childComponent.blubbService).toBe(parentComponent.blubbService);
   });
 
-  it('#should load nested content-components', () => {
+  it('#should load plain html as nested content', fakeAsync(() => {
+    const testText = `
+      <dynhooks-multitagtest>
+        <h1 class="the-title">Hello there!</h1>
+      </dynhooks-multitagtest>
+    `;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(fixture.nativeElement.children.length).toBe(1);
+    expect(fixture.nativeElement.children[0].tagName).toBe('DYNHOOKS-MULTITAGTEST');
+    const multiTagHostElement = fixture.nativeElement.children[0];
+
+    expect(multiTagHostElement.children.length).toBe(1);
+    expect(multiTagHostElement.children[0].className).toBe('multitag-component');
+    const multiTagViewElement = multiTagHostElement.children[0];
+
+    expect(multiTagViewElement.children.length).toBe(1);
+    expect(multiTagViewElement.children[0].className).toBe('the-title');
+    expect(multiTagViewElement.children[0].innerHTML).toBe('Hello there!');
+  }));
+
+  it('#should load nested components as content', () => {
     const testText = `
     <p>Some advanced nesting:
       <dynhooks-multitagtest id="'nestedImage-outer'">
