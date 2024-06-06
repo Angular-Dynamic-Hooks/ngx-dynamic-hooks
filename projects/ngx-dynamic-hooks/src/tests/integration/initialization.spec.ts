@@ -1,5 +1,5 @@
 // Testing api resources
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, GeneralPlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
@@ -19,17 +19,8 @@ describe('Initialization', () => {
     ({testBed, fixture, comp, context} = defaultBeforeEach());
   });
 
-  // ----------------------------------------------------------------------------
-
-  it('#should throw error if not registered main providers before using DynamicHooksComponent', (async () => {
-    expect(() => {
-      ({fixture, comp} = prepareTestingModule(() => []));
-    }).toThrow(new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.'));
-  }));
-
-  it('#should have created the main component correctly', () => {
-    expect(comp).toBeDefined();
-  });
+  // Initialize provide methods
+  // -------------------------------------------------------------
 
   it('#should load the global settings correctly', () => {
     const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest></span> within it.</p>`;
@@ -119,6 +110,65 @@ describe('Initialization', () => {
 
     // Parsers should be empty
     expect(comp.activeParsers.length).toBe(0);
+  });
+
+  it('#it should allow directly accepting a parsers array as a shorthand instead of a full settings object in provideDynamicHooks', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideDynamicHooks([MultiTagTestComponent, {component: SingleTagTestComponent, enclosing: false}])
+      ]
+    });
+
+    let allSettings = TestBed.inject(DYNAMICHOOKS_ALLSETTINGS);
+    expect(allSettings.length).toBe(1);
+    expect(allSettings[0].parsers!.length).toBe(2);
+    expect(allSettings[0].parsers![0]).toBe(MultiTagTestComponent);
+    expect((allSettings[0].parsers![1] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+  });
+
+  it('#it should allow directly accepting a parsers array as a shorthand instead of a full settings object in provideDynamicHooksForChild', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideDynamicHooks([]),
+        provideDynamicHooksForChild([MultiTagTestComponent, {component: SingleTagTestComponent, enclosing: false}])
+      ]
+    });
+
+    let allSettings = TestBed.inject(DYNAMICHOOKS_ALLSETTINGS);
+    expect(allSettings.length).toBe(2);
+    expect(allSettings[1].parsers!.length).toBe(2);
+    expect(allSettings[1].parsers![0]).toBe(MultiTagTestComponent);
+    expect((allSettings[1].parsers![1] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+  });
+
+  it('#should set platformService provider to custom platformService if passed', () => {
+    const CustomPlatformService = class {
+    };
+
+    const providers = provideDynamicHooks({}, CustomPlatformService as any);
+    const platformServiceProvider = providers.find((p: any) => p.useClass === CustomPlatformService);
+    expect(platformServiceProvider).not.toBeUndefined();
+  });
+
+  it('#should set platformService to PlatformBrowserService if custom platform not passed', () => {
+    const providers = provideDynamicHooks({});
+    const platformServiceProvider = providers.find((p: any) => p.useClass === GeneralPlatformService);
+    expect(platformServiceProvider).not.toBeUndefined();
+  });
+
+  // Initialize DynamicHookComponent
+  // -------------------------------------------------------------
+
+  it('#should throw error if not registered main providers before using DynamicHooksComponent', (async () => {
+    expect(() => {
+      ({fixture, comp} = prepareTestingModule(() => []));
+    }).toThrow(new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.'));
+  }));
+
+  it('#should have created the main component correctly', () => {
+    expect(comp).toBeDefined();
   });
 
   it('#should reset and reload when relevant bindings change', () => {

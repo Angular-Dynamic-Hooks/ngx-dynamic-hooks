@@ -4,6 +4,7 @@ import { DynamicHooksService } from './components/outlet/services/dynamicHooksSe
 import { PlatformService } from './platform/platformService';
 import { GeneralPlatformService } from './platform/generalPlatformService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
+import { HookParserEntry } from '../public-api';
 
 export const allSettings: DynamicHooksSettings[] = [];
 
@@ -13,8 +14,10 @@ export const allSettings: DynamicHooksSettings[] = [];
  * @param rootSettings - Settings that all loaded DynamicHooksComponents will use
  * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
  */
-export const provideDynamicHooks: (rootSettings: DynamicHooksSettings, platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
-  allSettings.push(rootSettings);
+export const provideDynamicHooks: (rootSettings: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
+  const settings: DynamicHooksSettings = Array.isArray(rootSettings) ? {parsers: rootSettings} : rootSettings;
+
+  allSettings.push(settings);
   
   return [
     {
@@ -25,8 +28,8 @@ export const provideDynamicHooks: (rootSettings: DynamicHooksSettings, platformS
     },
     { provide: DYNAMICHOOKS_PROVIDERS_REGISTERED, useValue: true },
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
-    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: rootSettings },
-    { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [rootSettings] },
+    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: settings },
+    { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [settings] },
     { provide: PlatformService, useClass: platformService || GeneralPlatformService }
   ];
 }
@@ -52,12 +55,14 @@ export class DynamicHooksInitService implements OnDestroy {
  * 
  * @param childSettings - Settings that the loaded DynamicHooksComponents of this child context will use
  */
-export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings) => Provider[] = childSettings => {
-  allSettings.push(childSettings);
+export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings|HookParserEntry[]) => Provider[] = childSettings => {
+  const settings: DynamicHooksSettings = Array.isArray(childSettings) ? {parsers: childSettings} : childSettings;
+
+  allSettings.push(settings);
 
   return [
     // Provide the child settings
-    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: childSettings },
+    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: settings },
     // Also add child settings to hierarchical array of child settings
     // By having itself as a dependency with SkipSelf, a circular reference is avoided as Angular will look for DYNAMICHOOKS_ANCESTORSETTINGS in the parent injector.
     // It will keep traveling injectors upwards until it finds another or just use null as the dep.
@@ -66,7 +71,7 @@ export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings) 
     {
       provide: DYNAMICHOOKS_ANCESTORSETTINGS,
       useFactory: (ancestorSettings: DynamicHooksSettings[]) => {
-        return ancestorSettings ? [...ancestorSettings, childSettings] : [childSettings];
+        return ancestorSettings ? [...ancestorSettings, settings] : [settings];
       },
       deps: [[new SkipSelf(), new Optional(), DYNAMICHOOKS_ANCESTORSETTINGS]]
     },
