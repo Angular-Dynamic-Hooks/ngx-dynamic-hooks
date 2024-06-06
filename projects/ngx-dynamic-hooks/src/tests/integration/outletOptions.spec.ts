@@ -27,8 +27,8 @@ describe('OutletOptions', () => {
 
     let {fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers,
-        globalOptions: differentOptions
+        parsers: testParsers,
+        options: differentOptions
       })
     ]);
 
@@ -73,7 +73,7 @@ describe('OutletOptions', () => {
   it('#should load fine without options', () => {
     let {fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]);
 
@@ -113,7 +113,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
 
@@ -153,7 +153,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
 
@@ -195,7 +195,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -228,7 +228,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -271,7 +271,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -367,7 +367,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -396,7 +396,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -422,7 +422,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -448,7 +448,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -472,7 +472,7 @@ describe('OutletOptions', () => {
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;

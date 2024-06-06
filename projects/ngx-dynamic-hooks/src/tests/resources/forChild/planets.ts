@@ -32,10 +32,10 @@ export const getPlanetsRoutes: (lazyChildren: boolean) => Route[] = (lazyChildre
       component: PlanetsComponent, 
       providers: [
         provideDynamicHooksForChild({
-          globalParsers: [
+          parsers: [
             {component: DynamicPlanetsComponent}
           ],
-          globalOptions: {
+          options: {
             sanitize: true,
             updateOnPushOnly: false,
             compareInputsByValue: true

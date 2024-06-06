@@ -7,7 +7,7 @@ import { OutletParseResult } from '../../../interfacesPublic';
 import { OutletOptions } from '../settings/options';
 import { HooksReplacer } from './hooksReplacer';
 import { ComponentCreator } from './componentCreator';
-import { DynamicHooksGlobalSettings } from '../settings/settings';
+import { DynamicHooksSettings } from '../settings/settings';
 import { HookParserEntry } from '../settings/parserEntry';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
 import { SettingsResolver } from '../settings/settingsResolver';
@@ -24,9 +24,9 @@ export class DynamicHooksService {
   private renderer: Renderer2;
 
   constructor(
-    @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksGlobalSettings[],
-    @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksGlobalSettings[],
-    @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksGlobalSettings,
+    @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksSettings[],
+    @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[],
+    @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
     private settingsResolver: SettingsResolver,
     private hooksReplacer: HooksReplacer,
     private componentCreator: ComponentCreator,

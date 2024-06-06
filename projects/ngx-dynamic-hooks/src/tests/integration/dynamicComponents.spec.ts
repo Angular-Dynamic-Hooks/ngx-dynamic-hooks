@@ -110,7 +110,7 @@ describe('Loading dynamic components', () => {
     }]);
 
     let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: parsersWithParentComponentParser})
+      provideDynamicHooks({parsers: parsersWithParentComponentParser})
     ]);
 
     const testText = `
@@ -276,7 +276,7 @@ describe('Loading dynamic components', () => {
     const parsersWithNgContentParser = testParsers.concat([NgContentTestParser]);
     let {fixture, comp} = prepareTestingModule(() => [
       NgContentTestParser,
-      provideDynamicHooks({globalParsers: parsersWithNgContentParser})
+      provideDynamicHooks({parsers: parsersWithNgContentParser})
     ]);
 
     const testText = `<dynhooks-ngcontenttest><p>original content</p><dynhooks-singletagtest></dynhooks-ngcontenttest>`;
@@ -332,7 +332,7 @@ describe('Loading dynamic components', () => {
   it('#should correctly trigger onDynamicMount() on init', () => {
     ({comp, fixture} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers,
+        parsers: testParsers,
       }),
       EnclosingCustomParser
     ]))
@@ -530,7 +530,7 @@ describe('Loading dynamic components', () => {
 
   it('#should activate dependency injection for dynamically loaded components', () => {
     ({comp} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: testParsers}),
+      provideDynamicHooks({parsers: testParsers}),
       RootTestService
     ]))
 
@@ -613,7 +613,7 @@ describe('Loading dynamic components', () => {
       selector: 'dynhooks-lazytest'
     }]);
     let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: parsersWithLazyParser})
+      provideDynamicHooks({parsers: parsersWithLazyParser})
     ]);
 
     const testText = `
@@ -723,7 +723,7 @@ describe('Loading dynamic components', () => {
       selector: 'dynhooks-lazytest'
     }]);
     let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: parsersWithLazyParser}),
+      provideDynamicHooks({parsers: parsersWithLazyParser}),
       {provide: PLATFORM_ID, useValue: 'server'}
     ]);
 

@@ -95,23 +95,23 @@ describe('forChild', () => {
     const settingsResolver = setup.testBed.inject(SettingsResolver);
     const settingsArray = [
       {
-        globalParsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}],
-        globalOptions: {sanitize: true, convertHTMLEntities: true, fixParagraphTags: true}
+        parsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}],
+        options: {sanitize: true, convertHTMLEntities: true, fixParagraphTags: true}
       },
       {
-        globalParsers: [{component: DynamicPlanetsComponent}, {component: DynamicPlanetCountriesComponent}],
-        globalOptions: {convertHTMLEntities: false, updateOnPushOnly: false}
+        parsers: [{component: DynamicPlanetsComponent}, {component: DynamicPlanetCountriesComponent}],
+        options: {convertHTMLEntities: false, updateOnPushOnly: false}
       },
       {
-        globalParsers: [{component: DynamicStarsComponent}],
-        globalOptions: {convertHTMLEntities: true, fixParagraphTags: false, ignoreOutputAliases: true}
+        parsers: [{component: DynamicStarsComponent}],
+        options: {convertHTMLEntities: true, fixParagraphTags: false, ignoreOutputAliases: true}
       }
     ];
     const mergedSettings = settingsResolver['mergeSettings'](settingsArray);
     expect(mergedSettings).toEqual(
       {
-        globalParsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetCountriesComponent}, {component: DynamicStarsComponent}],
-        globalOptions: {sanitize: true, convertHTMLEntities: true, fixParagraphTags: false, updateOnPushOnly: false, ignoreOutputAliases: true}
+        parsers: [{component: DynamicRootComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetsComponent}, {component: DynamicPlanetCountriesComponent}, {component: DynamicStarsComponent}],
+        options: {sanitize: true, convertHTMLEntities: true, fixParagraphTags: false, updateOnPushOnly: false, ignoreOutputAliases: true}
       }
     );
   });
@@ -231,7 +231,7 @@ describe('forChild', () => {
 
     // When assembling ancestors, should first look through all ElementInjectors, then all EnvironmentInjectors. B/c of that, settings set directly in providers array of
     // PlanetCitiesComponent should be the first ones to be found.
-    const ancestorParsers = ancestorSettings.map(settings => (settings.globalParsers![0] as SelectorHookParserConfig).component)
+    const ancestorParsers = ancestorSettings.map(settings => (settings.parsers![0] as SelectorHookParserConfig).component)
     expect(ancestorParsers.length).toBe(4);
     expect(ancestorParsers[0]).toBe(DynamicRootComponent);
     expect(ancestorParsers[1]).toBe(DynamicPlanetsComponent);

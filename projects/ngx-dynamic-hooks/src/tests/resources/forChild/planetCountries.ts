@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject } from '@angular/core';
 import { Route } from '@angular/router';
-import { DynamicHooksGlobalSettings, DynamicHooksInheritance, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooksForChild, DynamicHooksComponent, DYNAMICHOOKS_MODULESETTINGS } from '../../testing-api';
+import { DynamicHooksSettings, DynamicHooksInheritance, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooksForChild, DynamicHooksComponent, DYNAMICHOOKS_MODULESETTINGS } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -23,8 +23,8 @@ export class PlanetCountriesComponent {
   constructor(
     public hostElement: ElementRef,
     @Inject(CONTENT_STRING) public contentString: any,
-    @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksGlobalSettings[],
-    @Inject(DYNAMICHOOKS_MODULESETTINGS) public moduleSettings: DynamicHooksGlobalSettings,
+    @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[],
+    @Inject(DYNAMICHOOKS_MODULESETTINGS) public moduleSettings: DynamicHooksSettings,
     public dynamicHooksService: DynamicHooksService
   ) {
   }
@@ -34,10 +34,10 @@ export const getPlanetCountriesRoutes: () => Route[] = () => {
   return [
     { path: '', component: PlanetCountriesComponent, providers: [
       provideDynamicHooksForChild({
-        globalParsers: [
+        parsers: [
           {component: DynamicPlanetCountriesComponent}
         ],
-        globalOptions: {
+        options: {
           convertHTMLEntities: true,
           updateOnPushOnly: true,
           compareOutputsByValue: true

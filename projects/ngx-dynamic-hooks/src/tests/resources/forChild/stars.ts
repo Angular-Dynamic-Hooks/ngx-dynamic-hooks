@@ -26,10 +26,10 @@ export const getStarsRoutes: () => Route[] = () => {
   return [
     { path: '', component: StarsComponent, providers: [
       provideDynamicHooksForChild({
-        globalParsers: [
+        parsers: [
           {component: DynamicStarsComponent}
         ],
-        globalOptions: {
+        options: {
           sanitize: false,
           convertHTMLEntities: false,
           fixParagraphTags: true

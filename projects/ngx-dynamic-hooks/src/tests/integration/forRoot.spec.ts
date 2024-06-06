@@ -1,5 +1,5 @@
 // Testing api resources
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksGlobalSettings, GeneralPlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksSettings, GeneralPlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
@@ -20,7 +20,7 @@ describe('forRoot', () => {
     TestBed.configureTestingModule({
       providers: [
         provideDynamicHooks({
-          globalParsers: [
+          parsers: [
             {component: SingleTagTestComponent}
           ]
         })
@@ -29,14 +29,14 @@ describe('forRoot', () => {
 
     let allSettings = TestBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
-    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
 
     // Run forRoot again
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideDynamicHooks({
-          globalParsers: [
+          parsers: [
             {component: MultiTagTestComponent}
           ]
         })
@@ -45,7 +45,7 @@ describe('forRoot', () => {
 
     allSettings = TestBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
-    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
+    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
   });
 
   it('#should set platformService provider to custom platformService if passed', () => {

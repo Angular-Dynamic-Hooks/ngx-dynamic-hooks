@@ -138,7 +138,7 @@ describe('SelectorHookParserConfig', () => {
   it('#should recognize custom selectors', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: MultiTagTestComponent,
           selector: 'atotallycustomselector'
         }]
@@ -166,7 +166,7 @@ describe('SelectorHookParserConfig', () => {
     
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [config]
+        parsers: [config]
       })
     ]));
     comp.content = testText;
@@ -214,7 +214,7 @@ describe('SelectorHookParserConfig', () => {
   it('#should recognize singletag hooks', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: MultiTagTestComponent,
           enclosing: false
         }]
@@ -237,7 +237,7 @@ describe('SelectorHookParserConfig', () => {
   it('#should recognize unique bracket styles', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: MultiTagTestComponent,
           bracketStyle: {opening: '[[', closing: ']]'}
         }]
@@ -258,7 +258,7 @@ describe('SelectorHookParserConfig', () => {
   it('#should refrain from parsing inputs, if requested', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: MultiTagTestComponent,
           parseInputs: false,
           refreshBindingsOnPushOnly: false
@@ -296,7 +296,7 @@ describe('SelectorHookParserConfig', () => {
     // Unescape strings
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           unescapeStrings: true
@@ -316,7 +316,7 @@ describe('SelectorHookParserConfig', () => {
     // Leave strings as they are
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           unescapeStrings: false
@@ -349,7 +349,7 @@ describe('SelectorHookParserConfig', () => {
     // a) Test inputBlacklist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           inputsBlacklist: ['numberProp']
@@ -370,7 +370,7 @@ describe('SelectorHookParserConfig', () => {
     // b) Test inputWhitelist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           inputsWhitelist: ['simpleArray']
@@ -391,7 +391,7 @@ describe('SelectorHookParserConfig', () => {
     // c) Test inputBlacklist + inputWhitelist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           inputsBlacklist: ['simpleArray'], 
@@ -413,7 +413,7 @@ describe('SelectorHookParserConfig', () => {
     // d) Test outputBlacklist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           outputsBlacklist: ['eventTriggeredAlias']
@@ -434,7 +434,7 @@ describe('SelectorHookParserConfig', () => {
     // e) Test outputWhitelist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           outputsWhitelist: ['httpResponseReceived']
@@ -455,7 +455,7 @@ describe('SelectorHookParserConfig', () => {
     // f) Test outputBlacklist + outputWhitelist
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           outputsBlacklist: ['httpResponseReceived'], 
@@ -481,7 +481,7 @@ describe('SelectorHookParserConfig', () => {
     // Context access allowed
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           allowContextInBindings: true
@@ -502,7 +502,7 @@ describe('SelectorHookParserConfig', () => {
     // Context access not allowed
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           allowContextInBindings: false
@@ -526,7 +526,7 @@ describe('SelectorHookParserConfig', () => {
     // Context access allowed
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           allowContextInBindings: true
@@ -547,7 +547,7 @@ describe('SelectorHookParserConfig', () => {
     // Context access not allowed
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false,
           allowContextFunctionCalls: false

@@ -26,7 +26,7 @@ export const getHyperlaneRoutes: () => Route[] = () => {
   return [
     { path: '', component: HyperlanesComponent, providers: [
       provideDynamicHooksForChild({
-        globalParsers: [
+        parsers: [
           {component: DynamicHyperlanesComponent}
         ]
       })

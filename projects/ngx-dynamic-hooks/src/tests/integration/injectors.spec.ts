@@ -52,7 +52,7 @@ describe('Injectors logic', () => {
         ])
       ],
       providers: [
-        provideDynamicHooks({globalParsers: [{
+        provideDynamicHooks({parsers: [{
           component: SingleTagTestComponent,
           enclosing: false
         }]})

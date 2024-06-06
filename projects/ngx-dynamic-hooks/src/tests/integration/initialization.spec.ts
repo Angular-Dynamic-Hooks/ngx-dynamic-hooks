@@ -37,7 +37,7 @@ describe('Initialization', () => {
     // Test with config for SingleTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [{
+        parsers: [{
           component: SingleTagTestComponent,
           enclosing: false
         }]
@@ -54,7 +54,7 @@ describe('Initialization', () => {
     
     // Test with config for MultiTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: [{
+      provideDynamicHooks({parsers: [{
         component: MultiTagTestComponent
       }]})
     ]));
@@ -70,7 +70,7 @@ describe('Initialization', () => {
   it('#should reset allSettings on app reloads', (async () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [
+        parsers: [
           {component: SingleTagTestComponent}
         ]
       })
@@ -78,13 +78,13 @@ describe('Initialization', () => {
 
     let allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
-    expect(allSettings[0].globalParsers?.length).toBe(1);
-    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+    expect(allSettings[0].parsers?.length).toBe(1);
+    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
 
     // Reset and reload with different settings
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: [
+        parsers: [
           {component: MultiTagTestComponent}
         ]
       })
@@ -92,8 +92,8 @@ describe('Initialization', () => {
 
     allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
-    expect(allSettings[0].globalParsers?.length).toBe(1);
-    expect((allSettings[0].globalParsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
+    expect(allSettings[0].parsers?.length).toBe(1);
+    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
   }));
 
   it('#should not crash if the user passes an empty object as global settings', () => {

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
 import { OutletOptions, outletOptionDefaults } from './options';
-import { DynamicHooksGlobalSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
+import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
 import { ParserEntryResolver } from './parserEntryResolver';
 import { OptionsResolver } from './optionsResolver';
@@ -23,16 +23,16 @@ export class SettingsResolver {
   }
 
   public resolve(
-    allSettings: DynamicHooksGlobalSettings[],
-    ancestorSettings: DynamicHooksGlobalSettings[],
-    moduleSettings: DynamicHooksGlobalSettings, 
+    allSettings: DynamicHooksSettings[],
+    ancestorSettings: DynamicHooksSettings[],
+    moduleSettings: DynamicHooksSettings, 
     localParsers: HookParserEntry[]|null = null, 
     localOptions: OutletOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
     injector: Injector|null = null
   ): ResolvedSettings {
-    let resolvedSettings: DynamicHooksGlobalSettings = {};
+    let resolvedSettings: DynamicHooksSettings = {};
 
     if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
       // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
@@ -49,8 +49,8 @@ export class SettingsResolver {
       throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${moduleSettings.inheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
     }
 
-    const resolvedParsers = this.resolveParsers(resolvedSettings.globalParsers || null, localParsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
-    const resolvedOptions = this.resolveOptions(resolvedSettings.globalOptions || null, localOptions);
+    const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
+    const resolvedOptions = this.resolveOptions(resolvedSettings.options || null, localOptions);
 
     return {
       parsers: resolvedParsers,
@@ -63,28 +63,28 @@ export class SettingsResolver {
    *
    * @param settingsArray - The settings objects to merge
    */
-  private mergeSettings(settingsArray: DynamicHooksGlobalSettings[]): DynamicHooksGlobalSettings {
-    const mergedSettings: DynamicHooksGlobalSettings = {};
+  private mergeSettings(settingsArray: DynamicHooksSettings[]): DynamicHooksSettings {
+    const mergedSettings: DynamicHooksSettings = {};
 
     for (const settings of settingsArray) {
       // Unique parsers are simply all collected, not overwritten
-      if (settings.globalParsers !== undefined) {
-        if (mergedSettings.globalParsers === undefined) {
-          mergedSettings.globalParsers = [];
+      if (settings.parsers !== undefined) {
+        if (mergedSettings.parsers === undefined) {
+          mergedSettings.parsers = [];
         }
-        for (const parserEntry of settings.globalParsers) {
-          if (!mergedSettings.globalParsers.includes(parserEntry)) {
-            mergedSettings.globalParsers.push(parserEntry);
+        for (const parserEntry of settings.parsers) {
+          if (!mergedSettings.parsers.includes(parserEntry)) {
+            mergedSettings.parsers.push(parserEntry);
           }
         }
       }
       // Options are individually overwritten
-      if (settings.globalOptions !== undefined) {
-        if (mergedSettings.globalOptions === undefined) {
-          mergedSettings.globalOptions = {};
+      if (settings.options !== undefined) {
+        if (mergedSettings.options === undefined) {
+          mergedSettings.options = {};
         }
 
-        mergedSettings.globalOptions = Object.assign(mergedSettings.globalOptions, settings.globalOptions);
+        mergedSettings.options = Object.assign(mergedSettings.options, settings.options);
       }
     }
 

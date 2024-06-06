@@ -22,7 +22,7 @@ export const createForChildTestingModule = (mode: 'lazy'|'sync') => {
 
   // To run allsettings reset before loading child settings
   const rootHooksProviders = provideDynamicHooks({
-    globalParsers: [
+    parsers: [
       {component: DynamicRootComponent}
     ]
   });

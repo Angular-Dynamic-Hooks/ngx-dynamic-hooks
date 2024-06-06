@@ -1,11 +1,11 @@
 import { Type, SkipSelf, Optional, Provider, APP_INITIALIZER, Injectable, OnDestroy } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
-import { DynamicHooksGlobalSettings } from './components/outlet/settings/settings';
+import { DynamicHooksSettings } from './components/outlet/settings/settings';
 import { DynamicHooksService } from './components/outlet/services/dynamicHooksService';
 import { PlatformService } from './platform/platformService';
 import { GeneralPlatformService } from './platform/generalPlatformService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
 
-export const allSettings: DynamicHooksGlobalSettings[] = [];
+export const allSettings: DynamicHooksSettings[] = [];
 
 /**
  * Configures the root settings for running the ngx-dynamic-hooks library
@@ -13,7 +13,7 @@ export const allSettings: DynamicHooksGlobalSettings[] = [];
  * @param rootSettings - Settings that all loaded DynamicHooksComponents will use
  * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
  */
-export const provideDynamicHooks: (rootSettings: DynamicHooksGlobalSettings, platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
+export const provideDynamicHooks: (rootSettings: DynamicHooksSettings, platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
   allSettings.push(rootSettings);
   
   return [
@@ -52,7 +52,7 @@ export class DynamicHooksInitService implements OnDestroy {
  * 
  * @param childSettings - Settings that the loaded DynamicHooksComponents of this child context will use
  */
-export const provideDynamicHooksForChild: (childSettings: DynamicHooksGlobalSettings) => Provider[] = childSettings => {
+export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings) => Provider[] = childSettings => {
   allSettings.push(childSettings);
 
   return [
@@ -65,7 +65,7 @@ export const provideDynamicHooksForChild: (childSettings: DynamicHooksGlobalSett
     // See: https://stackoverflow.com/questions/49406615/is-there-a-way-how-to-use-angular-multi-providers-from-all-multiple-levels
     {
       provide: DYNAMICHOOKS_ANCESTORSETTINGS,
-      useFactory: (ancestorSettings: DynamicHooksGlobalSettings[]) => {
+      useFactory: (ancestorSettings: DynamicHooksSettings[]) => {
         return ancestorSettings ? [...ancestorSettings, childSettings] : [childSettings];
       },
       deps: [[new SkipSelf(), new Optional(), DYNAMICHOOKS_ANCESTORSETTINGS]]

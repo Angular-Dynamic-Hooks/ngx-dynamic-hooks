@@ -6,7 +6,7 @@
 
 // Public module resources
 export { provideDynamicHooks, provideDynamicHooksForChild, resetDynamicHooks, allSettings } from '../lib/dynamicHooksProviders';
-export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/components/outlet/settings/settings';
+export { DynamicHooksSettings, DynamicHooksInheritance } from '../lib/components/outlet/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
 export { DynamicHooksComponent } from '../lib/components/outlet/dynamicHooksComponent';
 export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/settings/options';

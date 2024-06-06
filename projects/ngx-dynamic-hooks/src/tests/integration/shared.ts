@@ -9,7 +9,7 @@ import { TestBed, ComponentFixtureAutoDetect, TestBedStatic, ComponentFixture } 
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
-import { provideDynamicHooks, DynamicHooksGlobalSettings, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
+import { provideDynamicHooks, DynamicHooksSettings, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
@@ -71,7 +71,7 @@ export function defaultBeforeEach(): TestingModuleComponentAndContext {
   resetDynamicHooks();
 
   const {testBed, fixture, comp} = prepareTestingModule(() => [
-    provideDynamicHooks({globalParsers: testParsers})
+    provideDynamicHooks({parsers: testParsers})
   ]);
   
   const context = {

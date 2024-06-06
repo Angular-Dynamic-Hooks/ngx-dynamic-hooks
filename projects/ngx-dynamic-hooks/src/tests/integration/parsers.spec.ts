@@ -50,7 +50,7 @@ describe('Parsers', () => {
 
   it('#should be able to load parsers in their various forms', () => {
     ({comp, fixture} = prepareTestingModule(() => [
-      provideDynamicHooks({globalParsers: []}),
+      provideDynamicHooks({parsers: []}),
       ServiceTestParser
     ]));
 
@@ -168,7 +168,7 @@ describe('Parsers', () => {
   it('#should load fine without parsers', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: []
+        parsers: []
       })
     ]));
 
@@ -202,7 +202,7 @@ describe('Parsers', () => {
     // Blacklist: Expect that MultiTagComponentParser is not loaded
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -220,7 +220,7 @@ describe('Parsers', () => {
     // WhiteList: Expect that only InlineTestComponentParser is loaded
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;
@@ -237,7 +237,7 @@ describe('Parsers', () => {
     // Both: Expect that only SingleTagTestComponentParser is loaded
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        globalParsers: testParsers
+        parsers: testParsers
       })
     ]));
     comp.content = testText;

@@ -11,9 +11,9 @@ export enum DynamicHooksInheritance {
 /**
  * The interface for users to define the global options
  */
-export interface DynamicHooksGlobalSettings {
-    globalParsers?: HookParserEntry[];
-    globalOptions?: OutletOptions;
+export interface DynamicHooksSettings {
+    parsers?: HookParserEntry[];
+    options?: OutletOptions;
     inheritance?: DynamicHooksInheritance;
 }
 

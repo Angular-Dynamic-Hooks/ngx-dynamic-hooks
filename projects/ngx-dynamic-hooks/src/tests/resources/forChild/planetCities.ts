@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject, Optional } from '@angular/core';
 import { Route } from '@angular/router';
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, DynamicHooksGlobalSettings, DynamicHooksInheritance, DynamicHooksService, allSettings, provideDynamicHooksForChild } from '../../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, DynamicHooksSettings, DynamicHooksInheritance, DynamicHooksService, allSettings, provideDynamicHooksForChild } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -16,7 +16,7 @@ export class DynamicPlanetCitiesComponent {}
 export class DynamicPlanetCitiesElementInjectorComponent {}
 
 export const planetCitiesComponentProviderSettings = {
-  globalParsers: [
+  parsers: [
     {component: DynamicPlanetCitiesElementInjectorComponent}
   ],
   inheritance: DynamicHooksInheritance.Linear
@@ -55,10 +55,10 @@ export const getPlanetCitiesRoutes: () => Route[] = () => {
   return [
     { path: '', component: PlanetCitiesComponent, providers: [
       provideDynamicHooksForChild({
-        globalParsers: [
+        parsers: [
           {component: DynamicPlanetCitiesComponent}
         ],
-        globalOptions: {
+        options: {
           sanitize: false
         }        
       })

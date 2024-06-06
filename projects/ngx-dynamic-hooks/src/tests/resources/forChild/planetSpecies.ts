@@ -26,7 +26,7 @@ export const getPlanetSpeciesRoutes: () => Route[] = () => {
   return [
     { path: '', component: PlanetSpeciesComponent, providers: [
       provideDynamicHooksForChild({
-        globalParsers: [
+        parsers: [
           {component: DynamicPlanetSpeciesComponent}
         ],
         inheritance: DynamicHooksInheritance.None
