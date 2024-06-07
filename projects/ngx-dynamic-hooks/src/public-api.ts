@@ -7,31 +7,31 @@ export { provideDynamicHooks, provideDynamicHooksForChild, resetDynamicHooks } f
 export * from './lib/interfacesPublic';
 
 // Settings
-export * from './lib/components/outlet/settings/options';
-export * from './lib/components/outlet/settings/parserEntry';
+export * from './lib/services/settings/options';
+export * from './lib/services/settings/parserEntry';
 
 // Main logic
 export * from './lib/components/outlet/dynamicHooksComponent';
-export * from './lib/components/outlet/services/dynamicHooksService';
-export * from './lib/components/outlet/settings/settings';
+export * from './lib/services/dynamicHooksService';
+export * from './lib/services/settings/settings';
 
 // SelectorHookParser
 export * from './lib/parsers/selector/selectorHookParser';
 export * from './lib/parsers/selector/config/selectorHookParserConfig';
 
 // Utils
-export * from './lib/utils/dataTypeEncoder';
-export * from './lib/utils/dataTypeParser';
-export * from './lib/utils/deepComparer';
-export * from './lib/utils/hookFinder';
-export * from './lib/utils/regexes';
+export * from './lib/services/utils/dataTypeEncoder';
+export * from './lib/services/utils/dataTypeParser';
+export * from './lib/services/utils/deepComparer';
+export * from './lib/services/utils/hookFinder';
+export * from './lib/services/utils/regexes';
 
 // Polyfills
-export * from './lib/polyfills/matchAll';
+export * from './lib/services/utils/polyfills/matchAll';
 
 // Platform
-export * from './lib/platform/platformService';
-export * from './lib/platform/generalPlatformService';
+export * from './lib/services/platform/platformService';
+export * from './lib/services/platform/defaultPlatformService';
 
 // Testing
 // export * from './tests/testing-api';

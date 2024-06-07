@@ -1,10 +1,10 @@
 import { Type, SkipSelf, Optional, Provider, APP_INITIALIZER, Injectable, OnDestroy } from '@angular/core'; // Don't remove InjectionToken here. It will compile with a dynamic import otherwise which breaks Ng<5 support
-import { DynamicHooksSettings } from './components/outlet/settings/settings';
-import { DynamicHooksService } from './components/outlet/services/dynamicHooksService';
-import { PlatformService } from './platform/platformService';
-import { GeneralPlatformService } from './platform/generalPlatformService';
+import { DynamicHooksSettings } from './services/settings/settings';
+import { DynamicHooksService } from './services/dynamicHooksService';
+import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
-import { HookParserEntry } from '../public-api';
+import { HookParserEntry } from './services/settings/parserEntry';
+import { EmptyPlatformService } from './services/platform/emptyPlatformService';
 
 export const allSettings: DynamicHooksSettings[] = [];
 
@@ -30,7 +30,7 @@ export const provideDynamicHooks: (rootSettings: DynamicHooksSettings|HookParser
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
     { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: settings },
     { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [settings] },
-    { provide: PlatformService, useClass: platformService || GeneralPlatformService }
+    { provide: PLATFORM_SERVICE, useClass: platformService || EmptyPlatformService }
   ];
 }
 

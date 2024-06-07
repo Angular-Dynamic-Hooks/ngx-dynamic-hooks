@@ -1,17 +1,18 @@
-import { Injectable, Renderer2, RendererFactory2, Optional, Inject, Injector, EnvironmentInjector } from '@angular/core';
+import { Injectable, Optional, Inject, Injector, EnvironmentInjector } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { HookIndex } from '../../../interfacesPublic';
-import { OutletParseResult } from '../../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
-import { HooksReplacer } from './hooksReplacer';
-import { ComponentCreator } from './componentCreator';
-import { DynamicHooksSettings } from '../settings/settings';
-import { HookParserEntry } from '../settings/parserEntry';
-import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
-import { SettingsResolver } from '../settings/settingsResolver';
-import { SelectorHookParser } from '../../../../public-api';
+import { HookIndex } from '../interfacesPublic';
+import { OutletParseResult } from '../interfacesPublic';
+import { OutletOptions } from './settings/options';
+import { HooksReplacer } from './core/hooksReplacer';
+import { ComponentCreator } from './core/componentCreator';
+import { DynamicHooksSettings } from './settings/settings';
+import { HookParserEntry } from './settings/parserEntry';
+import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../interfaces';
+import { SettingsResolver } from './settings/settingsResolver';
+import { ContentSanitizer } from './utils/contentSanitizer';
+import { AutoPlatformService } from './platform/autoPlatformService';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
@@ -21,7 +22,6 @@ import { SelectorHookParser } from '../../../../public-api';
   providedIn: 'root'
 })
 export class DynamicHooksService {
-  private renderer: Renderer2;
 
   constructor(
     @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksSettings[],
@@ -29,12 +29,12 @@ export class DynamicHooksService {
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
     private settingsResolver: SettingsResolver,
     private hooksReplacer: HooksReplacer,
+    private contentSanitizer: ContentSanitizer,
     private componentCreator: ComponentCreator,
-    private rendererFactory: RendererFactory2,
+    private platformService: AutoPlatformService,
     private environmentInjector: EnvironmentInjector,
     private injector: Injector
   ) {
-    this.renderer = rendererFactory.createRenderer(null, null);
   }
 
   /**
@@ -65,7 +65,7 @@ export class DynamicHooksService {
 
     // If no container element given, create one
     if (targetElement === null) {
-      targetElement = this.renderer.createElement('div') as HTMLElement;
+      targetElement = this.platformService.createElement('div') as HTMLElement;
     }
 
     // Resolve options and parsers
@@ -102,6 +102,20 @@ export class DynamicHooksService {
 
     // Parse HTML
     targetElement.innerHTML = content;
+
+    /*
+    // Sanitize?
+    if (options?.sanitize) {
+      this.contentSanitizer.sanitize(targetElement, targetHookIndex, token);
+    }
+
+    return of({
+      element: targetElement,
+      hookIndex: targetHookIndex,
+      resolvedParsers,
+      resolvedOptions
+    });
+    */
 
     // Dynamically create components in component selector elements
     return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)

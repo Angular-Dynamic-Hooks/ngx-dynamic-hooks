@@ -2,7 +2,7 @@ import { Injectable, isDevMode } from '@angular/core';
 
 import { regexes } from './regexes';
 import { DataTypeEncoder } from './dataTypeEncoder';
-import { matchAll } from '../polyfills/matchAll';
+import { matchAll } from './polyfills/matchAll';
 
 
 /**

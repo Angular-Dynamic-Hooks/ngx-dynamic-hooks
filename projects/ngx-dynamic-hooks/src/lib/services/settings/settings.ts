@@ -1,6 +1,6 @@
 import { HookParserEntry } from './parserEntry';
 import { OutletOptions } from './options';
-import { HookParser } from '../../../interfacesPublic';
+import { HookParser } from '../../interfacesPublic';
 
 export enum DynamicHooksInheritance {
     All,

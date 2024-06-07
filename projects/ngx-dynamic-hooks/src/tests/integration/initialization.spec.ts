@@ -1,5 +1,5 @@
 // Testing api resources
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, GeneralPlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
+import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
@@ -152,10 +152,33 @@ describe('Initialization', () => {
     expect(platformServiceProvider).not.toBeUndefined();
   });
 
-  it('#should set platformService to PlatformBrowserService if custom platform not passed', () => {
+  it('#should set platformService to EmptyPlatformService if custom platform not passed', () => {
     const providers = provideDynamicHooks({});
-    const platformServiceProvider = providers.find((p: any) => p.useClass === GeneralPlatformService);
+    const platformServiceProvider = providers.find((p: any) => p.useClass === EmptyPlatformService);
     expect(platformServiceProvider).not.toBeUndefined();
+  });
+
+  it('#should use user-provided platformService, if available', () => {
+    const expectedReturnValue = 'TESTTAGNAME';
+
+    class UserPlatformService implements PlatformService {
+      getTagName(element: any) {
+        return expectedReturnValue;
+      }  
+    }
+
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({}, UserPlatformService)
+    ]));
+
+    // Make sure AutoPlatformService used UserPlatformServie method
+    const autoPlatformService = TestBed.inject(AutoPlatformService);
+    const tagName = autoPlatformService.getTagName(document.createElement('div'));
+    expect(tagName).toBe(expectedReturnValue);
+
+    // If method not defined in UserPlatformService, AutoPlatformService should fallback to defaultPlatformService methods
+    const createdElement = autoPlatformService.createElement('h1');
+    expect(createdElement.tagName).toBe('H1');
   });
 
   // Initialize DynamicHookComponent

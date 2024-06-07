@@ -1,8 +1,9 @@
-import { HookIndex } from '../../../interfacesPublic';
-import { HookParser, HookPosition } from '../../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
-import { isDevMode, Injectable, Renderer2, RendererFactory2, Optional } from '@angular/core';
-import { PlatformService } from '../../../platform/platformService';
+import { HookIndex } from '../../interfacesPublic';
+import { HookParser, HookPosition } from '../../interfacesPublic';
+import { OutletOptions } from '../../services/settings/options';
+import { isDevMode, Injectable } from '@angular/core';
+import { PlatformService } from '../platform/platformService';
+import { AutoPlatformService } from '../platform/autoPlatformService';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
@@ -41,10 +42,8 @@ interface HookSegments {
   providedIn: 'root'
 })
 export class HooksReplacer {
-  private renderer: Renderer2;
 
-  constructor(rendererFactory: RendererFactory2, private platform: PlatformService) {
-    this.renderer = rendererFactory.createRenderer(null, null);
+  constructor(private platformService: AutoPlatformService) {
   }
 
   // 1. Replacing hooks
@@ -97,7 +96,7 @@ export class HooksReplacer {
       selectorReplaceInstructions.push({
         startIndex: pr.hookPosition.openingTagStartIndex,
         endIndex: pr.hookPosition.openingTagEndIndex,
-        replacement: this.encodeComponentPlaceholderElement('<dynamic-component-anchor hookid="' + hookCount + '" parsetoken="' + token + '" ' + (pr.parser.name ? 'parser="' + pr.parser.name + '"' : '') + '>')});
+        replacement: this.encodeComponentPlaceholderElement('<dynamic-component-anchor hookid="' + hookCount + '" parsetoken="' + token + '" >')});
       selectorReplaceInstructions.push({
         startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex! : pr.hookPosition.openingTagEndIndex,
         endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex! : pr.hookPosition.openingTagEndIndex,
@@ -136,24 +135,17 @@ export class HooksReplacer {
       }
     }
 
-    // Sort replace instructions by startIndex so indexModifier only applies to indexes that follow, not precede
-    selectorReplaceInstructions.sort((a, b) => a.startIndex - b.startIndex);
-
-    // Replace found hooks with encoded component placeholders
-    let indexModifier = 0;
+    // Replace found hooks with encoded component placeholders (from the back, so no need to change indexes)
+    selectorReplaceInstructions.sort((a, b) => b.startIndex - a.startIndex);
     for (const selectorReplaceInstruction of selectorReplaceInstructions) {
-      const textBeforeSelector = content.substring(0, selectorReplaceInstruction.startIndex + indexModifier);
-      const textAfterSelector = content.substring(selectorReplaceInstruction.endIndex + indexModifier);
-      const oldDynamicTextLength = content.length;
-
-      // Reassemble and correct index
+      const textBeforeSelector = content.substring(0, selectorReplaceInstruction.startIndex);
+      const textAfterSelector = content.substring(selectorReplaceInstruction.endIndex);
       content = textBeforeSelector + selectorReplaceInstruction.replacement + textAfterSelector;
-      indexModifier += content.length - oldDynamicTextLength;
     }
 
     // Sanitize? (ignores the encoded component selector elements)
     if (options.sanitize) {
-      content = this.platform.sanitize(content) || '';
+      content = this.platformService.sanitize(content) || '';
     }
 
     // Decode component selector elements again
@@ -392,12 +384,12 @@ export class HooksReplacer {
    * @param text - The text with the potential HTML entities
    */
   convertHTMLEntities(text: string): string {
-    const div = this.renderer.createElement('div');
+    const div = this.platformService.createElement('div');
     const result = text.replace(/&[#A-Za-z0-9]+;/gi, (hmtlEntity) => {
         // Replace invisible nbsp-whitespace with normal whitespace (not \u00A0). Leads to problems with JSON.parse() otherwise.
         if (hmtlEntity === ('&nbsp;')) { return ' '; }
-        this.platform.setInnerContent(div,hmtlEntity);
-        return this.platform.getInnerText(div);
+        this.platformService.setInnerContent(div, hmtlEntity);
+        return this.platformService.getInnerText(div);
     });
     return result;
   }

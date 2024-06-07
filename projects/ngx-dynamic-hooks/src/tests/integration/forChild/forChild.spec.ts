@@ -13,7 +13,7 @@ import { DynamicPlanetCitiesComponent, DynamicPlanetCitiesElementInjectorCompone
 import { DynamicPlanetSpeciesComponent, PlanetSpeciesComponent } from '../../resources/forChild/planetSpecies';
 import { StarsComponent, DynamicStarsComponent } from '../../resources/forChild/stars';
 import { DynamicHyperlanesComponent, HyperlanesComponent } from '../../resources/forChild/hyperlanes';
-import { SettingsResolver } from '../../../lib/components/outlet/settings/settingsResolver';
+import { SettingsResolver } from '../../../lib/services/settings/settingsResolver';
 import { TestSetup, createForChildTestingModule } from './shared';
 
 describe('forChild', () => {

@@ -1,11 +1,10 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
 import { OutletOptions, outletOptionDefaults } from './options';
 import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
-import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from '../../../interfaces';
 import { ParserEntryResolver } from './parserEntryResolver';
 import { OptionsResolver } from './optionsResolver';
 import { HookParserEntry } from './parserEntry';
-import { HookParser } from '../../../interfacesPublic';
+import { HookParser } from '../../interfacesPublic';
 
 /**
  * A helper class for resolving settings object and merge potentially multiple ones from different child modules/injection contexts

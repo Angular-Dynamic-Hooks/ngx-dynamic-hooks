@@ -1,12 +1,13 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges, EnvironmentInjector } from '@angular/core';
 import { HookIndex, Hook } from '../../interfacesPublic';
 import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
-import { OutletOptions, outletOptionDefaults } from './settings/options';
-import { DynamicHooksService } from './services/dynamicHooksService';
-import { HookParserEntry } from './settings/parserEntry';
-import { ComponentUpdater } from './services/componentUpdater';
-import { PlatformService } from '../../platform/platformService';
+import { OutletOptions, outletOptionDefaults } from '../../services/settings/options';
+import { DynamicHooksService } from '../../services/dynamicHooksService';
+import { HookParserEntry } from '../../services/settings/parserEntry';
+import { ComponentUpdater } from '../../services/core/componentUpdater';
+import { PlatformService } from '../../services/platform/platformService';
 import { DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_PROVIDERS_REGISTERED } from '../../interfaces';
+import { AutoPlatformService } from '../../services/platform/autoPlatformService';
 
 /**
 * Explanation in a nutshell:
@@ -69,7 +70,7 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     private hostElement: ElementRef,
     private dynamicHooksService: DynamicHooksService,
     private componentUpdater: ComponentUpdater,
-    private platform: PlatformService,
+    private platformService: AutoPlatformService,
     private environmentInjector: EnvironmentInjector,
     private injector: Injector
   ) {
@@ -123,7 +124,7 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     this.dynamicHooksService.destroy(this.hookIndex);
 
     // Reset state
-    this.platform.setInnerContent(this.hostElement.nativeElement, '');
+    this.platformService.setInnerContent(this.hostElement.nativeElement, '');
     this.hookIndex = {};
     this.activeOptions = outletOptionDefaults;
     this.activeParsers = [];

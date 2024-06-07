@@ -1,6 +1,6 @@
 import { isDevMode, Injectable } from '@angular/core';
-import { HookPosition } from '../interfacesPublic';
-import { matchAll } from '../polyfills/matchAll';
+import { HookPosition } from '../../interfacesPublic';
+import { matchAll } from './polyfills/matchAll';
 
 /**
  * A utility service to easily parse hooks from a string of text

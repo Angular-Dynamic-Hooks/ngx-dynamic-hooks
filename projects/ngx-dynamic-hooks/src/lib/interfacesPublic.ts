@@ -1,7 +1,7 @@
 import { ComponentRef, EnvironmentInjector, Injector } from '@angular/core';
-import { OutletOptions } from './components/outlet/settings/options';
+import { OutletOptions } from './services/settings/options';
 import { Subscription } from 'rxjs';
-import { DetailedStringifyResult } from './utils/deepComparer';
+import { DetailedStringifyResult } from './services/utils/deepComparer';
 
 // Hook interfaces
 // ---------------------------------
@@ -73,7 +73,7 @@ export interface HookParser {
      * @param context - The current context object
      * @param childNodes - The current child nodes of this hook
      */
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData;
+    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Node[]): HookComponentData;
 
     /**
      * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.

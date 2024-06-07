@@ -1,10 +1,10 @@
 import { isDevMode, Injectable } from '@angular/core';
 
-import { regexes } from '../../../utils/regexes';
-import { DataTypeParser } from '../../../utils/dataTypeParser';
+import { regexes } from '../../../services/utils/regexes';
+import { DataTypeParser } from '../../../services/utils/dataTypeParser';
 import { SelectorHookParserConfig } from '../config/selectorHookParserConfig';
 import { RichBindingData } from '../../../interfaces';
-import { matchAll } from '../../../polyfills/matchAll';
+import { matchAll } from '../../../services/utils/polyfills/matchAll';
 
 
 /**

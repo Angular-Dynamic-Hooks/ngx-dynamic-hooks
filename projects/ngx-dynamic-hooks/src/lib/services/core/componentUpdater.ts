@@ -1,9 +1,9 @@
 import { SimpleChange, isDevMode, Injectable, reflectComponentType} from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
-import { DeepComparer, DetailedStringifyResult } from '../../../utils/deepComparer';
+import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../interfacesPublic';
+import { OutletOptions } from '../../services/settings/options';
+import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
 
 /**
  * The service responsible for updating dynamically created components

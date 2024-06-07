@@ -1,10 +1,10 @@
 import { isDevMode, Injectable, Injector, reflectComponentType } from '@angular/core';
-import { HookParser } from '../../../interfacesPublic';
-import { SelectorHookParser } from '../../../parsers/selector/selectorHookParser';
-import { SelectorHookParserConfig } from '../../../parsers/selector/config/selectorHookParserConfig';
-import { SelectorHookParserConfigResolver } from '../../../parsers/selector/config/selectorHookParserConfigResolver';
-import { SelectorHookFinder } from '../../../parsers/selector/services/selectorHookFinder';
-import { BindingStateManager } from '../../../parsers/selector/services/bindingStateManager';
+import { HookParser } from '../../interfacesPublic';
+import { SelectorHookParser } from '../../parsers/selector/selectorHookParser';
+import { SelectorHookParserConfig } from '../../parsers/selector/config/selectorHookParserConfig';
+import { SelectorHookParserConfigResolver } from '../../parsers/selector/config/selectorHookParserConfigResolver';
+import { SelectorHookFinder } from '../../parsers/selector/services/selectorHookFinder';
+import { BindingStateManager } from '../../parsers/selector/services/bindingStateManager';
 import { HookParserEntry } from './parserEntry';
 
 /**

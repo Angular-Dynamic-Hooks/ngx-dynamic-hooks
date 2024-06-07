@@ -1,5 +1,5 @@
-import { HookParser } from '../../../interfacesPublic';
-import { SelectorHookParserConfig } from '../../../parsers/selector/config/selectorHookParserConfig';
+import { HookParser } from '../../interfacesPublic';
+import { SelectorHookParserConfig } from '../../parsers/selector/config/selectorHookParserConfig';
 
 /**
  * An configuration entry for a HookParser. This can either be:
