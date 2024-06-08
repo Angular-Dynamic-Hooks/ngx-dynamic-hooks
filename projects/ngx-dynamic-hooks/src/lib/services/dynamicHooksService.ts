@@ -103,19 +103,10 @@ export class DynamicHooksService {
     // Parse HTML
     targetElement.innerHTML = content;
 
-    /*
     // Sanitize?
-    if (options?.sanitize) {
+    if (resolvedOptions?.sanitize) {
       this.contentSanitizer.sanitize(targetElement, targetHookIndex, token);
     }
-
-    return of({
-      element: targetElement,
-      hookIndex: targetHookIndex,
-      resolvedParsers,
-      resolvedOptions
-    });
-    */
 
     // Dynamically create components in component selector elements
     return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)

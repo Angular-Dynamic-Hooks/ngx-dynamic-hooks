@@ -78,6 +78,28 @@ describe('DefaultPlatformService', () => {
     expect(actualTagName).toBe(expectedTagName);
   });
 
+  // getAttributeNames
+  // ------------------
+
+  it('#should return all attribute names', () => {
+    const element = document.createElement('div');
+    element.innerHTML = `
+    <div
+      id='asd'
+      class="asd"
+      href="asd"
+      src="asd"
+      style="color: blue"
+      customattr="asd"
+      [inputattr]="asd"
+      (outputattr)="asd"
+    ></div>
+    `;
+
+    const attrNames = platformService.getAttributeNames(element.children[0]);
+    expect(attrNames).toEqual(['id', 'class', 'href', 'src', 'style', 'customattr', '[inputattr]', '(outputattr)']);
+  });
+
   // getAttribute
   // ------------------
 

@@ -33,6 +33,13 @@ export interface CompletePlatformService {
   getTagName(element: any): string;
 
   /**
+   * Returns the names of all existing attributes of an element
+   * Return an emtpy array if none exist
+   * @param element The element
+   */
+  getAttributeNames(element: any): string[];
+
+  /**
    * Returns the value of an element attribute.
    * Returns null when the attribute doesn't exist
    * @param element The element
@@ -72,7 +79,7 @@ export interface CompletePlatformService {
 
   /**
    * Returns an array of child nodes.
-   * Returns an empty array if there's no child nodes
+   * Returns an empty array if none exist
    * @param parentNode A node
    */
   getChildNodes(parentNode: any): any[];

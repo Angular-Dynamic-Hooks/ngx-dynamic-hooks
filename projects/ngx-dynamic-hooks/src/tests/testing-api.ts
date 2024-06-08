@@ -17,12 +17,12 @@ export { DynamicHooksService } from '../lib/services/dynamicHooksService';
 export { AutoPlatformService } from '../lib/services/platform/autoPlatformService';
 export { DefaultPlatformService } from '../lib/services/platform/defaultPlatformService';
 export { EmptyPlatformService } from '../lib/services/platform/emptyPlatformService';
-export { PlatformService } from '../lib/services/platform/platformService';
+export { PlatformService, PLATFORM_SERVICE } from '../lib/services/platform/platformService';
 export { DataTypeEncoder } from '../lib/services/utils/dataTypeEncoder';
 export { DataTypeParser } from '../lib/services/utils/dataTypeParser';
 export { DeepComparer } from '../lib/services/utils/deepComparer';
 export { HookFinder } from '../lib/services/utils/hookFinder';
-export { regexes } from '../lib/services/utils/regexes';
+export { regexes } from '../lib/constants/regexes';
 export { matchAll } from '../lib/services/utils/polyfills/matchAll';
 
 // Private module resources

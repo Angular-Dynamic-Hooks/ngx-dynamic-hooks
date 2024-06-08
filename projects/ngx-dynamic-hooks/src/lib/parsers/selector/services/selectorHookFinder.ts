@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { HookPosition } from '../../../interfacesPublic';
-import { regexes } from '../../../services/utils/regexes';
+import { regexes } from '../../../constants/regexes';
 import { HookFinder } from '../../../services/utils/hookFinder';
 
 

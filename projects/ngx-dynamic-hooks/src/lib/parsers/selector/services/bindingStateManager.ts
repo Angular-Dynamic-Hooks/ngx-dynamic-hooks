@@ -1,6 +1,6 @@
 import { isDevMode, Injectable } from '@angular/core';
 
-import { regexes } from '../../../services/utils/regexes';
+import { regexes } from '../../../constants/regexes';
 import { DataTypeParser } from '../../../services/utils/dataTypeParser';
 import { SelectorHookParserConfig } from '../config/selectorHookParserConfig';
 import { RichBindingData } from '../../../interfaces';

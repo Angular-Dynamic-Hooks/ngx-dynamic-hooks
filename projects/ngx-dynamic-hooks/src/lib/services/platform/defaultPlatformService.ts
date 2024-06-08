@@ -40,7 +40,11 @@ export class DefaultPlatformService implements CompletePlatformService {
     return element.tagName;
   }
 
-  getAttribute(element: Node, attributeName: string) {
+  getAttributeNames(element: Node) {
+    return typeof (element as any).getAttributeNames === 'function' ? (element as any).getAttributeNames() : [];
+  }
+
+  getAttribute(element: Element, attributeName: string) {
     return typeof (element as any).getAttribute === 'function' ? (element as any).getAttribute(attributeName) : null;
   }
 

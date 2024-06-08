@@ -4,6 +4,7 @@ import { OutletOptions } from '../../services/settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { PlatformService } from '../platform/platformService';
 import { AutoPlatformService } from '../platform/autoPlatformService';
+import { attrNameHookId, attrNameParseToken } from '../../constants/core';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
@@ -35,8 +36,7 @@ interface HookSegments {
 }
 
 /**
- * The service responsible for finding all Hooks in the content, replacing them with component placeholders
- * and creating the HookIndex
+ * The service responsible for finding all string hooks in the content and replacing them with component anchors
  */
 @Injectable({
   providedIn: 'root'
@@ -46,14 +46,8 @@ export class HooksReplacer {
   constructor(private platformService: AutoPlatformService) {
   }
 
-  // 1. Replacing hooks
-  // -----------------------------------------------------------------------------------------------------------------------
-
   /**
-   * Lets all registered parsers anaylyze the content to find all hooks within. Then replaces those hooks with component placeholder elements
-   * (that will remain empty for now) and creates the hookIndex.
-   *
-   * It optionally also sanitizes the content and fixes paragraph artifacts.
+   * Lets all registered parsers anaylyze the content to find all hooks within. Then replaces those hooks with anchor elements and creates the hookIndex.
    *
    * @param content - The text to parse
    * @param context - The current context object
@@ -77,30 +71,23 @@ export class HooksReplacer {
     // Validate parser results
     parserResults = this.validateHookPositions(parserResults, content);
 
-    // Process parser results to
-    // a) Create an array of simple ReplaceInstructions to replace the hooks with the component placeholders
-    // b) Enter each found hook into hookIndex
-    // c) Replace tag artifacts
+    // Process parser results
     const selectorReplaceInstructions: ReplaceInstruction[] = [];
     for (const pr of parserResults) {
 
       // Some info about this hook
       const hookSegments = this.getHookSegments(pr.hookPosition, content);
 
-      // Create ReplaceInstructions array
-      // Notes:
-      // 1. Attach some parsing info as attributes to the placeholders for dynamically creating the components later
-      // 2. Use encoded tag syntax to make them pass sanitization unnoticed (decoded again below after sanitization)
-      // 3. Since the component selector of lazy-loaded components can't be known at this point, use placeholders tags for now (replaced with real selectors in ComponentCreator)
-      // 4. Still use custom tags however to circumvent HTML nesting rules for established tags (browser might autocorrect nesting structure otherwise)
+      // Prepare ReplaceInstructions array to replace all found hooks with anchor elements
       selectorReplaceInstructions.push({
         startIndex: pr.hookPosition.openingTagStartIndex,
         endIndex: pr.hookPosition.openingTagEndIndex,
-        replacement: this.encodeComponentPlaceholderElement('<dynamic-component-anchor hookid="' + hookCount + '" parsetoken="' + token + '" >')});
+        replacement: `<dynamic-component-anchor ${attrNameHookId}="${hookCount}" ${attrNameParseToken}="${token}">`
+      });
       selectorReplaceInstructions.push({
         startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex! : pr.hookPosition.openingTagEndIndex,
         endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex! : pr.hookPosition.openingTagEndIndex,
-        replacement: this.encodeComponentPlaceholderElement('</dynamic-component-anchor>')
+        replacement: '</dynamic-component-anchor>'
       });
 
       // Enter hook into index
@@ -135,21 +122,13 @@ export class HooksReplacer {
       }
     }
 
-    // Replace found hooks with encoded component placeholders (from the back, so no need to change indexes)
+    // Actually replace hooks with anchors (from the back, so no need to change indexes)
     selectorReplaceInstructions.sort((a, b) => b.startIndex - a.startIndex);
     for (const selectorReplaceInstruction of selectorReplaceInstructions) {
       const textBeforeSelector = content.substring(0, selectorReplaceInstruction.startIndex);
       const textAfterSelector = content.substring(selectorReplaceInstruction.endIndex);
       content = textBeforeSelector + selectorReplaceInstruction.replacement + textAfterSelector;
     }
-
-    // Sanitize? (ignores the encoded component selector elements)
-    if (options.sanitize) {
-      content = this.platformService.sanitize(content) || '';
-    }
-
-    // Decode component selector elements again
-    content = this.decodeComponentPlaceholderElements(content);
 
     return {
       content: content,
@@ -352,30 +331,6 @@ export class HooksReplacer {
       firstText: firstText,
       secondText: secondText
     };
-  }
-
-  /**
-   * Encodes the special html chars in a component placeholder tag
-   *
-   * @param element - The placeholder element as a string
-   */
-  encodeComponentPlaceholderElement(element: string): string {
-    element = element.replace(/</g, '@@@hook-lt@@@');
-    element = element.replace(/>/g, '@@@hook-gt@@@');
-    element = element.replace(/"/g, '@@@hook-dq@@@');
-    return element;
-  }
-
-  /**
-   * Decodes the special html chars in a component placeholder tag
-   *
-   * @param element - The placeholder element as a string
-   */
-  decodeComponentPlaceholderElements(element: string): string {
-    element = element.replace(/@@@hook-lt@@@/g, '<');
-    element = element.replace(/@@@hook-gt@@@/g, '>');
-    element = element.replace(/@@@hook-dq@@@/g, '"');
-    return element;
   }
 
   /**

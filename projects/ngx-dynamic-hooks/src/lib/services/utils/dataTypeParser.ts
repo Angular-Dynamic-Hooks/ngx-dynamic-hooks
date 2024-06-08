@@ -1,6 +1,6 @@
 import { Injectable, isDevMode } from '@angular/core';
 
-import { regexes } from './regexes';
+import { regexes } from '../../constants/regexes';
 import { DataTypeEncoder } from './dataTypeEncoder';
 import { matchAll } from './polyfills/matchAll';
 

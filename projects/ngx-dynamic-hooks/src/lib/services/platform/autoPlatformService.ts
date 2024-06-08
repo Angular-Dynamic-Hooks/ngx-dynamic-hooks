@@ -33,47 +33,51 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('createElement').createElement!(tagName);
   }
 
-  getTagName(element: Node) {
+  getTagName(element: any) {
     return this.getFor('getTagName').getTagName!(element);
   }
 
-  getAttribute(element: Node, attributeName: string) {
+  getAttributeNames(element: any) {
+    return this.getFor('getAttributeNames').getAttributeNames!(element);
+  }
+
+  getAttribute(element: any, attributeName: string) {
     return this.getFor('getAttribute').getAttribute!(element, attributeName);
   }
 
-  setAttribute(element: Node, attributeName: string, value: string) {
+  setAttribute(element: any, attributeName: string, value: string) {
     return this.getFor('setAttribute').setAttribute!(element, attributeName, value);
   }
 
-  removeAttribute(element: Node, attributeName: string) {
+  removeAttribute(element: any, attributeName: string) {
     return this.getFor('removeAttribute').removeAttribute!(element, attributeName);
   }
 
-  getParentNode(element: Node) {
+  getParentNode(element: any) {
     return this.getFor('getParentNode').getParentNode!(element);
   }
 
-  querySelectorAll(parentElement: Node, selector: string) {
+  querySelectorAll(parentElement: any, selector: string) {
     return this.getFor('querySelectorAll').querySelectorAll!(parentElement, selector);
   }
 
-  getChildNodes(node: Node) {
+  getChildNodes(node: any) {
     return this.getFor('getChildNodes').getChildNodes!(node);
   }
 
-  appendChild(parentElement: Node, childElement: Node) {
+  appendChild(parentElement: any, childElement: any) {
     return this.getFor('appendChild').appendChild!(parentElement, childElement);
   }
 
-  insertBefore(parentElement: Node, childElement: Node, referenceElement: Node) {
+  insertBefore(parentElement: any, childElement: any, referenceElement: any) {
     return this.getFor('insertBefore').insertBefore!(parentElement, childElement, referenceElement);
   }
   
-  clearChildNodes(element: Node) {
+  clearChildNodes(element: any) {
     return this.getFor('clearChildNodes').clearChildNodes!(element);
   }
 
-  removeChild(parentElement: Node, childElement: Node) {
+  removeChild(parentElement: any, childElement: any) {
     return this.getFor('removeChild').removeChild!(parentElement, childElement);
   }
 
@@ -81,11 +85,11 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('getInnerContent').getInnerContent!(element);
   }
 
-  setInnerContent(element: Node, content: string) {
+  setInnerContent(element: any, content: string) {
     return this.getFor('setInnerContent').setInnerContent!(element, content);
   }
 
-  getInnerText(element: Node) {
+  getInnerText(element: any) {
     return this.getFor('getInnerText').getInnerText!(element);
   }
 

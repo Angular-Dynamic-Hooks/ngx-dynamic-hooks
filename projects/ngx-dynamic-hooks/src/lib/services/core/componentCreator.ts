@@ -9,6 +9,7 @@ import { PLATFORM_SERVICE, PlatformService } from '../platform/platformService';
 import { OutletOptions } from '../settings/options';
 import { ComponentUpdater } from './componentUpdater';
 import { AutoPlatformService } from '../platform/autoPlatformService';
+import { attrNameHookId, attrNameParseToken } from '../../constants/core';
 
 /**
  * The service responsible for dynamically creating components for all found Hooks
@@ -43,7 +44,7 @@ export class ComponentCreator {
 
     // Get HookData, replace placeholders and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
-      const placeholderElement = this.platformService.querySelectorAll(contentElement, '[parsetoken="' + token + '"][hookid="' + hookId + '"]')?.[0];
+      const placeholderElement = this.platformService.querySelectorAll(contentElement, `[${attrNameHookId}="${hookId}"][${attrNameParseToken}="${token}"]`)?.[0];
 
       // If removed by previous hook in loop via ng-content replacement
       if (!placeholderElement) {
@@ -124,8 +125,8 @@ export class ComponentCreator {
 
       // Remove now redundant attributes from component elements
       for (const hostElement of Object.values(hookHostElements)) {
-        this.platformService.removeAttribute(hostElement, 'hookid');
-        this.platformService.removeAttribute(hostElement, 'parsetoken');
+        this.platformService.removeAttribute(hostElement, attrNameHookId);
+        this.platformService.removeAttribute(hostElement, attrNameParseToken);
         this.platformService.removeAttribute(hostElement, 'ng-version');
       }
 
@@ -157,15 +158,10 @@ export class ComponentCreator {
     const selectorElement = this.platformService.createElement(selector);
 
     // Move attributes to selector
-    this.platformService.setAttribute(selectorElement, 'hookid', this.platformService.getAttribute(anchorElement, 'hookid')!);
-    this.platformService.setAttribute(selectorElement, 'parsetoken', this.platformService.getAttribute(anchorElement, 'parsetoken')!);
-    if (this.platformService.getAttribute(anchorElement, 'parser')) {
-      this.platformService.setAttribute(selectorElement, 'parser', this.platformService.getAttribute(anchorElement, 'parser')!);
-    }
-
-    this.platformService.removeAttribute(anchorElement, 'hookid');
-    this.platformService.removeAttribute(anchorElement, 'parsetoken');
-    this.platformService.removeAttribute(anchorElement, 'parser');
+    this.platformService.setAttribute(selectorElement, attrNameHookId, this.platformService.getAttribute(anchorElement, attrNameHookId)!);
+    this.platformService.setAttribute(selectorElement, attrNameParseToken, this.platformService.getAttribute(anchorElement, attrNameParseToken)!);
+    this.platformService.removeAttribute(anchorElement, attrNameHookId);
+    this.platformService.removeAttribute(anchorElement, attrNameParseToken);
 
     // Move child nodes to selector
     const childNodes = this.platformService.getChildNodes(anchorElement);
@@ -350,14 +346,14 @@ export class ComponentCreator {
       childNodes.forEach((childNode, key) => {
         let componentFound = false;
         // If element has a parsetoken and hookid, it is a dynamic component
-        const parseToken = this.platformService.getAttribute(childNode, 'parsetoken');
+        const parseToken = this.platformService.getAttribute(childNode, attrNameParseToken);
 
         if (
           parseToken !== null &&
           parseToken === token &&
-          this.platformService.getAttribute(childNode, 'hookid')
+          this.platformService.getAttribute(childNode, attrNameHookId)
         ) {
-          const hookId = parseInt(this.platformService.getAttribute(childNode, 'hookid')!, 10);
+          const hookId = parseInt(this.platformService.getAttribute(childNode, attrNameHookId)!, 10);
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
               componentRef: hookIndex[hookId].componentRef!,

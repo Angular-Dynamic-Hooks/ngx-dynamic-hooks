@@ -89,26 +89,34 @@ describe('OutletOptions', () => {
   it('#should sanitize, if requested', () => {
     const testText = `
     <script>console.log("somescript");</script>
-    <p id="someId" style="color: blue" onclick="return 'someString'">
+    <p style="color: blue" onclick="return 'someString'">
       Here is a simple component
-      <dynHooks-singletagtest [simpleObject]="{testProp: 123, otherProp: true}">
+      <dynHooks-multitagtest [backgroundColor]="'#123456'" [fonts]="['Arial', 'Calibri']">
+        <span id="someId">
+          <dynHooks-singletagtest [simpleObject]="{testProp: 123, otherProp: true}">
+        </span>
+      </dynHooks-multitagtest>
       <custom-element></custom-element>
     </p>`;
     comp.content = testText;
     comp.options = { sanitize: true };
     comp.ngOnChanges({content: true, options: true} as any);
 
-    // Ensure that sanitized
-    expect(fixture.nativeElement.innerHTML).not.toContain('<script>');
+    // Ensure that content is sanitized
     let pEl = fixture.nativeElement.querySelector('p');
-    expect(pEl.getAttribute('id')).toBeNull();
+    let spanEl = fixture.nativeElement.querySelector('span');
+    let customEl = fixture.nativeElement.querySelector('custom-element');
+    expect(fixture.nativeElement.innerHTML).not.toContain('<script>');
     expect(pEl.getAttribute('style')).toBeNull();
     expect(pEl.onclick).toBeNull();
-    let customEl = fixture.nativeElement.querySelector('custom-element');
+    expect(spanEl.getAttribute('id')).toBeNull();    
     expect(customEl).toBeNull();
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
+    expect(Object.values(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.backgroundColor).toBe('#123456');
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['Arial', 'Calibri']);
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
 
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
@@ -122,16 +130,20 @@ describe('OutletOptions', () => {
     comp.ngOnChanges({content: true, options: true} as any);
 
     // Ensure that unsanitized
-    expect(fixture.nativeElement.innerHTML).toContain('<script>console.log("somescript");</script>');
     pEl = fixture.nativeElement.querySelector('p');
-    expect(pEl.getAttribute('id')).toBe('someId');
+    spanEl = fixture.nativeElement.querySelector('span');
+    customEl = fixture.nativeElement.querySelector('custom-element');
+    expect(fixture.nativeElement.innerHTML).toContain('<script>console.log("somescript");</script>');
     expect(pEl.getAttribute('style')).toBe('color: blue');
     expect(pEl.onclick()).toBe('someString');
-    customEl = fixture.nativeElement.querySelector('custom-element');
+    expect(spanEl.getAttribute('id')).toBe('someId');
     expect(customEl).not.toBeNull();
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
+    expect(Object.values(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.backgroundColor).toBe('#123456');
+    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['Arial', 'Calibri']);
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
   });
 
   it('#should convertHTMLEntities, if requested', () => {

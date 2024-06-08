@@ -24,7 +24,7 @@ export * from './lib/services/utils/dataTypeEncoder';
 export * from './lib/services/utils/dataTypeParser';
 export * from './lib/services/utils/deepComparer';
 export * from './lib/services/utils/hookFinder';
-export * from './lib/services/utils/regexes';
+export * from './lib/constants/regexes';
 
 // Polyfills
 export * from './lib/services/utils/polyfills/matchAll';
