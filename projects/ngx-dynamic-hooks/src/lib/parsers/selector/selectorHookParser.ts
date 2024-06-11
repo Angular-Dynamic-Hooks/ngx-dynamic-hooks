@@ -1,6 +1,6 @@
 import { RichBindingData } from '../../interfaces';
 import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../../interfacesPublic';
-import { SelectorHookFinder } from './services/selectorHookFinder';
+import { TagHookFinder } from './services/tagHookFinder';
 import { BindingStateManager } from './services/bindingStateManager';
 import { SelectorHookParserConfig } from './config/selectorHookParserConfig';
 import { SelectorHookParserConfigResolver } from './config/selectorHookParserConfigResolver';
@@ -18,7 +18,7 @@ export class SelectorHookParser implements HookParser {
     }
   } = {};
 
-  constructor(config: SelectorHookParserConfig, private configResolver: SelectorHookParserConfigResolver, private selectorFinder: SelectorHookFinder, private bindingStateManager: BindingStateManager) {
+  constructor(config: SelectorHookParserConfig, private configResolver: SelectorHookParserConfigResolver, private tagHookFinder: TagHookFinder, private bindingStateManager: BindingStateManager) {
     this.config = this.configResolver.processConfig(config);
     this.name = this.config.name;
   }
@@ -28,8 +28,8 @@ export class SelectorHookParser implements HookParser {
 
   public findHooks(content: string, context: any): Array<HookPosition> {
     return this.config.enclosing ?
-      this.selectorFinder.findEnclosingSelectors(content, this.config.selector!, this.config.bracketStyle) :
-      this.selectorFinder.findStandaloneSelectors(content, this.config.selector!, this.config.bracketStyle);
+      this.tagHookFinder.findEnclosingTags(content, this.config.selector!, this.config.bracketStyle) :
+      this.tagHookFinder.findStandaloneTags(content, this.config.selector!, this.config.bracketStyle);
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {

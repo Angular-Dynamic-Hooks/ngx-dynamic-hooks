@@ -2,13 +2,13 @@ import { Component, EnvironmentInjector, Injector, NgModule, createEnvironmentIn
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
-import { DynamicHooksComponent, ParserEntryResolver, SelectorHookParserConfig, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, ParserEntryResolver, SelectorHookParserConfig, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
-import { defaultBeforeEach, prepareTestingModule } from './shared';
-import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
+import { defaultBeforeEach, prepareTestingModule } from '../shared';
+import { MultiTagTestComponent } from '../../resources/components/multiTagTest/multiTagTest.c';
+import { GENERICINJECTIONTOKEN } from '../../resources/services/genericInjectionToken';
+import { SingleTagTestComponent } from '../../resources/components/singleTag/singleTagTest.c';
 
 describe('SelectorHookParserConfig', () => {
   let testBed;
@@ -156,7 +156,7 @@ describe('SelectorHookParserConfig', () => {
   it('#should recognize custom injectors', fakeAsync(() => {
 
     // Without custom element injectors, genericInjectionValue should be null
-    const testText = `<dynhooks-singletagtest>`;
+    const testText = `<singletagtest>`;
     const config: SelectorHookParserConfig = {
       component: SingleTagTestComponent,
       enclosing: false,
@@ -221,7 +221,7 @@ describe('SelectorHookParserConfig', () => {
       })
     ]));
 
-    const testText = `<p>Here the multitag hook is set to be single tag instead: <dynhooks-multitagtest [fonts]="['arial', 'calibri']">text within hook</dynhooks-multitagtest></p>`;
+    const testText = `<p>Here the multitag hook is set to be single tag instead: <multitagtest [fonts]="['arial', 'calibri']">text within hook</multitagtest></p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -244,7 +244,7 @@ describe('SelectorHookParserConfig', () => {
       })
     ]));
 
-    const testText = `<p>Here is a hook with a unique bracket style: [[dynhooks-multitagtest [fonts]="['arial', 'calibri']"]]text within hook[[/dynhooks-multitagtest]]</p>`;
+    const testText = `<p>Here is a hook with a unique bracket style: [[multitagtest [fonts]="['arial', 'calibri']"]]text within hook[[/multitagtest]]</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -266,7 +266,7 @@ describe('SelectorHookParserConfig', () => {
       })
     ]));
 
-    const testText = `<p>Here is a hook whose input shall not be parsed: <dynhooks-multitagtest [nr]="123" [fonts]="['arial', {prop: true}]">text within hook</dynhooks-multitagtest></p>`;
+    const testText = `<p>Here is a hook whose input shall not be parsed: <multitagtest [nr]="123" [fonts]="['arial', {prop: true}]">text within hook</multitagtest></p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -287,7 +287,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should unescapeStrings, if requested', () => {
-    const testText = `<dynhooks-singletagtest
+    const testText = `<singletagtest
       [stringPropAlias]="'This is a \\'test\\' string.'"
       [simpleObject]="{someProp: 'His name was O\\'Hara.'}"
       [simpleArray]="[context['maneu\\vers'].defend('O\\'Hara')]"
@@ -336,7 +336,7 @@ describe('SelectorHookParserConfig', () => {
 
   it('#should apply input black/whitelists and output black/whitelists', () => {
     const testText = `
-      <dynhooks-singletagtest
+      <singletagtest
         [stringPropAlias]="'this is an example string'"
         [numberProp]="917"
         [simpleArray]="[123, true, 'test']"
@@ -476,7 +476,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should disallow context access, if requested', () => {
-    const testText = `<dynhooks-singletagtest [numberProp]="context.order" (httpResponseReceived)="context.maneuvers.meditate()">`;
+    const testText = `<singletagtest [numberProp]="context.order" (httpResponseReceived)="context.maneuvers.meditate()">`;
 
     // Context access allowed
     ({fixture, comp} = prepareTestingModule(() => [
@@ -521,7 +521,7 @@ describe('SelectorHookParserConfig', () => {
   });
 
   it('#should disallow context function calls, if requested', () => {
-    const testText = `<dynhooks-singletagtest [stringPropAlias]="context.maneuvers.defend('the innocent')" (httpResponseReceived)="context.maneuvers.meditate()">`;
+    const testText = `<singletagtest [stringPropAlias]="context.maneuvers.defend('the innocent')" (httpResponseReceived)="context.maneuvers.meditate()">`;
 
     // Context access allowed
     ({fixture, comp} = prepareTestingModule(() => [

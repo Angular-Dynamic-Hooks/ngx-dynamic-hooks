@@ -3,7 +3,7 @@ import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } 
 import { BLUBBSERVICETOKEN } from '../parentTest.c';
 
 @Component({
-  selector: 'dynhooks-childtest',
+  selector: 'childtest',
   templateUrl: './childTest.c.html',
   styleUrls: ['./childTest.c.scss'],
   standalone: true

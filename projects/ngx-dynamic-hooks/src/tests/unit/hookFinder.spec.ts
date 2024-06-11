@@ -7,6 +7,60 @@ describe('HookFinder', () => {
   let hookFinder: HookFinder;
   beforeEach(() => { hookFinder = new HookFinder(); });
 
+  it('#should find standalone hook positions as expected', () => {
+    const openingTagRegex = /openingTag/g;
+    const content = `
+      <h1>Some html</h1>
+      <p>Here is an openingTag</p>
+      <p>Somewhere in the middle of the content. And another openingTag at the end</p>
+    `;
+
+    const position = hookFinder.findStandaloneHooks(content, openingTagRegex);
+
+    expect(position).toEqual([
+      {
+        openingTagStartIndex: 46,
+        openingTagEndIndex: 56,
+        closingTagStartIndex: null,
+        closingTagEndIndex: null
+      },
+      {
+        openingTagStartIndex: 122,
+        openingTagEndIndex: 132,
+        closingTagStartIndex: null,
+        closingTagEndIndex: null
+      }
+    ]);
+  });
+
+  it('#should find enclosing hook positions as expected', () => {
+    const openingTagRegex = /openingTag/g;
+    const closingTagRegex = /closingTag/g;
+    const content = `
+      <h1>Some enclosing html</h1>
+      <p>Here is an openingTag</p>
+      <p>Then we have a nested openingTag with a closingTag</p>
+      <p>And then the outer closingTag</p>
+    `;
+
+    const position = hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex);
+
+    expect(position).toEqual([
+      {
+        openingTagStartIndex: 102,
+        openingTagEndIndex: 112,
+        closingTagStartIndex: 120,
+        closingTagEndIndex: 130
+      },
+      {
+        openingTagStartIndex: 56,
+        openingTagEndIndex: 66,
+        closingTagStartIndex: 163,
+        closingTagEndIndex: 173
+      }
+    ]);
+  });
+
   it('#should ignore tags that start before previous tag has ended when finding enclosing hooks', () => {
     spyOn(console, 'warn').and.callThrough();
     const openingTagRegex = /openingTag/g;

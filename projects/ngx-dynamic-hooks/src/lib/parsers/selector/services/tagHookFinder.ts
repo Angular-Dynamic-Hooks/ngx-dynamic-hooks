@@ -11,7 +11,7 @@ import { HookFinder } from '../../../services/utils/hookFinder';
 @Injectable({
   providedIn: 'root'
 })
-export class SelectorHookFinder {
+export class TagHookFinder {
 
   constructor(private hookFinder: HookFinder) {
   }
@@ -23,7 +23,7 @@ export class SelectorHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findStandaloneSelectors(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  findStandaloneTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
@@ -37,7 +37,7 @@ export class SelectorHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findEnclosingSelectors(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
     // Create opening and closing tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
     const closingTagRegex =  this.generateClosingTagRegex(selector, bracketStyle);

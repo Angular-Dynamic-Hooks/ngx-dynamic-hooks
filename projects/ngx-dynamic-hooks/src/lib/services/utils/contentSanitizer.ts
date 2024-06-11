@@ -17,7 +17,7 @@ export class ContentSanitizer {
 
   sanitize(contentElement: Element, hookIndex: HookIndex, token: string): Element {
     const originalHookAnchors: {[key: string]: Element} = {};
-    const originalHtml = contentElement.innerHTML;
+    // const originalHtml = contentElement.innerHTML;
 
     // Replace all found hook anchors with placeholders that survive sanitization
     for (const hook of Object.values(hookIndex)) {
@@ -61,12 +61,12 @@ export class ContentSanitizer {
       }
     }
 
-    
+    /*
     console.log('original html', originalHtml)
     console.log('placeholder html:', innerHTML);
     console.log('sanitized string:', sanitizedInnerHtml);
     console.log('dom final:', contentElement.innerHTML);
-    
+    */
 
     return contentElement;
   }

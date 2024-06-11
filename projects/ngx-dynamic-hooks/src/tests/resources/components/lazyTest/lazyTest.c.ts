@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDe
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
 
 @Component({
-  selector: 'dynhooks-lazytest',
+  selector: 'lazytest',
   templateUrl: './lazyTest.c.html',
   styleUrls: ['./lazyTest.c.scss'],
   standalone: true

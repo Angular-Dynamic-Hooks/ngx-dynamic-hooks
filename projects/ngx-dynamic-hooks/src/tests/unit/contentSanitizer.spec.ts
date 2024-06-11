@@ -47,7 +47,7 @@ describe('ContentSanitizer', () => {
 
   });
 
-  fit('#should only partially sanitize hook anchors', () => {
+  it('#should only partially sanitize hook anchors', () => {
     const parseToken = "1a2b3c4d5e";
     const hookIndex = {
       1: {
@@ -80,24 +80,27 @@ describe('ContentSanitizer', () => {
     const contentElement = document.createElement('div');
     contentElement.innerHTML = testText;
 
+    // Make sure second anchor indeed has all attrs specified above
+    let secondAnchor = contentElement.querySelector(`[${attrNameHookId}="2"][${attrNameParseToken}="${parseToken}"]`);
+    expect(secondAnchor?.getAttributeNames()).toEqual(['id', 'class', 'href', 'src', '[exampleinput]', '(exampleoutput)', attrNameHookId, attrNameParseToken]);
+
     sanitizer.sanitize(contentElement, hookIndex as any, parseToken);
 
+    // Normal elements should be sanitized as expected
     let pEl = contentElement.querySelector('p');
     let spanEl = contentElement.querySelector('span');
-    let firstAnchor = contentElement.querySelector(`[${attrNameHookId}="1"][${attrNameParseToken}="${parseToken}"]`);
-    let secondAnchor = contentElement.querySelector(`[${attrNameHookId}="2"][${attrNameParseToken}="${parseToken}"]`);
     expect(pEl!.getAttribute('style')).toBeNull();
     expect(pEl!.onclick).toBeNull();
     expect(pEl!.innerHTML).toContain('This is the first anchor');
     expect(spanEl!.getAttribute('id')).toBeNull();
     expect(spanEl!.innerHTML).toContain('This is the second anchor');
+
+    // Anchor should still exist, but only have only safe attributes left
+    let firstAnchor = contentElement.querySelector(`[${attrNameHookId}="1"][${attrNameParseToken}="${parseToken}"]`);
+    secondAnchor = contentElement.querySelector(`[${attrNameHookId}="2"][${attrNameParseToken}="${parseToken}"]`);
     expect(firstAnchor).not.toBe(null);
     expect(secondAnchor).not.toBe(null);
-
-    // Should have sanitized the component anchor attrs as well
     expect(secondAnchor?.getAttributeNames()).toEqual([attrNameHookId, attrNameParseToken, 'class', 'href', 'src']);
-    expect(secondAnchor?.getAttribute(attrNameHookId)).toBe('2');
-    expect(secondAnchor?.getAttribute(attrNameParseToken)).toBe(parseToken);
     expect(secondAnchor?.getAttribute('class')).toBe('myWidget someOtherClass');
     expect(secondAnchor?.getAttribute('href')).toBe('https://www.warcraft-toys.com/toy/123456');
     expect(secondAnchor?.getAttribute('src')).toBe('/someFolder/someImage.png');

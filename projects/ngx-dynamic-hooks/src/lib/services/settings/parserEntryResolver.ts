@@ -3,7 +3,7 @@ import { HookParser } from '../../interfacesPublic';
 import { SelectorHookParser } from '../../parsers/selector/selectorHookParser';
 import { SelectorHookParserConfig } from '../../parsers/selector/config/selectorHookParserConfig';
 import { SelectorHookParserConfigResolver } from '../../parsers/selector/config/selectorHookParserConfigResolver';
-import { SelectorHookFinder } from '../../parsers/selector/services/selectorHookFinder';
+import { TagHookFinder } from '../../parsers/selector/services/tagHookFinder';
 import { BindingStateManager } from '../../parsers/selector/services/bindingStateManager';
 import { HookParserEntry } from './parserEntry';
 
@@ -15,7 +15,7 @@ import { HookParserEntry } from './parserEntry';
 })
 export class ParserEntryResolver {
 
-  constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private selectorFinder: SelectorHookFinder, private bindingStateManager: BindingStateManager) {
+  constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private tagHookFinder: TagHookFinder, private bindingStateManager: BindingStateManager) {
   }
 
   /**
@@ -87,7 +87,7 @@ export class ParserEntryResolver {
       // Check if component class
       const componentMeta = reflectComponentType(parserEntry as any);
       if (componentMeta) {
-        return new SelectorHookParser({component: parserEntry as any}, this.parserResolver, this.selectorFinder, this.bindingStateManager);
+        return new SelectorHookParser({component: parserEntry as any}, this.parserResolver, this.tagHookFinder, this.bindingStateManager);
       // Else must be parser class
       } else {
         // Check if service
@@ -108,7 +108,7 @@ export class ParserEntryResolver {
       // Is object literal
       } else {
         try {
-          return new SelectorHookParser(parserEntry as SelectorHookParserConfig, this.parserResolver, this.selectorFinder, this.bindingStateManager);
+          return new SelectorHookParser(parserEntry as SelectorHookParserConfig, this.parserResolver, this.tagHookFinder, this.bindingStateManager);
         } catch (e)  {}
       }
     }

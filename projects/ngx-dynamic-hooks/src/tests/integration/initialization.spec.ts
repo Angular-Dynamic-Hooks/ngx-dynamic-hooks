@@ -7,6 +7,8 @@ import { defaultBeforeEach, prepareTestingModule } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { TestBed } from '@angular/core/testing';
+import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
 
 
 describe('Initialization', () => {
@@ -23,68 +25,59 @@ describe('Initialization', () => {
   // -------------------------------------------------------------
 
   it('#should load the global settings correctly', () => {
-    const testText = `<p>This p-element has a <span>span-element with a component <dynHooks-singletagtest></span> within it.</p>`;
+    const testText = `<p>This p-element has a <span>span-element with a component [generic-singletagtest]></span> within it.</p>`;
 
     // Test with config for SingleTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [{
-          component: SingleTagTestComponent,
-          enclosing: false
-        }]
+        parsers: [GenericSingleTagParser]
       })
     ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
-    expect((comp.activeParsers[0] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagParser));
+    expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     
     // Test with config for MultiTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({parsers: [{
-        component: MultiTagTestComponent
-      }]})
+      provideDynamicHooks({parsers: [GenericMultiTagParser]})
     ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
-    expect((comp.activeParsers[0] as any)['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericMultiTagParser));
+    expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(0);
   });
 
   it('#should reset allSettings on app reloads', (async () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [
-          {component: SingleTagTestComponent}
-        ]
+        parsers: [GenericSingleTagParser]
       })
     ]));
 
     let allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
     expect(allSettings[0].parsers?.length).toBe(1);
-    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
+    expect(allSettings[0].parsers![0]).toBe(GenericSingleTagParser);
 
     // Reset and reload with different settings
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [
-          {component: MultiTagTestComponent}
-        ]
+        parsers: [GenericMultiTagParser]
       })
     ]));
 
     allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
     expect(allSettings[0].parsers?.length).toBe(1);
-    expect((allSettings[0].parsers![0] as SelectorHookParserConfig).component).toBe(MultiTagTestComponent);
+    expect(allSettings[0].parsers![0]).toBe(GenericMultiTagParser);
   }));
 
   it('#should not crash if the user passes an empty object as global settings', () => {
@@ -158,7 +151,7 @@ describe('Initialization', () => {
     expect(platformServiceProvider).not.toBeUndefined();
   });
 
-  it('#should use user-provided platformService, if available', () => {
+  it('#should use user-provided platformService methods, if available', () => {
     const expectedReturnValue = 'TESTTAGNAME';
 
     class UserPlatformService implements PlatformService {
@@ -179,84 +172,5 @@ describe('Initialization', () => {
     // If method not defined in UserPlatformService, AutoPlatformService should fallback to defaultPlatformService methods
     const createdElement = autoPlatformService.createElement('h1');
     expect(createdElement.tagName).toBe('H1');
-  });
-
-  // Initialize DynamicHookComponent
-  // -------------------------------------------------------------
-
-  it('#should throw error if not registered main providers before using DynamicHooksComponent', (async () => {
-    expect(() => {
-      ({fixture, comp} = prepareTestingModule(() => []));
-    }).toThrow(new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.'));
-  }));
-
-  it('#should have created the main component correctly', () => {
-    expect(comp).toBeDefined();
-  });
-
-  it('#should reset and reload when relevant bindings change', () => {
-    spyOn(comp, 'parse').and.callThrough();
-    spyOn(comp, 'reset').and.callThrough();
-
-    // Initialize
-    const testTextOne = `<div>Some random component <dynHooks-multitagtest>with inner content.</dynHooks-multitagtest></div>`;
-    comp.content = testTextOne;
-    comp.ngOnChanges({content: true} as any);
-    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp.parse as any)['calls'].count()).toBe(1);
-
-    // Change 'text'
-    const testTextTwo = `<span>Some other text <dynHooks-singletagtest><dynHooks-multitagtest></dynHooks-multitagtest></span>`;
-    comp.content = testTextTwo;
-    comp.ngOnChanges({content: true} as any);
-    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
-    expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp.parse as any)['calls'].count()).toBe(2);
-
-    // Change 'options'
-    const newOptions = {sanitize: false};
-    comp.options = newOptions;
-    comp.ngOnChanges({options: true} as any);
-    expect((comp.parse as any)['calls'].count()).toBe(3);
-
-    // Change 'globalParsersBlacklist'
-    const blacklist = ['SingleTagTestComponentParser'];
-    comp.globalParsersBlacklist = blacklist;
-    comp.ngOnChanges({globalParsersBlacklist: true} as any);
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp.parse as any)['calls'].count()).toBe(4);
-
-    // Reset
-    (comp as any).globalParsersBlacklist  = null;
-    (comp as any).globalParsersWhitelist = null;
-    comp.ngOnChanges({globalParsersBlacklist: true, globalParsersWhitelist: true} as any);
-    expect(Object.values(comp.hookIndex).length).toBe(2);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp as any).parse['calls'].count()).toBe(5);
-
-    // Change 'globalParsersWhitelist'
-    const whitelist = ['SingleTagTestComponentParser'];
-    comp.globalParsersWhitelist = whitelist;
-    comp.ngOnChanges({globalParsersWhitelist: true} as any);
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect((comp as any).parse['calls'].count()).toBe(6);
-
-    // Change 'parsers' (while leaving 'globalParsersWhitelist' as is, should be ignored)
-    comp.parsers = [{component: MultiTagTestComponent, name: 'LocalParser!'}];
-    comp.ngOnChanges({parsers: true} as any);
-    expect(Object.values(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(SelectorHookParser));
-    expect((comp as any).activeParsers[0]['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.activeParsers[0]['name']).toBe('LocalParser!');
-    expect((comp as any).parse['calls'].count()).toBe(7);
   });
 });

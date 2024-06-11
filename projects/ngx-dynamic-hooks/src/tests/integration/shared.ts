@@ -9,16 +9,24 @@ import { TestBed, ComponentFixtureAutoDetect, TestBedStatic, ComponentFixture } 
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
-import { provideDynamicHooks, DynamicHooksSettings, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
+import { provideDynamicHooks, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
 
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
+import { WhateverTestComponent } from '../resources/components/whateverTest/whateverTest.c';
+import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
+import { GenericWhateverParser } from '../resources/parsers/genericWhateverParser';
 
 
 // The standard parsers to be used for most tests
 export const testParsers: Array<HookParserEntry> = [
+  // Generic parsers
+  GenericSingleTagParser,
+  GenericMultiTagParser,
+  GenericWhateverParser,
+  // SelectorHookParsers
   {
     component: SingleTagTestComponent,
     name: 'SingleTagTestComponentParser',
@@ -29,8 +37,8 @@ export const testParsers: Array<HookParserEntry> = [
     name: 'MultiTagTestComponentParser'
   },
   {
-    component: InlineTestComponent,
-    name: 'InlineTestComponentParser',
+    component: WhateverTestComponent,
+    name: 'WhateverTestComponentParser',
   }
 ];
 

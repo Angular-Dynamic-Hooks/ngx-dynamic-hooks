@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../../testing-api';
 import { RootTestService } from '../../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../../services/genericInjectionToken';
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that is only provided directly on the SingleTagTestComponent');
 
 @Component({
-  selector: 'dynhooks-singletagtest',
+  selector: 'singletagtest',
   templateUrl: './singleTagTest.c.html',
   styleUrls: ['./singleTagTest.c.scss'],
   imports: [CommonModule],
@@ -18,6 +18,7 @@ export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that
 })
 export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   nonInputProperty: string = 'this is the default value';
+  @Input() genericInput: any;
   @Input() inputWithoutBrackets!: string;
   @Input() emptyInputWithoutBrackets!: string;
   @Input() emptyInput!: string;
@@ -40,6 +41,7 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
   @Input() nestedFunctionsInBrackets!: Array<any>;
   @Input() everythingTogether!: Array<any>;
   nonOutputEventEmitter: EventEmitter<number> = new EventEmitter();
+  @Output() genericOutput: EventEmitter<number> = new EventEmitter();
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() httpResponseReceived: EventEmitter<number> = new EventEmitter();
@@ -57,7 +59,8 @@ export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges,
     @Optional() public rootTestService: RootTestService,
     @Optional() @Inject(SINGLETAGCOMPONENTSERVICE) private singleTagComponentService: any,
     @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any,
-    public environmentInjector: EnvironmentInjector
+    public environmentInjector: EnvironmentInjector,
+    public injector: Injector
   ) {
     //console.log(environmentInjector);
     //console.log(rootTestService);

@@ -5,7 +5,7 @@ import { first, map } from 'rxjs/operators';
 import { HookIndex } from '../interfacesPublic';
 import { OutletParseResult } from '../interfacesPublic';
 import { OutletOptions } from './settings/options';
-import { HooksReplacer } from './core/hooksReplacer';
+import { StringHooksFinder } from './core/stringsHookFinder';
 import { ComponentCreator } from './core/componentCreator';
 import { DynamicHooksSettings } from './settings/settings';
 import { HookParserEntry } from './settings/parserEntry';
@@ -28,7 +28,7 @@ export class DynamicHooksService {
     @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[],
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
     private settingsResolver: SettingsResolver,
-    private hooksReplacer: HooksReplacer,
+    private stringHooksFinder: StringHooksFinder,
     private contentSanitizer: ContentSanitizer,
     private componentCreator: ComponentCreator,
     private platformService: AutoPlatformService,
@@ -90,18 +90,22 @@ export class DynamicHooksService {
       });
     }
 
-    // Convert input HTML entities?
-    if (resolvedOptions.convertHTMLEntities) {
-      content = this.hooksReplacer.convertHTMLEntities(content);
+    // Create parse token
+    const token = Math.random().toString(36).substring(2, 12);
+
+    // Find all string hooks
+    if (typeof content === 'string') {
+      const result = this.stringHooksFinder.find(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+      content = result.content;
+
+      // Parse HTML
+      targetElement.innerHTML = content;
+    } else {
+      // TODO: find string hooks in existing elements
     }
 
-    // Replace hooks with component selector elements
-    const token = Math.random().toString(36).substring(2, 12);
-    const result = this.hooksReplacer.replaceHooksWithNodes(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
-    content = result.content;
+    // TODO: Find all element hooks
 
-    // Parse HTML
-    targetElement.innerHTML = content;
 
     // Sanitize?
     if (resolvedOptions?.sanitize) {

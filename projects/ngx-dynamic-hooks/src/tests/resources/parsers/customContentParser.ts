@@ -1,6 +1,6 @@
 import { Injectable, reflectComponentType } from '@angular/core';
-import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings } from '../../testing-api';
-import { SelectorHookFinder } from '../../testing-api';
+import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings, matchAll, HookFinder } from '../../testing-api';
+import { TagHookFinder } from '../../testing-api';
 import { NgContentTestComponent } from '../components/ngContentTest/ngContentTest.c';
 
 /**
@@ -8,18 +8,18 @@ import { NgContentTestComponent } from '../components/ngContentTest/ngContentTes
  * to test that the actual childNodes are correctly replaced.
  */
 
-@Injectable()
-export class NgContentTestParser implements HookParser {
-  name: string = 'NgContentTestComponentParser';
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomContentParser implements HookParser {
+  name: string = 'CustomContentParser';
   component = NgContentTestComponent;
 
-  constructor(private selectorFinder: SelectorHookFinder) {
+  constructor(private hookFinder: HookFinder) {
   }
 
   public findHooks(content: string, context: any): Array<HookPosition> {
-    const selector = reflectComponentType(this.component)!.selector;
-    const bracketStyle = {opening: '<', closing: '>'};
-    return this.selectorFinder.findEnclosingSelectors(content, selector, bracketStyle);
+    return this.hookFinder.findEnclosingHooks(content, /\[customcontent\]/g, /\[\/customcontent\]/g);
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData {

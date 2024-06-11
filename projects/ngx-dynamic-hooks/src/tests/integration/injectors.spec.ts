@@ -8,9 +8,9 @@ import { SingleTagTestComponent } from '../resources/components/singleTag/single
 import { Component, EnvironmentInjector, Injector, NgModule } from '@angular/core';
 import { Route, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { RootTestService } from '../resources/services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
 import { By } from '@angular/platform-browser';
+import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
 
 
 describe('Injectors logic', () => {
@@ -26,7 +26,7 @@ describe('Injectors logic', () => {
   // ----------------------------------------------------------------------------
 
   it('#should use the injectors from DynamicHooksComponent by default. If not specified on manual use, fallback to root injectors', fakeAsync(() => {
-    const testText = '<dynhooks-singletagtest>';
+    const testText = '[generic-singletagtest]';
 
     // Create testing scaffolding: A root module with a lazily loaded child module
     // This is to create a separate (child module) environment injector, so the one injected into DynamicHooksComponent is different to the root one
@@ -52,10 +52,7 @@ describe('Injectors logic', () => {
         ])
       ],
       providers: [
-        provideDynamicHooks({parsers: [{
-          component: SingleTagTestComponent,
-          enclosing: false
-        }]})
+        provideDynamicHooks({parsers: [GenericSingleTagParser]})
       ]
     });
 

@@ -5,7 +5,7 @@ import { ChildTestComponent } from './childTest/childTest.c';
 export const BLUBBSERVICETOKEN = new InjectionToken<any>('the token for the blubb service');
 
 @Component({
-  selector: 'dynhooks-parenttest',
+  selector: 'parenttest',
   templateUrl: './parentTest.c.html',
   styleUrls: ['./parentTest.c.scss'],
   imports: [ChildTestComponent],

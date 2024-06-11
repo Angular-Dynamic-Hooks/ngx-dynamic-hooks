@@ -1,10 +1,9 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
-import { RootTestService } from '../../services/rootTestService';
 
 
 @Component({
-  selector: 'dynhooks-ngcontenttest',
+  selector: 'ngcontenttest',
   templateUrl: './ngContentTest.c.html',
   styleUrls: ['./ngContentTest.c.scss'],
   standalone: true

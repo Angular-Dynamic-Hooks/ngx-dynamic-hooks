@@ -1,8 +1,11 @@
 // Testing api resources
+import { TestBed } from '@angular/core/testing';
+import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { DynamicHooksComponent, OutletOptions, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
+import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
 
 describe('OutletOptions', () => {
   let testBed;
@@ -91,11 +94,11 @@ describe('OutletOptions', () => {
     <script>console.log("somescript");</script>
     <p style="color: blue" onclick="return 'someString'">
       Here is a simple component
-      <dynHooks-multitagtest [backgroundColor]="'#123456'" [fonts]="['Arial', 'Calibri']">
+      [generic-multitagtest]
         <span id="someId">
-          <dynHooks-singletagtest [simpleObject]="{testProp: 123, otherProp: true}">
+          [generic-singletagtest]
         </span>
-      </dynHooks-multitagtest>
+      [/generic-multitagtest]
       <custom-element></custom-element>
     </p>`;
     comp.content = testText;
@@ -113,10 +116,7 @@ describe('OutletOptions', () => {
     expect(customEl).toBeNull();
     expect(Object.values(comp.hookIndex).length).toBe(2);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.instance.backgroundColor).toBe('#123456');
-    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['Arial', 'Calibri']);
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
 
     // Reset
     ({fixture, comp} = prepareTestingModule(() => [
@@ -140,16 +140,13 @@ describe('OutletOptions', () => {
     expect(customEl).not.toBeNull();
     expect(Object.values(comp.hookIndex).length).toBe(2);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.instance.backgroundColor).toBe('#123456');
-    expect(comp.hookIndex[1].componentRef!.instance.fonts).toEqual(['Arial', 'Calibri']);
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(comp.hookIndex[2].componentRef!.instance.simpleObject).toEqual({testProp: 123, otherProp: true});
   });
 
   it('#should convertHTMLEntities, if requested', () => {
     const testText = `
       The following word has encoded b-tags: &lt;b&gt;BOLD&lt;/b&gt;.
-      This hook is using html entities as well: &lt;dynhooks-singletagtest [numberProp]=&quot;21&quot; [simpleArray]='[&quot;enrico&quot;,&nbsp;&quot;susanne&quot;]'&gt;
+      This hook is using html entities as well: &lt;singletagtest [numberProp]=&quot;21&quot; [simpleArray]='[&quot;enrico&quot;,&nbsp;&quot;susanne&quot;]'&gt;
     `;
     comp.content = testText;
     comp.options = { convertHTMLEntities: true, sanitize: false };
@@ -181,14 +178,14 @@ describe('OutletOptions', () => {
   it('#should fixParagraphTags, if requested', () => {
     const testText = `
       <p>Textbox in seperate HTML-tags, with contained HTML:</p>
-      <p><dynhooks-multitagtest id="'seperate-tags'"></p>
+      <p>[generic-multitagtest]</p>
         <span>This is some text</span>
         <ul>
           <li>menu point 1</li>
           <li>menu point 2</li>
         </ul>
         loose text
-      <p></dynhooks-multitagtest></p>
+      <p>[/generic-multitagtest]</p>
     `;
     comp.content = testText;
     comp.options = { fixParagraphTags: true };
@@ -198,7 +195,7 @@ describe('OutletOptions', () => {
     expect(fixture.nativeElement.children.length).toBe(2);
     expect(fixture.nativeElement.children[0].tagName).toBe('P');
     expect(fixture.nativeElement.children[0].textContent).toBe('Textbox in seperate HTML-tags, with contained HTML:');
-    expect(fixture.nativeElement.children[1].tagName).toBe('DYNHOOKS-MULTITAGTEST');
+    expect(fixture.nativeElement.children[1].tagName).toBe('MULTITAGTEST');
     expect(fixture.nativeElement.children[1].children.length).toBe(1);
     expect(fixture.nativeElement.children[1].children[0].className).toBe('multitag-component');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
@@ -221,7 +218,7 @@ describe('OutletOptions', () => {
   });
 
   it('#should update on push only, if requested', () => {
-    const testText = `<dynhooks-singletagtest>`;
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: true};
@@ -257,11 +254,19 @@ describe('OutletOptions', () => {
   });
 
   it('#should compareInputsByValue, if requested', () => {
-    // Clone $lightSaberCollection, so it has a difference reference, but the same content
-    // Note: Changing a bound context variable so that a ===-comparison returns false with its previous value will cause
-    // the SelectorHookParser to reparse the whole binding, thus changing the reference.
-    const newContext = {$lightSaberCollection: [...context.$lightSaberCollection]};
-    const testText = `<dynhooks-singletagtest [simpleObject]="{lightsabers: context.$lightSaberCollection}">`;
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            simpleObject: {lightsabers: context.$lightSaberCollection}
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
 
     comp.content = testText;
     comp.context = context;
@@ -272,6 +277,11 @@ describe('OutletOptions', () => {
     spyOn<any>(comp['componentUpdater'], 'refresh').and.callThrough();
     spyOn<any>(loadedComp, 'ngOnChanges').and.callThrough();
 
+    // Clone $lightSaberCollection, so it has a difference reference, but the same content
+    // Note: Changing a bound context variable so that a ===-comparison returns false with its previous value will cause
+    // the SelectorHookParser to reparse the whole binding, thus changing the reference.
+    const newContext = {$lightSaberCollection: [...context.$lightSaberCollection]};
+
     // With compareByValue: Expect ngOnChanges not to trigger and inputs not to be replaced if value stays the same (even if ref changes)
     comp.context = newContext;
     comp.ngOnChanges({context: true} as any);
@@ -281,11 +291,9 @@ describe('OutletOptions', () => {
     expect(loadedComp.simpleObject.lightsabers).toBe(context.$lightSaberCollection);    // Should NOT have been replaced
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+    
     comp.content = testText;
     comp.context = context;
     comp.options = { compareInputsByValue: false };
@@ -360,10 +368,22 @@ describe('OutletOptions', () => {
   });
 
   it('#should apply the desired compareByValueDepth', () => {
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            simpleObject: context.someObj
+          }
+        }
+      }
+    }
+    configureParser();
+
     const firstContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 5 }}}}};
     const secondContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 10 }}}}};
 
-    const testText = `<dynhooks-singletagtest [simpleObject]="context.someObj">`;
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 3 };
@@ -377,11 +397,9 @@ describe('OutletOptions', () => {
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(0);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+    
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 4 };
@@ -396,7 +414,20 @@ describe('OutletOptions', () => {
   });
 
   it('#should ignoreInputAliases, if requested', () => {
-    const testText = `<dynhooks-singletagtest [stringPropAlias]="'Hello there'" [stringProp]="'General Kenobi'">`;
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            stringPropAlias: 'Hello there',
+            stringProp: 'General Kenobi'
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.options = { ignoreInputAliases: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -406,11 +437,9 @@ describe('OutletOptions', () => {
     expect(loadedComp.stringProp).toBe('General Kenobi');
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+
     comp.content = testText;
     comp.options = { ignoreInputAliases: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -421,7 +450,20 @@ describe('OutletOptions', () => {
   });
 
   it('#should ignoreOutputAliases, if requested', () => {
-    const testText = `<dynhooks-singletagtest (eventTriggeredAlias)="123" (componentClicked)="456">`;
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          outputs: {
+            eventTriggeredAlias: event => 123,
+            componentClicked: event => 456
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.options = { ignoreOutputAliases: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -432,11 +474,9 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].outputSubscriptions['eventTriggered']).toBeUndefined();
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+
     comp.content = testText;
     comp.options = { ignoreOutputAliases: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -448,7 +488,19 @@ describe('OutletOptions', () => {
   });
 
   it('#should acceptInputsForAnyProperty, if requested', () => {
-    const testText = `<dynhooks-singletagtest [thisPropertyDoesNotExist]="123">`;
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            thisPropertyDoesNotExist: 123
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -458,11 +510,9 @@ describe('OutletOptions', () => {
     expect(loadedComp.thisPropertyDoesNotExist).toBe(123);
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: false };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -472,8 +522,43 @@ describe('OutletOptions', () => {
     expect(loadedComp.thisPropertyDoesNotExist).toBeUndefined();
   });
 
+  it('#should ignore acceptInputsForAnyProperty if special forbidden property', () => {
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            prototype: false
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {acceptInputsForAnyProperty: true};
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+
+    const loadedComp: SingleTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+    expect(loadedComp as any['prototype']).not.toBe(false);
+  });
+
   it('#should acceptOutputsForAnyObservable, if requested', () => {
-    const testText = `<dynhooks-singletagtest (nonOutputEventEmitter)="123">`;
+    const configureParser = function () {
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          outputs: {
+            nonOutputEventEmitter: event => 123
+          }
+        }
+      }
+    }
+    configureParser();
+
+    const testText = `[generic-singletagtest]`;
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -482,11 +567,9 @@ describe('OutletOptions', () => {
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeDefined();
 
     // Reset
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: testParsers
-      })
-    ]));
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+    configureParser();
+
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: false };
     comp.ngOnChanges({content: true, options: true} as any);

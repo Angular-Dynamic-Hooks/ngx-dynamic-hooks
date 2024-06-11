@@ -2,12 +2,12 @@ import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDe
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
 
 @Component({
-  selector: 'dynhooks-inlinetest',
-  templateUrl: './inlineTest.c.html',
-  styleUrls: ['./inlineTest.c.scss'],
+  selector: 'whatevertest',
+  templateUrl: './whateverTest.c.html',
+  styleUrls: ['./whateverTest.c.scss'],
   standalone: true
 })
-export class InlineTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class WhateverTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() backgroundColor: string = '#25436c';
   @Input() nr!: number;
   @Input() config: any;

@@ -6,6 +6,11 @@ import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
+import { ComponentRef } from '@angular/core';
+import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
+import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
+import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
+import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
 
 /**
  * DynamicHooksService tests
@@ -25,9 +30,28 @@ describe('DynamicHooksService', () => {
   it('#should create and fill a new HTML-Element by using the DynamicHooksService directly', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          stringPropAlias: "/media/maps/valley_of_the_four_winds.png",
+          simpleArray: ["chen stormstout", "nomi"]
+        }
+      }
+    }
+
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          fonts: ['arial', 'calibri']
+        }
+      }
+    }
+
     const testText = `
-      <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
-      <p>Here's another one: <dynHooks-multiTagTest [fonts]="['arial', 'calibri']"></dynHooks-multiTagTest></p>
+      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
+      <p>Here's another one: [generic-multitagtest][/generic-multitagtest]</p>
     `;
 
     dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
@@ -47,9 +71,28 @@ describe('DynamicHooksService', () => {
   it('#should fill an existing HTML-Element by using the DynamicHooksService directly', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          stringPropAlias: "/media/maps/valley_of_the_four_winds.png",
+          simpleArray: ["chen stormstout", "nomi"]
+        }
+      }
+    }
+
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          fonts: ['arial', 'calibri']
+        }
+      }
+    }
+
     const testText = `
-      <p>This p-element has a <span>span-element with a component <dynHooks-singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>
-      <p>Here's another one: <dynHooks-multiTagTest [fonts]="['arial', 'calibri']"></dynHooks-multiTagTest></p>
+      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
+      <p>Here's another one: [generic-multitagtest][/generic-multitagtest]</p>
     `;
 
     const existingElement = document.createElement('article');
@@ -70,6 +113,69 @@ describe('DynamicHooksService', () => {
       expect(existingElement.querySelector('.multitag-component')).not.toBe(null);
       expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
       expect(outletParseResult.hookIndex[2].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
+    });
+  });
+
+  it('#should destroy loaded components on demand', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          stringPropAlias: "This is the first loaded component"
+        }
+      }
+    }
+
+    const testText = `
+      [generic-singletagtest]
+      [generic-multitagtest][/generic-multitagtest]
+    `;
+
+    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+      const hookIndex = outletParseResult.hookIndex;
+      const hostElement = outletParseResult.element;
+
+      expect(Object.keys(hookIndex).length).toBe(2);
+      const firstCompRef = hookIndex[1].componentRef;
+      const secondCompRef = hookIndex[2].componentRef;
+      spyOn<ComponentRef<SingleTagTestComponent>, any>(firstCompRef!, 'destroy').and.callThrough();
+      spyOn<ComponentRef<MultiTagTestComponent>, any>(secondCompRef!, 'destroy').and.callThrough();
+      expect(firstCompRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(secondCompRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(firstCompRef!.instance.stringProp).toBe('This is the first loaded component');
+      expect((firstCompRef as any).destroy['calls'].count()).toBe(0);
+      expect((secondCompRef as any).destroy['calls'].count()).toBe(0);
+
+      // Destroy outlet comnponent
+      dynamicHooksService.destroy(hookIndex);
+
+      expect(hostElement.innerHTML.trim()).toBe('');
+      expect((firstCompRef as any).destroy['calls'].count()).toBe(1);
+      expect((secondCompRef as any).destroy['calls'].count()).toBe(1);
+    });
+  });
+
+  it('#should unsubscribe from outputs only after components are destroyed', () => {
+    const dynamicHooksService: DynamicHooksService = TestBed.inject(DynamicHooksService);
+
+    let testValue: string = '';
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        outputs: {
+          onDestroyEmitter: event => testValue = event
+        }
+      }
+    }
+
+    const testText = `[generic-singletagtest]`;
+
+    dynamicHooksService.parse(testText, context).subscribe((outletParseResult: OutletParseResult) => {
+      expect(testValue).toBe('');
+      dynamicHooksService.destroy(outletParseResult.hookIndex);
+      expect(testValue).toBe('Event triggered from onDestroy!');
     });
   });
 

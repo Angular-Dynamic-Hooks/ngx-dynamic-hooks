@@ -4,7 +4,7 @@ import { RootTestService } from '../../services/rootTestService';
 
 
 @Component({
-  selector: 'dynhooks-multitagtest',
+  selector: 'multitagtest',
   templateUrl: './multiTagTest.c.html',
   styleUrls: ['./multiTagTest.c.scss'],
   standalone: true

@@ -1,6 +1,6 @@
 import { HookIndex } from '../../interfacesPublic';
 import { HookParser, HookPosition } from '../../interfacesPublic';
-import { OutletOptions } from '../../services/settings/options';
+import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { PlatformService } from '../platform/platformService';
 import { AutoPlatformService } from '../platform/autoPlatformService';
@@ -41,9 +41,13 @@ interface HookSegments {
 @Injectable({
   providedIn: 'root'
 })
-export class HooksReplacer {
+export class StringHooksFinder {
 
   constructor(private platformService: AutoPlatformService) {
+  }
+
+  findInElement() {
+
   }
 
   /**
@@ -56,8 +60,13 @@ export class HooksReplacer {
    * @param options - The current OutletOptions
    * @param hookIndex - The hookIndex object to fill
    */
-  replaceHooksWithNodes(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
+  find(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
     let hookCount = 1;
+
+    // Convert input HTML entities?
+    if (options.convertHTMLEntities) {
+      content = this.convertHTMLEntities(content);
+    }
 
     // Collect all parser results (before changing content), sort by startIndex
     let parserResults: ParserResult[] = [];
