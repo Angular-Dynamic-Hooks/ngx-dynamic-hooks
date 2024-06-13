@@ -80,7 +80,7 @@ export class ComponentCreator {
           // Check if the host element is simply an anchor for a lazily-loaded component. If so, insert proper selector now.
           hookHostElements[hookId] = this.handleAnchorElement(hookHostElements[hookId], compClass);
           // Get projectableNodes from the content slots
-          const projectableNodes = this.getContentSlotElements(hookHostElements[hookId], token);
+          const projectableNodes = this.extractContentSlotElements(hookHostElements[hookId], token);
           // Instantiate component
           this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass, injector);
         }))
@@ -271,7 +271,7 @@ export class ComponentCreator {
    * @param componentHostElement - The dom element with the content slots
    * @param token - The current parse token
    */
-  getContentSlotElements(componentHostElement: any, token: string): Array<Array<any>> {
+  extractContentSlotElements(componentHostElement: any, token: string): Array<Array<any>> {
     // Resolve ng-content from content slots
     const projectableNodes = [];
     const contentSlotElements = this.platform.getChildNodes(componentHostElement)
@@ -281,6 +281,10 @@ export class ComponentCreator {
       const slotIndex = this.platform.getAttribute(contentSlotElement, 'slotIndex');
       projectableNodes[slotIndex] = this.platform.getChildNodes(contentSlotElement);
     }
+
+    // Bugfix: Make sure to manually remove the content slots and not just rely on createComponent() to do so. 
+    // Otherwise they will persist with SSR due to hydration bug.
+    this.platform.clearChildNodes(componentHostElement);
 
     return projectableNodes;
   }
