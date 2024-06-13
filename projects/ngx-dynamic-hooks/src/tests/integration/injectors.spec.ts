@@ -1,11 +1,11 @@
 // Testing api resources
-import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, OutletParseResult, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, OutletParseResult, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { Component, EnvironmentInjector, Injector, NgModule } from '@angular/core';
+import { Component, EnvironmentInjector, Injector, NgModule, createEnvironmentInjector } from '@angular/core';
 import { Route, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
@@ -116,5 +116,53 @@ describe('Injectors logic', () => {
       expect(latestUsedInjector).toEqual(rootModuleInjector);
     });
   }));
+
+  it('should use custom injectors if passed by parser', () => {
+    const configureParser = function (injector: Injector|null = null, envInjector: EnvironmentInjector|null = null) {
+      const compData: HookComponentData = {
+        component: SingleTagTestComponent
+      };
+      if (injector) {
+        compData.injector = injector;
+      }
+      if (envInjector) {
+        compData.environmentInjector = envInjector;
+      }
+
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      genericSingleTagParser.onLoadComponent = (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => compData;
+    }
+
+    const testText = `[generic-singletagtest]`;
+
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+    
+    // Should not be found as not provided anywhere
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toBeNull();
+
+    // Set custom injector
+    const customInjector = Injector.create({
+      providers: [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'injector test value' } }]
+    });
+    configureParser(customInjector);
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    // Should now be found
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toEqual({ name: 'injector test value' });
+
+    // Should also work for custom env injector
+    const customEnvInjector = createEnvironmentInjector(
+      [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'env injector test value' } }],
+      TestBed.inject(EnvironmentInjector),
+      'MyCustomEnvInjector'
+    );
+    configureParser(null, customEnvInjector);
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(comp.hookIndex[1].componentRef!.instance.genericInjectionValue).toEqual({ name: 'env injector test value' });
+  });
 
 });

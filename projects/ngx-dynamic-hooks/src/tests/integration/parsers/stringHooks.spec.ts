@@ -85,10 +85,11 @@ describe('Parser string hooks', () => {
   });
 
   
-  it('#should load plain html as nested content', fakeAsync(() => {
+  fit('#should load nested content correctly', fakeAsync(() => {
     const testText = `
       [generic-multitagtest]
         <h1 class="the-title">Hello there!</h1>
+        <p class="the-text">this is some text</p>
       [/generic-multitagtest]
     `;
     comp.content = testText;
@@ -103,12 +104,15 @@ describe('Parser string hooks', () => {
     expect(multiTagHostElement.children[0].className).toBe('multitag-component');
     const multiTagViewElement = multiTagHostElement.children[0];
 
-    expect(multiTagViewElement.children.length).toBe(1);
+    // Make sure content is exactly what it should be
+    expect(multiTagViewElement.children.length).toBe(2);
     expect(multiTagViewElement.children[0].className).toBe('the-title');
     expect(multiTagViewElement.children[0].innerHTML).toBe('Hello there!');
+    expect(multiTagViewElement.children[1].className).toBe('the-text');
+    expect(multiTagViewElement.children[1].innerHTML).toBe('this is some text');
   }));
 
-  it('#should load nested components as content', () => {
+  it('#should load nested content with components correctly', () => {
     const testText = `
     <p>Some advanced nesting:
       [generic-multitagtest]

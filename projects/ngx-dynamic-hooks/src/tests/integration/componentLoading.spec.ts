@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixtureAutoDetect, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { first } from 'rxjs/operators';
 
 // Testing api resources
@@ -13,6 +13,7 @@ import { PLATFORM_ID } from '@angular/core';
 import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
 import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
 import { GenericWhateverParser } from '../resources/parsers/genericWhateverParser';
+import { ModuleTestComponent } from '../resources/components/moduleTest/moduleTest.c';
 
 describe('Component loading', () => {
   let testBed;
@@ -30,6 +31,48 @@ describe('Component loading', () => {
     // Load with nonsensical componentConfig
     expect(() => comp['dynamicHooksService']['componentCreator'].loadComponentClass(true as any))
       .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig'));
+  });
+
+  it('#should be able to load module components', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      declarations: [ModuleTestComponent],
+      providers: [
+        {provide: ComponentFixtureAutoDetect, useValue: true},
+        provideDynamicHooks({parsers: [GenericWhateverParser]})
+      ]
+    });
+
+    const genericWhateverParser = TestBed.inject(GenericWhateverParser);
+    genericWhateverParser.component = ModuleTestComponent;
+  
+    const fixture = TestBed.createComponent(DynamicHooksComponent);
+    const comp = fixture.componentInstance;
+    comp.content = '[generic-whatever][/generic-whatever]';
+    comp.ngOnChanges({content: true} as any);
+
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef?.instance.constructor.name).toBe('ModuleTestComponent');
+    expect(fixture.nativeElement.querySelector('.module-component')).not.toBe(null);
+  });
+
+  it('#should be able to load standalone components', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        {provide: ComponentFixtureAutoDetect, useValue: true},
+        provideDynamicHooks({parsers: [GenericSingleTagParser]})
+      ]
+    });
+  
+    const fixture = TestBed.createComponent(DynamicHooksComponent);
+    const comp = fixture.componentInstance;
+    comp.content = '[generic-singletagtest][/generic-singletagtest]';
+    comp.ngOnChanges({content: true} as any);
+
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef?.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
   });
 
   it('#should remove components if they fail to load', () => {
