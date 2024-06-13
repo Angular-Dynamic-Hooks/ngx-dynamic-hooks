@@ -85,7 +85,7 @@ describe('Parser string hooks', () => {
   });
 
   
-  fit('#should load nested content correctly', fakeAsync(() => {
+  it('#should load nested content correctly', fakeAsync(() => {
     const testText = `
       [generic-multitagtest]
         <h1 class="the-title">Hello there!</h1>

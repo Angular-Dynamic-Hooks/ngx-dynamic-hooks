@@ -116,6 +116,32 @@ describe('DynamicHooksService', () => {
     });
   });
 
+  it('#should operate on a virtual content element before using sanitizer', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+
+    const testText = `
+      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
+    `;
+
+    const targetElement = document.createElement('article');
+    const targetElementExpectedHtml = '<div><span id="inner">This should not have been altered.</span></div>';
+    targetElement.innerHTML = targetElementExpectedHtml;
+
+    spyOn(dynamicHooksService['contentSanitizer'], 'sanitize').and.throwError('Lets stop execution here');
+
+    let errorMsg = '';
+    try {
+      dynamicHooksService.parse(testText, {}, null, null, null, null, targetElement, {});
+    } catch (e) {
+      errorMsg = (e as Error).message;
+    }
+    
+    expect(errorMsg).toBe('Lets stop execution here');
+    const elementPassedToSanitizer = (dynamicHooksService['contentSanitizer'].sanitize as jasmine.Spy).calls.allArgs()[0][0];
+    expect(elementPassedToSanitizer).not.toBe(targetElement);
+    expect(targetElement.innerHTML).toBe(targetElementExpectedHtml);
+  });
+
   it('#should destroy loaded components on demand', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Injector, inject } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
 import { RootTestService } from '../../services/rootTestService';
 
@@ -17,11 +17,13 @@ export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, 
   mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
   changesContentChildren!: Array<DynamicContentChild>;
+  rootTestService: RootTestService;
 
   constructor(
-    private cd: ChangeDetectorRef,
-    @Optional() public rootTestService: RootTestService
+    private cd: ChangeDetectorRef
   ) {
+    // Test DI via inject()
+    this.rootTestService = inject(RootTestService);
   }
 
 

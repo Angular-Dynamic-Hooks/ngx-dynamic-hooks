@@ -357,7 +357,6 @@ export class ComponentCreator {
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
               componentRef: hookIndex[hookId].componentRef!,
-              componentSelector: this.platformService.getTagName(childNode).toLowerCase(),
               contentChildren: [],
               hookValue: hookIndex[hookId].value
             });

@@ -198,7 +198,6 @@ export interface OnDynamicData {
  */
 export interface DynamicContentChild {
     componentRef: ComponentRef<any>;
-    componentSelector: string;
     contentChildren: Array<DynamicContentChild>;
     hookValue: HookValue;
 }

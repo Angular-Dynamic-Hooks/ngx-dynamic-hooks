@@ -10,7 +10,7 @@ import { attrNameHookId, attrNameParseToken } from '../../constants/core';
   providedIn: 'root'
 })
 export class ContentSanitizer {
-  sanitizerPlaceholderClass = '_ngx_dynamic_hooks_sanitize_placeholder_';
+  sanitizerPlaceholderClass = '_ngx_dynamic_hooks_sanitize_placeholder';
   attrWhitelist = [attrNameHookId, attrNameParseToken, 'class', 'href', 'src']
 
   constructor(private platformService: AutoPlatformService) {}
@@ -29,7 +29,7 @@ export class ContentSanitizer {
 
         // Use spans for placeholders. Browsers care about its placement and content the least. Only not allowed in certain parts of tables and direct ul/ol child.
         const placeholderElement = this.platformService.createElement('span');
-        this.platformService.setAttribute(placeholderElement, 'class', this.sanitizerPlaceholderClass + hook.id);
+        this.platformService.setAttribute(placeholderElement, 'class', `${this.sanitizerPlaceholderClass}_${hook.id}_${token}`);
         this.platformService.insertBefore(parentElement, placeholderElement, anchorElement);
         this.platformService.removeChild(parentElement, anchorElement);
         for (const node of childNodes) {
@@ -45,7 +45,7 @@ export class ContentSanitizer {
 
     // Restore original hook anchors
     for (const [hookId, anchorElement] of Object.entries(originalHookAnchors)) {
-      const placeholderElement = this.platformService.querySelectorAll(contentElement, `.${this.sanitizerPlaceholderClass}${hookId}`)?.[0];
+      const placeholderElement = this.platformService.querySelectorAll(contentElement, `.${this.sanitizerPlaceholderClass}_${hookId}_${token}`)?.[0];
       if (placeholderElement) {
         const parentElement = this.platformService.getParentNode(placeholderElement);
         const childNodes = this.platformService.getChildNodes(placeholderElement);

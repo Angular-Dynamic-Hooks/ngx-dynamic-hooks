@@ -90,18 +90,19 @@ export class DynamicHooksService {
       });
     }
 
-    // Create parse token
+    // Create parse token & virtual content element
     const token = Math.random().toString(36).substring(2, 12);
+    const virtualContentElement = this.platformService.createElement('div');
 
     // Find all string hooks
     if (typeof content === 'string') {
       const result = this.stringHooksFinder.find(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
-      content = result.content;
 
-      // Parse HTML
-      targetElement.innerHTML = content;
+      // Parse string into HTML
+      virtualContentElement.innerHTML = result.content;
     } else {
-      // TODO: find string hooks in existing elements
+      // TODO: add child nodes to contentElement
+      // then find string hooks in existing elements
     }
 
     // TODO: Find all element hooks
@@ -109,7 +110,13 @@ export class DynamicHooksService {
 
     // Sanitize?
     if (resolvedOptions?.sanitize) {
-      this.contentSanitizer.sanitize(targetElement, targetHookIndex, token);
+      this.contentSanitizer.sanitize(virtualContentElement, targetHookIndex, token);
+    }
+
+    // After sanitize, insert virtual content into targetElement
+    this.platformService.clearChildNodes(targetElement);
+    for (const childNode of this.platformService.getChildNodes(virtualContentElement)) {
+      this.platformService.appendChild(targetElement, childNode);
     }
 
     // Dynamically create components in component selector elements
