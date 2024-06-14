@@ -4,7 +4,8 @@ import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { PlatformService } from '../platform/platformService';
 import { AutoPlatformService } from '../platform/autoPlatformService';
-import { attrNameHookId, attrNameParseToken } from '../../constants/core';
+import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../constants/core';
+import { sortElements } from '../utils/utils';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
@@ -18,7 +19,7 @@ interface ReplaceInstruction {
 /**
  * Stores a HookPosition along with the parser who found it
  */
-interface ParserResult {
+interface ParserFindHooksResult {
   parser: HookParser;
   hookPosition: HookPosition;
 }
@@ -60,19 +61,20 @@ export class StringHooksFinder {
    * @param options - The current OutletOptions
    * @param hookIndex - The hookIndex object to fill
    */
-  find(content: string, context: any, parsers: Array<HookParser>, token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
-    let hookCount = 1;
+  find(content: string, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
 
     // Convert input HTML entities?
     if (options.convertHTMLEntities) {
       content = this.convertHTMLEntities(content);
     }
 
-    // Collect all parser results (before changing content), sort by startIndex
-    let parserResults: ParserResult[] = [];
+    // Collect all parser results, sort by order of appearance
+    let parserResults: ParserFindHooksResult[] = [];
     for (const parser of parsers) {
-      for (const hookPosition of parser.findHooks(content, context)) {
-        parserResults.push({parser, hookPosition});
+      if (typeof parser.findHooks === 'function') {
+        for (const hookPosition of parser.findHooks(content, context)) {
+          parserResults.push({parser, hookPosition});
+        }
       }
     }
     parserResults.sort((a, b) => a.hookPosition.openingTagStartIndex - b.hookPosition.openingTagStartIndex);
@@ -83,6 +85,7 @@ export class StringHooksFinder {
     // Process parser results
     const selectorReplaceInstructions: ReplaceInstruction[] = [];
     for (const pr of parserResults) {
+      const hookId = Object.keys(hookIndex).length + 1;
 
       // Some info about this hook
       const hookSegments = this.getHookSegments(pr.hookPosition, content);
@@ -91,21 +94,22 @@ export class StringHooksFinder {
       selectorReplaceInstructions.push({
         startIndex: pr.hookPosition.openingTagStartIndex,
         endIndex: pr.hookPosition.openingTagEndIndex,
-        replacement: `<dynamic-component-anchor ${attrNameHookId}="${hookCount}" ${attrNameParseToken}="${token}">`
+        replacement: `<${anchorElementTag} ${anchorAttrHookId}="${hookId}" ${anchorAttrParseToken}="${token}">`
       });
       selectorReplaceInstructions.push({
         startIndex: hookSegments.enclosing ? pr.hookPosition.closingTagStartIndex! : pr.hookPosition.openingTagEndIndex,
         endIndex: hookSegments.enclosing ? pr.hookPosition.closingTagEndIndex! : pr.hookPosition.openingTagEndIndex,
-        replacement: '</dynamic-component-anchor>'
+        replacement: `</${anchorElementTag}>`
       });
 
       // Enter hook into index
-      hookIndex[hookCount] = {
-        id: hookCount,
+      hookIndex[hookId] = {
+        id: hookId,
         parser: pr.parser,
         value: {
           openingTag: hookSegments.openingTag,
-          closingTag: hookSegments.closingTag
+          closingTag: hookSegments.closingTag,
+          element: null
         },
         data: null,
         isLazy: false,
@@ -115,7 +119,6 @@ export class StringHooksFinder {
         dirtyInputs: new Set(),
         outputSubscriptions: {}
       };
-      hookCount++;
 
       // Remove tag artifacts (does not change parser results indexes)
       if (hookSegments.enclosing && options.fixParagraphTags) {
@@ -170,7 +173,7 @@ export class StringHooksFinder {
    * @param parserResults - The parserResults from replaceHooksWithNodes()
    * @param content - The source text for the parserResults
    */
-  private validateHookPositions(parserResults: Array<ParserResult>, content: string): Array<ParserResult> {
+  private validateHookPositions(parserResults: ParserFindHooksResult[], content: string): ParserFindHooksResult[] {
     const checkedParserResults = [];
 
     outerloop: for (const [index, parserResult] of parserResults.entries()) {
@@ -183,7 +186,7 @@ export class StringHooksFinder {
         continue;
       }
       if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex!) {
-        if (isDevMode()) { console.warn('Error when checking hook positions - The closing tag must start after the opening tag has concluded. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('Error when checking hook positions - closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
         continue;
       }
       if (enclosing && hookPos.closingTagStartIndex! >= hookPos.closingTagEndIndex!) {
@@ -216,6 +219,8 @@ export class StringHooksFinder {
           continue outerloop;
         }
 
+        // Just need to check for collisions with previous closing tag now
+        
         // Opening tag must not overlap with previous closing tag
         if (prevIsEnclosing && !(
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! ||
@@ -242,7 +247,6 @@ export class StringHooksFinder {
             this.generateHookPosWarning('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
             continue outerloop;
         }
-
       }
 
       // If everything okay, add to result array

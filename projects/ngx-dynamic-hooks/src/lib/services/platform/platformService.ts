@@ -27,6 +27,21 @@ export interface CompletePlatformService {
   createElement(tagName: string): any;
 
   /**
+   * Given two elements, return a number indicating which one comes first
+   * @param a - The first element
+   * @param b - The second element
+   * @returns - 1 if b comes before a, -1 if a comes before b, 0 if equivalent
+   */
+  sortElements(a: any, b: any): number
+
+  /**
+   * Return a shallow clone of an element (just the element itself, not its children)
+   *
+   * @param element - The element to clone
+   */
+  cloneElement(element: any): any
+
+  /**
    * Returns the tag name of an element
    * @param element An element
    */

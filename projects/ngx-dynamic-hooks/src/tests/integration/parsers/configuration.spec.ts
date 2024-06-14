@@ -139,7 +139,7 @@ describe('Parser configuration', () => {
     comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
     expect((<any> console.error)['calls'].count()).toBe(1);
-    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "findHooks()". Removing from list of active parsers:');
+    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:');
 
     comp.parsers = [parseWithOneFunc as any];
     comp.ngOnChanges({content: true, parsers: true} as any);

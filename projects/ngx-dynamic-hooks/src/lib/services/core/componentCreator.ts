@@ -5,11 +5,10 @@ import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
 import { Hook, HookIndex } from '../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../interfacesPublic';
-import { PLATFORM_SERVICE, PlatformService } from '../platform/platformService';
 import { OutletOptions } from '../settings/options';
 import { ComponentUpdater } from './componentUpdater';
 import { AutoPlatformService } from '../platform/autoPlatformService';
-import { attrNameHookId, attrNameParseToken } from '../../constants/core';
+import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
 
 /**
  * The service responsible for dynamically creating components for all found Hooks
@@ -44,15 +43,15 @@ export class ComponentCreator {
 
     // Get HookData, replace placeholders and create desired content slots
     for (const [hookId, hook] of Object.entries(hookIndex)) {
-      const placeholderElement = this.platformService.querySelectorAll(contentElement, `[${attrNameHookId}="${hookId}"][${attrNameParseToken}="${token}"]`)?.[0];
+      const anchorElement = this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}="${hookId}"][${anchorAttrParseToken}="${token}"]`)?.[0];
 
       // If removed by previous hook in loop via ng-content replacement
-      if (!placeholderElement) {
+      if (!anchorElement) {
         delete hookIndex[hook.id];
         continue;
       }
 
-      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(placeholderElement));
+      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(anchorElement));
       hook.isLazy = hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName');
 
       // Skip loading lazy components during SSR
@@ -62,7 +61,7 @@ export class ComponentCreator {
       }
 
       // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
-      hookHostElements[hookId] = hook.isLazy ? placeholderElement : this.replaceAnchorElement(placeholderElement, hook.data.component as new(...args: any[]) => any);
+      hookHostElements[hookId] = hook.isLazy ? anchorElement : this.replaceAnchorElement(anchorElement, hook.data.component as new(...args: any[]) => any);
 
       // Insert child content according to hook.data immediately
       // This has the benefit that if the child content is custom, the next iterations of this loop will throw out all hooks whose placeholder elements 
@@ -125,8 +124,8 @@ export class ComponentCreator {
 
       // Remove now redundant attributes from component elements
       for (const hostElement of Object.values(hookHostElements)) {
-        this.platformService.removeAttribute(hostElement, attrNameHookId);
-        this.platformService.removeAttribute(hostElement, attrNameParseToken);
+        this.platformService.removeAttribute(hostElement, anchorAttrHookId);
+        this.platformService.removeAttribute(hostElement, anchorAttrParseToken);
         this.platformService.removeAttribute(hostElement, 'ng-version');
       }
 
@@ -158,10 +157,10 @@ export class ComponentCreator {
     const selectorElement = this.platformService.createElement(selector);
 
     // Move attributes to selector
-    this.platformService.setAttribute(selectorElement, attrNameHookId, this.platformService.getAttribute(anchorElement, attrNameHookId)!);
-    this.platformService.setAttribute(selectorElement, attrNameParseToken, this.platformService.getAttribute(anchorElement, attrNameParseToken)!);
-    this.platformService.removeAttribute(anchorElement, attrNameHookId);
-    this.platformService.removeAttribute(anchorElement, attrNameParseToken);
+    this.platformService.setAttribute(selectorElement, anchorAttrHookId, this.platformService.getAttribute(anchorElement, anchorAttrHookId)!);
+    this.platformService.setAttribute(selectorElement, anchorAttrParseToken, this.platformService.getAttribute(anchorElement, anchorAttrParseToken)!);
+    this.platformService.removeAttribute(anchorElement, anchorAttrHookId);
+    this.platformService.removeAttribute(anchorElement, anchorAttrParseToken);
 
     // Move child nodes to selector
     const childNodes = this.platformService.getChildNodes(anchorElement);
@@ -346,14 +345,14 @@ export class ComponentCreator {
       childNodes.forEach((childNode, key) => {
         let componentFound = false;
         // If element has a parsetoken and hookid, it is a dynamic component
-        const parseToken = this.platformService.getAttribute(childNode, attrNameParseToken);
+        const parseToken = this.platformService.getAttribute(childNode, anchorAttrParseToken);
 
         if (
           parseToken !== null &&
           parseToken === token &&
-          this.platformService.getAttribute(childNode, attrNameHookId)
+          this.platformService.getAttribute(childNode, anchorAttrHookId)
         ) {
-          const hookId = parseInt(this.platformService.getAttribute(childNode, attrNameHookId)!, 10);
+          const hookId = parseInt(this.platformService.getAttribute(childNode, anchorAttrHookId)!, 10);
           if (hookIndex.hasOwnProperty(hookId)) {
             treeLevel.push({
               componentRef: hookIndex[hookId].componentRef!,

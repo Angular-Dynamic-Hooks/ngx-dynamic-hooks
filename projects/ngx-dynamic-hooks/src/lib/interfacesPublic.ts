@@ -54,14 +54,24 @@ export interface HookParser {
     name?: string;
 
     /**
-     * Returns the positions of all hooks in the content string.
+     * Returns the positions of all string hooks in the content string.
      *
-     * This function is called once for each parser.
+     * Note: Each parser needs to implement either findHooks or findHookElements. The function is then called once for each parser.
      *
      * @param content - The content to search for hooks
      * @param context - The current context object
      */
-    findHooks(content: string, context: any): HookPosition[];
+    findHooks?(content: string, context: any): HookPosition[];
+
+    /**
+     * Returns the hook elements that should serve as host elements for components in the content.
+     *
+     * Note: Each parser needs to implement either findHooks or findHookElements. The function is then called once for each parser.
+     *
+     * @param content - The content element to search for hooks (usually a standard Element)
+     * @param context - The current context object
+     */
+    findHookElements?(contentElement: any, context: any): any[];
 
     /**
      * How to instantiate the component for this hook.
@@ -105,8 +115,9 @@ export interface HookPosition {
  * The hook as it appears in the content string
  */
 export interface HookValue {
-    openingTag: string;
-    closingTag: string|null;
+    openingTag?: string|null;
+    closingTag?: string|null;
+    element?: any;
 }
 
 /**
@@ -114,6 +125,7 @@ export interface HookValue {
  */
 export interface HookComponentData {
     component: ComponentConfig;
+    hostElementTag?: string;
     injector?: Injector;
     environmentInjector?: EnvironmentInjector;
     content?: Node[][];
@@ -206,7 +218,7 @@ export interface DynamicContentChild {
 // ---------------------------------
 
 export interface OutletParseResult {
-    element: HTMLElement;
+    element: any;
     hookIndex: HookIndex;
     resolvedParsers: HookParser[];
     resolvedOptions: OutletOptions;

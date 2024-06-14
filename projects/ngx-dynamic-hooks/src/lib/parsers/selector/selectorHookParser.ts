@@ -47,8 +47,8 @@ export class SelectorHookParser implements HookParser {
 
     // Store the bindings for each hook to preserve references in between updates
     const hookBindings = this.currentBindings[hookId];
-    hookBindings.inputs = this.bindingStateManager.getCurrentInputBindings(hookValue.openingTag, context, this.config, hookBindings.inputs);
-    hookBindings.outputs = this.bindingStateManager.getCurrentOutputBindings(hookValue.openingTag, this.config, hookBindings.outputs);
+    hookBindings.inputs = this.bindingStateManager.getCurrentInputBindings(hookValue.openingTag!, context, this.config, hookBindings.inputs);
+    hookBindings.outputs = this.bindingStateManager.getCurrentOutputBindings(hookValue.openingTag!, this.config, hookBindings.outputs);
 
     return {
       inputs: this.getValuesFromBindings(hookBindings.inputs),

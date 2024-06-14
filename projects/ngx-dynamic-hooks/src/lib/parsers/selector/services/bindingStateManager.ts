@@ -4,7 +4,7 @@ import { regexes } from '../../../constants/regexes';
 import { DataTypeParser } from '../../../services/utils/dataTypeParser';
 import { SelectorHookParserConfig } from '../config/selectorHookParserConfig';
 import { RichBindingData } from '../../../interfaces';
-import { matchAll } from '../../../services/utils/polyfills/matchAll';
+import { matchAll } from '../../../services/utils/utils';
 
 
 /**

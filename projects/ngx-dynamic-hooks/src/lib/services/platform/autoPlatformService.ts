@@ -33,6 +33,14 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('createElement').createElement!(tagName);
   }
 
+  sortElements(a: any, b: any): number {
+    return this.getFor('sortElements').sortElements!(a, b);
+  }
+
+  cloneElement(element: any) {
+    return this.getFor('cloneElement').cloneElement!(element);
+  }
+
   getTagName(element: any) {
     return this.getFor('getTagName').getTagName!(element);
   }

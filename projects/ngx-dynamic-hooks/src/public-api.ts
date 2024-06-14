@@ -26,8 +26,8 @@ export * from './lib/services/utils/deepComparer';
 export * from './lib/services/utils/hookFinder';
 export * from './lib/constants/regexes';
 
-// Polyfills
-export * from './lib/services/utils/polyfills/matchAll';
+// Utils
+export * from './lib/services/utils/utils';
 
 // Platform
 export * from './lib/services/platform/platformService';

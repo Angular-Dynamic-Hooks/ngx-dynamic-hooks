@@ -5,6 +5,7 @@ import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformS
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
 import { HookParserEntry } from './services/settings/parserEntry';
 import { EmptyPlatformService } from './services/platform/emptyPlatformService';
+import { HookFinder } from '../public-api';
 
 export const allSettings: DynamicHooksSettings[] = [];
 

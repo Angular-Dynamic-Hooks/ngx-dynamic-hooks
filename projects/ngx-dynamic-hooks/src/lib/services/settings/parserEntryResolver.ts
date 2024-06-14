@@ -127,8 +127,8 @@ export class ParserEntryResolver {
   validateParserFunctions(parsers: Array<HookParser>): Array<HookParser> {
     const validParsers = [];
     for (const parser of parsers) {
-      if (typeof parser.findHooks !== 'function') {
-        console.error('Submitted parser does not implement "findHooks()". Removing from list of active parsers:', parser);
+      if (typeof parser.findHooks !== 'function' && typeof parser.findHookElements !== 'function') {
+        console.error('Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:', parser);
         continue;
       }
       if (typeof parser.loadComponent !== 'function') {

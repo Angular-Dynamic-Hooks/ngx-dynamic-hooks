@@ -1,15 +1,15 @@
+import { PLATFORM_ID } from '@angular/core';
 import { ComponentFixtureAutoDetect, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { first } from 'rxjs/operators';
 
 // Testing api resources
-import { DynamicHooksComponent, LoadedComponent, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, LoadedComponent, anchorElementTag, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
 import { CustomContentParser } from '../resources/parsers/customContentParser';
 import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
-import { PLATFORM_ID } from '@angular/core';
 import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
 import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
 import { GenericWhateverParser } from '../resources/parsers/genericWhateverParser';
@@ -211,35 +211,35 @@ describe('Component loading', () => {
     expect(one_multiTagComp.mountContentChildren.length).toBe(2);
     expect(one_multiTagComp.mountContentChildren[0].componentRef).toBeDefined();
     expect(one_multiTagComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
-    expect(one_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(one_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].componentRef).toBeDefined();
     expect(one_multiTagComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
-    expect(one_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(one_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren.length).toBe(3);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren.length).toBe(2);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren.length).toBe(1);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].contentChildren.length).toBe(0);
 
     expect(two_singleTagComp.mountContentChildren.length).toBe(0);
@@ -247,27 +247,27 @@ describe('Component loading', () => {
     expect(two_multiTagComp.mountContentChildren.length).toBe(3);
     expect(two_multiTagComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
     expect(two_multiTagComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(two_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(two_multiTagComp.mountContentChildren[0].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
     expect(two_multiTagComp.mountContentChildren[1].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(two_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren.length).toBe(2);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren.length).toBe(1);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[2].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(two_multiTagComp.mountContentChildren[2].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(two_multiTagComp.mountContentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(two_multiTagComp.mountContentChildren[2].contentChildren.length).toBe(0);
 
     expect(three_singleTagComp.mountContentChildren.length).toBe(0);
@@ -275,21 +275,21 @@ describe('Component loading', () => {
     expect(three_customComp.mountContentChildren.length).toBe(2);
     expect(three_customComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe('MULTITAGTEST');
     expect(three_customComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]'});
+    expect(three_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
     expect(three_customComp.mountContentChildren[0].contentChildren.length).toBe(1);
     expect(three_customComp.mountContentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(three_customComp.mountContentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(three_customComp.mountContentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(three_customComp.mountContentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(three_customComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe('SINGLETAGTEST');
     expect(three_customComp.mountContentChildren[1].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null});
+    expect(three_customComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
     expect(three_customComp.mountContentChildren[1].contentChildren.length).toBe(0);
 
     expect(four_customComp.mountContentChildren.length).toBe(1);
     expect(four_customComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe('WHATEVERTEST');
     expect(four_customComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(four_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]'});
+    expect(four_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
     expect(four_customComp.mountContentChildren[0].contentChildren.length).toBe(0);
 
     expect(four_singleTagComp.mountContentChildren.length).toBe(0);
@@ -433,17 +433,17 @@ describe('Component loading', () => {
     expect(loadedComponents.length).toBe(3);
 
     expect(loadedComponents[0].hookId).toBe(1);
-    expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null});
+    expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null, element: null});
     expect(loadedComponents[0].hookParser).toBeDefined();
     expect(loadedComponents[0].componentRef.instance.stringProp).toBe('some random sentence');
 
     expect(loadedComponents[1].hookId).toBe(2);
-    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`});
+    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`, element: null});
     expect(loadedComponents[1].hookParser).toBeDefined();
     expect(loadedComponents[1].componentRef.instance.nr).toBe(99);
 
     expect(loadedComponents[2].hookId).toBe(3);
-    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`});
+    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`, element: null});
     expect(loadedComponents[2].hookParser).toBeDefined();
     expect(loadedComponents[2].componentRef.instance.nr).toBe(1000);
   });
@@ -502,7 +502,7 @@ describe('Component loading', () => {
 
     // Everything except the lazy-loaded component should be loaded
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
+    expect(fixture.nativeElement.querySelector(anchorElementTag)).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);    
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
 
@@ -533,9 +533,9 @@ describe('Component loading', () => {
 
     // Lazy-loaded component should be loaded by now in anchor
     expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).toBe('lazytest-anchor');    // Anchor should have comp class
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes[0].tagName).toBe('LAZYTEST');  // Selector element should be loaded in anchor
+    expect(fixture.nativeElement.querySelector(anchorElementTag)).not.toBe(null);
+    expect(fixture.nativeElement.querySelector(anchorElementTag).classList[0]).toBe('lazytest-anchor');    // Anchor should have comp class
+    expect(fixture.nativeElement.querySelector(anchorElementTag).childNodes[0].tagName).toBe('LAZYTEST');  // Selector element should be loaded in anchor
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('LazyTestComponent');
     expect(comp.hookIndex[2].componentRef!.instance.name).toBe('sleepy');
 
@@ -555,17 +555,17 @@ describe('Component loading', () => {
     expect(loadedComponents.length).toBe(3);
 
     expect(loadedComponents[0].hookId).toBe(1);
-    expect(loadedComponents[0].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`});
+    expect(loadedComponents[0].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`, element: null});
     expect(loadedComponents[0].hookParser).toBeDefined();
     expect(loadedComponents[0].componentRef.instance.nr).toBe(4);
 
     expect(loadedComponents[1].hookId).toBe(2);
-    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`});
+    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`, element: null});
     expect(loadedComponents[1].hookParser).toBeDefined();
     expect(loadedComponents[1].componentRef.instance.name).toBe('sleepy');
 
     expect(loadedComponents[2].hookId).toBe(3);
-    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null});
+    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null, element: null});
     expect(loadedComponents[2].hookParser).toBeDefined();
     expect(loadedComponents[2].componentRef.instance.numberProp).toBe(87);
   }));
@@ -622,9 +622,9 @@ describe('Component loading', () => {
 
     // Placeholder anchor should be created, but nothing further
     expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').classList[0]).not.toBe('lazytest-anchor');
-    expect(fixture.nativeElement.querySelector('dynamic-component-anchor').childNodes.length).toBe(0);
+    expect(fixture.nativeElement.querySelector(anchorElementTag)).not.toBe(null);
+    expect(fixture.nativeElement.querySelector(anchorElementTag).classList[0]).not.toBe('lazytest-anchor');
+    expect(fixture.nativeElement.querySelector(anchorElementTag).childNodes.length).toBe(0);
   }));
 
 });

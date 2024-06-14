@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HookIndex } from '../../interfacesPublic';
 import { AutoPlatformService } from '../platform/autoPlatformService';
-import { attrNameHookId, attrNameParseToken } from '../../constants/core';
+import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
 
 /**
  * A utility service that sanitizes an Element and all of its children while exluding found hook elements
@@ -11,7 +11,7 @@ import { attrNameHookId, attrNameParseToken } from '../../constants/core';
 })
 export class ContentSanitizer {
   sanitizerPlaceholderClass = '_ngx_dynamic_hooks_sanitize_placeholder';
-  attrWhitelist = [attrNameHookId, attrNameParseToken, 'class', 'href', 'src']
+  attrWhitelist = [anchorAttrHookId, anchorAttrParseToken, 'class', 'href', 'src']
 
   constructor(private platformService: AutoPlatformService) {}
 
@@ -20,7 +20,7 @@ export class ContentSanitizer {
 
     // Replace all found hook anchors with placeholders that survive sanitization
     for (const hook of Object.values(hookIndex)) {
-      const anchorElement = this.platformService.querySelectorAll(contentElement, `[${attrNameHookId}="${hook.id}"][${attrNameParseToken}="${token}"]`)?.[0];
+      const anchorElement = this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}="${hook.id}"][${anchorAttrParseToken}="${token}"]`)?.[0];
       if (anchorElement) {
         originalHookAnchors[hook.id] = anchorElement;
 
@@ -83,7 +83,7 @@ export class ContentSanitizer {
         // Keep in separate try-catch, so the first doesn't stop the second
         try {
           // Always keep those two
-          if (attr !== attrNameHookId && attr !== attrNameParseToken) {
+          if (attr !== anchorAttrHookId && attr !== anchorAttrParseToken) {
             this.platformService.removeAttribute(element, attr);
           }
         } catch (e) {}          

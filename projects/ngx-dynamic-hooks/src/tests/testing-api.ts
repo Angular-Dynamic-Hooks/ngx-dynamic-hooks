@@ -23,7 +23,7 @@ export { DataTypeParser } from '../lib/services/utils/dataTypeParser';
 export { DeepComparer } from '../lib/services/utils/deepComparer';
 export { HookFinder } from '../lib/services/utils/hookFinder';
 export { regexes } from '../lib/constants/regexes';
-export { matchAll } from '../lib/services/utils/polyfills/matchAll';
+export { matchAll } from '../lib/services/utils/utils';
 
 // Private module resources
 export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED, DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_MODULESETTINGS} from '../lib/interfaces';
@@ -35,3 +35,4 @@ export { StringHooksFinder } from '../lib/services/core/stringsHookFinder';
 export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
 export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
 export { TagHookFinder } from '../lib/parsers/selector/services/tagHookFinder';
+export * from '../lib/constants/core';

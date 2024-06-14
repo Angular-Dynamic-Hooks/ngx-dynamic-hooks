@@ -13,6 +13,7 @@ import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_M
 import { SettingsResolver } from './settings/settingsResolver';
 import { ContentSanitizer } from './utils/contentSanitizer';
 import { AutoPlatformService } from './platform/autoPlatformService';
+import { ElementHooksFinder } from './core/elementHookFinder';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
@@ -29,6 +30,7 @@ export class DynamicHooksService {
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
     private settingsResolver: SettingsResolver,
     private stringHooksFinder: StringHooksFinder,
+    private elementHooksFinder: ElementHooksFinder,
     private contentSanitizer: ContentSanitizer,
     private componentCreator: ComponentCreator,
     private platformService: AutoPlatformService,
@@ -65,7 +67,7 @@ export class DynamicHooksService {
 
     // If no container element given, create one
     if (targetElement === null) {
-      targetElement = this.platformService.createElement('div') as HTMLElement;
+      targetElement = this.platformService.createElement('div');
     }
 
     // Resolve options and parsers
@@ -105,8 +107,8 @@ export class DynamicHooksService {
       // then find string hooks in existing elements
     }
 
-    // TODO: Find all element hooks
-
+    // Find all element hooks
+    targetHookIndex = this.elementHooksFinder.find(virtualContentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
 
     // Sanitize?
     if (resolvedOptions?.sanitize) {

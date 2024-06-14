@@ -36,6 +36,26 @@ export class DefaultPlatformService implements CompletePlatformService {
     return this.renderer.createElement(tagName);
   }
 
+  sortElements(a: Element, b: Element): number {
+    if ( a === b) return 0;
+
+    if ( !a.compareDocumentPosition) {
+      // support for IE8 and below
+      return (a as any).sourceIndex - (b as any).sourceIndex;
+    }
+
+    if ( a.compareDocumentPosition(b) & 2) {
+      // b comes before a
+      return 1;
+    }
+
+    return -1;
+  }
+
+  cloneElement(element: Element) {
+    return element.cloneNode();
+  }
+
   getTagName(element: Element) {
     return element.tagName;
   }

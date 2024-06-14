@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { matchAll } from './polyfills/matchAll';
+import { matchAll } from './utils';
 
 interface TextSegment {
   startIndex: number;

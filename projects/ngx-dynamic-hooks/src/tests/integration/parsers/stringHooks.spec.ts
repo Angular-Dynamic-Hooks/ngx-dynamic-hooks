@@ -1,7 +1,7 @@
 // Custom testing resources
 import { defaultBeforeEach } from '../shared';
 import { TestBedStatic, fakeAsync } from '@angular/core/testing';
-import { DynamicHooksComponent, DynamicHooksService } from '../../testing-api';
+import { DynamicHooksComponent } from '../../testing-api';
 import { NonServiceTestParser } from '../../resources/parsers/nonServiceTestParser';
 
 describe('Parser string hooks', () => {
@@ -253,7 +253,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHooksFinder['validateHookPositions'](parserResults, '');
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - The closing tag must start after the opening tag has concluded. Ignoring.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.');
 
     // closingTagEndIndex must be greater than closingTagStartIndex
     parserResults = [{
