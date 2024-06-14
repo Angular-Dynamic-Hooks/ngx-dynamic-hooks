@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, HookFinder, SelectorHookParser, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, HookFinder, SelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from '../shared';
@@ -65,8 +65,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <multitagtest');
-    expect(fixture.nativeElement.children[0].tagName).toBe('MULTITAGTEST');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
 
     // Should be able to load parsers that are object literals (SelectorHookParser)
@@ -77,8 +77,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <singletagtest');
-    expect(fixture.nativeElement.children[0].tagName).toBe('SINGLETAGTEST');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should be able to load parsers that are services
@@ -89,8 +89,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('GenericSingleTagParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <singletagtest');
-    expect(fixture.nativeElement.children[0].tagName).toBe('SINGLETAGTEST');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should be able to load parsers that are classes
@@ -101,8 +101,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('NonServiceTestParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <singletagtest');
-    expect(fixture.nativeElement.children[0].tagName).toBe('SINGLETAGTEST');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should be able to load parsers that are instances
@@ -113,8 +113,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('NonServiceTestParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <singletagtest');
-    expect(fixture.nativeElement.children[0].tagName).toBe('SINGLETAGTEST');
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should ignore invalid parser entries

@@ -1,7 +1,7 @@
 // Custom testing resources
 import { defaultBeforeEach } from '../shared';
 import { TestBedStatic, fakeAsync } from '@angular/core/testing';
-import { DynamicHooksComponent } from '../../testing-api';
+import { DynamicHooksComponent, anchorElementTag } from '../../testing-api';
 import { NonServiceTestParser } from '../../resources/parsers/nonServiceTestParser';
 
 describe('Parser string hooks', () => {
@@ -97,7 +97,7 @@ describe('Parser string hooks', () => {
 
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(fixture.nativeElement.children.length).toBe(1);
-    expect(fixture.nativeElement.children[0].tagName).toBe('MULTITAGTEST');
+    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
     const multiTagHostElement = fixture.nativeElement.children[0];
 
     expect(multiTagHostElement.children.length).toBe(1);
@@ -199,14 +199,14 @@ describe('Parser string hooks', () => {
     expect(firstLi.innerText).toBe('This is the first li-element.');
 
     const secondLi = ul.children[1];
-    expect(secondLi.innerHTML).toContain('This is the <whatevertest');
+    expect(secondLi.innerHTML).toContain('This is the <' + anchorElementTag);
     expect(secondLi.children[0].children[0].className).toBe('whatever-component');
     expect(secondLi.children[0].children[0].innerText.trim()).toBe('second');
-    expect(secondLi.innerHTML).toContain('</whatevertest> li-element. It has a component <singletagtest');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> li-element. It has a component <' + anchorElementTag);
     expect(secondLi.children[1].children[0].className).toBe('singletag-component');
-    expect(secondLi.innerHTML).toContain('</singletagtest> in it. Lets put another component <singletagtest');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> in it. Lets put another component <' + anchorElementTag);
     expect(secondLi.children[2].children[0].className).toBe('singletag-component');
-    expect(secondLi.innerHTML).toContain('</singletagtest> here.');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> here.');
 
     const thirdLi = ul.children[2];
     expect(thirdLi.innerHTML).toContain('This is the third li-element. It has a <a ');

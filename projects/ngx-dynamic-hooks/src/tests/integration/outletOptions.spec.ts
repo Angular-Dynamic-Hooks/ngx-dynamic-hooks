@@ -1,7 +1,7 @@
 // Testing api resources
 import { TestBed } from '@angular/core/testing';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { DynamicHooksComponent, OutletOptions, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, OutletOptions, anchorElementTag, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
@@ -195,7 +195,7 @@ describe('OutletOptions', () => {
     expect(fixture.nativeElement.children.length).toBe(2);
     expect(fixture.nativeElement.children[0].tagName).toBe('P');
     expect(fixture.nativeElement.children[0].textContent).toBe('Textbox in seperate HTML-tags, with contained HTML:');
-    expect(fixture.nativeElement.children[1].tagName).toBe('MULTITAGTEST');
+    expect(fixture.nativeElement.children[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(fixture.nativeElement.children[1].children.length).toBe(1);
     expect(fixture.nativeElement.children[1].children[0].className).toBe('multitag-component');
     expect(Object.keys(comp.hookIndex).length).toBe(1);

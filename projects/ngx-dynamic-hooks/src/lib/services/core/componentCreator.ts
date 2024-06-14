@@ -50,8 +50,9 @@ export class ComponentCreator {
         delete hookIndex[hook.id];
         continue;
       }
+      hookHostElements[hookId] = anchorElement;
 
-      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(anchorElement));
+      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(hookHostElements[hookId]));
       hook.isLazy = hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName');
 
       // Skip loading lazy components during SSR
@@ -60,8 +61,17 @@ export class ComponentCreator {
         continue;
       }
 
-      // Replace placeholder element with component selector element (or a generic anchor element if lazy-loaded)
-      hookHostElements[hookId] = hook.isLazy ? anchorElement : this.replaceAnchorElement(anchorElement, hook.data.component as new(...args: any[]) => any);
+      /*
+      * Replace anchor element with custom one, if desired. Do this before loading any components.
+      * 
+      * Explanation: 
+      * When a component is created, one of its projectableNodes happens to be another components anchor element, but the parent component doesn't render the anchor right away
+      * (due to *ngIf, for example), you can't replace that anchor anymore as it is now tracked in Angular's memory as a reference. And that exact reference will 
+      * be rendered when the component's *ngIf eventually resolved to true.
+      */
+      if (hook.data.hostElementTag) {
+        hookHostElements[hookId] = this.useCustomHostElement(hookHostElements[hookId], hook.data.hostElementTag);
+      }
 
       // Insert child content according to hook.data immediately
       // This has the benefit that if the child content is custom, the next iterations of this loop will throw out all hooks whose placeholder elements 
@@ -77,8 +87,6 @@ export class ComponentCreator {
         // Load component class first (might be lazy-loaded)
         .pipe(mergeMap(() => this.loadComponentClass(hook.data!.component)))
         .pipe(tap((compClass) => {
-          // Check if the host element is simply an anchor for a lazily-loaded component. If so, insert proper selector now.
-          hookHostElements[hookId] = hook.isLazy ? this.replaceAnchorElement(hookHostElements[hookId], compClass, true) : hookHostElements[hookId];
           // Get projectableNodes from the content slots
           const projectableNodes = this.extractContentSlotElements(hookHostElements[hookId], token);
           // Instantiate component
@@ -140,46 +148,31 @@ export class ComponentCreator {
   // ----------------------------------------------------------------------------------------------------------------
 
   /**
-   * Replaces a placeholder anchor element created in HooksReplacer with the actual component selector elements.
-   * If a component is lazily-loaded however, the selector element is instead inserted as a child
-   *
-   * Explanation: 
-   * When a component is created, one of its projectableNodes happens to be a placeholder element, but that component doesn't render the placeholder right away
-   * (due to *ngIf, for example), you can't replace that placeholder anymore as it now exclusively exists in Angular's memory as a reference. And that exact reference will 
-   * be rendered when the component decides to show it. The only thing you can do is insert children into that reference.
-   *
-   * @param anchorElement - The preliminary anchor placeholder element
-   * @param compClass - The loaded component class
-   * @param insertAsChild - Whether to replace the anchor element with the new selector element or insert it as a child
+   * Replaces a default anchor element with a custom element 
+   * 
+   * @param anchorElement - The default component anchor element
+   * @param customTagName - The custom tag that should be used instead
    */
-  replaceAnchorElement(anchorElement: any, compClass: new(...args: any[]) => any, insertAsChild: boolean = false): any {
-    const selector = reflectComponentType(compClass)!.selector;
-    const selectorElement = this.platformService.createElement(selector);
+  useCustomHostElement(anchorElement: any, customTagName: string): any {
+    const customHostElement = this.platformService.createElement(customTagName);
 
     // Move attributes to selector
-    this.platformService.setAttribute(selectorElement, anchorAttrHookId, this.platformService.getAttribute(anchorElement, anchorAttrHookId)!);
-    this.platformService.setAttribute(selectorElement, anchorAttrParseToken, this.platformService.getAttribute(anchorElement, anchorAttrParseToken)!);
+    this.platformService.setAttribute(customHostElement, anchorAttrHookId, this.platformService.getAttribute(anchorElement, anchorAttrHookId)!);
+    this.platformService.setAttribute(customHostElement, anchorAttrParseToken, this.platformService.getAttribute(anchorElement, anchorAttrParseToken)!);
     this.platformService.removeAttribute(anchorElement, anchorAttrHookId);
     this.platformService.removeAttribute(anchorElement, anchorAttrParseToken);
 
     // Move child nodes to selector
     const childNodes = this.platformService.getChildNodes(anchorElement);
     for (const node of childNodes) {
-      this.platformService.appendChild(selectorElement, node);
+      this.platformService.appendChild(customHostElement, node);
     }
 
-    // Replace anchorElement or insert as child of anchorElement
-    if (insertAsChild) {
-      // Add selector name as class to anchor (for easier identification via css and such)
-      this.platformService.setAttribute(anchorElement, 'class', (this.platformService.getAttribute(anchorElement, 'class') || '') + (selector + '-anchor'));
-      this.platformService.appendChild(anchorElement, selectorElement);
+    // Replace anchorElement
+    this.platformService.insertBefore(this.platformService.getParentNode(anchorElement)!, customHostElement, anchorElement);
+    this.platformService.removeChild(this.platformService.getParentNode(anchorElement)!, anchorElement);
 
-    } else {
-      this.platformService.insertBefore(this.platformService.getParentNode(anchorElement)!, selectorElement, anchorElement);
-      this.platformService.removeChild(this.platformService.getParentNode(anchorElement)!, anchorElement);
-    }
-
-    return selectorElement;
+    return customHostElement;
   }
 
   /**
