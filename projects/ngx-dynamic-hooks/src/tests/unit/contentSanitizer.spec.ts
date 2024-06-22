@@ -94,7 +94,7 @@ describe('ContentSanitizer', () => {
     expect(spanEl!.getAttribute('id')).toBeNull();
     expect(spanEl!.innerHTML).toContain('This is the second anchor');
 
-    // Anchor should still exist, but only have only safe attributes left
+    // Anchor should still exist, but only have safe attributes left
     let firstAnchor = contentElement.querySelector(`[${anchorAttrHookId}="1"][${anchorAttrParseToken}="${parseToken}"]`);
     secondAnchor = contentElement.querySelector(`[${anchorAttrHookId}="2"][${anchorAttrParseToken}="${parseToken}"]`);
     expect(firstAnchor).not.toBe(null);

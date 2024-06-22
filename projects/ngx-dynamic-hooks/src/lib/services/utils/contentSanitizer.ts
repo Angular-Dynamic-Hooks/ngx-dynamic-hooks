@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { HookIndex } from '../../interfacesPublic';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
+import { HookFinder } from './hookFinder';
+import { matchAll } from './utils';
+
+const sanitizerPlaceholderTag = 'dynamic-hooks-sanitization-placeholder';
 
 /**
  * A utility service that sanitizes an Element and all of its children while exluding found hook elements
@@ -10,7 +14,7 @@ import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
   providedIn: 'root'
 })
 export class ContentSanitizer {
-  sanitizerPlaceholderClass = '_ngx_dynamic_hooks_sanitize_placeholder';
+  
   attrWhitelist = [anchorAttrHookId, anchorAttrParseToken, 'class', 'href', 'src']
 
   constructor(private platformService: AutoPlatformService) {}
@@ -18,7 +22,8 @@ export class ContentSanitizer {
   sanitize(contentElement: Element, hookIndex: HookIndex, token: string): Element {
     const originalHookAnchors: {[key: string]: Element} = {};
 
-    // Replace all found hook anchors with placeholders that survive sanitization
+    // Replace all hook anchors with custom placeholder elements
+    // This is so the browser has no predefined rules where they can and can't exist in the dom hierarchy and doesn't edit the html.
     for (const hook of Object.values(hookIndex)) {
       const anchorElement = this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}="${hook.id}"][${anchorAttrParseToken}="${token}"]`)?.[0];
       if (anchorElement) {
@@ -27,9 +32,9 @@ export class ContentSanitizer {
         const parentElement = this.platformService.getParentNode(anchorElement);
         const childNodes = this.platformService.getChildNodes(anchorElement);
 
-        // Use spans for placeholders. Browsers care about its placement and content the least. Only not allowed in certain parts of tables and direct ul/ol child.
-        const placeholderElement = this.platformService.createElement('span');
-        this.platformService.setAttribute(placeholderElement, 'class', `${this.sanitizerPlaceholderClass}_${hook.id}_${token}`);
+        const placeholderElement = this.platformService.createElement(sanitizerPlaceholderTag);
+        this.platformService.setAttribute(placeholderElement, anchorAttrHookId, hook.id.toString());
+        this.platformService.setAttribute(placeholderElement, anchorAttrParseToken, token);
         this.platformService.insertBefore(parentElement, placeholderElement, anchorElement);
         this.platformService.removeChild(parentElement, anchorElement);
         for (const node of childNodes) {
@@ -37,15 +42,22 @@ export class ContentSanitizer {
         }
       }
     }
-    
+
+    // Encode sanitization placeholders (so they survive sanitization)
+    let innerHTML = this.platformService.getInnerContent(contentElement);
+    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`<${sanitizerPlaceholderTag}.*>`, 'g'));
+    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`</${sanitizerPlaceholderTag}.*>`, 'g'));
+
     // Sanitize
-    const innerHTML = this.platformService.getInnerContent(contentElement);
-    const sanitizedInnerHtml = this.platformService.sanitize(innerHTML);
+    let sanitizedInnerHtml = this.platformService.sanitize(innerHTML);
+
+    // Decode sanitization placeholders
+    sanitizedInnerHtml = this.decodeTagString(sanitizedInnerHtml);
     contentElement.innerHTML = sanitizedInnerHtml || '';
 
     // Restore original hook anchors
     for (const [hookId, anchorElement] of Object.entries(originalHookAnchors)) {
-      const placeholderElement = this.platformService.querySelectorAll(contentElement, `.${this.sanitizerPlaceholderClass}_${hookId}_${token}`)?.[0];
+      const placeholderElement = this.platformService.querySelectorAll(contentElement, `${sanitizerPlaceholderTag}[${anchorAttrHookId}="${hookId}"]`)?.[0];
       if (placeholderElement) {
         const parentElement = this.platformService.getParentNode(placeholderElement);
         const childNodes = this.platformService.getChildNodes(placeholderElement);
@@ -102,6 +114,62 @@ export class ContentSanitizer {
       }
 
       return element;
+  }
+
+  // En/decoding placeholders
+  // ------------------------
+
+  /**
+   * Finds and encodes all tags that match the specified regex so that they survive sanitization
+   * 
+   * @param content - The stringified html content to search
+   * @param substrRegex - The regex that matches the element tags
+   */
+  findAndEncodeTags(content: string, substrRegex: RegExp): string {
+    let encodedContent = content;
+
+    const positions = [];
+    for (const match of matchAll(content, substrRegex)) {
+      positions.push({
+        startIndex: match.index,
+        endIndex: match.index + match[0].length
+      });
+    }
+
+    // Replace from the back
+    positions.sort((a, b) => b.startIndex - a.endIndex);
+    for (const position of positions) {
+      const textBeforeSelector = encodedContent.substring(0, position.startIndex);
+      const encodedPlaceholder = this.encodeTagString(encodedContent.substring(position.startIndex, position.endIndex));
+      const textAfterSelector = encodedContent.substring(position.endIndex);
+      encodedContent = textBeforeSelector + encodedPlaceholder + textAfterSelector;
+    }
+
+    return encodedContent;
+  }
+
+  /**
+   * Encodes the special html chars in a html tag so that is is considered a harmless string
+   *
+   * @param element - The element as a string
+   */
+  private encodeTagString(element: string): string {
+    element = element.replace(/</g, '@@@hook-lt@@@');
+    element = element.replace(/>/g, '@@@hook-gt@@@');
+    element = element.replace(/"/g, '@@@hook-dq@@@');
+    return element;
+  }
+
+  /**
+   * Decodes the special html chars in a component placeholder tag
+   *
+   * @param element - The element as a string
+   */
+  private decodeTagString(element: string): string {
+    element = element.replace(/@@@hook-lt@@@/g, '<');
+    element = element.replace(/@@@hook-gt@@@/g, '>');
+    element = element.replace(/@@@hook-dq@@@/g, '"');
+    return element;
   }
 
 }

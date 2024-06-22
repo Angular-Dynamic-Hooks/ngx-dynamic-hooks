@@ -31,7 +31,7 @@ export { OptionsResolver } from '../lib/services/settings/optionsResolver';
 export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/services/core/componentCreator';
 export { ComponentUpdater } from '../lib/services/core/componentUpdater';
-export { StringHooksFinder } from '../lib/services/core/stringsHookFinder';
+export { StringHooksFinder } from '../lib/services/core/stringHookFinder';
 export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
 export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
 export { TagHookFinder } from '../lib/parsers/selector/services/tagHookFinder';

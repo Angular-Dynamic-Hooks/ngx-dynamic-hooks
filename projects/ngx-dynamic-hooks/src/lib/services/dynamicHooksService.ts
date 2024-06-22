@@ -5,7 +5,7 @@ import { first, map } from 'rxjs/operators';
 import { HookIndex } from '../interfacesPublic';
 import { OutletParseResult } from '../interfacesPublic';
 import { OutletOptions } from './settings/options';
-import { StringHooksFinder } from './core/stringsHookFinder';
+import { StringHooksFinder } from './core/stringHookFinder';
 import { ComponentCreator } from './core/componentCreator';
 import { DynamicHooksSettings } from './settings/settings';
 import { HookParserEntry } from './settings/parserEntry';
