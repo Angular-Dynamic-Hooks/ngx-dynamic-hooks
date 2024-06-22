@@ -45,8 +45,7 @@ export class ContentSanitizer {
 
     // Encode sanitization placeholders (so they survive sanitization)
     let innerHTML = this.platformService.getInnerContent(contentElement);
-    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`<${sanitizerPlaceholderTag}.*>`, 'g'));
-    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`</${sanitizerPlaceholderTag}.*>`, 'g'));
+    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`<\/?${sanitizerPlaceholderTag}.*>`, 'g'));
 
     // Sanitize
     let sanitizedInnerHtml = this.platformService.sanitize(innerHTML);
