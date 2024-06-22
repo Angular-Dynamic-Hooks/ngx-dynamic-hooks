@@ -17,7 +17,7 @@ describe('Parser string hooks', () => {
   // ----------------------------------------------------------------------------
 
   it('#should load a single tag dynamic component', () => {
-    const testText = `<p>This p-element has a <span>span-element with a component [generic-singletagtest] within it.</p>`;
+    const testText = `<p>This p-element has a <span>span-element with a component [singletag-string] within it.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -28,7 +28,7 @@ describe('Parser string hooks', () => {
   });
 
   it('#should load a multi tag dynamic component', () => {
-    const testText = `<p>This is a multi tag component [generic-multitagtest]This is the inner content.[/generic-multitagtest].</p>`;
+    const testText = `<p>This is a multi tag component [multitag-string]This is the inner content.[/multitag-string].</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -39,23 +39,9 @@ describe('Parser string hooks', () => {
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.innerText).toBe('This is the inner content.');
   });
-  
-  it('#should load just the text if there are no dynamic components', () => {
-    const testText = `
-    <div>
-      <p>This is a bit of prose. If has no dynamic components in it.</p>
-      <p>Hopefully, this does not cause the app to explode.</p>
-    </div>
-    `;
-    comp.content = testText;
-    comp.ngOnChanges({content: true} as any);
-
-    expect(fixture.nativeElement.innerHTML.trim()).toBe(testText.trim());
-    expect(Object.values(comp.hookIndex).length).toBe(0);
-  });
 
   it('#should load component hooks without any text surrounding them', () => {
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -65,7 +51,7 @@ describe('Parser string hooks', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
 
     // Try with multitag
-    comp.content = `[generic-multitagtest][/generic-multitagtest]`;
+    comp.content = `[multitag-string][/multitag-string]`;
     comp.ngOnChanges({content: true} as any);
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
@@ -83,14 +69,13 @@ describe('Parser string hooks', () => {
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
   });
-
   
   it('#should load nested content correctly', fakeAsync(() => {
     const testText = `
-      [generic-multitagtest]
+      [multitag-string]
         <h1 class="the-title">Hello there!</h1>
         <p class="the-text">this is some text</p>
-      [/generic-multitagtest]
+      [/multitag-string]
     `;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
@@ -115,19 +100,19 @@ describe('Parser string hooks', () => {
   it('#should load nested content with components correctly', () => {
     const testText = `
     <p>Some advanced nesting:
-      [generic-multitagtest]
-        [generic-multitagtest]
+      [multitag-string]
+        [multitag-string]
           lorem ipsum dolor sit amet
-          [generic-singletagtest]
-          [generic-multitagtest]
+          [singletag-string]
+          [multitag-string]
             here is some deeply nested text
-            [generic-whatever]some inline text[/generic-whatever]
+            [whatever-string]some inline text[/whatever-string]
             <span>And an element in between</span>
-            [generic-singletagtest]
-          [/generic-multitagtest]
-        [/generic-multitagtest]
-        [generic-multitagtest][/generic-multitagtest]
-      [/generic-multitagtest]
+            [singletag-string]
+          [/multitag-string]
+        [/multitag-string]
+        [multitag-string][/multitag-string]
+      [/multitag-string]
     </p>`;
 
     comp.content = testText;
@@ -148,13 +133,14 @@ describe('Parser string hooks', () => {
     expect(childComponentOneEl.children[0].className).toBe('singletag-component');
     expect(childComponentTwoEl.children[0].className).toBe('multitag-component');
 
-    const grandcChildComponentOneEl = childComponentTwoEl.children[0].children[0];
-    expect(grandcChildComponentOneEl.innerText).toBe('some inline text');
+    expect(childComponentTwoEl.children[0].childNodes[0].textContent.trim()).toBe('here is some deeply nested text');
+    const grandChildComponentOneEl = childComponentTwoEl.children[0].children[0];
+    expect(grandChildComponentOneEl.innerText).toBe('some inline text');
     const spanInBetween = childComponentTwoEl.children[0].children[1];
-    const grandcChildComponentTwoEl = childComponentTwoEl.children[0].children[2];
-    expect(grandcChildComponentOneEl.children[0].className).toBe('whatever-component');
+    const grandChildComponentTwoEl = childComponentTwoEl.children[0].children[2];
+    expect(grandChildComponentOneEl.children[0].className).toBe('whatever-component');
     expect(spanInBetween.textContent).toBe('And an element in between');
-    expect(grandcChildComponentTwoEl.children[0].className).toBe('singletag-component');
+    expect(grandChildComponentTwoEl.children[0].className).toBe('singletag-component');
 
     expect(Object.values(comp.hookIndex).length).toBe(7);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
@@ -167,7 +153,7 @@ describe('Parser string hooks', () => {
   });
 
   it('#should not load incorrectly nested content-components', () => {
-    const testText = `<p>Overlapping textboxes: [generic-multitagtest]text from multitag[generic-whatever]text from inline[/generic-multitagtest][/generic-whatever]</p>`;
+    const testText = `<p>Overlapping textboxes: [multitag-string]text from multitag[whatever-string]text from inline[/multitag-string][/whatever-string]</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -181,13 +167,13 @@ describe('Parser string hooks', () => {
     const testText = `
     <ul>
       <li>This is the first li-element.</li>
-      <li>This is the [generic-whatever]second[/generic-whatever] li-element. It has a component [generic-singletagtest] in it. Lets put another component [generic-singletagtest] here.</li>
+      <li>This is the [whatever-string]second[/whatever-string] li-element. It has a component [singletag-string] in it. Lets put another component [singletag-string] here.</li>
       <li>This is the third li-element. It has a <a href="https://www.google.de" target="_blank">link</a>.</li>
       <li>
         <span>And this is the last</span>
-        [generic-multitagtest]
+        [multitag-string]
           <span>element in this test</span>
-        [/generic-multitagtest]
+        [/multitag-string]
         <span>that we are looking at.</span>
       </li>
     </ul>`;
@@ -224,7 +210,7 @@ describe('Parser string hooks', () => {
     expect(fourthLi.children[2].textContent).toBe('that we are looking at.');
   });
 
-  it('#should validate the HookPositions of parsers', () => {
+  it('#should validate the found hook positions', () => {
     const stringHooksFinder = comp['dynamicHooksService']['stringHooksFinder'];
     spyOn(console, 'warn').and.callThrough();
 

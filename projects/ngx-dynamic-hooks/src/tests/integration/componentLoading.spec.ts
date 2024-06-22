@@ -10,9 +10,9 @@ import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
 import { CustomContentParser } from '../resources/parsers/customContentParser';
 import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
-import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
-import { GenericWhateverParser } from '../resources/parsers/genericWhateverParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
 import { ModuleTestComponent } from '../resources/components/moduleTest/moduleTest.c';
 
 describe('Component loading', () => {
@@ -27,6 +27,20 @@ describe('Component loading', () => {
 
   // ----------------------------------------------------------------------------
 
+  it('#should load just the text if there are no dynamic components', () => {
+    const testText = `
+    <div>
+      <p>This is a bit of prose. If has no dynamic components in it.</p>
+      <p>Hopefully, this does not cause the app to explode.</p>
+    </div>
+    `;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(fixture.nativeElement.innerHTML.trim()).toBe(testText.trim());
+    expect(Object.values(comp.hookIndex).length).toBe(0);
+  });
+
   it('#should ensure the passed componentConfig is correct', () => {
     // Load with nonsensical componentConfig
     expect(() => comp['dynamicHooksService']['componentCreator'].loadComponentClass(true as any))
@@ -39,16 +53,16 @@ describe('Component loading', () => {
       declarations: [ModuleTestComponent],
       providers: [
         {provide: ComponentFixtureAutoDetect, useValue: true},
-        provideDynamicHooks({parsers: [GenericWhateverParser]})
+        provideDynamicHooks({parsers: [GenericWhateverStringParser]})
       ]
     });
 
-    const genericWhateverParser = TestBed.inject(GenericWhateverParser);
+    const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
     genericWhateverParser.component = ModuleTestComponent;
   
     const fixture = TestBed.createComponent(DynamicHooksComponent);
     const comp = fixture.componentInstance;
-    comp.content = '[generic-whatever][/generic-whatever]';
+    comp.content = '[whatever-string][/whatever-string]';
     comp.ngOnChanges({content: true} as any);
 
     expect(Object.keys(comp.hookIndex).length).toBe(1);
@@ -61,13 +75,13 @@ describe('Component loading', () => {
     TestBed.configureTestingModule({
       providers: [
         {provide: ComponentFixtureAutoDetect, useValue: true},
-        provideDynamicHooks({parsers: [GenericSingleTagParser]})
+        provideDynamicHooks({parsers: [GenericSingleTagStringParser]})
       ]
     });
   
     const fixture = TestBed.createComponent(DynamicHooksComponent);
     const comp = fixture.componentInstance;
-    comp.content = '[generic-singletagtest][/generic-singletagtest]';
+    comp.content = '[singletag-string][/singletag-string]';
     comp.ngOnChanges({content: true} as any);
 
     expect(Object.keys(comp.hookIndex).length).toBe(1);
@@ -76,12 +90,12 @@ describe('Component loading', () => {
   });
 
   it('#should remove components if they fail to load', () => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     (genericMultiTagParser.onGetBindings as any) = () => {
       throw new Error('Failed to load bindings for example');
     }
 
-    const testText = `[generic-multitagtest]This is the inner content.[/generic-multitagtest]`;
+    const testText = `[multitag-string]This is the inner content.[/multitag-string]`;
     comp.content = testText;
     spyOn(console, 'error');
     comp.ngOnChanges({content: true} as any);
@@ -91,10 +105,10 @@ describe('Component loading', () => {
   });
 
   it('#should load child view components normally', () => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.component = ParentTestComponent;
 
-    const testText = `<p>Here's a normal parent component, which should contain its child component as declared in the template: [generic-multitagtest][/generic-multitagtest]</p>`;
+    const testText = `<p>Here's a normal parent component, which should contain its child component as declared in the template: [multitag-string][/multitag-string]</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -123,7 +137,7 @@ describe('Component loading', () => {
     const testText = `
       [customcontent]
         <p>original content</p>
-        [generic-singletagtest]
+        [singletag-string]
       [/customcontent]
     `;
     comp.content = testText;
@@ -146,7 +160,7 @@ describe('Component loading', () => {
   });
 
   it('#should trigger ngOnInit() after component creation', () => {
-    const testText = `Just some component: [generic-singletagtest]`;
+    const testText = `Just some component: [singletag-string]`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -157,28 +171,28 @@ describe('Component loading', () => {
 
   it('#should correctly trigger onDynamicMount() on init', () => {
     const testText = `
-    [generic-multitagtest]
+    [multitag-string]
       bla bla
-      [generic-singletagtest]
+      [singletag-string]
       <p>some<b>text</b></p>
       <div>
-        [generic-multitagtest]
-          [generic-singletagtest]
-          [generic-multitagtest]
-            [generic-multitagtest]
-              [generic-whatever][/generic-whatever]
-            [/generic-multitagtest]
-            [generic-singletagtest]
-          [/generic-multitagtest]
+        [multitag-string]
+          [singletag-string]
+          [multitag-string]
+            [multitag-string]
+              [whatever-string][/whatever-string]
+            [/multitag-string]
+            [singletag-string]
+          [/multitag-string]
           yada yada
           <ul>
             <li>first li</li>
-            <li>second li with [generic-whatever][/generic-whatever]</li>
+            <li>second li with [whatever-string][/whatever-string]</li>
             <li>third li</li>
           </ul>
-        [/generic-multitagtest]
+        [/multitag-string]
       </div>
-    [/generic-multitagtest]`;
+    [/multitag-string]`;
 
     comp.content = testText;
     comp.context = context;
@@ -211,35 +225,35 @@ describe('Component loading', () => {
     expect(one_multiTagComp.mountContentChildren.length).toBe(2);
     expect(one_multiTagComp.mountContentChildren[0].componentRef).toBeDefined();
     expect(one_multiTagComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
-    expect(one_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(one_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].componentRef).toBeDefined();
     expect(one_multiTagComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
-    expect(one_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(one_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren.length).toBe(3);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren.length).toBe(2);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren.length).toBe(1);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren[1].contentChildren.length).toBe(0);
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].componentRef).toBeDefined();
-    expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(one_multiTagComp.mountContentChildren[1].contentChildren[2].contentChildren.length).toBe(0);
 
     expect(two_singleTagComp.mountContentChildren.length).toBe(0);
@@ -247,27 +261,27 @@ describe('Component loading', () => {
     expect(two_multiTagComp.mountContentChildren.length).toBe(3);
     expect(two_multiTagComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(two_multiTagComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(two_multiTagComp.mountContentChildren[0].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[1].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(two_multiTagComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren.length).toBe(2);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren.length).toBe(1);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(two_multiTagComp.mountContentChildren[1].contentChildren[1].contentChildren.length).toBe(0);
     expect(two_multiTagComp.mountContentChildren[2].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(two_multiTagComp.mountContentChildren[2].componentRef).toBeDefined();
-    expect(two_multiTagComp.mountContentChildren[2].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(two_multiTagComp.mountContentChildren[2].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(two_multiTagComp.mountContentChildren[2].contentChildren.length).toBe(0);
 
     expect(three_singleTagComp.mountContentChildren.length).toBe(0);
@@ -275,21 +289,21 @@ describe('Component loading', () => {
     expect(three_customComp.mountContentChildren.length).toBe(2);
     expect(three_customComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(three_customComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-multitagtest]', closingTag: '[/generic-multitagtest]', element: null});
+    expect(three_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[multitag-string]', closingTag: '[/multitag-string]', element: null});
     expect(three_customComp.mountContentChildren[0].contentChildren.length).toBe(1);
     expect(three_customComp.mountContentChildren[0].contentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(three_customComp.mountContentChildren[0].contentChildren[0].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(three_customComp.mountContentChildren[0].contentChildren[0].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(three_customComp.mountContentChildren[0].contentChildren[0].contentChildren.length).toBe(0);
     expect(three_customComp.mountContentChildren[1].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(three_customComp.mountContentChildren[1].componentRef).toBeDefined();
-    expect(three_customComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[generic-singletagtest]', closingTag: null, element: null});
+    expect(three_customComp.mountContentChildren[1].hookValue).toEqual({openingTag: '[singletag-string]', closingTag: null, element: null});
     expect(three_customComp.mountContentChildren[1].contentChildren.length).toBe(0);
 
     expect(four_customComp.mountContentChildren.length).toBe(1);
     expect(four_customComp.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(four_customComp.mountContentChildren[0].componentRef).toBeDefined();
-    expect(four_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[generic-whatever]', closingTag: '[/generic-whatever]', element: null});
+    expect(four_customComp.mountContentChildren[0].hookValue).toEqual({openingTag: '[whatever-string]', closingTag: '[/whatever-string]', element: null});
     expect(four_customComp.mountContentChildren[0].contentChildren.length).toBe(0);
 
     expect(four_singleTagComp.mountContentChildren.length).toBe(0);
@@ -300,7 +314,7 @@ describe('Component loading', () => {
   });
 
   it('#should correctly trigger onDynamicChanges() on context reference change', () => {
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -327,7 +341,7 @@ describe('Component loading', () => {
   });
 
   it('#should activate change detection for dynamically loaded components', () => {
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -336,7 +350,7 @@ describe('Component loading', () => {
       }
     }
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -357,8 +371,8 @@ describe('Component loading', () => {
   it('#should activate dependency injection for dynamically loaded components', () => {
     const testText = `
     <p>
-      This is the first component. It uses constructor injection: [generic-singletagtest].
-      This is the second component. It uses the inject() function: [generic-multitagtest][/generic-multitagtest].
+      This is the first component. It uses constructor injection: [singletag-string].
+      This is the second component. It uses the inject() function: [multitag-string][/multitag-string].
     </p>
     `;
     comp.content = testText;
@@ -383,7 +397,7 @@ describe('Component loading', () => {
   });
 
   it('#should trigger componentsLoaded when all components have loaded', () => {
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -392,7 +406,7 @@ describe('Component loading', () => {
       }
     }
 
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -401,7 +415,7 @@ describe('Component loading', () => {
       }
     }
 
-    const genericWhateverParser = TestBed.inject(GenericWhateverParser);
+    const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
     genericWhateverParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -412,10 +426,10 @@ describe('Component loading', () => {
 
     const testText = `
       <p>Let's load a couple of components like</p>
-      [generic-singletagtest]
-      [generic-multitagtest]
-        [generic-whatever][/generic-whatever]
-      [/generic-multitagtest]
+      [singletag-string]
+      [multitag-string]
+        [whatever-string][/whatever-string]
+      [/multitag-string]
       <p>Really cool stuff.</p>
     `;
 
@@ -433,23 +447,23 @@ describe('Component loading', () => {
     expect(loadedComponents.length).toBe(3);
 
     expect(loadedComponents[0].hookId).toBe(1);
-    expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null, element: null});
+    expect(loadedComponents[0].hookValue as any).toEqual({openingTag: `[singletag-string]`, closingTag: null, element: null});
     expect(loadedComponents[0].hookParser).toBeDefined();
     expect(loadedComponents[0].componentRef.instance.stringProp).toBe('some random sentence');
 
     expect(loadedComponents[1].hookId).toBe(2);
-    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`, element: null});
+    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[multitag-string]`, closingTag: `[/multitag-string]`, element: null});
     expect(loadedComponents[1].hookParser).toBeDefined();
     expect(loadedComponents[1].componentRef.instance.nr).toBe(99);
 
     expect(loadedComponents[2].hookId).toBe(3);
-    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`, element: null});
+    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[whatever-string]`, closingTag: `[/whatever-string]`, element: null});
     expect(loadedComponents[2].hookParser).toBeDefined();
     expect(loadedComponents[2].componentRef.instance.nr).toBe(1000);
   });
 
   it('#should lazy-load components', fakeAsync(() => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -459,7 +473,7 @@ describe('Component loading', () => {
     }
 
     // Whatever parsers lazy-loads a component for this test
-    const genericWhateverParser = TestBed.inject(GenericWhateverParser);
+    const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
     genericWhateverParser.component = {
       // Simulate that loading this component takes 100ms
       importPromise: () => new Promise(resolve => setTimeout(() => {
@@ -475,7 +489,7 @@ describe('Component loading', () => {
       }
     }
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -487,10 +501,10 @@ describe('Component loading', () => {
     const testText = `
       <p>
         A couple of components:
-        [generic-multitagtest]
-          [generic-whatever][/generic-whatever]
-        [/generic-multitagtest]
-        [generic-singletagtest]
+        [multitag-string]
+          [whatever-string][/whatever-string]
+        [/multitag-string]
+        [singletag-string]
       </p>
     `;
 
@@ -552,23 +566,23 @@ describe('Component loading', () => {
     expect(loadedComponents.length).toBe(3);
 
     expect(loadedComponents[0].hookId).toBe(1);
-    expect(loadedComponents[0].hookValue).toEqual({openingTag: `[generic-multitagtest]`, closingTag: `[/generic-multitagtest]`, element: null});
+    expect(loadedComponents[0].hookValue).toEqual({openingTag: `[multitag-string]`, closingTag: `[/multitag-string]`, element: null});
     expect(loadedComponents[0].hookParser).toBeDefined();
     expect(loadedComponents[0].componentRef.instance.nr).toBe(4);
 
     expect(loadedComponents[1].hookId).toBe(2);
-    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[generic-whatever]`, closingTag: `[/generic-whatever]`, element: null});
+    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[whatever-string]`, closingTag: `[/whatever-string]`, element: null});
     expect(loadedComponents[1].hookParser).toBeDefined();
     expect(loadedComponents[1].componentRef.instance.name).toBe('sleepy');
 
     expect(loadedComponents[2].hookId).toBe(3);
-    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[generic-singletagtest]`, closingTag: null, element: null});
+    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[singletag-string]`, closingTag: null, element: null});
     expect(loadedComponents[2].hookParser).toBeDefined();
     expect(loadedComponents[2].componentRef.instance.numberProp).toBe(87);
   }));
   
   it('#should check that the "importPromise"-field of lazy-loaded parsers is not the promise itself', () => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.component = {
       // Simulate that loading this component takes 100ms
       importPromise: (new Promise(() => {})) as any,
@@ -576,7 +590,7 @@ describe('Component loading', () => {
     };
 
     spyOn(console, 'error');
-    comp.content = 'Should load here: [generic-multitagtest][/generic-multitagtest]';
+    comp.content = 'Should load here: [multitag-string][/multitag-string]';
     comp.ngOnChanges({content: true, parsers: true} as any);
 
     expect((<any>console.error)['calls'].mostRecent().args[0]).toContain('When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.');
@@ -589,7 +603,7 @@ describe('Component loading', () => {
     ]);
 
     // Whatever parsers lazy-loads a component for this test
-    const genericWhateverParser = TestBed.inject(GenericWhateverParser);
+    const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
     genericWhateverParser.component = {
       // Simulate that loading this component takes 100ms
       importPromise: () => new Promise(resolve => setTimeout(() => {
@@ -598,7 +612,7 @@ describe('Component loading', () => {
       importName: 'LazyTestComponent'
     };
 
-    const testText = `[generic-whatever][/generic-whatever]`;
+    const testText = `[whatever-string][/whatever-string]`;
 
     comp.content = testText;
     comp.context = context;

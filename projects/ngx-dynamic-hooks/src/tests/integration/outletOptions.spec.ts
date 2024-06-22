@@ -5,7 +5,7 @@ import { DynamicHooksComponent, OutletOptions, anchorElementTag, outletOptionDef
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 
 describe('OutletOptions', () => {
   let testBed;
@@ -94,11 +94,11 @@ describe('OutletOptions', () => {
     <script>console.log("somescript");</script>
     <p style="color: blue" onclick="return 'someString'">
       Here is a simple component
-      [generic-multitagtest]
+      [multitag-string]
         <span id="someId">
-          [generic-singletagtest]
+          [singletag-string]
         </span>
-      [/generic-multitagtest]
+      [/multitag-string]
       <custom-element></custom-element>
     </p>`;
     comp.content = testText;
@@ -178,14 +178,14 @@ describe('OutletOptions', () => {
   it('#should fixParagraphTags, if requested', () => {
     const testText = `
       <p>Textbox in seperate HTML-tags, with contained HTML:</p>
-      <p>[generic-multitagtest]</p>
+      <p>[multitag-string]</p>
         <span>This is some text</span>
         <ul>
           <li>menu point 1</li>
           <li>menu point 2</li>
         </ul>
         loose text
-      <p>[/generic-multitagtest]</p>
+      <p>[/multitag-string]</p>
     `;
     comp.content = testText;
     comp.options = { fixParagraphTags: true };
@@ -218,7 +218,7 @@ describe('OutletOptions', () => {
   });
 
   it('#should update on push only, if requested', () => {
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: true};
@@ -255,7 +255,7 @@ describe('OutletOptions', () => {
 
   it('#should compareInputsByValue, if requested', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           inputs: {
@@ -266,7 +266,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
 
     comp.content = testText;
     comp.context = context;
@@ -369,7 +369,7 @@ describe('OutletOptions', () => {
 
   it('#should apply the desired compareByValueDepth', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           inputs: {
@@ -383,7 +383,7 @@ describe('OutletOptions', () => {
     const firstContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 5 }}}}};
     const secondContext = {someObj: {firstLevel: {secondLevel: {thirdLevel: {someValue: 10 }}}}};
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.context = firstContext;
     comp.options = { compareInputsByValue: true, compareByValueDepth: 3 };
@@ -415,7 +415,7 @@ describe('OutletOptions', () => {
 
   it('#should ignoreInputAliases, if requested', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           inputs: {
@@ -427,7 +427,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.options = { ignoreInputAliases: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -451,7 +451,7 @@ describe('OutletOptions', () => {
 
   it('#should ignoreOutputAliases, if requested', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           outputs: {
@@ -463,7 +463,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.options = { ignoreOutputAliases: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -489,7 +489,7 @@ describe('OutletOptions', () => {
 
   it('#should acceptInputsForAnyProperty, if requested', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           inputs: {
@@ -500,7 +500,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.options = { acceptInputsForAnyProperty: true };
     comp.ngOnChanges({content: true, options: true} as any);
@@ -524,7 +524,7 @@ describe('OutletOptions', () => {
 
   it('#should ignore acceptInputsForAnyProperty if special forbidden property', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           inputs: {
@@ -535,7 +535,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {acceptInputsForAnyProperty: true};
@@ -547,7 +547,7 @@ describe('OutletOptions', () => {
 
   it('#should acceptOutputsForAnyObservable, if requested', () => {
     const configureParser = function () {
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
         return {
           outputs: {
@@ -558,7 +558,7 @@ describe('OutletOptions', () => {
     }
     configureParser();
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
     comp.content = testText;
     comp.options = { acceptOutputsForAnyObservable: true };
     comp.ngOnChanges({content: true, options: true} as any);

@@ -5,12 +5,12 @@ import { MultiTagTestComponent } from '../components/multiTagTest/multiTagTest.c
 @Injectable({
   providedIn: 'root'
 })
-export class GenericMultiTagParser implements HookParser {
-  name: string = 'GenericMultiTagParser';
+export class GenericMultiTagStringParser implements HookParser {
+  name: string = 'GenericMultiTagStringParser';
   component: ComponentConfig = MultiTagTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findEnclosingHooks(content, /\[generic-multitagtest\]/g, /\[\/generic-multitagtest\]/g);
+    return this.hookFinder.findEnclosingHooks(content, /\[multitag-string\]/g, /\[\/multitag-string\]/g);
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {

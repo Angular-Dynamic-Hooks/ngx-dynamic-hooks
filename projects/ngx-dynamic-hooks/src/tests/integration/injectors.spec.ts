@@ -10,7 +10,7 @@ import { Route, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
 import { By } from '@angular/platform-browser';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 
 
 describe('Injectors logic', () => {
@@ -26,7 +26,7 @@ describe('Injectors logic', () => {
   // ----------------------------------------------------------------------------
 
   it('#should use the injectors from DynamicHooksComponent by default. If not specified on manual use, fallback to root injectors', fakeAsync(() => {
-    const testText = '[generic-singletagtest]';
+    const testText = '[singletag-string]';
 
     // Create testing scaffolding: A root module with a lazily loaded child module
     // This is to create a separate (child module) environment injector, so the one injected into DynamicHooksComponent is different to the root one
@@ -52,7 +52,7 @@ describe('Injectors logic', () => {
         ])
       ],
       providers: [
-        provideDynamicHooks({parsers: [GenericSingleTagParser]})
+        provideDynamicHooks({parsers: [GenericSingleTagStringParser]})
       ]
     });
 
@@ -129,11 +129,11 @@ describe('Injectors logic', () => {
         compData.environmentInjector = envInjector;
       }
 
-      let genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+      let genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
       genericSingleTagParser.onLoadComponent = (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => compData;
     }
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
 
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);

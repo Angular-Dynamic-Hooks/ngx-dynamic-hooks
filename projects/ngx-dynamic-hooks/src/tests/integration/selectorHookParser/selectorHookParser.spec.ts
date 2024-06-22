@@ -212,7 +212,7 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true} as any);
 
     // singletag hooks
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings).length).toBe(2);
 
     // First singletag:
@@ -239,7 +239,7 @@ describe('SelectorHookParser', () => {
     expect(Object.keys(singleTagBindings[2].inputs['numberProp'].boundContextVariables).length).toBe(0);
 
     // multitag hooks
-    const multiTagBindings = (comp as any).activeParsers[4]['currentBindings'];
+    const multiTagBindings = (comp as any).activeParsers[6]['currentBindings'];
     expect(Object.keys(multiTagBindings).length).toBe(1);
 
     // First multitag:
@@ -257,7 +257,7 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true} as any);
 
     // simpleObject should not be tracked
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['numberProp'].value).toBe(12345);
   });
@@ -270,20 +270,20 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: true, extra: 'hi, this is a string!'}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: true, extra: "hi, this is a string!"});
     expect(Object.keys(singleTagBindings[1].inputs['simpleObject'].boundContextVariables).length).toBe(0);
 
-    spyOn(comp.activeParsers[3], 'getBindings').and.callThrough();
+    spyOn(comp.activeParsers[5], 'getBindings').and.callThrough();
     const previousRef = singleTagBindings[1].inputs['simpleObject'].value;
 
     // Trigger cd
     comp.ngDoCheck();
 
     // Parser should preserve binding reference on reevaluation
-    expect((comp as any).activeParsers[3].getBindings['calls'].count()).toBe(1);
+    expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].value).toBe(previousRef);
   });
 
@@ -295,21 +295,21 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: context.$lightSaberCollection}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: context.$lightSaberCollection});
     expect(Object.keys(singleTagBindings[1].inputs['simpleObject'].boundContextVariables).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].boundContextVariables['context.$lightSaberCollection']).toBe(context.$lightSaberCollection);
 
-    spyOn(comp.activeParsers[3], 'getBindings').and.callThrough();
+    spyOn(comp.activeParsers[5], 'getBindings').and.callThrough();
     const previousRef = singleTagBindings[1].inputs['simpleObject'].value;
 
     // Trigger cd
     comp.ngDoCheck();
 
     // Parser should preserve binding reference on reevaluation
-    expect((comp as any).activeParsers[3].getBindings['calls'].count()).toBe(1);
+    expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].value).toBe(previousRef);
   });
 
@@ -321,14 +321,14 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: context.$lightSaberCollection}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: context.$lightSaberCollection});
     expect(Object.keys(singleTagBindings[1].inputs['simpleObject'].boundContextVariables).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].boundContextVariables['context.$lightSaberCollection']).toBe(context.$lightSaberCollection);
 
-    spyOn(comp.activeParsers[3], 'getBindings').and.callThrough();
+    spyOn(comp.activeParsers[5], 'getBindings').and.callThrough();
     const previousRef = singleTagBindings[1].inputs['simpleObject'].value;
 
     // Change content and trigger cd
@@ -336,7 +336,7 @@ describe('SelectorHookParser', () => {
     comp.ngDoCheck();
 
     // Parser should preserve binding reference on reevaluation
-    expect((comp as any).activeParsers[3].getBindings['calls'].count()).toBe(1);
+    expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].value).toBe(previousRef);
   });
 
@@ -348,7 +348,7 @@ describe('SelectorHookParser', () => {
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[3]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(2);
 
     expect(singleTagBindings[1].inputs['simpleArray'].raw).toBe("[context.order]");
@@ -365,7 +365,7 @@ describe('SelectorHookParser', () => {
     expect(typeof singleTagBindings[1].outputs['httpResponseReceived'].value).toBe('function');
     expect(Object.keys(singleTagBindings[1].outputs['httpResponseReceived'].boundContextVariables).length).toBe(0); // Can't be known until the event triggers
 
-    spyOn(comp.activeParsers[3], 'getBindings').and.callThrough();
+    spyOn(comp.activeParsers[5], 'getBindings').and.callThrough();
 
     // Change bound property and trigger cd
     let previousArrayRef = singleTagBindings[1].inputs['simpleArray'].value;
@@ -377,7 +377,7 @@ describe('SelectorHookParser', () => {
     comp.ngDoCheck();
 
     // Parser should have changed binding reference on reevaluation
-    expect((comp as any).activeParsers[3].getBindings['calls'].count()).toBe(1);
+    expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[1].inputs['simpleArray'].value).not.toBe(previousArrayRef);
     expect(singleTagBindings[1].inputs['simpleObject'].value).not.toBe(previousObjectRef);
     expect(singleTagBindings[1].outputs['httpResponseReceived'].value).toBe(previousOutputRef); // Output wrapper func refs should never change
@@ -390,7 +390,7 @@ describe('SelectorHookParser', () => {
     context.order = 77;
     context.$lightSaberCollection = ['cyan', 'viridian', 'turquoise'];
     comp.ngDoCheck();
-    expect((comp as any).activeParsers[3].getBindings['calls'].count()).toBe(2);
+    expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(2);
     expect(singleTagBindings[1].inputs['simpleArray'].value).toBe(previousArrayRef);
     expect(singleTagBindings[1].inputs['simpleObject'].value).not.toBe(previousObjectRef);
   });

@@ -6,10 +6,12 @@ import { defaultBeforeEach, prepareTestingModule, testParsers } from '../shared'
 import { SingleTagTestComponent } from '../../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../../resources/components/multiTagTest/multiTagTest.c';
 import { NonServiceTestParser } from '../../resources/parsers/nonServiceTestParser';
-import { GenericSingleTagParser } from '../../resources/parsers/genericSingleTagParser';
-import { GenericMultiTagParser } from '../../resources/parsers/genericMultiTagParser';
-import { GenericWhateverParser } from '../../resources/parsers/genericWhateverParser';
+import { GenericSingleTagStringParser } from '../../resources/parsers/genericSingleTagStringParser';
+import { GenericMultiTagStringParser } from '../../resources/parsers/genericMultiTagStringParser';
+import { GenericWhateverStringParser } from '../../resources/parsers/genericWhateverStringParser';
 import { TestBed } from '@angular/core/testing';
+import { GenericWhateverElementParser } from '../../resources/parsers/genericWhateverElementParser';
+import { GenericMultiTagElementParser } from '../../resources/parsers/genericMultiTagElementParser';
 
 describe('Parser configuration', () => {
   let testBed;
@@ -27,28 +29,32 @@ describe('Parser configuration', () => {
     comp.content = 'something';
     comp.ngOnChanges({content: true} as any);
 
-    expect(comp.activeParsers.length).toBe(6);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagParser));
-    expect(comp.activeParsers[1]).toEqual(jasmine.any(GenericMultiTagParser));
-    expect(comp.activeParsers[2]).toEqual(jasmine.any(GenericWhateverParser));
-    expect(comp.activeParsers[3]).toEqual(jasmine.any(SelectorHookParser));
-    expect(comp.activeParsers[4]).toEqual(jasmine.any(SelectorHookParser));
+    expect(comp.activeParsers.length).toBe(8);
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagStringParser));
+    expect(comp.activeParsers[1]).toEqual(jasmine.any(GenericMultiTagStringParser));
+    expect(comp.activeParsers[2]).toEqual(jasmine.any(GenericWhateverStringParser));
+    expect(comp.activeParsers[3]).toEqual(jasmine.any(GenericMultiTagElementParser));
+    expect(comp.activeParsers[4]).toEqual(jasmine.any(GenericWhateverElementParser));
     expect(comp.activeParsers[5]).toEqual(jasmine.any(SelectorHookParser));
+    expect(comp.activeParsers[6]).toEqual(jasmine.any(SelectorHookParser));
+    expect(comp.activeParsers[7]).toEqual(jasmine.any(SelectorHookParser));
     expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect((comp.activeParsers[1] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.activeParsers[2] as any).component.prototype.constructor.name).toBe('WhateverTestComponent');
-    expect((comp.activeParsers[3] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
-    expect((comp.activeParsers[4] as any)['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp.activeParsers[5] as any)['config'].component.prototype.constructor.name).toBe('WhateverTestComponent');
+    expect((comp.activeParsers[3] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
+    expect((comp.activeParsers[4] as any).component.prototype.constructor.name).toBe('WhateverTestComponent');
+    expect((comp.activeParsers[5] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
+    expect((comp.activeParsers[6] as any)['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
+    expect((comp.activeParsers[7] as any)['config'].component.prototype.constructor.name).toBe('WhateverTestComponent');
   });
 
   it('#should load local parsers correctly', () => {
     comp.content = 'something';
-    comp.parsers = [GenericWhateverParser];
+    comp.parsers = [GenericWhateverStringParser];
     comp.ngOnChanges({content: true, parsers: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0] instanceof GenericWhateverParser).toBeTrue();
+    expect(comp.activeParsers[0] instanceof GenericWhateverStringParser).toBeTrue();
     expect((comp as any).activeParsers[0].component.prototype.constructor.name).toBe('WhateverTestComponent');
   });
 
@@ -82,11 +88,11 @@ describe('Parser configuration', () => {
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should be able to load parsers that are services
-    comp.content = 'This is a sentence with a [generic-singletagtest].';
-    comp.parsers = [GenericSingleTagParser];
+    comp.content = 'This is a sentence with a [singletag-string].';
+    comp.parsers = [GenericSingleTagStringParser];
     comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0].constructor.name).toBe('GenericSingleTagParser');
+    expect(comp.activeParsers[0].constructor.name).toBe('GenericSingleTagStringParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
@@ -156,9 +162,9 @@ describe('Parser configuration', () => {
 
   it('#should check parser names', () => {
     comp.content = 'This text is irrelevant for this test.';
-    comp.parsers = [GenericSingleTagParser, GenericMultiTagParser];
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    comp.parsers = [GenericSingleTagStringParser, GenericMultiTagStringParser];
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     (genericSingleTagParser as any).name = 'IdenticalParserName';
     (genericMultiTagParser as any).name = 'IdenticalParserName';
     spyOn(console, 'warn').and.callThrough();
@@ -184,9 +190,9 @@ describe('Parser configuration', () => {
 
   it('#should apply the parserBlacklist and parserWhitelist, if requested', () => {
     const testText = `
-      <p>[generic-singletagtest]</p>
-      <p>[generic-multitagtest][/generic-multitagtest]</p>
-      <p>[generic-whatever][/generic-whatever]</p>
+      <p>[singletag-string]</p>
+      <p>[multitag-string][/multitag-string]</p>
+      <p>[whatever-string][/whatever-string]</p>
     `;
     comp.content = testText;
     (comp as any).globalParsersBlacklist = null;
@@ -202,10 +208,10 @@ describe('Parser configuration', () => {
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('WhateverTestComponent');
 
-    // Blacklist: Expect that MultiTagComponentParser is not loaded
+    // Blacklist: Expect that GenericMultiTagStringParser is not loaded
     ({testBed, fixture, comp, context} = defaultBeforeEach());
     comp.content = testText;
-    comp.globalParsersBlacklist = ['GenericMultiTagParser'];
+    comp.globalParsersBlacklist = ['GenericMultiTagStringParser'];
     (comp as any).globalParsersWhitelist = null;
     comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
@@ -216,11 +222,11 @@ describe('Parser configuration', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('WhateverTestComponent');
 
-    // WhiteList: Expect that only WhateverTestComponentParser is loaded
+    // WhiteList: Expect that only GenericWhateverStringParser is loaded
     ({testBed, fixture, comp, context} = defaultBeforeEach());
     comp.content = testText;
     (comp as any).globalParsersBlacklist = null;
-    comp.globalParsersWhitelist = ['GenericWhateverParser'];
+    comp.globalParsersWhitelist = ['GenericWhateverStringParser'];
     comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     expect(fixture.nativeElement.querySelector('.singletag-component')).toBeNull();
@@ -229,11 +235,11 @@ describe('Parser configuration', () => {
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('WhateverTestComponent');
 
-    // Both: Expect that only SingleTagTestComponentParser is loaded
+    // Both: Expect that only GenericSingleTagStringParser is loaded
     ({testBed, fixture, comp, context} = defaultBeforeEach());
     comp.content = testText;
-    comp.globalParsersBlacklist = ['GenericMultiTagParser'];
-    comp.globalParsersWhitelist = ['GenericSingleTagParser', 'GenericMultiTagParser'];
+    comp.globalParsersBlacklist = ['GenericMultiTagStringParser'];
+    comp.globalParsersWhitelist = ['GenericSingleTagStringParser', 'GenericMultiTagStringParser'];
     comp.ngOnChanges({content: true, globalParserBlacklist: true, globalParserWhitelist: true} as any);
 
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();

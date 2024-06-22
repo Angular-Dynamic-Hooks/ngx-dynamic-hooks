@@ -9,8 +9,8 @@ import { defaultBeforeEach } from './shared';
 import { ComponentRef } from '@angular/core';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 
 /**
  * DynamicHooksService tests
@@ -30,7 +30,7 @@ describe('DynamicHooksService', () => {
   it('#should create and fill a new HTML-Element by using the DynamicHooksService directly', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -40,7 +40,7 @@ describe('DynamicHooksService', () => {
       }
     }
 
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -50,8 +50,8 @@ describe('DynamicHooksService', () => {
     }
 
     const testText = `
-      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
-      <p>Here's another one: [generic-multitagtest][/generic-multitagtest]</p>
+      <p>This p-element has a <span>span-element with a component [singletag-string]</span> within it.</p>
+      <p>Here's another one: [multitag-string][/multitag-string]</p>
     `;
 
     dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
@@ -71,7 +71,7 @@ describe('DynamicHooksService', () => {
   it('#should fill an existing HTML-Element by using the DynamicHooksService directly', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -81,7 +81,7 @@ describe('DynamicHooksService', () => {
       }
     }
 
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagParser);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -91,8 +91,8 @@ describe('DynamicHooksService', () => {
     }
 
     const testText = `
-      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
-      <p>Here's another one: [generic-multitagtest][/generic-multitagtest]</p>
+      <p>This p-element has a <span>span-element with a component [singletag-string]</span> within it.</p>
+      <p>Here's another one: [multitag-string][/multitag-string]</p>
     `;
 
     const existingElement = document.createElement('article');
@@ -120,7 +120,7 @@ describe('DynamicHooksService', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
     const testText = `
-      <p>This p-element has a <span>span-element with a component [generic-singletagtest]</span> within it.</p>
+      <p>This p-element has a <span>span-element with a component [singletag-string]</span> within it.</p>
     `;
 
     const targetElement = document.createElement('article');
@@ -145,7 +145,7 @@ describe('DynamicHooksService', () => {
   it('#should destroy loaded components on demand', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -155,8 +155,8 @@ describe('DynamicHooksService', () => {
     }
 
     const testText = `
-      [generic-singletagtest]
-      [generic-multitagtest][/generic-multitagtest]
+      [singletag-string]
+      [multitag-string][/multitag-string]
     `;
 
     dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
@@ -187,7 +187,7 @@ describe('DynamicHooksService', () => {
     const dynamicHooksService: DynamicHooksService = TestBed.inject(DynamicHooksService);
 
     let testValue: string = '';
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
@@ -196,7 +196,7 @@ describe('DynamicHooksService', () => {
       }
     }
 
-    const testText = `[generic-singletagtest]`;
+    const testText = `[singletag-string]`;
 
     dynamicHooksService.parse(testText, context).subscribe((outletParseResult: OutletParseResult) => {
       expect(testValue).toBe('');

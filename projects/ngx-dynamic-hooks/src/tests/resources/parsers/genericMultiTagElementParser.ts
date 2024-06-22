@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings, HookFinder, ComponentConfig } from '../../testing-api';
-import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
+import { MultiTagTestComponent } from '../components/multiTagTest/multiTagTest.c';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GenericSingleTagParser implements HookParser {
-  name: string = 'GenericSingleTagParser';
-  component: ComponentConfig = SingleTagTestComponent;
+export class GenericMultiTagElementParser implements HookParser {
+  name: string = 'GenericMultiTagElementParser';
+  component: ComponentConfig = MultiTagTestComponent;
   // Callbacks that you can overwrite for testing
-  onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findStandaloneHooks(content, /\[generic-singletagtest\]/g);
+  onFindHookElements: (contentElement: Element, context: any) => any[] = (contentElement, context) => {
+    return Array.from(contentElement.querySelectorAll('multitag-element'));
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {
@@ -24,8 +24,8 @@ export class GenericSingleTagParser implements HookParser {
   constructor(private hookFinder: HookFinder) {
   }
 
-  public findHooks(content: string, context: any): Array<HookPosition> {
-    return this.onFindHooks(content, context);
+  public findHookElements(contentElement: Element, context: any): any[] {
+    return this.onFindHookElements(contentElement, context);
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData {

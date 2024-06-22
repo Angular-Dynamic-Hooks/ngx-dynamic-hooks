@@ -10,7 +10,7 @@ import { sortElements } from '../utils/utils';
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
  */
-interface ReplaceInstruction {
+export interface ReplaceInstruction {
   startIndex: number;
   endIndex: number;
   replacement: string;
@@ -19,7 +19,7 @@ interface ReplaceInstruction {
 /**
  * Stores a HookPosition along with the parser who found it
  */
-interface ParserFindHooksResult {
+export interface ParserFindHooksResult {
   parser: HookParser;
   hookPosition: HookPosition;
 }
@@ -27,7 +27,7 @@ interface ParserFindHooksResult {
 /**
  * Stores the HookValue as well as the text surrounding it
  */
-interface HookSegments {
+export interface HookSegments {
   enclosing: boolean;
   textBefore: string;
   openingTag: string;

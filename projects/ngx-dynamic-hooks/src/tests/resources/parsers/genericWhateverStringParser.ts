@@ -5,12 +5,12 @@ import { WhateverTestComponent } from '../components/whateverTest/whateverTest.c
 @Injectable({
   providedIn: 'root'
 })
-export class GenericWhateverParser implements HookParser {
-  name: string = 'GenericWhateverParser';
+export class GenericWhateverStringParser implements HookParser {
+  name: string = 'GenericWhateverStringParser';
   component: ComponentConfig = WhateverTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findEnclosingHooks(content, /\[generic-whatever\]/g, /\[\/generic-whatever\]/g);
+    return this.hookFinder.findEnclosingHooks(content, /\[whatever-string\]/g, /\[\/whatever-string\]/g);
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {

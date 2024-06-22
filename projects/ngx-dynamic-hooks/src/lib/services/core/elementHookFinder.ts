@@ -9,7 +9,7 @@ import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
 /**
  * Stores a hook element along with the parser who found it
  */
-interface ParserFindHookElementsResult {
+export interface ParserFindHookElementsResult {
   parser: HookParser;
   hookElement: any;
 }
@@ -33,7 +33,7 @@ export class ElementHooksFinder {
         }
       }
     }
-    parserResults = sortElements(parserResults, this.platformService.sortElements, entry => entry.hookElement);
+    parserResults = sortElements(parserResults, this.platformService.sortElements.bind(this.platformService), entry => entry.hookElement);
 
     // Validate parser results
     parserResults = this.validateHookElements(parserResults, contentElement);

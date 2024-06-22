@@ -4,7 +4,7 @@ import { DynamicHooksComponent } from '../testing-api';
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
 import { TestBed } from '@angular/core/testing';
-import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 
 
 describe('DynamicHooksComponent', () => {
@@ -57,7 +57,7 @@ describe('DynamicHooksComponent', () => {
     spyOn(comp, 'reset').and.callThrough();
 
     // Initialize
-    const testTextOne = `<div>Some random component [generic-multitagtest]with inner content.[/generic-multitagtest]></div>`;
+    const testTextOne = `<div>Some random component [multitag-string]with inner content.[/multitag-string]></div>`;
     comp.content = testTextOne;
     comp.ngOnChanges({content: true} as any);
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
@@ -65,8 +65,8 @@ describe('DynamicHooksComponent', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.parse as any)['calls'].count()).toBe(1);
 
-    // Change 'text'
-    const testTextTwo = `<span>Some other text [generic-singletagtest][generic-multitagtest][/generic-multitagtest]</span>`;
+    // Change 'content'
+    const testTextTwo = `<span>Some other text [singletag-string][multitag-string][/multitag-string]</span>`;
     comp.content = testTextTwo;
     comp.ngOnChanges({content: true} as any);
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
@@ -82,7 +82,7 @@ describe('DynamicHooksComponent', () => {
     expect((comp.parse as any)['calls'].count()).toBe(3);
 
     // Change 'globalParsersBlacklist'
-    const blacklist = ['GenericSingleTagParser'];
+    const blacklist = ['GenericSingleTagStringParser'];
     comp.globalParsersBlacklist = blacklist;
     comp.ngOnChanges({globalParsersBlacklist: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
@@ -99,7 +99,7 @@ describe('DynamicHooksComponent', () => {
     expect((comp as any).parse['calls'].count()).toBe(5);
 
     // Change 'globalParsersWhitelist'
-    const whitelist = ['GenericSingleTagParser'];
+    const whitelist = ['GenericSingleTagStringParser'];
     comp.globalParsersWhitelist = whitelist;
     comp.ngOnChanges({globalParsersWhitelist: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
@@ -107,14 +107,14 @@ describe('DynamicHooksComponent', () => {
     expect((comp as any).parse['calls'].count()).toBe(6);
 
     // Change 'parsers' (while leaving 'globalParsersWhitelist' as is, should be ignored)
-    comp.parsers = [GenericMultiTagParser];
+    comp.parsers = [GenericMultiTagStringParser];
     comp.ngOnChanges({parsers: true} as any);
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericMultiTagParser));
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericMultiTagStringParser));
     expect((comp as any).activeParsers[0].component.prototype.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.activeParsers[0]['name']).toBe('GenericMultiTagParser');
+    expect(comp.activeParsers[0]['name']).toBe('GenericMultiTagStringParser');
     expect((comp as any).parse['calls'].count()).toBe(7);
   });
 

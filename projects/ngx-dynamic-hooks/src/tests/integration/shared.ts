@@ -15,17 +15,22 @@ import { provideDynamicHooks, HookParserEntry, resetDynamicHooks, DynamicHooksCo
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { WhateverTestComponent } from '../resources/components/whateverTest/whateverTest.c';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
-import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
-import { GenericWhateverParser } from '../resources/parsers/genericWhateverParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
+import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
+import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
+import { GenericWhateverElementParser } from '../resources/parsers/genericWhateverElementParser';
 
 
 // The standard parsers to be used for most tests
 export const testParsers: Array<HookParserEntry> = [
-  // Generic parsers
-  GenericSingleTagParser,
-  GenericMultiTagParser,
-  GenericWhateverParser,
+  // Generic string hook parsers
+  GenericSingleTagStringParser,
+  GenericMultiTagStringParser,
+  GenericWhateverStringParser,
+  // Generic element hook parsers
+  GenericMultiTagElementParser,
+  GenericWhateverElementParser,
   // SelectorHookParsers
   {
     component: SingleTagTestComponent,

@@ -7,8 +7,8 @@ import { defaultBeforeEach, prepareTestingModule } from './shared';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { TestBed } from '@angular/core/testing';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
-import { GenericMultiTagParser } from '../resources/parsers/genericMultiTagParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 
 
 describe('Initialization', () => {
@@ -25,32 +25,32 @@ describe('Initialization', () => {
   // -------------------------------------------------------------
 
   it('#should load the global settings correctly', () => {
-    const testText = `<p>This p-element has a <span>span-element with a component [generic-singletagtest]></span> within it.</p>`;
+    const testText = `<p>This p-element has a <span>span-element with a component [singletag-string]></span> within it.</p>`;
 
     // Test with config for SingleTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [GenericSingleTagParser]
+        parsers: [GenericSingleTagStringParser]
       })
     ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagParser));
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagStringParser));
     expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     
     // Test with config for MultiTagTestComponent
     ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({parsers: [GenericMultiTagParser]})
+      provideDynamicHooks({parsers: [GenericMultiTagStringParser]})
     ]));
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericMultiTagParser));
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericMultiTagStringParser));
     expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
     expect(Object.keys(comp.hookIndex).length).toBe(0);
   });
@@ -58,26 +58,26 @@ describe('Initialization', () => {
   it('#should reset allSettings on app reloads', (async () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [GenericSingleTagParser]
+        parsers: [GenericSingleTagStringParser]
       })
     ]));
 
     let allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
     expect(allSettings[0].parsers?.length).toBe(1);
-    expect(allSettings[0].parsers![0]).toBe(GenericSingleTagParser);
+    expect(allSettings[0].parsers![0]).toBe(GenericSingleTagStringParser);
 
     // Reset and reload with different settings
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
-        parsers: [GenericMultiTagParser]
+        parsers: [GenericMultiTagStringParser]
       })
     ]));
 
     allSettings = testBed.inject(DYNAMICHOOKS_ALLSETTINGS);
     expect(allSettings.length).toBe(1);
     expect(allSettings[0].parsers?.length).toBe(1);
-    expect(allSettings[0].parsers![0]).toBe(GenericMultiTagParser);
+    expect(allSettings[0].parsers![0]).toBe(GenericMultiTagStringParser);
   }));
 
   it('#should not crash if the user passes an empty object as global settings', () => {

@@ -2,7 +2,7 @@
 import { defaultBeforeEach } from './shared';
 import { TestBed, TestBedStatic } from '@angular/core/testing';
 import { DynamicHooksComponent, DynamicHooksService } from '../testing-api';
-import { GenericSingleTagParser } from '../resources/parsers/genericSingleTagParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 
 describe('Component bindings', () => {
   let testBed: TestBedStatic;
@@ -22,7 +22,7 @@ describe('Component bindings', () => {
       someArr: ['hello', 'from', 'the', 'parser!']
     };
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -32,7 +32,7 @@ describe('Component bindings', () => {
       }
     }
 
-    const testText = `Just some component: [generic-singletagtest]">`;
+    const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true, options: true} as any);
@@ -45,7 +45,7 @@ describe('Component bindings', () => {
   it('#should subscribe to outputs of dynamic components', () => {
     let testVar: any = null;
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
@@ -54,7 +54,7 @@ describe('Component bindings', () => {
       }
     }
 
-    const testText = `Just some component: [generic-singletagtest]">`;
+    const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true, options: true} as any);
@@ -65,7 +65,7 @@ describe('Component bindings', () => {
   });
 
   it('#should trigger ngOnChanges() after component creation and any time an input changes', () => {
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
@@ -74,7 +74,7 @@ describe('Component bindings', () => {
       }
     }
 
-    const testText = `Just some component: [generic-singletagtest]">`;
+    const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true, options: true} as any);
@@ -93,7 +93,7 @@ describe('Component bindings', () => {
   });
 
   it('#should resubscribe to outputs if outputs returned by parser changed', () => {
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
@@ -102,7 +102,7 @@ describe('Component bindings', () => {
       }
     }
 
-    const testText = `[generic-singletagtest]">`;
+    const testText = `[singletag-string]">`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -127,7 +127,7 @@ describe('Component bindings', () => {
   it('#should unsubscribe from outputs on destroy', () => {
     let testVar: any = null;
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagParser);
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
@@ -136,7 +136,7 @@ describe('Component bindings', () => {
       }
     }
 
-    const testText = `Just some component: [generic-singletagtest]">`;
+    const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true, options: true} as any);
