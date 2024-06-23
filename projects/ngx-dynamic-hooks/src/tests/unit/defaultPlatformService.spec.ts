@@ -65,6 +65,38 @@ describe('DefaultPlatformService', () => {
     expect(element.tagName).toBe('P');
   });
 
+  // sortElements
+  // ------------------
+
+  it(`#should be able to sort elements`, () => {
+    const parentDiv = document.createElement('div');
+    const childA = document.createElement('div');
+    const childB = document.createElement('div');
+
+    // A before B
+    parentDiv.appendChild(childA);
+    parentDiv.appendChild(childB);
+    let order = platformService.sortElements(childA, childB);
+    expect(order).toBe(-1);
+
+    // Reset
+    while (parentDiv.firstChild) { parentDiv.removeChild(parentDiv.firstChild) }
+
+    // B before A
+    parentDiv.appendChild(childB);
+    parentDiv.appendChild(childA);
+    order = platformService.sortElements(childA, childB);
+    expect(order).toBe(1);
+
+    // Reset
+    while (parentDiv.firstChild) { parentDiv.removeChild(parentDiv.firstChild) }
+
+    // Identical
+    parentDiv.appendChild(childA);
+    order = platformService.sortElements(childA, childA);
+    expect(order).toBe(0);
+  });
+
   // getTagName
   // ------------------
 

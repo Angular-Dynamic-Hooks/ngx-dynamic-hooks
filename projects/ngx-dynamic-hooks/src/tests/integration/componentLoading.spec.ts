@@ -3,17 +3,18 @@ import { ComponentFixtureAutoDetect, TestBed, fakeAsync, tick } from '@angular/c
 import { first } from 'rxjs/operators';
 
 // Testing api resources
-import { DynamicHooksComponent, LoadedComponent, anchorElementTag, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, LoadedComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { ParentTestComponent } from '../resources/components/parentTest/parentTest.c';
-import { CustomContentParser } from '../resources/parsers/customContentParser';
 import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
 import { ModuleTestComponent } from '../resources/components/moduleTest/moduleTest.c';
+import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
+import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
 
 describe('Component loading', () => {
   let testBed;
@@ -127,26 +128,41 @@ describe('Component loading', () => {
   });
 
   it('#should load custom ng-content properly', () => {
-    // Test custom ng-content
-    // NgContentTestParser always returns unique hardcoded ngContent for NgContentTestComponent
-    // instead of the actual childNodes. Check that this hardcoded content is correctly rendered.
-    let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({parsers: testParsers.concat([CustomContentParser])})
-    ]);
+    const genericMultiTagParser = TestBed.inject(GenericMultiTagElementParser);
+    genericMultiTagParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
+      const customSpan = document.createElement('span');
+      customSpan.innerHTML = 'this should be highlighted';
+  
+      const customH2 = document.createElement('h2');
+      customH2.innerHTML = 'This is the title';
+  
+      const customDiv = document.createElement('div');
+      customDiv.innerHTML = 'Some random content';
+  
+      const content = [];
+      content[0] = [customSpan];
+      content[2] = [customH2, customDiv];
+  
+      return {
+        component: NgContentTestComponent,
+        injector: undefined,
+        content: content
+      };
+    }
 
     const testText = `
-      [customcontent]
+      <multitag-element>
         <p>original content</p>
         [singletag-string]
-      [/customcontent]
+      </multitag-element>
     `;
     comp.content = testText;
     comp.context = {};
     comp.ngOnChanges({content: true, context: context} as any);
 
-    // Inner component should be removed
+    // Inner component should not be loaded
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('NgContentTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('NgContentTestComponent');
 
     // Make sure that <ng-content> slots of NgContentComponent are correctly filled out
     const componentElement = fixture.nativeElement.children[0];
@@ -637,5 +653,39 @@ describe('Component loading', () => {
     expect(fixture.nativeElement.querySelector(anchorElementTag).classList[0]).not.toBe('lazytest-anchor');
     expect(fixture.nativeElement.querySelector(anchorElementTag).childNodes.length).toBe(0);
   }));
+
+  it('#should remove anchor attributes after loading components', () => {
+    comp.content = `Let's try a [singletag-string] as well as a <multitag-element></multitag-element>`;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true} as any);
+
+    expect(Object.values(comp.hookIndex).length).toBe(2);
+    const attrs1 = Array.from(comp.hookIndex[1].componentRef?.location.nativeElement.attributes).map((attrObj: any) => attrObj.name);
+    expect(attrs1.length).toBe(1);
+    expect(attrs1[0]).toContain('_nghost');
+    expect(attrs1).not.toContain(anchorAttrHookId);
+    expect(attrs1).not.toContain(anchorAttrParseToken);
+    const attrs2 = Array.from(comp.hookIndex[2].componentRef?.location.nativeElement.attributes).map((attrObj: any) => attrObj.name);
+    expect(attrs2.length).toBe(1);
+    expect(attrs2[0]).toContain('_nghost');
+    expect(attrs2).not.toContain(anchorAttrHookId);
+    expect(attrs2).not.toContain(anchorAttrParseToken);
+  });
+
+  it('#should scrub input- and output-attributes even with sanitization disabled', () => {
+    const testText = `<multitag-element id="unique-identifier" class="some-class" customattr="asd" [numberprop]="123" (someoutput)="context.maneuvers.modifyParent($event)"></<multitag-element>`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {sanitize: false};
+    comp.ngOnChanges({content: true, context: true} as any);
+
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    const attrs = Array.from(comp.hookIndex[1].componentRef?.location.nativeElement.attributes).map((attrObj: any) => attrObj.name);
+    expect(attrs.includes('id')).toBeTrue();
+    expect(attrs.includes('class')).toBeTrue();
+    expect(attrs.includes('customattr')).toBeTrue();
+    expect(attrs.includes('[numberprop]')).toBeFalse();
+    expect(attrs.includes('(someoutput)')).toBeFalse();
+  });
 
 });

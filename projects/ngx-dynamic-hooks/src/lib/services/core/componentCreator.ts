@@ -39,25 +39,25 @@ export class ComponentCreator {
   init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
-    const hookHostElements: {[key: string]: Element} = {};
+    const anchorElements: {[key: string]: Element} = {};
 
-    // Get HookData, replace placeholders and create desired content slots
-    for (const [hookId, hook] of Object.entries(hookIndex)) {
-      const anchorElement = this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}="${hookId}"][${anchorAttrParseToken}="${token}"]`)?.[0];
-
-      // If removed by previous hook in loop via ng-content replacement
-      if (!anchorElement) {
-        delete hookIndex[hook.id];
+    // Check anchor elements in order of appearance and prepare loading components
+    for (let anchorElement of this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}][${anchorAttrParseToken}]`)) {
+      const hookId = parseInt(this.platformService.getAttribute(anchorElement, anchorAttrHookId)!);
+      
+      // Discard hook if anchor element was removed by previous hook in loop via ng-content replacement
+      if (this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}="${hookId}"][${anchorAttrParseToken}="${token}"]`).length === 0) {
+        delete hookIndex[hookId];
         continue;
       }
-      hookHostElements[hookId] = anchorElement;
 
-      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(hookHostElements[hookId]));
+      const hook = hookIndex[hookId];
+      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(anchorElement));
       hook.isLazy = hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName');
 
       // Skip loading lazy components during SSR
       if (!isPlatformBrowser(this.platformId) && hook.isLazy) {
-        delete hookIndex[hook.id];
+        delete hookIndex[hookId];
         continue;
       }
 
@@ -70,17 +70,23 @@ export class ComponentCreator {
       * be rendered when the component's *ngIf eventually resolved to true.
       */
       if (hook.data.hostElementTag) {
-        hookHostElements[hookId] = this.useCustomHostElement(hookHostElements[hookId], hook.data.hostElementTag);
+        anchorElement = this.useCustomHostElement(anchorElement, hook.data.hostElementTag);
       }
+
+      // Always scrub potential []-input- and ()-output-attrs from anchor elements 
+      this.scrubBindingAttrs(anchorElement);
 
       // Insert child content according to hook.data immediately
       // This has the benefit that if the child content is custom, the next iterations of this loop will throw out all hooks whose placeholder elements 
       // can no longer be found (b/c they were in the discarded child content) so their component won't be unnecessarily loaded.
-      this.createContentSlotElements(hookHostElements[hookId], hook, token);
+      this.createContentSlotElements(anchorElement, hook, token);
+
+      anchorElements[hookId] = anchorElement;
     }
 
-    // Load all components from hookIndex into the prepared host elements
-    for (const [hookId, hook] of Object.entries(hookIndex)) {
+    // Load components
+    for (const [hookId, anchorElement] of Object.entries(anchorElements)) {
+      const hook = hookIndex[hookId];
 
       // Start with of(true) to catch errors from loadComponentClass in the observable stream as well
       componentLoadSubjects.push(of(true)
@@ -88,9 +94,9 @@ export class ComponentCreator {
         .pipe(mergeMap(() => this.loadComponentClass(hook.data!.component)))
         .pipe(tap((compClass) => {
           // Get projectableNodes from the content slots
-          const projectableNodes = this.extractContentSlotElements(hookHostElements[hookId], token);
+          const projectableNodes = this.extractContentSlotElements(anchorElement, token);
           // Instantiate component
-          this.createComponent(hook, context, hookHostElements[hookId], projectableNodes, options, compClass, environmentInjector, injector);
+          this.createComponent(hook, context, anchorElement, projectableNodes, options, compClass, environmentInjector, injector);
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
@@ -131,10 +137,10 @@ export class ComponentCreator {
       }
 
       // Remove now redundant attributes from component elements
-      for (const hostElement of Object.values(hookHostElements)) {
-        this.platformService.removeAttribute(hostElement, anchorAttrHookId);
-        this.platformService.removeAttribute(hostElement, anchorAttrParseToken);
-        this.platformService.removeAttribute(hostElement, 'ng-version');
+      for (const anchorElement of Object.values(anchorElements)) {
+        this.platformService.removeAttribute(anchorElement, anchorAttrHookId);
+        this.platformService.removeAttribute(anchorElement, anchorAttrParseToken);
+        this.platformService.removeAttribute(anchorElement, 'ng-version');
       }
 
       // Done!
@@ -173,6 +179,24 @@ export class ComponentCreator {
     this.platformService.removeChild(this.platformService.getParentNode(anchorElement)!, anchorElement);
 
     return customHostElement;
+  }
+
+  /**
+   * Always removes angular-typical template attrs like []-input and ()-outputs from anchors
+   *
+   * @param anchorElement - The element to strub
+   */
+  scrubBindingAttrs(anchorElement: any) {
+    const attrsToScrub = Array.from(anchorElement.attributes)
+      .map((attrObj: any) => attrObj.name)
+      .filter((attr: string) => 
+        (attr.startsWith('[') && attr.endsWith(']')) ||
+        (attr.startsWith('(') && attr.endsWith(')'))
+      );
+
+    for (const attr of attrsToScrub) {
+      this.platformService.removeAttribute(anchorElement, attr);
+    }
   }
 
   /**

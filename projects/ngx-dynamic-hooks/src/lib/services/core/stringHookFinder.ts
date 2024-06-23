@@ -2,10 +2,8 @@ import { HookIndex } from '../../interfacesPublic';
 import { HookParser, HookPosition } from '../../interfacesPublic';
 import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
-import { PlatformService } from '../platform/platformService';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../constants/core';
-import { sortElements } from '../utils/utils';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
