@@ -122,8 +122,8 @@ export class DefaultPlatformService implements CompletePlatformService {
     }
   }
 
-  getInnerText(element: HTMLElement) {
-    return element.innerText;
+  getTextContent(element: Node) {
+    return element.textContent;
   }
 
 }

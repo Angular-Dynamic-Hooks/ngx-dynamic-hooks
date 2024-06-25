@@ -1,5 +1,5 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
-import { OutletOptions, outletOptionDefaults } from './options';
+import { OutletOptions, getOutletOptionDefaults } from './options';
 import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
 import { ParserEntryResolver } from './parserEntryResolver';
 import { OptionsResolver } from './optionsResolver';
@@ -22,6 +22,7 @@ export class SettingsResolver {
   }
 
   public resolve(
+    content: any,
     allSettings: DynamicHooksSettings[],
     ancestorSettings: DynamicHooksSettings[],
     moduleSettings: DynamicHooksSettings, 
@@ -49,7 +50,7 @@ export class SettingsResolver {
     }
 
     const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
-    const resolvedOptions = this.resolveOptions(resolvedSettings.options || null, localOptions);
+    const resolvedOptions = this.resolveOptions(content, resolvedSettings.options || null, localOptions);
 
     return {
       parsers: resolvedParsers,
@@ -93,18 +94,18 @@ export class SettingsResolver {
   /**
    * Loads the relevant outlet options
    */
-  private resolveOptions(globalOptions: OutletOptions|null, localOptions: OutletOptions|null): OutletOptions {
+  private resolveOptions(content: any, globalOptions: OutletOptions|null, localOptions: OutletOptions|null): OutletOptions {
     let resolvedOptions: OutletOptions;
 
     // If local
     if (localOptions) {
-      resolvedOptions = this.optionsResolver.resolve(localOptions);
+      resolvedOptions = this.optionsResolver.resolve(content, localOptions);
     // If global
     } else if (globalOptions) {
-      resolvedOptions = this.optionsResolver.resolve(globalOptions);
+      resolvedOptions = this.optionsResolver.resolve(content, globalOptions);
     // If none given
     } else {
-      resolvedOptions = outletOptionDefaults;
+      resolvedOptions = getOutletOptionDefaults(content);
     }
 
     return resolvedOptions;

@@ -141,10 +141,10 @@ export interface CompletePlatformService {
   setInnerContent(element: any, content: string): void;
 
   /**
-   * Returns the plain inner text of an element (like HTMLElement.innerText)
+   * Returns the pure text content of an element (like Node.textContent)
    * @param element An element
    */
-  getInnerText(element: any): string;
+  getTextContent(element: any): string|null;
 }
 
 export type PlatformService =  Partial<CompletePlatformService>;

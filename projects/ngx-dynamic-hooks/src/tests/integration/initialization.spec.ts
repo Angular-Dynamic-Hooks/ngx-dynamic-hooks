@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, outletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
+import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getOutletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
@@ -98,7 +98,7 @@ describe('Initialization', () => {
 
     // Options should be default
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((outletOptionDefaults as any)[key]);
+      expect(value).toBe((getOutletOptionDefaults() as any)[key]);
     }
 
     // Parsers should be empty

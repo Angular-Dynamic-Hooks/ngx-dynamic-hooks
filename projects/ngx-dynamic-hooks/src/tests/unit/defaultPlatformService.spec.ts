@@ -385,14 +385,14 @@ describe('DefaultPlatformService', () => {
     expect(element.innerHTML).toBe(expectedContent);
   });
 
-  // getInnerText
+  // getTextContent
   // ------------------
 
-  it(`#should return inner text of an element`, () => {
+  it(`#should return the text content of an element`, () => {
     const element = document.createElement('div');
     element.innerHTML = '&gt;';
 
-    const returnedText = platformService.getInnerText(element);
+    const returnedText = platformService.getTextContent(element)!;
 
     // InnerText should automatically convert html entities
     expect(returnedText).toBe('>');

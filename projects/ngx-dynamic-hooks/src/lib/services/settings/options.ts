@@ -16,18 +16,30 @@ export interface OutletOptions {
 }
 
 /**
- * The default values for the OutletOptions
+ * Returns the default values for the OutletOptions
  */
-export const outletOptionDefaults: OutletOptions = {
-    sanitize: true,
-    convertHTMLEntities: true,
-    fixParagraphTags: true,
-    updateOnPushOnly: false,
-    compareInputsByValue: false,
-    compareOutputsByValue: false,
-    compareByValueDepth: 5,
-    ignoreInputAliases: false,
-    ignoreOutputAliases: false,
-    acceptInputsForAnyProperty: false,
-    acceptOutputsForAnyObservable: false
-};
+export const getOutletOptionDefaults: (content?: any) => OutletOptions = (content = '') => {
+
+    const outletOptionDefaults: OutletOptions = {
+        sanitize: true,
+        convertHTMLEntities: true,
+        fixParagraphTags: true,
+        updateOnPushOnly: false,
+        compareInputsByValue: false,
+        compareOutputsByValue: false,
+        compareByValueDepth: 5,
+        ignoreInputAliases: false,
+        ignoreOutputAliases: false,
+        acceptInputsForAnyProperty: false,
+        acceptOutputsForAnyObservable: false
+    };
+
+    // Don't sanitize if content is element
+    if (content && typeof content !== 'string') {
+        outletOptionDefaults.sanitize = false;
+    }
+
+    return outletOptionDefaults;
+}
+
+

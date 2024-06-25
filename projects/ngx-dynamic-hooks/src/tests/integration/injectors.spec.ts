@@ -1,5 +1,5 @@
 // Testing api resources
-import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, OutletParseResult, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, OutletParseResult, provideDynamicHooks } from '../testing-api';
 import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
@@ -117,7 +117,7 @@ describe('Injectors logic', () => {
     });
   }));
 
-  it('should use custom injectors if passed by parser', () => {
+  it('#should use custom injectors if passed by parser', () => {
     const configureParser = function (injector: Injector|null = null, envInjector: EnvironmentInjector|null = null) {
       const compData: HookComponentData = {
         component: SingleTagTestComponent

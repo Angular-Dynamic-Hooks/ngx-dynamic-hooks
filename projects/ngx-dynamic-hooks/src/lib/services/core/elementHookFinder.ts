@@ -17,7 +17,7 @@ export interface ParserFindHookElementsResult {
 @Injectable({
   providedIn: 'root'
 })
-export class ElementHooksFinder {
+export class ElementHookFinder {
 
   constructor(private platformService: AutoPlatformService) {
   }
@@ -68,6 +68,8 @@ export class ElementHooksFinder {
     return hookIndex;
   }
 
+
+
   /**
    * Checks the hookPositions of the combined parserResults to ensure they do not collide/overlap.
    * Any that do are removed from the results.
@@ -89,10 +91,21 @@ export class ElementHooksFinder {
         continue;
       }
 
+      // Must not already be host or view element for an Angular component
+      if (this.isAngularManagedElement(parserResult.hookElement)) {
+        if (isDevMode()) { console.warn('Error when checking hook elements - The following element is already being used as an active host or view element for an Angular component. It cannot be used to load a component. Ignoring.', parserResult.hookElement); }
+        continue;
+      }
+
       // If everything okay, add to result array
       checkedParserResults.push(parserResult);
     }
 
     return checkedParserResults;
+  }
+  
+  private isAngularManagedElement(element: any): boolean {
+    // Angular gives component host and view elements the following property, so can simply check for that
+    return !!element.__ngContext__;
   }
 }

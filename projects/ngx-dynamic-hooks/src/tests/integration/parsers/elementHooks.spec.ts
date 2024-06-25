@@ -180,28 +180,52 @@ describe('Parser element hooks', () => {
 
   it('#should validate the found hook elements', () => {
     const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser);
-    const elementHooksFinder = comp['dynamicHooksService']['elementHooksFinder'];
+    const elementHookFinder = comp['dynamicHooksService']['elementHookFinder'];
     spyOn(console, 'warn').and.callThrough();
 
     // Should warn and ignore found elements that are already marked as anchors
-    const contentElement = document.createElement('div');
-    const harmlessElement = document.createElement('div');
-    const existingAnchorElement = document.createElement('div');
-    existingAnchorElement.setAttribute(anchorAttrHookId, '1');
-    existingAnchorElement.setAttribute(anchorAttrParseToken, 'asd');
+    let contentElement = document.createElement('div');
+    let harmlessElement = document.createElement('div');
+    let problemElement = document.createElement('div');
+    problemElement.setAttribute(anchorAttrHookId, '1');
+    problemElement.setAttribute(anchorAttrParseToken, 'asd');
 
-    const parserResults: ParserFindHookElementsResult[] = [
+    let parserResults: ParserFindHookElementsResult[] = [
       {
         parser: genericMultiTagElementParser,
         hookElement: harmlessElement
       },
       {
         parser: genericMultiTagElementParser,
-        hookElement: existingAnchorElement
+        hookElement: problemElement
       }
     ];
-    const checkedParserResults = elementHooksFinder['validateHookElements'](parserResults, contentElement);
+    let checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element was already found as a hook element, but was found again.');
+    expect(checkedParserResults.length).toBe(1);
+    expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
+
+    // Reset
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+
+    // Should warn and ignore found elements that are already being used by loaded Angular components
+    contentElement = document.createElement('div');
+    harmlessElement = document.createElement('div');
+    problemElement = document.createElement('div');
+    (problemElement as any).__ngContext__ = 4; // Usually some number
+
+    parserResults = [
+      {
+        parser: genericMultiTagElementParser,
+        hookElement: harmlessElement
+      },
+      {
+        parser: genericMultiTagElementParser,
+        hookElement: problemElement
+      }
+    ];
+    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element is already being used as an active host or view element for an Angular component.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
   });

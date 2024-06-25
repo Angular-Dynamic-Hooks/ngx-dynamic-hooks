@@ -4,6 +4,9 @@ import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../constants/core';
+import { matchAll } from '../utils/utils';
+
+const findInElementsNodePlaceholder = '_ngx_dynamic_hooks_node_placeholder';
 
 /**
  * An atomic replace instruction. Reads as: Replace the text from startIndex to endIndex with replacement.
@@ -40,17 +43,134 @@ export interface HookSegments {
 @Injectable({
   providedIn: 'root'
 })
-export class StringHooksFinder {
+export class StringHookFinder {
 
   constructor(private platformService: AutoPlatformService) {
   }
 
-  findInElement() {
-
+  /**
+   * Finds all string hooks in an existing element and creates the corresponding anchors
+   * 
+   * @param element - The element to parse
+   * @param context - The current context object
+   * @param parsers - All of the registered parsers
+   * @param token - A random token to attach to all created selector elements
+   * @param options - The current OutletOptions
+   * @param hookIndex - The hookIndex object to fill
+   */
+  findInElement(element: any, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex) {
+    // Only bother looking for string hooks if there even are string hook parsers
+    for (const parser of parsers) {
+      if (typeof parser.findHooks === 'function') {
+        this.checkElement(element, context, parsers, token, options, hookIndex, {});
+        break;
+      }
+    }
   }
 
   /**
-   * Lets all registered parsers anaylyze the content to find all hooks within. Then replaces those hooks with anchor elements and creates the hookIndex.
+   * Checks an individual element and travels it recursively
+   * 
+   * @param element - The element to parse
+   * @param context - The current context object
+   * @param parsers - All of the registered parsers
+   * @param token - A random token to attach to all created selector elements
+   * @param options - The current OutletOptions
+   * @param hookIndex - The hookIndex object to fill 
+   * @param extractedNodes - A recursively-used object holding all temporarily extracted nodes
+   */
+  checkElement(element: any, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex, extractedNodes: {[key: string]: any} = {}, ) {
+    // To find string hooks in an already existing node, first replace non-text child nodes with string placeholders, then concat all text content.
+    // This is so enclosing string hooks can be found even if they are separated by other elements
+    let childNodes = this.platformService.getChildNodes(element);
+    let collectedText = '';
+
+    for (const childNode of childNodes) {
+      if (childNode.nodeType === Node.TEXT_NODE) {
+        collectedText += this.platformService.getTextContent(childNode);
+      } else {
+        const nodeId = Object.keys(extractedNodes).length + 1;
+        extractedNodes[nodeId] = childNode;
+        collectedText += `${findInElementsNodePlaceholder}__${nodeId}__`;
+      }
+    }    
+
+    // Parse collected text, overwrite element content with result
+    if (collectedText) {
+      const prevHookCount = Object.keys(hookIndex).length;
+      const result = this.find(collectedText, context, parsers, token, options, hookIndex);
+
+      // If hooks were found
+      if (prevHookCount < Object.keys(hookIndex).length) {
+
+        // Render string anchors into actual html elements
+        const tmpDiv = this.platformService.createElement('div');
+        this.platformService.setInnerContent(tmpDiv, result.content);
+        childNodes = this.platformService.getChildNodes(tmpDiv);
+
+        // Replace existing child nodes with result
+        this.platformService.clearChildNodes(element);
+        for (const node of childNodes) {
+          this.platformService.appendChild(element, node);
+        }
+      }
+    }
+
+    // Then reinsert previously extracted non-text nodes again
+    for (const childNode of childNodes) {
+      if (childNode.nodeType === Node.TEXT_NODE) {
+        let text = this.platformService.getTextContent(childNode);
+        if (text) {
+          const matches = matchAll(text, new RegExp(`${findInElementsNodePlaceholder}__(\\d*)__`, 'g'));
+
+          // If placeholders found
+          if (matches.length) {
+            const textReplacementNodes = [];
+            let currentPos = 0;
+
+            // Split text node containing placeholder into nodes array with restored nodes
+            for (const match of matches) {
+              const textBefore = text.substring(currentPos, match.index);
+              const extractedNodeId = parseInt(match[1]);
+
+              if (textBefore) {
+                textReplacementNodes.push(document.createTextNode(textBefore));
+              }
+              if (extractedNodeId && extractedNodes[extractedNodeId]) {
+                textReplacementNodes.push(extractedNodes[extractedNodeId]);
+              }
+              
+              currentPos = match.index + match[0].length;
+            }
+            const textRemaining = text.substring(currentPos);
+            if (textRemaining) {
+              textReplacementNodes.push(document.createTextNode(textRemaining));
+            }
+
+            // Replace text node with that array
+            const parent = this.platformService.getParentNode(childNode);
+            for (const replacementNode of textReplacementNodes) {
+              this.platformService.insertBefore(parent, replacementNode, childNode);
+            }
+            this.platformService.removeChild(parent, childNode);
+
+            // Update child nodes var
+            childNodes = this.platformService.getChildNodes(parent);
+          }
+        }
+      }
+    }
+
+    // Travel child nodes recursively
+    for (const childNode of childNodes) {
+      if (childNode.nodeType !== Node.TEXT_NODE) {
+        this.checkElement(childNode, context, parsers, token, options, hookIndex, extractedNodes);
+      }
+    }
+  }
+
+  /**
+   * Finds all string hooks in a string variable and creates the corresponding anchors
    *
    * @param content - The text to parse
    * @param context - The current context object
@@ -355,7 +475,7 @@ export class StringHooksFinder {
         // Replace invisible nbsp-whitespace with normal whitespace (not \u00A0). Leads to problems with JSON.parse() otherwise.
         if (hmtlEntity === ('&nbsp;')) { return ' '; }
         this.platformService.setInnerContent(div, hmtlEntity);
-        return this.platformService.getInnerText(div);
+        return this.platformService.getTextContent(div)!;
     });
     return result;
   }

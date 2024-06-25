@@ -27,7 +27,7 @@ describe('DynamicHooksService', () => {
 
   // ----------------------------------------------------------------------------
 
-  it('#should create and fill a new HTML-Element by using the DynamicHooksService directly', () => {
+  it('#should create a new HTML-Element, if target element is not specified', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
     const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
@@ -68,7 +68,7 @@ describe('DynamicHooksService', () => {
     });
   });
 
-  it('#should fill an existing HTML-Element by using the DynamicHooksService directly', () => {
+  it('#should fill out an existing target element, if specified', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
 
     const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);

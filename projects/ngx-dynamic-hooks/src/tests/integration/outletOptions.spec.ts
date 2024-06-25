@@ -1,7 +1,7 @@
 // Testing api resources
 import { TestBed } from '@angular/core/testing';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { DynamicHooksComponent, OutletOptions, anchorElementTag, outletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, OutletOptions, anchorElementTag, getOutletOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
@@ -21,7 +21,7 @@ describe('OutletOptions', () => {
 
   it('#should load global options correctly', () => {
     const differentOptions: any = {};
-    for (const [key, value] of Object.entries(outletOptionDefaults)) {
+    for (const [key, value] of Object.entries(getOutletOptionDefaults())) {
       if (typeof value === 'boolean') { differentOptions[key] = !value; }
       else if (typeof value === 'number') { differentOptions[key] = value * 2; }
       else if (typeof value === 'string') { differentOptions[key] = value; }
@@ -45,7 +45,7 @@ describe('OutletOptions', () => {
 
   it('#should load local options correctly', () => {
     const differentOptions: any = {};
-    for (const [key, value] of Object.entries(outletOptionDefaults)) {
+    for (const [key, value] of Object.entries(getOutletOptionDefaults())) {
       if (typeof value === 'boolean') { differentOptions[key] = !value; }
       else if (typeof value === 'number') { differentOptions[key] = value * 2; }
       else if (typeof value === 'string') { differentOptions[key] = value; }
@@ -68,8 +68,9 @@ describe('OutletOptions', () => {
     comp.options = invalidOptions as OutletOptions;
     comp.ngOnChanges({content: true, options: true} as any);
 
+    const defaults = getOutletOptionDefaults();
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((outletOptionDefaults as any)[key]);
+      expect(value).toBe((defaults as any)[key]);
     }
   });
 
@@ -85,7 +86,7 @@ describe('OutletOptions', () => {
 
     expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((outletOptionDefaults as any)[key]);
+      expect(value).toBe((getOutletOptionDefaults() as any)[key]);
     }
   });
 

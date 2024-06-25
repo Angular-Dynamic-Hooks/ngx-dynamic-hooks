@@ -5,7 +5,7 @@ import { first, map } from 'rxjs/operators';
 import { HookIndex } from '../interfacesPublic';
 import { OutletParseResult } from '../interfacesPublic';
 import { OutletOptions } from './settings/options';
-import { StringHooksFinder } from './core/stringHookFinder';
+import { StringHookFinder } from './core/stringHookFinder';
 import { ComponentCreator } from './core/componentCreator';
 import { DynamicHooksSettings } from './settings/settings';
 import { HookParserEntry } from './settings/parserEntry';
@@ -13,7 +13,7 @@ import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_M
 import { SettingsResolver } from './settings/settingsResolver';
 import { ContentSanitizer } from './utils/contentSanitizer';
 import { AutoPlatformService } from './platform/autoPlatformService';
-import { ElementHooksFinder } from './core/elementHookFinder';
+import { ElementHookFinder } from './core/elementHookFinder';
 
 /**
  * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
@@ -29,8 +29,8 @@ export class DynamicHooksService {
     @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[],
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
     private settingsResolver: SettingsResolver,
-    private stringHooksFinder: StringHooksFinder,
-    private elementHooksFinder: ElementHooksFinder,
+    private stringHookFinder: StringHookFinder,
+    private elementHookFinder: ElementHookFinder,
     private contentSanitizer: ContentSanitizer,
     private componentCreator: ComponentCreator,
     private platformService: AutoPlatformService,
@@ -42,7 +42,7 @@ export class DynamicHooksService {
   /**
    * Parses a string of content and loads components for all found hooks
    *
-   * @param content - The input content to parse
+   * @param content - The content to parse
    * @param context - An optional context object
    * @param globalParsersBlacklist - An optional list of global parsers to blacklist
    * @param globalParsersWhitelist - An optional list of global parsers to whitelist
@@ -53,7 +53,7 @@ export class DynamicHooksService {
    * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the injector of the module this library is imported to is used.
    */
   parse(
-    content: string|null = null,
+    content: any = null,
     context: any = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
@@ -65,13 +65,9 @@ export class DynamicHooksService {
     injector: Injector|null = null
   ): Observable<OutletParseResult> {
 
-    // If no container element given, create one
-    if (targetElement === null) {
-      targetElement = this.platformService.createElement('div');
-    }
-
     // Resolve options and parsers
-    const {parsers: resolvedParsers, options: resolvedOptions } = this.settingsResolver.resolve(
+    const { parsers: resolvedParsers, options: resolvedOptions } = this.settingsResolver.resolve(
+      content,
       this.allSettings, 
       this.ancestorSettings, 
       this.moduleSettings, 
@@ -82,52 +78,55 @@ export class DynamicHooksService {
       injector // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
     );
 
-    // Needs a content string
-    if (!content || typeof content !== 'string') {
+    // Needs string or element as content
+    if (!content) {
       return of({
-        element: targetElement,
+        element: targetElement || this.platformService.createElement('div'),
         hookIndex: targetHookIndex,
         resolvedParsers,
         resolvedOptions
       });
     }
 
-    // Create parse token & virtual content element
     const token = Math.random().toString(36).substring(2, 12);
-    const virtualContentElement = this.platformService.createElement('div');
+    let contentElement;
 
-    // Find all string hooks
+    // a) Find all string hooks in string content
     if (typeof content === 'string') {
-      const result = this.stringHooksFinder.find(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
-
-      // Parse string into HTML
-      virtualContentElement.innerHTML = result.content;
+      contentElement = this.platformService.createElement('div');
+      const result = this.stringHookFinder.find(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+      this.platformService.setInnerContent(contentElement, result.content);
+      
+    // b) Find all string hooks in element content
     } else {
-      // TODO: add child nodes to contentElement
-      // then find string hooks in existing elements
+      contentElement = content;
+      this.stringHookFinder.findInElement(contentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
     }
 
     // Find all element hooks
-    targetHookIndex = this.elementHooksFinder.find(virtualContentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+    targetHookIndex = this.elementHookFinder.find(contentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
 
     // Sanitize?
     if (resolvedOptions?.sanitize) {
-      this.contentSanitizer.sanitize(virtualContentElement, targetHookIndex, token);
+      this.contentSanitizer.sanitize(contentElement, targetHookIndex, token);
     }
 
-    // After sanitize, insert virtual content into targetElement
-    this.platformService.clearChildNodes(targetElement);
-    for (const childNode of this.platformService.getChildNodes(virtualContentElement)) {
-      this.platformService.appendChild(targetElement, childNode);
+    // Insert virtual content into targetElement
+    if (targetElement && targetElement !== contentElement) {
+      this.platformService.clearChildNodes(targetElement);
+      for (const childNode of this.platformService.getChildNodes(contentElement)) {
+        this.platformService.appendChild(targetElement, childNode);
+      }
+      contentElement = targetElement
     }
 
     // Dynamically create components in component selector elements
-    return this.componentCreator.init(targetElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)
+    return this.componentCreator.init(contentElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)
     .pipe(first())
     .pipe(map((allComponentsLoaded: boolean) => {
       // Everything done! Return finished hookIndex and resolved parsers and options
       return {
-        element: targetElement,
+        element: contentElement,
         hookIndex: targetHookIndex,
         resolvedParsers,
         resolvedOptions

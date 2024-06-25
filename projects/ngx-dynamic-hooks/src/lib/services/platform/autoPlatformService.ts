@@ -97,8 +97,8 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('setInnerContent').setInnerContent!(element, content);
   }
 
-  getInnerText(element: any) {
-    return this.getFor('getInnerText').getInnerText!(element);
+  getTextContent(element: any) {
+    return this.getFor('getTextContent').getTextContent!(element);
   }
 
 }

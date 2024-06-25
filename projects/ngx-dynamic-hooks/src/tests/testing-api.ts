@@ -9,7 +9,7 @@ export { provideDynamicHooks, provideDynamicHooksForChild, resetDynamicHooks, al
 export { DynamicHooksSettings, DynamicHooksInheritance } from '../lib/services/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent, ComponentConfig } from '../lib/interfacesPublic';
 export { DynamicHooksComponent } from '../lib/components/outlet/dynamicHooksComponent';
-export { OutletOptions, outletOptionDefaults } from '../lib/services/settings/options';
+export { OutletOptions, getOutletOptionDefaults } from '../lib/services/settings/options';
 export { HookParserEntry } from '../lib/services/settings/parserEntry';
 export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
 export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
@@ -31,7 +31,7 @@ export { OptionsResolver } from '../lib/services/settings/optionsResolver';
 export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/services/core/componentCreator';
 export { ComponentUpdater } from '../lib/services/core/componentUpdater';
-export { StringHooksFinder } from '../lib/services/core/stringHookFinder';
+export { StringHookFinder } from '../lib/services/core/stringHookFinder';
 export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
 export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
 export { TagHookFinder } from '../lib/parsers/selector/services/tagHookFinder';
