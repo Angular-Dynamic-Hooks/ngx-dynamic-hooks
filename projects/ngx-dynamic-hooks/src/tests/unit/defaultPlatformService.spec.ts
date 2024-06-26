@@ -385,6 +385,25 @@ describe('DefaultPlatformService', () => {
     expect(element.innerHTML).toBe(expectedContent);
   });
 
+  // isTextNode
+  // ------------------
+
+  it(`#should test whether a node is a text node or not`, () => {
+    const div = document.createElement('div');
+    const textNode = document.createTextNode('inner text');
+
+    expect(platformService.isTextNode(div)).toBeFalse();
+    expect(platformService.isTextNode(textNode)).toBeTrue();
+  });
+
+  // createTextNode
+  // ------------------
+
+  it(`#should create text nodes`, () => {
+    const textNode = platformService.createTextNode('innerText');
+    expect(textNode.nodeType === Node.TEXT_NODE);
+  });
+
   // getTextContent
   // ------------------
 

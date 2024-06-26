@@ -97,6 +97,14 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('setInnerContent').setInnerContent!(element, content);
   }
 
+  isTextNode(element: any) {
+    return this.getFor('isTextNode').isTextNode!(element);
+  }
+
+  createTextNode(content: string) {
+    return this.getFor('createTextNode').createTextNode!(content);
+  }
+
   getTextContent(element: any) {
     return this.getFor('getTextContent').getTextContent!(element);
   }

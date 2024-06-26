@@ -15,6 +15,7 @@ import { GenericWhateverStringParser } from '../resources/parsers/genericWhateve
 import { ModuleTestComponent } from '../resources/components/moduleTest/moduleTest.c';
 import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
 import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
+import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 
 describe('Component loading', () => {
   let testBed;
@@ -125,6 +126,48 @@ describe('Component loading', () => {
     expect(fixture.nativeElement.querySelector('.childtest-component')).not.toBe(null); // Component has loaded
     expect(childComponent.constructor.name).toBe('ChildTestComponent');
     expect(childComponent.blubbService).toBe(parentComponent.blubbService);
+  });
+
+  
+  fit('#should load custom host elements properly', () => {
+    const genericMultiTagStringParser = TestBed.inject(GenericMultiTagStringParser);
+    genericMultiTagStringParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
+      return {
+        component: MultiTagTestComponent,
+        hostElementTag: 'some-custom-element'
+      };
+    }
+
+    const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser);
+    genericMultiTagElementParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
+      return {
+        component: MultiTagTestComponent,
+        hostElementTag: 'yet-another-custom-element'
+      };
+    }
+
+    comp.content = `
+      [multitag-string]
+        <p>Some irrelevant text</p>
+      [/multitag-string]
+      <multitag-element>
+        <p>and more</p>
+      </multitag-element>
+    `;
+    comp.context = {};
+    comp.ngOnChanges({content: true} as any);
+
+    expect(Object.keys(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+
+    const firstComponentElement = fixture.nativeElement.children[0];
+    expect(firstComponentElement.tagName).toBe('SOME-CUSTOM-ELEMENT');
+    expect(firstComponentElement.children[0].classList).toContain('multitag-component');
+
+    const secondComponentElement = fixture.nativeElement.children[1];
+    expect(secondComponentElement.tagName).toBe('YET-ANOTHER-CUSTOM-ELEMENT');
+    expect(secondComponentElement.children[0].classList).toContain('multitag-component');
   });
 
   it('#should load custom ng-content properly', () => {

@@ -141,6 +141,18 @@ export interface CompletePlatformService {
   setInnerContent(element: any, content: string): void;
 
   /**
+   * Returns a boolean determining whether an element is a text node or not
+   * @param element An element
+   */
+  isTextNode(element: any): boolean;
+
+   /**
+   * Creates a text node and returns it
+   * @param content The text content of the node
+   */
+  createTextNode(content: string): any;
+
+  /**
    * Returns the pure text content of an element (like Node.textContent)
    * @param element An element
    */

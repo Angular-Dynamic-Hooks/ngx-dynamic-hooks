@@ -127,20 +127,16 @@ export class ContentSanitizer {
   findAndEncodeTags(content: string, substrRegex: RegExp): string {
     let encodedContent = content;
 
-    const positions = [];
-    for (const match of matchAll(content, substrRegex)) {
-      positions.push({
-        startIndex: match.index,
-        endIndex: match.index + match[0].length
-      });
-    }
+    const matches = matchAll(content, substrRegex);
+    matches.sort((a, b) => b.index - a.index);
 
-    // Replace from the back
-    positions.sort((a, b) => b.startIndex - a.endIndex);
-    for (const position of positions) {
-      const textBeforeSelector = encodedContent.substring(0, position.startIndex);
-      const encodedPlaceholder = this.encodeTagString(encodedContent.substring(position.startIndex, position.endIndex));
-      const textAfterSelector = encodedContent.substring(position.endIndex);
+    for (const match of matches) {
+      const startIndex = match.index;
+      const endIndex = match.index + match[0].length;
+
+      const textBeforeSelector = encodedContent.substring(0, startIndex);
+      const encodedPlaceholder = this.encodeTagString(encodedContent.substring(startIndex, endIndex));
+      const textAfterSelector = encodedContent.substring(endIndex);
       encodedContent = textBeforeSelector + encodedPlaceholder + textAfterSelector;
     }
 

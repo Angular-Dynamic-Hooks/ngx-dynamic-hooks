@@ -122,6 +122,14 @@ export class DefaultPlatformService implements CompletePlatformService {
     }
   }
 
+  isTextNode(element: Node) {
+    return element.nodeType === Node.TEXT_NODE;
+  }
+
+  createTextNode(content: string) {
+    return document.createTextNode(content);
+  }
+
   getTextContent(element: Node) {
     return element.textContent;
   }

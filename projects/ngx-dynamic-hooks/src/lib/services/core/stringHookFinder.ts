@@ -86,7 +86,7 @@ export class StringHookFinder {
     let collectedText = '';
 
     for (const childNode of childNodes) {
-      if (childNode.nodeType === Node.TEXT_NODE) {
+      if (this.platformService.isTextNode(childNode)) {
         collectedText += this.platformService.getTextContent(childNode);
       } else {
         const nodeId = Object.keys(extractedNodes).length + 1;
@@ -118,7 +118,7 @@ export class StringHookFinder {
 
     // Then reinsert previously extracted non-text nodes again
     for (const childNode of childNodes) {
-      if (childNode.nodeType === Node.TEXT_NODE) {
+      if (this.platformService.isTextNode(childNode)) {
         let text = this.platformService.getTextContent(childNode);
         if (text) {
           const matches = matchAll(text, new RegExp(`${findInElementsNodePlaceholder}__(\\d*)__`, 'g'));
@@ -134,7 +134,7 @@ export class StringHookFinder {
               const extractedNodeId = parseInt(match[1]);
 
               if (textBefore) {
-                textReplacementNodes.push(document.createTextNode(textBefore));
+                textReplacementNodes.push(this.platformService.createTextNode(textBefore));
               }
               if (extractedNodeId && extractedNodes[extractedNodeId]) {
                 textReplacementNodes.push(extractedNodes[extractedNodeId]);
@@ -144,7 +144,7 @@ export class StringHookFinder {
             }
             const textRemaining = text.substring(currentPos);
             if (textRemaining) {
-              textReplacementNodes.push(document.createTextNode(textRemaining));
+              textReplacementNodes.push(this.platformService.createTextNode(textRemaining));
             }
 
             // Replace text node with that array

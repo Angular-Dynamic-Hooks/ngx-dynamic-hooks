@@ -69,6 +69,26 @@ describe('Parser string hooks', () => {
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
   });
+
+  it('#should save the found opening and closing tags in HookValue', () => {
+    comp.content = `
+      Here is some string hook: [singletag-string]
+      And another: [multitag-string]asd[/multitag-string]
+    `;
+
+    comp.ngOnChanges({content: true} as any);
+    const hookIndex = comp.hookIndex;
+  
+    expect(Object.keys(hookIndex).length).toBe(2);
+
+    expect(hookIndex[1].value.openingTag).toBe('[singletag-string]');
+    expect(hookIndex[1].value.closingTag).toBe(null);
+    expect(hookIndex[1].value.element).toBe(null);
+
+    expect(hookIndex[2].value.openingTag).toBe('[multitag-string]');
+    expect(hookIndex[2].value.closingTag).toBe('[/multitag-string]');
+    expect(hookIndex[2].value.element).toBe(null);
+  });
   
   it('#should load nested content correctly', fakeAsync(() => {
     const testText = `

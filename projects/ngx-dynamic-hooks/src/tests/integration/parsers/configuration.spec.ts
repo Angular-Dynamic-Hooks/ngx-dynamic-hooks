@@ -132,32 +132,18 @@ describe('Parser configuration', () => {
     expect((<any> console.error)['calls'].count()).toBe(1);
   });
 
-  it('#should check parser functions', () => {
-    comp.content = 'This text is irrelevant for this test.';
-    // Create an objects that will be mistaken for parser instances (as they have constructor.name)
-    // Test with varying amounts of incomplete parser functions to trigger an error for each scenario
-    const noFuncParser = {constructor: {name: 'something'}};
-    const parseWithOneFunc = {constructor: {name: 'something'}, findHooks: () => {}};
-    const parseWithTwoFuncs = {constructor: {name: 'something'}, findHooks: () => {}, loadComponent: () => {}};
+  it('#should load fine without parsers', () => {
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        parsers: []
+      })
+    ]));
 
-    comp.parsers = [noFuncParser as any];
-    spyOn(console, 'error').and.callThrough();
-    comp.ngOnChanges({content: true, parsers: true} as any);
-    expect(comp.activeParsers.length).toBe(0);
-    expect((<any> console.error)['calls'].count()).toBe(1);
-    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:');
+    comp.content = 'something';
+    comp.ngOnChanges({content: true} as any);
 
-    comp.parsers = [parseWithOneFunc as any];
-    comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(0);
-    expect((<any> console.error)['calls'].count()).toBe(2);
-    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "loadComponent()". Removing from list of active parsers:');
-
-    comp.parsers = [parseWithTwoFuncs as any];
-    comp.ngOnChanges({content: true, parsers: true} as any);
-    expect(comp.activeParsers.length).toBe(0);
-    expect((<any> console.error)['calls'].count()).toBe(3);
-    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "getBindings()". Removing from list of active parsers:');
+    expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
   });
 
   it('#should check parser names', () => {
@@ -172,20 +158,6 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers.length).toBe(2);
     expect((<any> console.warn)['calls'].count()).toBe(1);
     expect((<any> console.warn)['calls'].mostRecent().args[0]).toBe('Parser name "IdenticalParserName" is not unique and appears multiple times in the list of active parsers.');
-  });
-
-  it('#should load fine without parsers', () => {
-    ({fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({
-        parsers: []
-      })
-    ]));
-
-    comp.content = 'something';
-    comp.ngOnChanges({content: true} as any);
-
-    expect(comp.activeParsers.length).toBe(0);
-    expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
   });
 
   it('#should apply the parserBlacklist and parserWhitelist, if requested', () => {
@@ -261,6 +233,34 @@ describe('Parser configuration', () => {
     expect((<any>console.warn)['calls'].count()).toBe(2);
     expect((<any>console.warn)['calls'].allArgs()[0][0]).toBe('Blacklisted parser name "blacklistedParser" does not appear in the list of global parsers names. Make sure both spellings are identical.');
     expect((<any>console.warn)['calls'].allArgs()[1][0]).toBe('Whitelisted parser name "whitelistedParser" does not appear in the list of global parsers names. Make sure both spellings are identical.');
+  });
+
+  it('#should check parser functions', () => {
+    comp.content = 'This text is irrelevant for this test.';
+    // Create an objects that will be mistaken for parser instances (as they have constructor.name)
+    // Test with varying amounts of incomplete parser functions to trigger an error for each scenario
+    const noFuncParser = {constructor: {name: 'something'}};
+    const parseWithOneFunc = {constructor: {name: 'something'}, findHooks: () => {}};
+    const parseWithTwoFuncs = {constructor: {name: 'something'}, findHooks: () => {}, loadComponent: () => {}};
+
+    comp.parsers = [noFuncParser as any];
+    spyOn(console, 'error').and.callThrough();
+    comp.ngOnChanges({content: true, parsers: true} as any);
+    expect(comp.activeParsers.length).toBe(0);
+    expect((<any> console.error)['calls'].count()).toBe(1);
+    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:');
+
+    comp.parsers = [parseWithOneFunc as any];
+    comp.ngOnChanges({content: true, parsers: true} as any);
+    expect(comp.activeParsers.length).toBe(0);
+    expect((<any> console.error)['calls'].count()).toBe(2);
+    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "loadComponent()". Removing from list of active parsers:');
+
+    comp.parsers = [parseWithTwoFuncs as any];
+    comp.ngOnChanges({content: true, parsers: true} as any);
+    expect(comp.activeParsers.length).toBe(0);
+    expect((<any> console.error)['calls'].count()).toBe(3);
+    expect((<any> console.error)['calls'].mostRecent().args[0]).toBe('Submitted parser does not implement "getBindings()". Removing from list of active parsers:');
   });
 
 });
