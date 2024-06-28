@@ -14,7 +14,6 @@ import { provideDynamicHooks, HookParserEntry, resetDynamicHooks, DynamicHooksCo
 // Custom testing resources
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { WhateverTestComponent } from '../resources/components/whateverTest/whateverTest.c';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
@@ -31,19 +30,25 @@ export const testParsers: Array<HookParserEntry> = [
   // Generic element hook parsers
   GenericMultiTagElementParser,
   GenericWhateverElementParser,
-  // SelectorHookParsers
+  // String SelectorHookParsers
   {
     component: SingleTagTestComponent,
-    name: 'SingleTagTestComponentParser',
+    selector: 'singletag-string-selector',
+    bracketStyle: {opening: '[', closing: ']'}, // Forces the use of StringSelectorHookParser
+    name: 'SingleTagStringSelectorParser',
     enclosing: false
   },
   {
     component: MultiTagTestComponent,
-    name: 'MultiTagTestComponentParser'
+    selector: 'multitag-string-selector',
+    bracketStyle: {opening: '[', closing: ']'}, // Forces the use of StringSelectorHookParser
+    name: 'MultiTagStringSelectorParser'
   },
+  // Element SelectorHookParsers
   {
-    component: WhateverTestComponent,
-    name: 'WhateverTestComponentParser',
+    component: MultiTagTestComponent,
+    selector: 'multitag-element-selector',
+    name: 'MultiTagElementSelectorParser'
   }
 ];
 

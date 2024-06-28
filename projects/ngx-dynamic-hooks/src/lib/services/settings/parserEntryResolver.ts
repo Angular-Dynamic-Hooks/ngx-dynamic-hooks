@@ -1,11 +1,14 @@
 import { isDevMode, Injectable, Injector, reflectComponentType } from '@angular/core';
 import { HookParser } from '../../interfacesPublic';
-import { SelectorHookParser } from '../../parsers/selector/selectorHookParser';
-import { SelectorHookParserConfig } from '../../parsers/selector/config/selectorHookParserConfig';
-import { SelectorHookParserConfigResolver } from '../../parsers/selector/config/selectorHookParserConfigResolver';
-import { TagHookFinder } from '../../parsers/selector/services/tagHookFinder';
-import { BindingStateManager } from '../../parsers/selector/services/bindingStateManager';
+import { StringSelectorHookParser } from '../../parsers/selector/string/stringSelectorHookParser';
+import { SelectorHookParserConfig } from '../../parsers/selector/selectorHookParserConfig';
+import { SelectorHookParserConfigResolver } from '../../parsers/selector/selectorHookParserConfigResolver';
+import { TagHookFinder } from '../../parsers/selector/string/tagHookFinder';
+import { BindingsValueManager } from '../../parsers/selector/bindingsValueManager';
 import { HookParserEntry } from './parserEntry';
+import { ElementSelectorHookParser } from '../../parsers/selector/element/elementSelectorHookParser';
+import { PlatformService } from '../platform/platformService';
+import { AutoPlatformService } from '../platform/autoPlatformService';
 
 /**
  * A helper class for resolving HookParserEntries
@@ -15,7 +18,7 @@ import { HookParserEntry } from './parserEntry';
 })
 export class ParserEntryResolver {
 
-  constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private tagHookFinder: TagHookFinder, private bindingStateManager: BindingStateManager) {
+  constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private platformService: AutoPlatformService, private tagHookFinder: TagHookFinder, private bindingsValueManager: BindingsValueManager) {
   }
 
   /**
@@ -87,7 +90,7 @@ export class ParserEntryResolver {
       // Check if component class
       const componentMeta = reflectComponentType(parserEntry as any);
       if (componentMeta) {
-        return new SelectorHookParser({component: parserEntry as any}, this.parserResolver, this.tagHookFinder, this.bindingStateManager);
+        return this.createSelectorHookParser({component: parserEntry as any});
       // Else must be parser class
       } else {
         // Check if service
@@ -108,7 +111,7 @@ export class ParserEntryResolver {
       // Is object literal
       } else {
         try {
-          return new SelectorHookParser(parserEntry as SelectorHookParserConfig, this.parserResolver, this.tagHookFinder, this.bindingStateManager);
+          return this.createSelectorHookParser(parserEntry as SelectorHookParserConfig);
         } catch (e)  {}
       }
     }
@@ -117,6 +120,22 @@ export class ParserEntryResolver {
       console.error('Invalid parser config - ', parserEntry);
     }
     return null;
+  }
+
+  /**
+   * Depending on the config, load either string or element SelectorHookParser
+   *
+   * @param config - The selectorHookParserConfig
+   */
+  private createSelectorHookParser(config: SelectorHookParserConfig): HookParser {
+    if (
+      (config.hasOwnProperty('enclosing') && !config.enclosing) || 
+      (config.hasOwnProperty('bracketStyle') && config.bracketStyle)
+    ) {
+      return new StringSelectorHookParser(config, this.parserResolver, this.tagHookFinder, this.bindingsValueManager);
+    } else {
+      return new ElementSelectorHookParser(config, this.parserResolver, this.platformService, this.bindingsValueManager);
+    }    
   }
 
   /**

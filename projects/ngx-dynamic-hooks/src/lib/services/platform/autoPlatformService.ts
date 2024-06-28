@@ -45,6 +45,14 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('getTagName').getTagName!(element);
   }
 
+  getOpeningTag(element: any) {
+    return this.getFor('getOpeningTag').getOpeningTag!(element);
+  }
+
+  getClosingTag(element: any) {
+    return this.getFor('getClosingTag').getClosingTag!(element);
+  }
+
   getAttributeNames(element: any) {
     return this.getFor('getAttributeNames').getAttributeNames!(element);
   }

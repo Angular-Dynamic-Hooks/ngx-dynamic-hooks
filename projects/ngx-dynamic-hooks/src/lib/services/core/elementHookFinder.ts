@@ -47,9 +47,10 @@ export class ElementHookFinder {
         id: hookId,
         parser: pr.parser,
         value: {
-          openingTag: null,
-          closingTag: null,
-          element: this.platformService.cloneElement(pr.hookElement)
+          openingTag: this.platformService.getOpeningTag(pr.hookElement),
+          closingTag: this.platformService.getClosingTag(pr.hookElement),
+          element: pr.hookElement,
+          elementSnapshot: this.platformService.cloneElement(pr.hookElement)
         },
         data: null,
         isLazy: false,

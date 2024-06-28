@@ -44,7 +44,7 @@ describe('DynamicHooksService', () => {
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
-          fonts: ['arial', 'calibri']
+          simpleArray: ['arial', 'calibri']
         }
       }
     }
@@ -64,7 +64,7 @@ describe('DynamicHooksService', () => {
 
       expect(outletParseResult.element.querySelector('.multitag-component')).not.toBe(null);
       expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
     });
   });
 
@@ -85,7 +85,7 @@ describe('DynamicHooksService', () => {
     genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         inputs: {
-          fonts: ['arial', 'calibri']
+          simpleArray: ['arial', 'calibri']
         }
       }
     }
@@ -112,7 +112,7 @@ describe('DynamicHooksService', () => {
 
       expect(existingElement.querySelector('.multitag-component')).not.toBe(null);
       expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.fonts).toEqual(['arial', 'calibri']);
+      expect(outletParseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
     });
   });
 
@@ -155,13 +155,14 @@ describe('DynamicHooksService', () => {
     }
 
     const testText = `
+      <p>Some generic paragraph</p>
       [singletag-string]
       [multitag-string][/multitag-string]
     `;
 
-    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
-      const hookIndex = outletParseResult.hookIndex;
-      const hostElement = outletParseResult.element;
+    dynamicHooksService.parse(testText).subscribe((result: OutletParseResult) => {
+      const hookIndex = result.hookIndex;
+      const hostElement = result.element;
 
       expect(Object.keys(hookIndex).length).toBe(2);
       const firstCompRef = hookIndex[1].componentRef;
@@ -174,10 +175,18 @@ describe('DynamicHooksService', () => {
       expect((firstCompRef as any).destroy['calls'].count()).toBe(0);
       expect((secondCompRef as any).destroy['calls'].count()).toBe(0);
 
+      expect(result.element.children[0].tagName).toBe('P');
+      expect(result.element.children[0].textContent).toBe('Some generic paragraph');
+      expect(result.element.children[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+      expect(result.element.children[1].children[0].classList.contains('singletag-component')).toBeTrue();
+      expect(result.element.children[2].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+      expect(result.element.children[2].children[0].classList.contains('multitag-component')).toBeTrue();
+
       // Destroy outlet comnponent
       dynamicHooksService.destroy(hookIndex);
 
-      expect(hostElement.innerHTML.trim()).toBe('');
+      // Component html will be fully removed when Angular destroys them, so only paragraph ought to be left
+      expect(hostElement.innerHTML.trim()).toBe('<p>Some generic paragraph</p>');
       expect((firstCompRef as any).destroy['calls'].count()).toBe(1);
       expect((secondCompRef as any).destroy['calls'].count()).toBe(1);
     });

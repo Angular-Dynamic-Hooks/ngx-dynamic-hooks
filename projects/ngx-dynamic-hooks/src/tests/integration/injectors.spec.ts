@@ -1,6 +1,5 @@
 // Testing api resources
 import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, OutletParseResult, provideDynamicHooks } from '../testing-api';
-import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';

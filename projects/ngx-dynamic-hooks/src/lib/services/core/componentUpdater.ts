@@ -89,6 +89,8 @@ export class ComponentUpdater {
    * @param options - The current HookComponentOptions
    */
   updateComponentWithNewOutputs(hook: Hook, context: any, options: OutletOptions): void {
+    const component = hook.componentRef!.instance;
+
     // Find out which outputs have changed
     const changedOutputs: {[key: string]: (e: any, c: any) => any} = this.getChangedBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!);
 
@@ -96,17 +98,24 @@ export class ComponentUpdater {
     const existingOutputs: {[key: string]: (e: any, c: any) => any} = {};
     if (options.acceptOutputsForAnyObservable) {
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
-        if (hook.componentRef!.instance[outputName] instanceof Observable) {
-          existingOutputs[outputName] = outputCallback;
+        let foundOutputProp = 
+          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && outputName === propName) ||
+          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && outputName.toLowerCase() === propName.toLowerCase());
+      
+        if (foundOutputProp) {
+          existingOutputs[foundOutputProp] = outputCallback;
         }
       }
     } else {
       const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
-        const outputEntry = compMeta.outputs.filter(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName));
-        if (outputEntry.length > 0) {
+        let outputEntry = 
+          compMeta.outputs.find(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName)) ||
+          compMeta.outputs.find(outputObject => outputName.toLowerCase() === (options.ignoreOutputAliases ? outputObject.propName.toLowerCase() : outputObject.templateName.toLowerCase()));
+
+        if (outputEntry) {
           // Save in existingInputs with actual property name, not alias
-          existingOutputs[outputEntry[0].propName] = outputCallback;
+          existingOutputs[outputEntry.propName] = outputCallback;
         }
       }
     }
@@ -116,7 +125,6 @@ export class ComponentUpdater {
       if (hook.outputSubscriptions[outputName]) { hook.outputSubscriptions[outputName].unsubscribe(); }
       hook.outputSubscriptions[outputName] = hook.componentRef!.instance[outputName].subscribe((event: any) => outputCallback(event, context));
     }
-
   }
 
   /**
@@ -126,6 +134,8 @@ export class ComponentUpdater {
    * @param options - The current HookComponentOptions
    */
   updateComponentWithNewInputs(hook: Hook, options: OutletOptions): void {
+    const component = hook.componentRef!.instance;
+
     // Find out which inputs have changed
     const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!);
 
@@ -133,21 +143,31 @@ export class ComponentUpdater {
     const existingInputs: {[key: string]: any} = {};
     if (options.acceptInputsForAnyProperty) {
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {
+        let foundInputProp = 
+          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && inputName === propName) ||
+          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && inputName.toLowerCase() === propName.toLowerCase());
+      
+        // If property exists (in a case-agnostic way), use it. Otherwise create literal new property.
+        const finalInputProp = foundInputProp || inputName;
+
         // Even this setting has limits. Don't allow setting fundamental JavaScript object properties.
-        if (!['__proto__', 'prototype', 'constructor'].includes(inputName)) {
-          existingInputs[inputName] = inputValue;
+        if (!['__proto__', 'prototype', 'constructor'].includes(finalInputProp)) {
+          existingInputs[finalInputProp] = inputValue;
         } else {
-          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + inputName + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
+          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + finalInputProp + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
           continue;
         }
       }
     } else {
       const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
       for (const [inputName, inputValue] of Object.entries(changedInputs)) {
-        const inputEntry = compMeta.inputs.filter(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName));
-        if (inputEntry.length > 0) {
+        let inputEntry = 
+          compMeta.inputs.find(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName)) ||
+          compMeta.inputs.find(inputObject => inputName.toLowerCase() === (options.ignoreOutputAliases ? inputObject.propName.toLowerCase() : inputObject.templateName.toLowerCase()));
+
+        if (inputEntry) {
           // Save in existingInputs with actual property name, not alias
-          existingInputs[inputEntry[0].propName] = inputValue;
+          existingInputs[inputEntry.propName] = inputValue;
         }
       }
     }

@@ -11,8 +11,9 @@ export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicCont
 export { DynamicHooksComponent } from '../lib/components/outlet/dynamicHooksComponent';
 export { OutletOptions, getOutletOptionDefaults } from '../lib/services/settings/options';
 export { HookParserEntry } from '../lib/services/settings/parserEntry';
-export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
-export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
+export { StringSelectorHookParser } from '../lib/parsers/selector/string/stringSelectorHookParser';
+export { ElementSelectorHookParser } from '../lib/parsers/selector/element/elementSelectorHookParser';
+export { SelectorHookParserConfig } from '../lib/parsers/selector/selectorHookParserConfig';
 export { DynamicHooksService } from '../lib/services/dynamicHooksService';
 export { AutoPlatformService } from '../lib/services/platform/autoPlatformService';
 export { DefaultPlatformService } from '../lib/services/platform/defaultPlatformService';
@@ -26,13 +27,13 @@ export { regexes } from '../lib/constants/regexes';
 export { matchAll } from '../lib/services/utils/utils';
 
 // Private module resources
-export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED, DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_MODULESETTINGS} from '../lib/interfaces';
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED, DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_MODULESETTINGS, SavedBindings} from '../lib/interfaces';
 export { OptionsResolver } from '../lib/services/settings/optionsResolver';
 export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/services/core/componentCreator';
 export { ComponentUpdater } from '../lib/services/core/componentUpdater';
 export { StringHookFinder } from '../lib/services/core/stringHookFinder';
-export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
-export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
-export { TagHookFinder } from '../lib/parsers/selector/services/tagHookFinder';
+export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/selectorHookParserConfigResolver';
+export { BindingsValueManager } from '../lib/parsers/selector/bindingsValueManager';
+export { TagHookFinder } from '../lib/parsers/selector/string/tagHookFinder';
 export * from '../lib/constants/core';

@@ -110,6 +110,31 @@ describe('DefaultPlatformService', () => {
     expect(actualTagName).toBe(expectedTagName);
   });
 
+  // getOpeningTag
+  // ------------------
+
+  it(`#should return the element's opening tag`, () => {
+    const openingTag = `<p id="myCustomId" class="something" style="{color: blue}">`;
+
+    const div = document.createElement('div');
+    div.innerHTML = `${openingTag}<span>Some content</span></p>`;
+    const p = div.children[0];
+
+    expect(platformService.getOpeningTag(p)).toBe(openingTag);
+  });
+
+  // getClosingTag
+  // ------------------
+
+  it(`#should return the element's closing tag`, () => {
+    const div = document.createElement('div');
+    div.innerHTML = `<p><span>Some content</span></p>`;
+    const p = div.children[0];
+
+    expect(platformService.getClosingTag(p)).toBe('</p>');
+  });
+
+
   // getAttributeNames
   // ------------------
 

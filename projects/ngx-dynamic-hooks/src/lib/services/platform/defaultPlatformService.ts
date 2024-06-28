@@ -60,6 +60,23 @@ export class DefaultPlatformService implements CompletePlatformService {
     return element.tagName;
   }
 
+  getOpeningTag(element: any) {
+    // Approach by: https://stackoverflow.com/a/55859966/3099523
+    const innerLength = element.innerHTML.length
+    const outerLength = element.outerHTML.length;
+    
+    // Check for self-closing elements
+    const openingTagLength = element.outerHTML[outerLength - 2] === '/' ?
+      outerLength :
+      outerLength - innerLength - element.tagName.length - 3;
+    
+    return element.outerHTML.slice(0, openingTagLength);
+  }
+
+  getClosingTag(element: any) {
+    return element.outerHTML.slice(element.outerHTML.length - element.tagName.length - 3);
+  }
+
   getAttributeNames(element: Node) {
     return typeof (element as any).getAttributeNames === 'function' ? (element as any).getAttributeNames() : [];
   }

@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, HookFinder, SelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, ElementSelectorHookParser, HookFinder, StringSelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from '../shared';
@@ -35,9 +35,9 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[2]).toEqual(jasmine.any(GenericWhateverStringParser));
     expect(comp.activeParsers[3]).toEqual(jasmine.any(GenericMultiTagElementParser));
     expect(comp.activeParsers[4]).toEqual(jasmine.any(GenericWhateverElementParser));
-    expect(comp.activeParsers[5]).toEqual(jasmine.any(SelectorHookParser));
-    expect(comp.activeParsers[6]).toEqual(jasmine.any(SelectorHookParser));
-    expect(comp.activeParsers[7]).toEqual(jasmine.any(SelectorHookParser));
+    expect(comp.activeParsers[5]).toEqual(jasmine.any(StringSelectorHookParser));
+    expect(comp.activeParsers[6]).toEqual(jasmine.any(StringSelectorHookParser));
+    expect(comp.activeParsers[7]).toEqual(jasmine.any(ElementSelectorHookParser));
     expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect((comp.activeParsers[1] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.activeParsers[2] as any).component.prototype.constructor.name).toBe('WhateverTestComponent');
@@ -45,7 +45,7 @@ describe('Parser configuration', () => {
     expect((comp.activeParsers[4] as any).component.prototype.constructor.name).toBe('WhateverTestComponent');
     expect((comp.activeParsers[5] as any)['config'].component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect((comp.activeParsers[6] as any)['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
-    expect((comp.activeParsers[7] as any)['config'].component.prototype.constructor.name).toBe('WhateverTestComponent');
+    expect((comp.activeParsers[7] as any)['config'].component.prototype.constructor.name).toBe('MultiTagTestComponent');
   });
 
   it('#should load local parsers correctly', () => {
@@ -63,16 +63,16 @@ describe('Parser configuration', () => {
       provideDynamicHooks({parsers: []})
     ]));
 
-    // Should be able to load parsers that are just component classes (SelectorHookParser)
+    // Should be able to load parsers that are just component classes based on the component selector (SelectorHookParser)
     comp.content = 'This is a sentence with a <multitagtest></multitagtest>.';
     comp.parsers = [MultiTagTestComponent];
     comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
+    expect(comp.activeParsers[0].constructor.name).toBe('ElementSelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
-    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <multitagtest');
+    expect(fixture.nativeElement.children[0].tagName).toBe('MULTITAGTEST');
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
 
     // Should be able to load parsers that are object literals (SelectorHookParser)
@@ -80,7 +80,7 @@ describe('Parser configuration', () => {
     comp.parsers = [{component: SingleTagTestComponent, enclosing: false}];
     comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0].constructor.name).toBe('SelectorHookParser');
+    expect(comp.activeParsers[0].constructor.name).toBe('StringSelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);

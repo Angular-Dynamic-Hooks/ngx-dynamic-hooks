@@ -43,18 +43,19 @@ describe('Parser element hooks', () => {
   });
 
   it('#should save a copy of the found element in HookValue', () => {
-    comp.content = `Here is an element hook: <multitag-element>asd</multitag-element>`;
+    comp.content = `Here is an element hook: <multitag-element id="asd" class="hello">asd</multitag-element>`;
     comp.ngOnChanges({content: true} as any);
   
     expect(Object.keys(comp.hookIndex).length).toBe(1);
-    expect(comp.hookIndex[1].value.openingTag).toBe(null);
-    expect(comp.hookIndex[1].value.closingTag).toBe(null);
+    expect(comp.hookIndex[1].value.openingTag).toBe('<multitag-element id="asd" class="hello">');
+    expect(comp.hookIndex[1].value.closingTag).toBe('</multitag-element>');
     expect(comp.hookIndex[1].value.element.tagName).toBe('MULTITAG-ELEMENT');
+    expect(comp.hookIndex[1].value.elementSnapshot.tagName).toBe('MULTITAG-ELEMENT');
 
     // Reset
     ({testBed, fixture, comp, context} = defaultBeforeEach());
 
-    // hookValue.element should be a copy and not the same element
+    // hookValue.element should be actual found element, hookValue.elementSnapshot should be a copy of it
     const div = document.createElement('div');
     const componentElement = document.createElement('multitag-element');
     div.appendChild(componentElement);
@@ -62,9 +63,10 @@ describe('Parser element hooks', () => {
     comp.ngOnChanges({content: true} as any);
   
     expect(comp.hookIndex[1].value.element.tagName).toBe('MULTITAG-ELEMENT');
-    expect(comp.hookIndex[1].value.element).not.toBe(componentElement);
+    expect(comp.hookIndex[1].value.elementSnapshot.tagName).toBe('MULTITAG-ELEMENT');
+    expect(comp.hookIndex[1].value.element).toBe(componentElement);
+    expect(comp.hookIndex[1].value.elementSnapshot).not.toBe(componentElement);
   });
-  
   
   it('#should load nested content correctly', fakeAsync(() => {
     const testText = `

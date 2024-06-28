@@ -1,5 +1,5 @@
 import { EnvironmentInjector, Injector } from '@angular/core';
-import { ComponentConfig } from '../../../interfacesPublic';
+import { ComponentConfig } from '../../interfacesPublic';
 
 /**
  * Several options to configure and instantiate a ComponentSelectorParser with

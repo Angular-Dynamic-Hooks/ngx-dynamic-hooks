@@ -84,10 +84,12 @@ describe('Parser string hooks', () => {
     expect(hookIndex[1].value.openingTag).toBe('[singletag-string]');
     expect(hookIndex[1].value.closingTag).toBe(null);
     expect(hookIndex[1].value.element).toBe(null);
+    expect(hookIndex[1].value.elementSnapshot).toBe(null);
 
     expect(hookIndex[2].value.openingTag).toBe('[multitag-string]');
     expect(hookIndex[2].value.closingTag).toBe('[/multitag-string]');
     expect(hookIndex[2].value.element).toBe(null);
+    expect(hookIndex[2].value.elementSnapshot).toBe(null);
   });
   
   it('#should load nested content correctly', fakeAsync(() => {

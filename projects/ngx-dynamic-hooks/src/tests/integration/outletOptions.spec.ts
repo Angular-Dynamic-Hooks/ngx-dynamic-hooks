@@ -147,7 +147,7 @@ describe('OutletOptions', () => {
   it('#should convertHTMLEntities, if requested', () => {
     const testText = `
       The following word has encoded b-tags: &lt;b&gt;BOLD&lt;/b&gt;.
-      This hook is using html entities as well: &lt;singletagtest [numberProp]=&quot;21&quot; [simpleArray]='[&quot;enrico&quot;,&nbsp;&quot;susanne&quot;]'&gt;
+      This hook is using html entities as well: &#91;singletag-string-selector [numberProp]=&quot;21&quot; [simpleArray]='[&quot;enrico&quot;,&nbsp;&quot;susanne&quot;]'&#93;
     `;
     comp.content = testText;
     comp.options = { convertHTMLEntities: true, sanitize: false };

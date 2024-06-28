@@ -227,7 +227,8 @@ export class StringHookFinder {
         value: {
           openingTag: hookSegments.openingTag,
           closingTag: hookSegments.closingTag,
-          element: null
+          element: null,
+          elementSnapshot: null
         },
         data: null,
         isLazy: false,

@@ -1,6 +1,5 @@
 // Testing api resources
 import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getOutletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
-import { SelectorHookParser } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';

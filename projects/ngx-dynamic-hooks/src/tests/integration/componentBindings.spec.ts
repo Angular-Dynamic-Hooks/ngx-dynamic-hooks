@@ -64,6 +64,35 @@ describe('Component bindings', () => {
     expect(testVar).toBe(`Output callback was triggered with value 777!`);
   });
 
+  it('#should ignore letter-casing when when receiving bindings from parsers', () => {
+    const someObj = {
+      someArr: ['hello', 'from', 'the', 'parser!']
+    };
+    let testVar: any = null;
+
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          sImPlEoBjEcT: someObj
+        },
+        outputs: {
+          GeNeRiCoUtPuT: event => { testVar = `Triggered ${event}!`; }
+        }
+      }
+    }
+
+    const testText = `Just some component: [singletag-string]">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+
+    const loadedComp = comp.hookIndex[1].componentRef!.instance;
+    expect(loadedComp.simpleObject).toBe(someObj);
+    loadedComp.genericOutput.emit('successfully');
+    expect(testVar).toBe(`Triggered successfully!`);
+  });
+
   it('#should trigger ngOnChanges() after component creation and any time an input changes', () => {
     const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
@@ -97,7 +126,7 @@ describe('Component bindings', () => {
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
-          httpResponseReceived: () => 'someFunction'
+          genericOutput: () => 'someFunction'
         }
       }
     }
@@ -106,13 +135,13 @@ describe('Component bindings', () => {
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
-    spyOn(comp.hookIndex[1].componentRef!.instance['httpResponseReceived'], 'subscribe').and.callThrough();
+    spyOn(comp.hookIndex[1].componentRef!.instance['genericOutput'], 'subscribe').and.callThrough();
 
     // Change returned output
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
-          httpResponseReceived: () => 'someOtherFunction'
+          genericOutput: () => 'someOtherFunction'
         }
       }
     }
@@ -121,7 +150,7 @@ describe('Component bindings', () => {
     comp.ngDoCheck();
 
     // Should have resubscribed
-    expect(comp.hookIndex[1].componentRef!.instance['httpResponseReceived'].subscribe['calls'].count()).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance['genericOutput'].subscribe['calls'].count()).toBe(1);
   });
 
   it('#should unsubscribe from outputs on destroy', () => {

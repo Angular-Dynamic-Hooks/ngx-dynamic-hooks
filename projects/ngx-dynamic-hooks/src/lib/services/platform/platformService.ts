@@ -48,6 +48,18 @@ export interface CompletePlatformService {
   getTagName(element: any): string;
 
   /**
+   * Returns the opening tag of an element as a string
+   * @param element An element
+   */
+  getOpeningTag(element: any): string;
+
+  /**
+   * Returns the closing tag of an element as a string
+   * @param element An element
+   */
+  getClosingTag(element: any): string;
+
+  /**
    * Returns the names of all existing attributes of an element
    * Return an emtpy array if none exist
    * @param element The element

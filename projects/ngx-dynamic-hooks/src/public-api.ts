@@ -16,8 +16,8 @@ export * from './lib/services/dynamicHooksService';
 export * from './lib/services/settings/settings';
 
 // SelectorHookParser
-export * from './lib/parsers/selector/selectorHookParser';
-export * from './lib/parsers/selector/config/selectorHookParserConfig';
+export * from './lib/parsers/selector/string/stringSelectorHookParser';
+export * from './lib/parsers/selector/selectorHookParserConfig';
 
 // Utils
 export * from './lib/services/utils/dataTypeEncoder';

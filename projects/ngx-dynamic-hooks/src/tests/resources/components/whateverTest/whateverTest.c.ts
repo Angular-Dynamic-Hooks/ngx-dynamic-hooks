@@ -1,5 +1,6 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Inject, InjectionToken } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Inject, InjectionToken, inject } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
+import { RootTestService } from '../../services/rootTestService';
 
 @Component({
   selector: 'whatevertest',
@@ -8,15 +9,18 @@ import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } 
   standalone: true
 })
 export class WhateverTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
-  @Input() backgroundColor: string = '#25436c';
-  @Input() nr!: number;
+  @Input() someString!: string;
+  @Input() someNumber!: number;
   @Input() config: any;
   mountContext: any;
   mountContentChildren!: Array<DynamicContentChild>;
   changesContext: any;
   changesContentChildren!: Array<DynamicContentChild>;
+  rootTestService: RootTestService;
 
   constructor(private cd: ChangeDetectorRef) {
+    // Test DI via inject()
+    this.rootTestService = inject(RootTestService);
   }
 
   ngOnInit () {

@@ -3,6 +3,7 @@ import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } 
 import { RootTestService } from '../../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../../services/genericInjectionToken';
 import { CommonModule } from '@angular/common';
+import { AbstractTestComponent } from '../abstractTest.c';
 
 export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that is only provided directly on the SingleTagTestComponent');
 
@@ -16,89 +17,17 @@ export const SINGLETAGCOMPONENTSERVICE = new InjectionToken<any>('A service that
   ],
   standalone: true
 })
-export class SingleTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
-  nonInputProperty: string = 'this is the default value';
-  @Input() genericInput: any;
-  @Input() inputWithoutBrackets!: string;
-  @Input() emptyInputWithoutBrackets!: string;
-  @Input() emptyInput!: string;
-  @Input() emptyStringInput!: string;
-  @Input() _weird5Input$Name13!: string;
-  @Input('stringPropAlias') stringProp: any;
-  @Input('data-somevalue') dataSomeValue!: string;
-  @Input() numberProp: any;
-  @Input() booleanProp!: boolean;
-  @Input() nullProp: any;
-  @Input() undefinedProp: any;
-  @Input() simpleObject: any;
-  @Input() simpleArray: any;
-  @Input() variable!: string;
-  @Input() variableLookalike!: string;
-  @Input() variableInObject: any;
-  @Input() variableInArray!: Array<any>;
-  @Input() contextWithoutAnything: any;
-  @Input() nestedFunctions: any;
-  @Input() nestedFunctionsInBrackets!: Array<any>;
-  @Input() everythingTogether!: Array<any>;
-  nonOutputEventEmitter: EventEmitter<number> = new EventEmitter();
-  @Output() genericOutput: EventEmitter<number> = new EventEmitter();
-  @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
-  @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
-  @Output() httpResponseReceived: EventEmitter<number> = new EventEmitter();
-  @Output() onDestroyEmitter: EventEmitter<string> = new EventEmitter();
-  ngOnInitTriggered: boolean = false;
-  ngOnChangesTriggered: boolean = false;
-  mountContext: any;
-  mountContentChildren!: Array<DynamicContentChild>;
-  changesContext: any;
-  changesContentChildren!: Array<DynamicContentChild>;
-
+export class SingleTagTestComponent extends AbstractTestComponent {
 
   constructor (
-    public cd: ChangeDetectorRef, 
-    @Optional() public rootTestService: RootTestService,
+    cd: ChangeDetectorRef, 
+    @Optional() rootTestService: RootTestService,
+    @Optional() @Inject(GENERICINJECTIONTOKEN) genericInjectionValue: any,
+    environmentInjector: EnvironmentInjector,
+    injector: Injector,
     @Optional() @Inject(SINGLETAGCOMPONENTSERVICE) private singleTagComponentService: any,
-    @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any,
-    public environmentInjector: EnvironmentInjector,
-    public injector: Injector
   ) {
-    //console.log(environmentInjector);
-    //console.log(rootTestService);
-    //console.log(genericInjectionValue);
-    //console.log(singleTagComponentService);
-  }
-
-  ngDoCheck() {
-  }
-
-  ngOnInit () {
-    this.ngOnInitTriggered = true;
-  }
-
-  ngOnChanges(changes: any) {
-    this.ngOnChangesTriggered = true;
-    // console.log(changes);
-  }
-
-  ngAfterViewInit() {
-  }
-
-  ngOnDestroy() {
-    this.onDestroyEmitter.emit('Event triggered from onDestroy!');
-  }
-
-  onDynamicMount(data: OnDynamicData) {
-    this.mountContext = data.context;
-    this.mountContentChildren = (data as any).contentChildren;
-  }
-
-  onDynamicChanges(data: OnDynamicData) {
-    if (data.hasOwnProperty('context')) {
-      this.changesContext = data.context;
-    }
-    if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = (data as any).contentChildren;
-    }
+    super(cd, rootTestService, genericInjectionValue, environmentInjector, injector);
   }
 
 }

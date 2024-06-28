@@ -5,7 +5,7 @@ import { SingleTagTestComponent } from '../../resources/components/singleTag/sin
 import { DynamicHooksComponent } from '../../testing-api';
 import { defaultBeforeEach } from '../shared';
 
-describe('SelectorHookParser', () => {
+describe('StringSelectorHookParser', () => {
   let testBed;
   let fixture: any;
   let comp: DynamicHooksComponent;
@@ -18,7 +18,7 @@ describe('SelectorHookParser', () => {
   // ----------------------------------------------------------------------------
 
   it('#should load single tag selectors', () => {
-    const testText = `<p>This p-element has a <span>span-element with a component <singletagtest [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'></span> within it.</p>`;
+    const testText = `<p>This p-element has a <span>span-element with a component [singletag-string-selector [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]']</span> within it.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -28,7 +28,7 @@ describe('SelectorHookParser', () => {
   });
 
   it('#should load a multi tag selectors', () => {
-    const testText = `<p>This is a multi tag component <multitagtest>This is the inner content.</multitagtest>.</p>`;
+    const testText = `<p>This is a multi tag component [multitag-string-selector]This is the inner content.[/multitag-string-selector].</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
@@ -38,10 +38,73 @@ describe('SelectorHookParser', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
   });
 
+  it('#should parse the html structure correctly', () => {
+    comp.content = `
+      <div class='initial-div'>
+        Some introductory text
+        [singletag-string-selector [numberProp]="846" (genericOutput)="context.maneuvers.modifyParent($event)"]
+        text in between
+        <span>Some span element</span>
+        [multitag-string-selector [simpleArray]="['arial', 'roboto', 'noto-sans']"]
+          Should be parsed fine
+          <h2 class='nested-title'>A nested title</h2>
+          [singletag-string-selector [simpleObject]='{occupation: "Mailman"}']
+        [/multitag-string-selector]
+        [singletag-string-selector]
+        <p>And a last paragraph element</p>
+      </div>
+    `;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true} as any);
+    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+    const thirdComp: SingleTagTestComponent = comp.hookIndex[3].componentRef!.instance;
+    const fourthComp: SingleTagTestComponent = comp.hookIndex[4].componentRef!.instance;
+
+    // Make sure components are loaded properly
+    expect(Object.keys(comp.hookIndex).length).toBe(4);
+    expect(firstComp.constructor.name).toBe('SingleTagTestComponent');
+    expect(secondComp.constructor.name).toBe('MultiTagTestComponent');
+    expect(thirdComp.constructor.name).toBe('SingleTagTestComponent');
+    expect(fourthComp.constructor.name).toBe('SingleTagTestComponent');
+
+    // Check html structure
+    const topDiv = fixture.nativeElement.children[0];
+    expect(topDiv.classList.contains('initial-div')).toBeTrue();
+    expect(topDiv.childNodes[0].textContent.trim()).toBe('Some introductory text');
+
+    const firstSingleTagComp = topDiv.childNodes[1];
+    expect(firstSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(firstSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
+
+    expect(topDiv.childNodes[2].textContent.trim()).toBe('text in between');
+    expect(topDiv.childNodes[3].tagName).toBe('SPAN');
+    expect(topDiv.childNodes[3].textContent.trim()).toBe('Some span element');
+
+    const firstMultiTagComp = topDiv.childNodes[5];
+    expect(firstMultiTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(firstMultiTagComp.children[0].classList.contains('multitag-component')).toBeTrue();
+    expect(firstMultiTagComp.children[0].childNodes[0].textContent.trim()).toBe('Should be parsed fine');
+    expect(firstMultiTagComp.children[0].childNodes[1].tagName).toBe('H2');
+    expect(firstMultiTagComp.children[0].childNodes[1].classList.contains('nested-title')).toBeTrue();
+    expect(firstMultiTagComp.children[0].childNodes[1].textContent.trim()).toBe('A nested title');
+
+    const secondSingleTagComp = firstMultiTagComp.children[0].childNodes[3];
+    expect(secondSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(secondSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
+
+    const thirdSingleTagComp = topDiv.childNodes[7];
+    expect(thirdSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(thirdSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
+
+    expect(topDiv.childNodes[9].tagName).toBe('P');
+    expect(topDiv.childNodes[9].textContent.trim()).toBe('And a last paragraph element');
+  });
+
   it('#should parse inputs properly', () => {
     const testText = `
-    <multitagtest [fonts]="['test', 'something', 'here']"></multitagtest>
-    <singletagtest
+    [multitag-string-selector [simpleArray]="['test', 'something', 'here']"][/multitag-string-selector]
+    [singletag-string-selector
       id="someid"
       id-with-hyphen="something"
       inputWithoutBrackets="{test: 'Hullo!'}"
@@ -91,25 +154,22 @@ describe('SelectorHookParser', () => {
           }
         ]
       ]"
-    >
-    <p>This should be untouched</p>
-    <whatevertest [nr]="123" [config]="{name: 'test', supportedValues: [1, 2, 3], active: true}"></whatevertest>`;
+    ]
+    <p>This should be untouched</p>`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
     const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
     const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
-    const thirdComp: WhateverTestComponent = comp.hookIndex[3].componentRef!.instance;
 
     // Make sure components are loaded properly
-    expect(Object.keys(comp.hookIndex).length).toBe(3);
+    expect(Object.keys(comp.hookIndex).length).toBe(2);
     expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
     expect(secondComp.constructor.name).toBe('SingleTagTestComponent');
-    expect(thirdComp.constructor.name).toBe('WhateverTestComponent');
     expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
 
     // Check all inputs
-    expect(firstComp.fonts).toEqual(['test', 'something', 'here']);
+    expect(firstComp.simpleArray).toEqual(['test', 'something', 'here']);
 
     expect((secondComp as any)['id']).toBe(undefined);
     expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
@@ -170,13 +230,10 @@ describe('SelectorHookParser', () => {
         }
       ]
     ]);
-
-    expect(thirdComp.nr).toBe(123);
-    expect(thirdComp.config).toEqual({name: 'test', supportedValues: [1, 2, 3], active: true});
   });
 
   it('#should parse outputs properly', () => {
-    const testText = `<singletagtest [numberProp]="123" (componentClickedAlias)="context.maneuvers.modifyParent($event)">`;
+    const testText = `[singletag-string-selector [numberProp]="123" (componentClickedAlias)="context.maneuvers.modifyParent($event)"]`;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -188,7 +245,7 @@ describe('SelectorHookParser', () => {
 
   it('#should catch errors if output string cannot be evaluated', () => {
     spyOn(console, 'error').and.callThrough();
-    const testText = `<singletagtest (componentClickedAlias)="context.maneuvers.modifyParent($event">`; // Missing final bracket
+    const testText = `[singletag-string-selector (componentClickedAlias)="context.maneuvers.modifyParent($event"]`; // Missing final bracket
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
@@ -202,17 +259,17 @@ describe('SelectorHookParser', () => {
   it('#should track all hooks and their bindings with used context variables', () => {
     const testText = `
       <p>Let's test this with two singletag-components</p>
-      <singletagtest [simpleObject]="{something: true, contextVar: context.order, nestedArray: [context.$lightSaberCollection]}" [simpleArray]="[true]" (httpResponseReceived)="context.maneuvers.meditate()">
-      <singletagtest [numberProp]="567">
+      [singletag-string-selector [simpleObject]="{something: true, contextVar: context.order, nestedArray: [context.$lightSaberCollection]}" [simpleArray]="[true]" (genericOutput)="context.maneuvers.meditate()"]
+      [singletag-string-selector [numberProp]="567"]
       <p>And a multitagcomponent</p>
-      <multitagtest [fonts]="['arial', context.greeting]"></multitagtest>
+      [multitag-string-selector [simpleArray]="['arial', context.greeting]"][/multitag-string-selector]
     `;
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
 
     // singletag hooks
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings).length).toBe(2);
 
     // First singletag:
@@ -228,9 +285,9 @@ describe('SelectorHookParser', () => {
     expect(Object.keys(singleTagBindings[1].inputs['simpleArray'].boundContextVariables).length).toBe(0);
 
     expect(Object.keys(singleTagBindings[1].outputs).length).toBe(1);
-    expect(singleTagBindings[1].outputs['httpResponseReceived'].raw).toBe('context.maneuvers.meditate()');
-    expect(typeof singleTagBindings[1].outputs['httpResponseReceived'].value).toBe('function');
-    expect(Object.keys(singleTagBindings[1].outputs['httpResponseReceived'].boundContextVariables).length).toBe(0);
+    expect(singleTagBindings[1].outputs['genericOutput'].raw).toBe('context.maneuvers.meditate()');
+    expect(typeof singleTagBindings[1].outputs['genericOutput'].value).toBe('function');
+    expect(Object.keys(singleTagBindings[1].outputs['genericOutput'].boundContextVariables).length).toBe(0);
 
     // Second singletag:
     expect(Object.keys(singleTagBindings[2].inputs).length).toBe(1);
@@ -239,38 +296,38 @@ describe('SelectorHookParser', () => {
     expect(Object.keys(singleTagBindings[2].inputs['numberProp'].boundContextVariables).length).toBe(0);
 
     // multitag hooks
-    const multiTagBindings = (comp as any).activeParsers[6]['currentBindings'];
+    const multiTagBindings = (comp as any).activeParsers[6]['savedBindings'];
     expect(Object.keys(multiTagBindings).length).toBe(1);
 
     // First multitag:
     expect(Object.keys(multiTagBindings[3].inputs).length).toBe(1);
-    expect(multiTagBindings[3].inputs['fonts'].raw).toBe(`['arial', context.greeting]`);
-    expect(multiTagBindings[3].inputs['fonts'].value).toEqual(['arial', context.greeting]);
-    expect(Object.keys(multiTagBindings[3].inputs['fonts'].boundContextVariables).length).toBe(1);
-    expect(multiTagBindings[3].inputs['fonts'].boundContextVariables['context.greeting']).toBe(context.greeting);
+    expect(multiTagBindings[3].inputs['simpleArray'].raw).toBe(`['arial', context.greeting]`);
+    expect(multiTagBindings[3].inputs['simpleArray'].value).toEqual(['arial', context.greeting]);
+    expect(Object.keys(multiTagBindings[3].inputs['simpleArray'].boundContextVariables).length).toBe(1);
+    expect(multiTagBindings[3].inputs['simpleArray'].boundContextVariables['context.greeting']).toBe(context.greeting);
   });
 
   it('#should remove bindings that cannot be parsed', () => {
-    const testText = `<singletagtest [numberProp]="12345" [simpleObject]="{color: 'blue', speed: 100">`; // <-- object has missing closing tag
+    const testText = `[singletag-string-selector  [numberProp]="12345" [simpleObject]="{color: 'blue', speed: 100"]`; // <-- object has missing closing tag
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
 
     // simpleObject should not be tracked
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['numberProp'].value).toBe(12345);
   });
 
   it('#should preserve binding references on update if binding is static', () => {
-    const testText = `<singletagtest [simpleObject]="{something: true, extra: 'hi, this is a string!'}">`;
+    const testText = `[singletag-string-selector [simpleObject]="{something: true, extra: 'hi, this is a string!'}"]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: true, extra: 'hi, this is a string!'}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: true, extra: "hi, this is a string!"});
@@ -288,14 +345,14 @@ describe('SelectorHookParser', () => {
   });
 
   it('#should preserve binding references on update if binding has bound context vars, but they have not changed', () => {
-    const testText = `<singletagtest [simpleObject]="{something: context.$lightSaberCollection}">`;
+    const testText = `[singletag-string-selector  [simpleObject]="{something: context.$lightSaberCollection}"]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: context.$lightSaberCollection}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: context.$lightSaberCollection});
@@ -314,14 +371,14 @@ describe('SelectorHookParser', () => {
   });
 
   it('#should preserve binding references on update if binding has bound context vars, and only their content has changed', () => {
-    const testText = `<singletagtest [simpleObject]="{something: context.$lightSaberCollection}">`;
+    const testText = `[singletag-string-selector [simpleObject]="{something: context.$lightSaberCollection}"]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].raw).toBe("{something: context.$lightSaberCollection}");
     expect(singleTagBindings[1].inputs['simpleObject'].value).toEqual({something: context.$lightSaberCollection});
@@ -341,14 +398,14 @@ describe('SelectorHookParser', () => {
   });
 
   it('#should change binding references on update if binding has bound context vars and they have changed', () => {
-    const testText = `<singletagtest [simpleArray]="[context.order]" [simpleObject]="{something: context.$lightSaberCollection}" (httpResponseReceived)="content.maneuvers.getMentalState()">`;
+    const testText = `[singletag-string-selector  [simpleArray]="[context.order]" [simpleObject]="{something: context.$lightSaberCollection}" (genericOutput)="content.maneuvers.getMentalState()"]`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     // Check bindings
-    const singleTagBindings = (comp as any).activeParsers[5]['currentBindings'];
+    const singleTagBindings = (comp as any).activeParsers[5]['savedBindings'];
     expect(Object.keys(singleTagBindings[1].inputs).length).toBe(2);
 
     expect(singleTagBindings[1].inputs['simpleArray'].raw).toBe("[context.order]");
@@ -361,16 +418,16 @@ describe('SelectorHookParser', () => {
     expect(Object.keys(singleTagBindings[1].inputs['simpleObject'].boundContextVariables).length).toBe(1);
     expect(singleTagBindings[1].inputs['simpleObject'].boundContextVariables['context.$lightSaberCollection']).toBe(context.$lightSaberCollection);
 
-    expect(singleTagBindings[1].outputs['httpResponseReceived'].raw).toBe('content.maneuvers.getMentalState()');
-    expect(typeof singleTagBindings[1].outputs['httpResponseReceived'].value).toBe('function');
-    expect(Object.keys(singleTagBindings[1].outputs['httpResponseReceived'].boundContextVariables).length).toBe(0); // Can't be known until the event triggers
+    expect(singleTagBindings[1].outputs['genericOutput'].raw).toBe('content.maneuvers.getMentalState()');
+    expect(typeof singleTagBindings[1].outputs['genericOutput'].value).toBe('function');
+    expect(Object.keys(singleTagBindings[1].outputs['genericOutput'].boundContextVariables).length).toBe(0); // Can't be known until the event triggers
 
     spyOn(comp.activeParsers[5], 'getBindings').and.callThrough();
 
     // Change bound property and trigger cd
     let previousArrayRef = singleTagBindings[1].inputs['simpleArray'].value;
     let previousObjectRef = singleTagBindings[1].inputs['simpleObject'].value;
-    let previousOutputRef = singleTagBindings[1].outputs['httpResponseReceived'].value;
+    let previousOutputRef = singleTagBindings[1].outputs['genericOutput'].value;
     context.order = 77;
     context.$lightSaberCollection = ['cyan', 'viridian', 'turquoise'];
     context.maneuvers.getMentalState = () => 'happy';
@@ -380,7 +437,7 @@ describe('SelectorHookParser', () => {
     expect((comp as any).activeParsers[5].getBindings['calls'].count()).toBe(1);
     expect(singleTagBindings[1].inputs['simpleArray'].value).not.toBe(previousArrayRef);
     expect(singleTagBindings[1].inputs['simpleObject'].value).not.toBe(previousObjectRef);
-    expect(singleTagBindings[1].outputs['httpResponseReceived'].value).toBe(previousOutputRef); // Output wrapper func refs should never change
+    expect(singleTagBindings[1].outputs['genericOutput'].value).toBe(previousOutputRef); // Output wrapper func refs should never change
 
     // Test identical by value:
     // If object, binding reference should change even if new context prop is identical by value, as the reference is still different.
@@ -396,7 +453,7 @@ describe('SelectorHookParser', () => {
   });
 
   it('#should replace (currently) invalid context vars with undefined, but fix them when they become available', () => {
-    const testText = `<singletagtest [simpleObject]='{validContextVar: context._jediCouncil.kenobi, invalidContextVar: context.sithTriumvirate.kreia}'>`;
+    const testText = `[singletag-string-selector  [simpleObject]='{validContextVar: context._jediCouncil.kenobi, invalidContextVar: context.sithTriumvirate.kreia}']`;
     comp.content = testText;
     comp.context = context;
     comp.options = {updateOnPushOnly: false};

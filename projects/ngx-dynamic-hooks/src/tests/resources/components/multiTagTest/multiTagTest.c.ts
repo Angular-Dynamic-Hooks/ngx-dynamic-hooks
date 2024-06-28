@@ -1,6 +1,8 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Injector, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, DoCheck, Optional, Injector, inject, Output, EventEmitter, EnvironmentInjector, Inject } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
 import { RootTestService } from '../../services/rootTestService';
+import { GENERICINJECTIONTOKEN } from '../../services/genericInjectionToken';
+import { AbstractTestComponent } from '../abstractTest.c';
 
 
 @Component({
@@ -9,56 +11,14 @@ import { RootTestService } from '../../services/rootTestService';
   styleUrls: ['./multiTagTest.c.scss'],
   standalone: true
 })
-export class MultiTagTestComponent implements OnDynamicMount, OnDynamicChanges, DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
-  @Input() backgroundColor: string = '#4493ff40';
-  @Input() nr!: number;
-  @Input() fonts!: Array<string>;
-  mountContext: any;
-  mountContentChildren!: Array<DynamicContentChild>;
-  changesContext: any;
-  changesContentChildren!: Array<DynamicContentChild>;
-  rootTestService: RootTestService;
-
-  constructor(
-    private cd: ChangeDetectorRef
+export class MultiTagTestComponent extends AbstractTestComponent {
+  constructor (
+    cd: ChangeDetectorRef, 
+    @Optional() rootTestService: RootTestService,
+    @Optional() @Inject(GENERICINJECTIONTOKEN) genericInjectionValue: any,
+    environmentInjector: EnvironmentInjector,
+    injector: Injector
   ) {
-    // Test DI via inject()
-    this.rootTestService = inject(RootTestService);
+    super(cd, rootTestService, genericInjectionValue, environmentInjector, injector);
   }
-
-
-  ngOnInit () {
-    // console.log('textbox init');
-  }
-
-  ngOnChanges(changes: any) {
-    // console.log('textbox changes');
-  }
-
-  ngDoCheck() {
-    // console.log('textbox doCheck');
-  }
-
-  ngAfterViewInit() {
-    // console.log('textbox afterviewinit');
-  }
-
-  ngOnDestroy() {
-    // console.log('textbox destroy');
-  }
-
-  onDynamicMount(data: OnDynamicData) {
-    this.mountContext = data.context;
-    this.mountContentChildren = (data as any).contentChildren;
-  }
-
-  onDynamicChanges(data: OnDynamicData) {
-    if (data.hasOwnProperty('context')) {
-      this.changesContext = data.context;
-    }
-    if (data.hasOwnProperty('contentChildren')) {
-      this.changesContentChildren = (data as any).contentChildren;
-    }
-  }
-
 }

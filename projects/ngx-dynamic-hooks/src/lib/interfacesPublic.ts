@@ -118,6 +118,7 @@ export interface HookValue {
     openingTag?: string|null;
     closingTag?: string|null;
     element?: any;
+    elementSnapshot?: any;
 }
 
 /**
