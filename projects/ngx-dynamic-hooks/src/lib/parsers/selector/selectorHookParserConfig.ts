@@ -8,6 +8,7 @@ export interface SelectorHookParserConfig {
     component: ComponentConfig;
     name?: string;
     selector?: string;
+    hostElementTag?: string;
     injector?: Injector;
     environmentInjector?: EnvironmentInjector,
     enclosing?: boolean;
@@ -32,6 +33,7 @@ export const selectorHookParserConfigDefaults: SelectorHookParserConfigDefaults 
     component: undefined,
     name: undefined,
     selector: undefined,
+    hostElementTag: undefined,
     injector: undefined,
     enclosing: true,
     bracketStyle: {opening: '<', closing: '>'},

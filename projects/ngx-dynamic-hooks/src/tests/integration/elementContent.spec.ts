@@ -1,14 +1,11 @@
 // Testing api resources
-import { EnvironmentInjector, createComponent } from '@angular/core';
-import { ElementHookFinder } from '../../lib/services/core/elementHookFinder';
 import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
-import { DynamicHooksComponent, DynamicHooksService, HookFinder, StringHookFinder } from '../testing-api';
+import { DynamicHooksComponent, DynamicHooksService, HookFinder, StringHookFinder, anchorElementTag } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
 import { TestBed } from '@angular/core/testing';
-import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 
 
 describe('Element content', () => {
@@ -59,12 +56,12 @@ describe('Element content', () => {
 
     const firstSection = fixture.nativeElement.children[0];
     expect(firstSection.childNodes[0].textContent).toContain('Here should be the first component');
-    expect(firstSection.childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(firstSection.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(firstSection.childNodes[1].querySelector('.whatever-component')).not.toBe(null);
 
     const article = fixture.nativeElement.children[1];
     expect(article.childNodes[0].textContent).toContain('Lets try another with nested content:');
-    expect(article.childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(article.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(article.childNodes[1].children[0].classList.contains('multitag-component')).toBeTrue();
 
     const multitag = article.childNodes[1].children[0];
@@ -79,7 +76,7 @@ describe('Element content', () => {
 
     const deeplyNestedDiv = multitag.childNodes[3];
     expect(deeplyNestedDiv.childNodes[0].textContent).toContain('And a nested component ');
-    expect(deeplyNestedDiv.childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(deeplyNestedDiv.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(deeplyNestedDiv.childNodes[1].querySelector('.singletag-component')).not.toBe(null);
     expect(deeplyNestedDiv.childNodes[2].textContent).toContain('Pretty neat.'); 
   });
@@ -177,11 +174,11 @@ describe('Element content', () => {
 
     const elementMultitag = section.childNodes[1].children[0];
     expect(elementMultitag.childNodes[0].textContent).toContain('And it contains a string hook');
-    expect(elementMultitag.childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(elementMultitag.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(elementMultitag.childNodes[1].children[0].classList.contains('singletag-component')).toBeTrue();
     expect(elementMultitag.childNodes[2].textContent).toContain('Should work');
 
-    expect(section.childNodes[3].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(section.childNodes[3].tagName).toBe(anchorElementTag.toUpperCase());
     expect(section.childNodes[3].children[0].classList.contains('multitag-component')).toBeTrue();
 
     const stringMultitag = section.childNodes[3].children[0];

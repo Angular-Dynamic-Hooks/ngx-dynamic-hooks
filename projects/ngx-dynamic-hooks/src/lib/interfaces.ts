@@ -1,4 +1,4 @@
-import { InjectionToken, Optional } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 import { DynamicHooksSettings } from './services/settings/settings';
 
 /**

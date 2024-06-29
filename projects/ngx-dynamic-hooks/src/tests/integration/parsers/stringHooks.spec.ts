@@ -16,7 +16,7 @@ describe('Parser string hooks', () => {
 
   // ----------------------------------------------------------------------------
 
-  it('#should load a single tag dynamic component', () => {
+  fit('#should load a single tag dynamic component', () => {
     const testText = `<p>This p-element has a <span>span-element with a component [singletag-string] within it.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
@@ -25,6 +25,8 @@ describe('Parser string hooks', () => {
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.singletag-component')).not.toBeNull();
+
+    console.log(fixture.nativeElement.innerHTML)
   });
 
   it('#should load a multi tag dynamic component', () => {

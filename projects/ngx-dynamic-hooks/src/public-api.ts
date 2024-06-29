@@ -17,10 +17,10 @@ export * from './lib/services/settings/settings';
 
 // SelectorHookParser
 export * from './lib/parsers/selector/string/stringSelectorHookParser';
+export * from './lib/parsers/selector/element/elementSelectorHookParser';
 export * from './lib/parsers/selector/selectorHookParserConfig';
 
 // Utils
-export * from './lib/services/utils/dataTypeEncoder';
 export * from './lib/services/utils/dataTypeParser';
 export * from './lib/services/utils/deepComparer';
 export * from './lib/services/utils/hookFinder';

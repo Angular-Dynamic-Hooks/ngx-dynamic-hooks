@@ -53,6 +53,11 @@ export class SelectorHookParserConfigResolver {
       parserConfig.selector = userParserConfig.selector;
     }
 
+    if (userParserConfig.hasOwnProperty('hostElementTag')) {
+      if (typeof userParserConfig.hostElementTag !== 'string') { throw Error('The submitted "hostElementTag" property in the SelectorHookParserConfig must be of type string, was ' + typeof userParserConfig.hostElementTag); }
+      parserConfig.hostElementTag = userParserConfig.hostElementTag;
+    }
+
     // injector (defaults to undefined)
     if (userParserConfig.hasOwnProperty('injector')) {
       parserConfig.injector = userParserConfig.injector;

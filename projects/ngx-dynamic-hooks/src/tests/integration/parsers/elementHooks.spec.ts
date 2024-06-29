@@ -1,9 +1,8 @@
 // Custom testing resources
 import { defaultBeforeEach } from '../shared';
 import { TestBed, TestBedStatic, fakeAsync } from '@angular/core/testing';
-import { DynamicHooksComponent, DynamicHooksService, anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../testing-api';
+import { DynamicHooksComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../testing-api';
 import { ParserFindHookElementsResult } from '../../../lib/services/core/elementHookFinder';
-import { MultiTagTestComponent } from '../../resources/components/multiTagTest/multiTagTest.c';
 import { GenericMultiTagElementParser } from '../../resources/parsers/genericMultiTagElementParser';
 
 describe('Parser element hooks', () => {
@@ -345,29 +344,29 @@ describe('Parser element hooks', () => {
     expect(Object.values(comp.hookIndex).length).toBe(6);
 
     // Note about hook index order: String hooks come first, followed by all element hooks
-    expect(comp.hookIndex[1].componentRef!.location.nativeElement.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[1].componentRef!.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('singletag-component')).toBeTrue();
 
-    expect(comp.hookIndex[2].componentRef!.location.nativeElement.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[2].componentRef!.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('Nested element hook');
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe('MULTITAG-ELEMENT');
 
-    expect(comp.hookIndex[3].componentRef!.location.nativeElement.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[3].componentRef!.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(comp.hookIndex[3].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('singletag-component')).toBeTrue();
 
-    expect(comp.hookIndex[4].componentRef!.location.nativeElement.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[4].componentRef!.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(comp.hookIndex[4].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
     expect(comp.hookIndex[4].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('With some content');
 
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.tagName).toBe('MULTITAG-ELEMENT');
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('And another standalone string hook');
-    expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.tagName).toBe('MULTITAG-ELEMENT');
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('Nested string hook');
-    expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
   });
 });

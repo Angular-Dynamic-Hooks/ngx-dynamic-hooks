@@ -29,6 +29,7 @@ export class StringSelectorHookParser implements HookParser {
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
     return {
       component: this.config.component,
+      hostElementTag: this.config.hostElementTag,
       injector: this.config.injector,
       environmentInjector: this.config.environmentInjector
     };

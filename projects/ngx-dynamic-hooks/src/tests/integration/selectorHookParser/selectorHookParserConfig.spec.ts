@@ -64,6 +64,11 @@ describe('SelectorHookParserConfig', () => {
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "selector" property in the SelectorHookParserConfig must be of type string, was boolean'));
 
+    // Wrong hostElementTag type
+    config = { component: SingleTagTestComponent, hostElementTag: true };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "hostElementTag" property in the SelectorHookParserConfig must be of type string, was boolean'));
+
     // Wrong enclosing type
     config = { component: SingleTagTestComponent, enclosing: 'true' };
     expect(() => configResolver.processConfig(config as any))
@@ -150,6 +155,7 @@ describe('SelectorHookParserConfig', () => {
 
     expect(getParserFor({...c, name: 'asd'})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, selector: 'asd'})).toBe(ElementSelectorHookParser);
+    expect(getParserFor({...c, hostElementTag: 'asd'})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, injector: TestBed.inject(Injector)})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, environmentInjector: TestBed.inject(EnvironmentInjector)})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, enclosing: false})).toBe(StringSelectorHookParser);
@@ -214,6 +220,49 @@ describe('SelectorHookParserConfig', () => {
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.innerText).toBe('Third span');
+  });
+
+  it('#should load custom host elements properly', () => {
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        parsers: [
+          {
+            component: MultiTagTestComponent,
+            hostElementTag: 'some-custom-element',
+            bracketStyle: {opening: '[', closing: ']'}
+          },
+          {
+            component: MultiTagTestComponent,
+            hostElementTag: 'yet-another-custom-element'
+          }
+        ]
+      })
+    ]));
+
+    comp.content = `
+      [multitagtest]
+        <p>Some irrelevant text</p>
+      [/multitagtest]
+      <multitagtest>
+        <p>yet more text</p>
+      </multitag-element>
+    `;
+    comp.context = {};
+    comp.ngOnChanges({content: true} as any);
+
+    expect(Object.keys(comp.hookIndex).length).toBe(2);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+
+    const firstComponentElement = fixture.nativeElement.children[0];
+    expect(firstComponentElement.tagName).toBe('SOME-CUSTOM-ELEMENT');
+    expect(comp.hookIndex[1].value.element.tagName).toBe('SOME-CUSTOM-ELEMENT');
+    expect(firstComponentElement.children[0].classList).toContain('multitag-component');
+
+    const secondComponentElement = fixture.nativeElement.children[1];
+    expect(secondComponentElement.tagName).toBe('YET-ANOTHER-CUSTOM-ELEMENT');
+    expect(comp.hookIndex[2].value.element.tagName).toBe('YET-ANOTHER-CUSTOM-ELEMENT');
+    expect(secondComponentElement.children[0].classList).toContain('multitag-component');
   });
 
   it('#should recognize custom injectors', fakeAsync(() => {
@@ -290,7 +339,6 @@ describe('SelectorHookParserConfig', () => {
 
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('');
-    console.log(fixture.nativeElement.children[0].childNodes)
     expect(fixture.nativeElement.children[0].childNodes[0].textContent).toContain('Here the multitag hook is set to be single tag instead:');
     expect(fixture.nativeElement.children[0].childNodes[1].textContent).not.toContain('text within hook');
     expect(fixture.nativeElement.children[0].childNodes[2].textContent).toContain('text within hook');

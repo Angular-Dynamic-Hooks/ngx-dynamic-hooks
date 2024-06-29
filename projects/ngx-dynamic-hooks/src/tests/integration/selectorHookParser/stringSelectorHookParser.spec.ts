@@ -2,7 +2,7 @@
 import { WhateverTestComponent } from '../../resources/components/whateverTest/whateverTest.c';
 import { MultiTagTestComponent } from '../../resources/components/multiTagTest/multiTagTest.c';
 import { SingleTagTestComponent } from '../../resources/components/singleTag/singleTagTest.c';
-import { DynamicHooksComponent } from '../../testing-api';
+import { DynamicHooksComponent, anchorElementTag } from '../../testing-api';
 import { defaultBeforeEach } from '../shared';
 
 describe('StringSelectorHookParser', () => {
@@ -74,7 +74,7 @@ describe('StringSelectorHookParser', () => {
     expect(topDiv.childNodes[0].textContent.trim()).toBe('Some introductory text');
 
     const firstSingleTagComp = topDiv.childNodes[1];
-    expect(firstSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(firstSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
     expect(firstSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     expect(topDiv.childNodes[2].textContent.trim()).toBe('text in between');
@@ -82,7 +82,7 @@ describe('StringSelectorHookParser', () => {
     expect(topDiv.childNodes[3].textContent.trim()).toBe('Some span element');
 
     const firstMultiTagComp = topDiv.childNodes[5];
-    expect(firstMultiTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(firstMultiTagComp.tagName).toBe(anchorElementTag.toUpperCase());
     expect(firstMultiTagComp.children[0].classList.contains('multitag-component')).toBeTrue();
     expect(firstMultiTagComp.children[0].childNodes[0].textContent.trim()).toBe('Should be parsed fine');
     expect(firstMultiTagComp.children[0].childNodes[1].tagName).toBe('H2');
@@ -90,11 +90,11 @@ describe('StringSelectorHookParser', () => {
     expect(firstMultiTagComp.children[0].childNodes[1].textContent.trim()).toBe('A nested title');
 
     const secondSingleTagComp = firstMultiTagComp.children[0].childNodes[3];
-    expect(secondSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(secondSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
     expect(secondSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     const thirdSingleTagComp = topDiv.childNodes[7];
-    expect(thirdSingleTagComp.tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+    expect(thirdSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
     expect(thirdSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     expect(topDiv.childNodes[9].tagName).toBe('P');

@@ -71,10 +71,8 @@ export class ComponentCreator {
       */
       if (hook.data.hostElementTag) {
         anchorElement = this.useCustomHostElement(anchorElement, hook.data.hostElementTag);
+        hook.value.element = anchorElement;
       }
-
-      // Always scrub potential []-input- and ()-output-attrs from anchor elements 
-      this.scrubBindingAttrs(anchorElement);
 
       // Insert child content according to hook.data immediately
       // This has the benefit that if the child content is custom, the next iterations of this loop will throw out all hooks whose placeholder elements 
@@ -179,24 +177,6 @@ export class ComponentCreator {
     this.platformService.removeChild(this.platformService.getParentNode(anchorElement)!, anchorElement);
 
     return customHostElement;
-  }
-
-  /**
-   * Always removes angular-typical template attrs like []-input and ()-outputs from anchors
-   *
-   * @param anchorElement - The element to strub
-   */
-  scrubBindingAttrs(anchorElement: any) {
-    const attrsToScrub = Array.from(anchorElement.attributes)
-      .map((attrObj: any) => attrObj.name)
-      .filter((attr: string) => 
-        (attr.startsWith('[') && attr.endsWith(']')) ||
-        (attr.startsWith('(') && attr.endsWith(')'))
-      );
-
-    for (const attr of attrsToScrub) {
-      this.platformService.removeAttribute(anchorElement, attr);
-    }
   }
 
   /**

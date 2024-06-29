@@ -23,8 +23,13 @@ export class ElementSelectorHookParser implements HookParser {
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
+
+    // Always scrub potential []-input- and ()-output-attrs from anchor elements 
+    this.scrubAngularBindingAttrs(hookValue.element);
+
     return {
       component: this.config.component,
+      hostElementTag: this.config.hostElementTag,
       injector: this.config.injector,
       environmentInjector: this.config.environmentInjector
     };
@@ -51,6 +56,24 @@ export class ElementSelectorHookParser implements HookParser {
 
   // Bindings
   // --------------------------------------------------------------------------
+
+    /**
+   * Always removes angular-typical template attrs like []-input and ()-outputs from anchors
+   *
+   * @param anchorElement - The element to strub
+   */
+  scrubAngularBindingAttrs(anchorElement: any) {
+    const attrsToScrub = Array.from(anchorElement.attributes)
+      .map((attrObj: any) => attrObj.name)
+      .filter((attr: string) => 
+        (attr.startsWith('[') && attr.endsWith(']')) ||
+        (attr.startsWith('(') && attr.endsWith(')'))
+      );
+
+    for (const attr of attrsToScrub) {
+      this.platformService.removeAttribute(anchorElement, attr);
+    }
+  }
 
   createBindings(element: any): SavedBindings {
     const rawInputs = this.collectRawBindings(element!, 'inputs', this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);

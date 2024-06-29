@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 // Testing api resources
-import { DynamicHooksComponent, OutletParseResult } from '../testing-api';
+import { DynamicHooksComponent, OutletParseResult, anchorElementTag } from '../testing-api';
 import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
@@ -177,9 +177,9 @@ describe('DynamicHooksService', () => {
 
       expect(result.element.children[0].tagName).toBe('P');
       expect(result.element.children[0].textContent).toBe('Some generic paragraph');
-      expect(result.element.children[1].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+      expect(result.element.children[1].tagName).toBe(anchorElementTag.toUpperCase());
       expect(result.element.children[1].children[0].classList.contains('singletag-component')).toBeTrue();
-      expect(result.element.children[2].tagName).toBe('DYNAMIC-COMPONENT-ANCHOR');
+      expect(result.element.children[2].tagName).toBe(anchorElementTag.toUpperCase());
       expect(result.element.children[2].children[0].classList.contains('multitag-component')).toBeTrue();
 
       // Destroy outlet comnponent

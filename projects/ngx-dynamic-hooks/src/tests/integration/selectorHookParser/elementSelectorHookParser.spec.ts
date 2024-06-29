@@ -491,4 +491,20 @@ describe('ElementSelectorHookParser', () => {
     expect((comp as any)['completelyNewProperty']).toBe('Forest');
   });
 
+  it('#should scrub input- and output-attributes even with sanitization disabled', () => {
+    const testText = `<multitag-element-selector id="unique-identifier" class="some-class" customattr="asd" [numberprop]="123" (someoutput)="context.maneuvers.modifyParent($event)"></<multitag-element-selector>`;
+    comp.content = testText;
+    comp.context = context;
+    comp.options = {sanitize: false};
+    comp.ngOnChanges({content: true, context: true} as any);
+
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    const attrs = Array.from(comp.hookIndex[1].componentRef?.location.nativeElement.attributes).map((attrObj: any) => attrObj.name);
+    expect(attrs.includes('id')).toBeTrue();
+    expect(attrs.includes('class')).toBeTrue();
+    expect(attrs.includes('customattr')).toBeTrue();
+    expect(attrs.includes('[numberprop]')).toBeFalse();
+    expect(attrs.includes('(someoutput)')).toBeFalse();
+  });
+
 });

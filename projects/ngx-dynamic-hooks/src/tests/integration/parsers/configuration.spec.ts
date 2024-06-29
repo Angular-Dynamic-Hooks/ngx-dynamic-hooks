@@ -1,8 +1,8 @@
 // Testing api resources
-import { DynamicHooksComponent, ElementSelectorHookParser, HookFinder, StringSelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, ElementSelectorHookParser, StringSelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
-import { defaultBeforeEach, prepareTestingModule, testParsers } from '../shared';
+import { defaultBeforeEach, prepareTestingModule } from '../shared';
 import { SingleTagTestComponent } from '../../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../../resources/components/multiTagTest/multiTagTest.c';
 import { NonServiceTestParser } from '../../resources/parsers/nonServiceTestParser';
