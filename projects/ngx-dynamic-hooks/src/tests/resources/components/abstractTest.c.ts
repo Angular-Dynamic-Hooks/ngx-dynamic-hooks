@@ -50,7 +50,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
   constructor (
     public cd: ChangeDetectorRef, 
     @Optional() public rootTestService: RootTestService,
-    @Optional() @Inject(GENERICINJECTIONTOKEN) private genericInjectionValue: any,
+    @Optional() @Inject(GENERICINJECTIONTOKEN) public genericInjectionValue: any,
     public environmentInjector: EnvironmentInjector,
     public injector: Injector
   ) {

@@ -3,7 +3,7 @@ import { TestBed, TestBedStatic, ComponentFixtureAutoDetect, fakeAsync, tick, Co
 import { By } from '@angular/platform-browser';
 
 // Testing api resources
-import { DynamicHooksService, DYNAMICHOOKS_ALLSETTINGS, getOutletOptionDefaults, StringSelectorHookParser, allSettings, SelectorHookParserConfig, HookParser } from '../../testing-api';
+import { DynamicHooksService, DYNAMICHOOKS_ALLSETTINGS, getParseOptionDefaults, StringSelectorHookParser, allSettings, SelectorHookParserConfig, HookParser } from '../../testing-api';
 
 // Resources
 import { DynamicRootComponent } from '../../resources/forChild/root';
@@ -15,6 +15,7 @@ import { StarsComponent, DynamicStarsComponent } from '../../resources/forChild/
 import { DynamicHyperlanesComponent, HyperlanesComponent } from '../../resources/forChild/hyperlanes';
 import { SettingsResolver } from '../../../lib/services/settings/settingsResolver';
 import { TestSetup, createForChildTestingModule } from './shared';
+import { Injector } from '@angular/core';
 
 describe('forChild', () => {
 
@@ -121,11 +122,11 @@ describe('forChild', () => {
     const dynamicHooksService = setup.testBed.inject(DynamicHooksService);
 
     const mergedSettings = dynamicHooksService['settingsResolver'].resolve(
+      dynamicHooksService['injector'],
       '',
       dynamicHooksService['allSettings'], 
       dynamicHooksService['ancestorSettings'], 
       dynamicHooksService['moduleSettings'], 
-      null, 
       null, 
       null, 
       null, 
@@ -163,11 +164,11 @@ describe('forChild', () => {
     const dynamicHooksService = setup.testBed.inject(DynamicHooksService);
 
     const mergedSettings = dynamicHooksService['settingsResolver'].resolve(
+      dynamicHooksService['injector'],
       '',
       dynamicHooksService['allSettings'], 
       dynamicHooksService['ancestorSettings'], 
       dynamicHooksService['moduleSettings'], 
-      null, 
       null, 
       null, 
       null, 
@@ -181,7 +182,7 @@ describe('forChild', () => {
     expect(loadedParsers.includes(DynamicRootComponent)).toBeTrue();
     expect(loadedParsers.includes(DynamicHyperlanesComponent)).toBeTrue();
     
-    expect(mergedSettings.options).toEqual(getOutletOptionDefaults());
+    expect(mergedSettings.options).toEqual(getParseOptionDefaults());
   }));
 
   it('#should prioritize ancestor options when using DynamicHooksInheritance.All', fakeAsync(() => {
@@ -205,7 +206,7 @@ describe('forChild', () => {
 
     // Get child instance of dynamicHooksService from lazily-loaded child module and resolve options
     const childDynamicHooksService = setup.fixture.debugElement.query(By.directive(PlanetCountriesComponent)).componentInstance.dynamicHooksService as DynamicHooksService;
-    const options = childDynamicHooksService['settingsResolver'].resolve('', childDynamicHooksService['allSettings'], childDynamicHooksService['ancestorSettings'], childDynamicHooksService['moduleSettings'], null, null, null, null, null).options;
+    const options = childDynamicHooksService['settingsResolver'].resolve(childDynamicHooksService['injector'], '', childDynamicHooksService['allSettings'], childDynamicHooksService['ancestorSettings'], childDynamicHooksService['moduleSettings'], null, null, null, null).options;
 
     // With DynamicHooksInheritance.All, allSettings and ancestorSettings are merged, with ancestorSettings overwriting the former
     // Because of that, despite the settings of "stars" being the last ones added to allSettings, "countries" should still overwrite "stars" options with its ancestorOptions

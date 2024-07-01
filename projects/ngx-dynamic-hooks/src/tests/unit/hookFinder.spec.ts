@@ -7,7 +7,7 @@ describe('HookFinder', () => {
   let hookFinder: HookFinder;
   beforeEach(() => { hookFinder = new HookFinder(); });
 
-  it('#should find standalone hook positions as expected', () => {
+  it('#should find singletag hook positions as expected', () => {
     const openingTagRegex = /openingTag/g;
     const content = `
       <h1>Some html</h1>
@@ -15,7 +15,7 @@ describe('HookFinder', () => {
       <p>Somewhere in the middle of the content. And another openingTag at the end</p>
     `;
 
-    const position = hookFinder.findStandaloneHooks(content, openingTagRegex);
+    const position = hookFinder.findSingletagHooks(content, openingTagRegex);
 
     expect(position).toEqual([
       {

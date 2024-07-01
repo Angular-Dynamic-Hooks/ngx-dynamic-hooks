@@ -1,16 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 
 // Testing api resources
-import { DynamicHooksComponent, OutletParseResult, anchorElementTag } from '../testing-api';
+import { DynamicHooksComponent, ParseResult, anchorElementTag, getParseOptionDefaults } from '../testing-api';
 import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
-import { defaultBeforeEach } from './shared';
-import { ComponentRef } from '@angular/core';
+import { defaultBeforeEach, testParsers } from './shared';
+import { ComponentRef, EnvironmentInjector, Injector, createEnvironmentInjector } from '@angular/core';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { GENERICINJECTIONTOKEN } from '../resources/services/genericInjectionToken';
 
 /**
  * DynamicHooksService tests
@@ -26,6 +27,49 @@ describe('DynamicHooksService', () => {
   });
 
   // ----------------------------------------------------------------------------
+
+  it('#should return a parseResult with the expected properties', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+
+    // Try defaults
+    dynamicHooksService.parse('[singletag-string]').subscribe((parseResult: ParseResult) => {
+      expect(Object.values(parseResult.hookIndex).length).toBe(1);
+      expect(parseResult.element instanceof Node).toBeTrue();
+      expect(parseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');      
+      expect(parseResult.context).toBe(null);
+      expect(parseResult.usedParsers.length).toBe(8);
+      expect(parseResult.usedOptions).toEqual(getParseOptionDefaults());
+      expect(parseResult.usedEnvironmentInjector).toEqual(dynamicHooksService['environmentInjector']);
+      expect(parseResult.usedInjector).toEqual(dynamicHooksService['injector']);
+    });
+
+    // Try custom params
+    const div = document.createElement('div');
+    const hookIndex = {};
+    const options = getParseOptionDefaults();
+    options.sanitize = false;
+    const customInjector = Injector.create({
+      parent: TestBed.inject(Injector),
+      providers: [
+        {provide: GENERICINJECTIONTOKEN, useValue: { name: 'injector test value' } }
+      ]
+    });
+    const customEnvInjector = createEnvironmentInjector(
+      [{provide: GENERICINJECTIONTOKEN, useValue: { name: 'env injector test value' } }],
+      TestBed.inject(EnvironmentInjector),
+      'MyCustomEnvInjector'
+    );
+    dynamicHooksService.parse('[singletag-string]', {someProp: 'hello!'}, null, null, [GenericSingleTagStringParser], options, div, hookIndex, customEnvInjector, customInjector).subscribe((parseResult: ParseResult) => {
+      expect(Object.values(parseResult.hookIndex).length).toBe(1);
+      expect(parseResult.element instanceof Node).toBeTrue();
+      expect(parseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(parseResult.context).toEqual({someProp: 'hello!'});
+      expect(parseResult.usedParsers.length).toBe(1);
+      expect(parseResult.usedOptions).toEqual(options);
+      expect(parseResult.usedEnvironmentInjector).toEqual(customEnvInjector);
+      expect(parseResult.usedInjector).toEqual(customInjector);
+    });
+  });
 
   it('#should create a new HTML-Element, if target element is not specified', () => {
     const dynamicHooksService = TestBed.inject(DynamicHooksService);
@@ -54,17 +98,17 @@ describe('DynamicHooksService', () => {
       <p>Here's another one: [multitag-string][/multitag-string]</p>
     `;
 
-    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
-      expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
+    dynamicHooksService.parse(testText).subscribe((parseResult: ParseResult) => {
+      expect(Object.values(parseResult.hookIndex).length).toBe(2);
 
-      expect(outletParseResult.element.querySelector('.singletag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+      expect(parseResult.element.querySelector('.singletag-component')).not.toBe(null);
+      expect(parseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(parseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(parseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
 
-      expect(outletParseResult.element.querySelector('.multitag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
+      expect(parseResult.element.querySelector('.multitag-component')).not.toBe(null);
+      expect(parseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(parseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
     });
   });
 
@@ -98,21 +142,21 @@ describe('DynamicHooksService', () => {
     const existingElement = document.createElement('article');
     existingElement.setAttribute('id', 'myExistingElement');
 
-    dynamicHooksService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((outletParseResult: OutletParseResult) => {
-      expect(Object.values(outletParseResult.hookIndex).length).toBe(2);
+    dynamicHooksService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((parseResult: ParseResult) => {
+      expect(Object.values(parseResult.hookIndex).length).toBe(2);
 
       expect(existingElement.getAttribute('id')).toBe('myExistingElement');
       expect(existingElement.tagName).toBe('ARTICLE');
-      expect(existingElement).toBe(outletParseResult.element);
+      expect(existingElement).toBe(parseResult.element);
 
       expect(existingElement.querySelector('.singletag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
-      expect(outletParseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
+      expect(parseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+      expect(parseResult.hookIndex[1].componentRef!.instance.stringProp).toBe('/media/maps/valley_of_the_four_winds.png');
+      expect(parseResult.hookIndex[1].componentRef!.instance.simpleArray).toEqual(["chen stormstout", "nomi"]);
 
       expect(existingElement.querySelector('.multitag-component')).not.toBe(null);
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-      expect(outletParseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
+      expect(parseResult.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(parseResult.hookIndex[2].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
     });
   });
 
@@ -160,13 +204,10 @@ describe('DynamicHooksService', () => {
       [multitag-string][/multitag-string]
     `;
 
-    dynamicHooksService.parse(testText).subscribe((result: OutletParseResult) => {
-      const hookIndex = result.hookIndex;
-      const hostElement = result.element;
-
-      expect(Object.keys(hookIndex).length).toBe(2);
-      const firstCompRef = hookIndex[1].componentRef;
-      const secondCompRef = hookIndex[2].componentRef;
+    const testIsLoadedCorrectly = (result: ParseResult) => {
+      expect(Object.keys(result.hookIndex).length).toBe(2);
+      const firstCompRef = result.hookIndex[1].componentRef;
+      const secondCompRef = result.hookIndex[2].componentRef;
       spyOn<ComponentRef<SingleTagTestComponent>, any>(firstCompRef!, 'destroy').and.callThrough();
       spyOn<ComponentRef<MultiTagTestComponent>, any>(secondCompRef!, 'destroy').and.callThrough();
       expect(firstCompRef!.instance.constructor.name).toBe('SingleTagTestComponent');
@@ -181,14 +222,30 @@ describe('DynamicHooksService', () => {
       expect(result.element.children[1].children[0].classList.contains('singletag-component')).toBeTrue();
       expect(result.element.children[2].tagName).toBe(anchorElementTag.toUpperCase());
       expect(result.element.children[2].children[0].classList.contains('multitag-component')).toBeTrue();
+    };
 
-      // Destroy outlet comnponent
-      dynamicHooksService.destroy(hookIndex);
+    const testIsDestroyedCorrectly = (result: ParseResult) => {
+      const firstCompRef = result.hookIndex[1].componentRef;
+      const secondCompRef = result.hookIndex[2].componentRef;
 
       // Component html will be fully removed when Angular destroys them, so only paragraph ought to be left
-      expect(hostElement.innerHTML.trim()).toBe('<p>Some generic paragraph</p>');
+      expect(result.element.innerHTML.trim()).toBe('<p>Some generic paragraph</p>');
       expect((firstCompRef as any).destroy['calls'].count()).toBe(1);
       expect((secondCompRef as any).destroy['calls'].count()).toBe(1);
+    };
+
+    // Test destroying via dynamicHooksService.parse
+    dynamicHooksService.parse(testText).subscribe((result: ParseResult) => {
+      testIsLoadedCorrectly(result);
+      dynamicHooksService.destroy(result.hookIndex);
+      testIsDestroyedCorrectly(result);
+    });
+
+    // Test destroying via result.destroy
+    dynamicHooksService.parse(testText).subscribe((result: ParseResult) => {
+      testIsLoadedCorrectly(result);
+      result.destroy();
+      testIsDestroyedCorrectly(result);
     });
   });
 
@@ -207,9 +264,9 @@ describe('DynamicHooksService', () => {
 
     const testText = `[singletag-string]`;
 
-    dynamicHooksService.parse(testText, context).subscribe((outletParseResult: OutletParseResult) => {
+    dynamicHooksService.parse(testText, context).subscribe((parseResult: ParseResult) => {
       expect(testValue).toBe('');
-      dynamicHooksService.destroy(outletParseResult.hookIndex);
+      dynamicHooksService.destroy(parseResult.hookIndex);
       expect(testValue).toBe('Event triggered from onDestroy!');
     });
   });

@@ -11,7 +11,7 @@ export * from './lib/services/settings/options';
 export * from './lib/services/settings/parserEntry';
 
 // Main logic
-export * from './lib/components/outlet/dynamicHooksComponent';
+export * from './lib/components/main/dynamicHooksComponent';
 export * from './lib/services/dynamicHooksService';
 export * from './lib/services/settings/settings';
 

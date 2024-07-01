@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getOutletOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
+import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getParseOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
@@ -92,12 +92,39 @@ describe('Initialization', () => {
 
     expect(comp['dynamicHooksService']['allSettings'].length).toBe(1);
     expect(comp['dynamicHooksService']['allSettings'][0]).toEqual({});
+    expect(comp['dynamicHooksService']['ancestorSettings'].length).toBe(1);
+    expect(comp['dynamicHooksService']['ancestorSettings'][0]).toEqual({});
     expect(comp['dynamicHooksService']['moduleSettings']).toEqual({});
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getOutletOptionDefaults() as any)[key]);
+      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+    }
+
+    // Parsers should be empty
+    expect(comp.activeParsers.length).toBe(0);
+  });
+
+  it('#should not crash if the user passes no arguments at all to provideDynamicHooks()', () => {
+    const testText = `<p>This is just a bit of text.</p>`;
+
+    testBed.resetTestingModule();
+    let {fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks()
+    ]);
+
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(comp['dynamicHooksService']['allSettings'].length).toBe(0);
+    expect(comp['dynamicHooksService']['ancestorSettings'].length).toBe(0);
+    expect(comp['dynamicHooksService']['moduleSettings']).toBeUndefined();
+    expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
+
+    // Options should be default
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe((getParseOptionDefaults() as any)[key]);
     }
 
     // Parsers should be empty
@@ -151,11 +178,9 @@ describe('Initialization', () => {
   });
 
   it('#should use user-provided platformService methods, if available', () => {
-    const expectedReturnValue = 'TESTTAGNAME';
-
     class UserPlatformService implements PlatformService {
       getTagName(element: any) {
-        return expectedReturnValue;
+        return 'TESTTAGNAME';
       }  
     }
 
@@ -163,10 +188,10 @@ describe('Initialization', () => {
       provideDynamicHooks({}, UserPlatformService)
     ]));
 
-    // Make sure AutoPlatformService used UserPlatformServie method
+    // Make sure AutoPlatformService used UserPlatformService method
     const autoPlatformService = TestBed.inject(AutoPlatformService);
     const tagName = autoPlatformService.getTagName(document.createElement('div'));
-    expect(tagName).toBe(expectedReturnValue);
+    expect(tagName).toBe('TESTTAGNAME');
 
     // If method not defined in UserPlatformService, AutoPlatformService should fallback to defaultPlatformService methods
     const createdElement = autoPlatformService.createElement('h1');

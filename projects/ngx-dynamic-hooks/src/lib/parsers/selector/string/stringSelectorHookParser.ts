@@ -23,7 +23,7 @@ export class StringSelectorHookParser implements HookParser {
   public findHooks(content: string, context: any): Array<HookPosition> {
     return this.config.enclosing ?
       this.tagHookFinder.findEnclosingTags(content, this.config.selector!, this.config.bracketStyle) :
-      this.tagHookFinder.findStandaloneTags(content, this.config.selector!, this.config.bracketStyle);
+      this.tagHookFinder.findSingleTags(content, this.config.selector!, this.config.bracketStyle);
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {

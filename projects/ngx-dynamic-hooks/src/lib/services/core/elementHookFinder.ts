@@ -1,10 +1,10 @@
 import { HookIndex } from '../../interfacesPublic';
 import { HookParser, HookPosition } from '../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { sortElements } from '../utils/utils';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
+import { ParseOptions } from '../settings/options';
 
 /**
  * Stores a hook element along with the parser who found it
@@ -22,7 +22,7 @@ export class ElementHookFinder {
   constructor(private platformService: AutoPlatformService) {
   }
 
-  find(contentElement: any, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex): HookIndex {
+  find(contentElement: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex): HookIndex {
 
     // Collect all parser results
     let parserResults: ParserFindHookElementsResult[] = [];
@@ -88,13 +88,13 @@ export class ElementHookFinder {
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrHookId) || 
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrParseToken)
       ) {
-        if (isDevMode()) { console.warn('Error when checking hook elements - The following element was already found as a hook element, but was found again. There may be multiple identical parsers active that are looking for the same hook. Ignoring.', parserResult.hookElement); }
+        if (isDevMode()) { console.warn('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse. There may be multiple identical parsers active that are looking for the same hook. Ignoring.', parserResult.hookElement); }
         continue;
       }
 
       // Must not already be host or view element for an Angular component
       if (this.isAngularManagedElement(parserResult.hookElement)) {
-        if (isDevMode()) { console.warn('Error when checking hook elements - The following element is already being used as an active host or view element for an Angular component. It cannot be used to load a component. Ignoring.', parserResult.hookElement); }
+        if (isDevMode()) { console.warn('Note: The following element was found as a hook, but is already being used as an active host or view element for an Angular component. Ignoring.', parserResult.hookElement); }
         continue;
       }
 

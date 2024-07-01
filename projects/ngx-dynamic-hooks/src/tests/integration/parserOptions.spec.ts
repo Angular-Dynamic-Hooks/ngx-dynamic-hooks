@@ -1,13 +1,13 @@
 // Testing api resources
 import { TestBed } from '@angular/core/testing';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { DynamicHooksComponent, OutletOptions, anchorElementTag, getOutletOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, ParseOptions, anchorElementTag, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 
-describe('OutletOptions', () => {
+describe('ParserOptions', () => {
   let testBed;
   let fixture: any;
   let comp: DynamicHooksComponent;
@@ -21,7 +21,7 @@ describe('OutletOptions', () => {
 
   it('#should load global options correctly', () => {
     const differentOptions: any = {};
-    for (const [key, value] of Object.entries(getOutletOptionDefaults())) {
+    for (const [key, value] of Object.entries(getParseOptionDefaults())) {
       if (typeof value === 'boolean') { differentOptions[key] = !value; }
       else if (typeof value === 'number') { differentOptions[key] = value * 2; }
       else if (typeof value === 'string') { differentOptions[key] = value; }
@@ -45,14 +45,14 @@ describe('OutletOptions', () => {
 
   it('#should load local options correctly', () => {
     const differentOptions: any = {};
-    for (const [key, value] of Object.entries(getOutletOptionDefaults())) {
+    for (const [key, value] of Object.entries(getParseOptionDefaults())) {
       if (typeof value === 'boolean') { differentOptions[key] = !value; }
       else if (typeof value === 'number') { differentOptions[key] = value * 2; }
       else if (typeof value === 'string') { differentOptions[key] = value; }
       else {  differentOptions[key] = null; }
     }
 
-    comp.options = differentOptions as OutletOptions;
+    comp.options = differentOptions as ParseOptions;
     comp.ngOnChanges({content: true, options: true} as any);
 
     for (const [key, value] of Object.entries(comp.activeOptions)) {
@@ -65,10 +65,10 @@ describe('OutletOptions', () => {
       invalidOption: true
     };
 
-    comp.options = invalidOptions as OutletOptions;
+    comp.options = invalidOptions as ParseOptions;
     comp.ngOnChanges({content: true, options: true} as any);
 
-    const defaults = getOutletOptionDefaults();
+    const defaults = getParseOptionDefaults();
     for (const [key, value] of Object.entries(comp.activeOptions)) {
       expect(value).toBe((defaults as any)[key]);
     }
@@ -86,7 +86,7 @@ describe('OutletOptions', () => {
 
     expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getOutletOptionDefaults() as any)[key]);
+      expect(value).toBe((getParseOptionDefaults() as any)[key]);
     }
   });
 

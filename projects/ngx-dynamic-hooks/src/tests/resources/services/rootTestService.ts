@@ -4,7 +4,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class RootTestService {
-  someString = 'RootTestService works!';
+  someString: string = 'RootTestService works!';
+  someObj: any = {test: 'Hello!'};
 
   constructor() {
   }

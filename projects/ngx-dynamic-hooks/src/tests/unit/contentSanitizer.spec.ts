@@ -34,14 +34,17 @@ describe('ContentSanitizer', () => {
     sanitizer.sanitize(contentElement, {}, 'asdasdasd');
 
     // Ensure that content is sanitized
-    let pEl = contentElement.querySelector('p');
-    let spanEl = contentElement.querySelector('span');
-    let customEl = contentElement.querySelector('custom-element');
     expect(contentElement.innerHTML).not.toContain('<script>');
+
+    let pEl = contentElement.querySelector('p');
     expect(pEl!.getAttribute('style')).toBeNull();
     expect(pEl!.onclick).toBeNull();
+
+    let spanEl = contentElement.querySelector('span');
     expect(spanEl!.getAttribute('id')).toBeNull();    
     expect(spanEl!.innerHTML).toContain('Some span with an id');
+
+    let customEl = contentElement.querySelector('custom-element');
     expect(customEl).toBeNull();
 
   });
@@ -87,10 +90,11 @@ describe('ContentSanitizer', () => {
 
     // Normal elements should be sanitized as expected
     let pEl = contentElement.querySelector('p');
-    let spanEl = contentElement.querySelector('span');
     expect(pEl!.getAttribute('style')).toBeNull();
     expect(pEl!.onclick).toBeNull();
     expect(pEl!.innerHTML).toContain('This is the first anchor');
+
+    let spanEl = contentElement.querySelector('span');
     expect(spanEl!.getAttribute('id')).toBeNull();
     expect(spanEl!.innerHTML).toContain('This is the second anchor');
 
@@ -104,6 +108,53 @@ describe('ContentSanitizer', () => {
     expect(secondAnchor?.getAttribute('href')).toBe('https://www.warcraft-toys.com/toy/123456');
     expect(secondAnchor?.getAttribute('src')).toBe('/someFolder/someImage.png');
   });
+
+  it('#should sanitize hook anchor content', () => {
+    const parseToken = "1a2b3c4d5e";
+    const hookIndex = {
+      1: {
+        id: 1
+      }
+    };    
+
+    const testText = `
+      <dynamic-hooks-anchor ${anchorAttrHookId}="1" ${anchorAttrParseToken}="${parseToken}">
+        With some dubious <span id="someId">element</span>
+        <script>console.log('and a script tag');</script>
+      </dynamic-hooks-anchor>
+    `;
+    const contentElement = document.createElement('div');
+    contentElement.innerHTML = testText;
+
+    sanitizer.sanitize(contentElement, hookIndex as any, parseToken);
+
+    expect(contentElement.innerHTML).not.toContain('<script>');
+    const spanEl = contentElement.querySelector('span');
+    expect(spanEl!.getAttribute('id')).toBeNull();    
+    expect(spanEl!.innerHTML).toContain('element');
+  });
+
+  it('#should have fixed bug: Did not sanitize anchor content when there were no line breaks in the innerHTML', () => {
+    const parseToken = "1a2b3c4d5e";
+    const hookIndex = {
+      1: {
+        id: 1
+      }
+    };    
+
+    const testText = `<dynamic-hooks-anchor ${anchorAttrHookId}="1" ${anchorAttrParseToken}="${parseToken}">With some dubious <span id="someId">element</span><script>console.log('and a script tag');</script></dynamic-hooks-anchor>`;
+    const contentElement = document.createElement('div');
+    contentElement.innerHTML = testText;
+
+    sanitizer.sanitize(contentElement, hookIndex as any, parseToken);
+
+    expect(contentElement.innerHTML).not.toContain('<script>');
+
+    const spanEl = contentElement.querySelector('span');
+    expect(spanEl!.getAttribute('id')).toBeNull();    
+    expect(spanEl!.innerHTML).toContain('element');
+  });
+
 
   it('#should keep anchor references when sanitizing', () => {
     const parseToken = "1a2b3c4d5e";

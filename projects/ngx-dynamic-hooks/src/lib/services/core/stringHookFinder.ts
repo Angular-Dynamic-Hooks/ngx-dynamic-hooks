@@ -1,10 +1,10 @@
 import { HookIndex } from '../../interfacesPublic';
 import { HookParser, HookPosition } from '../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
 import { isDevMode, Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../constants/core';
 import { matchAll } from '../utils/utils';
+import { ParseOptions } from '../settings/options';
 
 const findInElementsNodePlaceholder = '_ngx_dynamic_hooks_node_placeholder';
 
@@ -55,10 +55,10 @@ export class StringHookFinder {
    * @param context - The current context object
    * @param parsers - All of the registered parsers
    * @param token - A random token to attach to all created selector elements
-   * @param options - The current OutletOptions
+   * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill
    */
-  findInElement(element: any, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex) {
+  findInElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex) {
     // Only bother looking for string hooks if there even are string hook parsers
     for (const parser of parsers) {
       if (typeof parser.findHooks === 'function') {
@@ -75,11 +75,11 @@ export class StringHookFinder {
    * @param context - The current context object
    * @param parsers - All of the registered parsers
    * @param token - A random token to attach to all created selector elements
-   * @param options - The current OutletOptions
+   * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill 
    * @param extractedNodes - A recursively-used object holding all temporarily extracted nodes
    */
-  checkElement(element: any, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex, extractedNodes: {[key: string]: any} = {}, ) {
+  checkElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex, extractedNodes: {[key: string]: any} = {}, ) {
     // To find string hooks in an already existing node, first replace non-text child nodes with string placeholders, then concat all text content.
     // This is so enclosing string hooks can be found even if they are separated by other elements
     let childNodes = this.platformService.getChildNodes(element);
@@ -176,10 +176,10 @@ export class StringHookFinder {
    * @param context - The current context object
    * @param parsers - All of the registered parsers
    * @param token - A random token to attach to all created selector elements
-   * @param options - The current OutletOptions
+   * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill
    */
-  find(content: string, context: any, parsers: HookParser[], token: string, options: OutletOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
+  find(content: string, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
 
     // Convert input HTML entities?
     if (options.convertHTMLEntities) {

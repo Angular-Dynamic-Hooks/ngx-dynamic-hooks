@@ -1,6 +1,6 @@
 import { HookParserEntry } from './parserEntry';
-import { OutletOptions } from './options';
 import { HookParser } from '../../interfacesPublic';
+import { ParseOptions } from './options';
 
 export enum DynamicHooksInheritance {
     All,
@@ -13,7 +13,7 @@ export enum DynamicHooksInheritance {
  */
 export interface DynamicHooksSettings {
     parsers?: HookParserEntry[];
-    options?: OutletOptions;
+    options?: ParseOptions;
     inheritance?: DynamicHooksInheritance;
 }
 
@@ -22,5 +22,5 @@ export interface DynamicHooksSettings {
  */
 export interface ResolvedSettings {
     parsers: HookParser[];
-    options: OutletOptions;
+    options: ParseOptions;
 }

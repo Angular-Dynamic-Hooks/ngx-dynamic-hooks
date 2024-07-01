@@ -1,7 +1,7 @@
 /**
  * Several options for the DynamicHooksComponent
  */
-export interface OutletOptions {
+export interface ParseOptions {
     sanitize?: boolean;
     convertHTMLEntities?: boolean;
     fixParagraphTags?: boolean;
@@ -16,11 +16,11 @@ export interface OutletOptions {
 }
 
 /**
- * Returns the default values for the OutletOptions
+ * Returns the default values for the ParseOptions
  */
-export const getOutletOptionDefaults: (content?: any) => OutletOptions = (content = '') => {
+export const getParseOptionDefaults: (content?: any) => ParseOptions = (content = '') => {
 
-    const outletOptionDefaults: OutletOptions = {
+    const parseOptionDefaults: ParseOptions = {
         sanitize: true,
         convertHTMLEntities: true,
         fixParagraphTags: true,
@@ -36,10 +36,10 @@ export const getOutletOptionDefaults: (content?: any) => OutletOptions = (conten
 
     // Don't sanitize if content is element
     if (content && typeof content !== 'string') {
-        outletOptionDefaults.sanitize = false;
+        parseOptionDefaults.sanitize = false;
     }
 
-    return outletOptionDefaults;
+    return parseOptionDefaults;
 }
 
 

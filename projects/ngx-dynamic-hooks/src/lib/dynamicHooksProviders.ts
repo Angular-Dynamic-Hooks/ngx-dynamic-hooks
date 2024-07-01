@@ -5,7 +5,6 @@ import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformS
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
 import { HookParserEntry } from './services/settings/parserEntry';
 import { EmptyPlatformService } from './services/platform/emptyPlatformService';
-import { HookFinder } from '../public-api';
 
 export const allSettings: DynamicHooksSettings[] = [];
 
@@ -15,10 +14,12 @@ export const allSettings: DynamicHooksSettings[] = [];
  * @param rootSettings - Settings that all loaded DynamicHooksComponents will use
  * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
  */
-export const provideDynamicHooks: (rootSettings: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
-  const settings: DynamicHooksSettings = Array.isArray(rootSettings) ? {parsers: rootSettings} : rootSettings;
+export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
+  const settings: DynamicHooksSettings|undefined = Array.isArray(rootSettings) ? {parsers: rootSettings} : rootSettings;
 
-  allSettings.push(settings);
+  if (settings !== undefined) {
+    allSettings.push(settings);
+  }
   
   return [
     {
@@ -30,7 +31,7 @@ export const provideDynamicHooks: (rootSettings: DynamicHooksSettings|HookParser
     { provide: DYNAMICHOOKS_PROVIDERS_REGISTERED, useValue: true },
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
     { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: settings },
-    { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: [settings] },
+    { provide: DYNAMICHOOKS_ANCESTORSETTINGS, useValue: settings !== undefined ? [settings] : [] },
     { provide: PLATFORM_SERVICE, useClass: platformService || EmptyPlatformService }
   ];
 }
@@ -56,10 +57,12 @@ export class DynamicHooksInitService implements OnDestroy {
  * 
  * @param childSettings - Settings that the loaded DynamicHooksComponents of this child context will use
  */
-export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings|HookParserEntry[]) => Provider[] = childSettings => {
-  const settings: DynamicHooksSettings = Array.isArray(childSettings) ? {parsers: childSettings} : childSettings;
+export const provideDynamicHooksForChild: (childSettings?: DynamicHooksSettings|HookParserEntry[]) => Provider[] = childSettings => {
+  const settings: DynamicHooksSettings|undefined = Array.isArray(childSettings) ? {parsers: childSettings} : childSettings;
 
-  allSettings.push(settings);
+  if (settings !== undefined) {
+    allSettings.push(settings);
+  }
 
   return [
     // Provide the child settings
@@ -72,7 +75,9 @@ export const provideDynamicHooksForChild: (childSettings: DynamicHooksSettings|H
     {
       provide: DYNAMICHOOKS_ANCESTORSETTINGS,
       useFactory: (ancestorSettings: DynamicHooksSettings[]) => {
-        return ancestorSettings ? [...ancestorSettings, settings] : [settings];
+        ancestorSettings = Array.isArray(ancestorSettings) ? ancestorSettings : [];
+        ancestorSettings = settings !== undefined ? [...ancestorSettings, settings] : ancestorSettings;
+        return ancestorSettings;
       },
       deps: [[new SkipSelf(), new Optional(), DYNAMICHOOKS_ANCESTORSETTINGS]]
     },

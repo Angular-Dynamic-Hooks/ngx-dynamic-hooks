@@ -17,17 +17,17 @@ export class TagHookFinder {
   }
 
   /**
-   * Finds standalone Angular component selectors
+   * Finds singletag Angular component selectors
    *
    * @param content - The content to parse
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findStandaloneTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.findStandaloneHooks(content, openingTagRegex);
+    return this.hookFinder.findSingletagHooks(content, openingTagRegex);
   }
 
   /**

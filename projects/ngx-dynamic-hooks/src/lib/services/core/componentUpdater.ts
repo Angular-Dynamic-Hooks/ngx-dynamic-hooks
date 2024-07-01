@@ -2,7 +2,7 @@ import { SimpleChange, isDevMode, Injectable, reflectComponentType} from '@angul
 import { Observable } from 'rxjs';
 
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../interfacesPublic';
-import { OutletOptions } from '../../services/settings/options';
+import { ParseOptions } from '../../services/settings/options';
 import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
 
 /**
@@ -21,10 +21,10 @@ export class ComponentUpdater {
    *
    * @param hookIndex - The current hookIndex
    * @param context - The new context object
-   * @param options - The current OutletOptions
+   * @param options - The current ParseOptions
    * @param triggerOnDynamicChanges - Whether to trigger the OnDynamicChanges method of dynamically loaded components
    */
-  refresh(hookIndex: HookIndex, context: any, options: OutletOptions, triggerOnDynamicChanges: boolean): void {
+  refresh(hookIndex: HookIndex, context: any, options: ParseOptions, triggerOnDynamicChanges: boolean): void {
 
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       if (!hook.componentRef) { 
@@ -88,7 +88,7 @@ export class ComponentUpdater {
    * @param context - The current context object
    * @param options - The current HookComponentOptions
    */
-  updateComponentWithNewOutputs(hook: Hook, context: any, options: OutletOptions): void {
+  updateComponentWithNewOutputs(hook: Hook, context: any, options: ParseOptions): void {
     const component = hook.componentRef!.instance;
 
     // Find out which outputs have changed
@@ -133,7 +133,7 @@ export class ComponentUpdater {
    * @param hook - The hook in question
    * @param options - The current HookComponentOptions
    */
-  updateComponentWithNewInputs(hook: Hook, options: OutletOptions): void {
+  updateComponentWithNewInputs(hook: Hook, options: ParseOptions): void {
     const component = hook.componentRef!.instance;
 
     // Find out which inputs have changed

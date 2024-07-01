@@ -16,7 +16,7 @@ describe('Parser string hooks', () => {
 
   // ----------------------------------------------------------------------------
 
-  fit('#should load a single tag dynamic component', () => {
+  it('#should load a single tag dynamic component', () => {
     const testText = `<p>This p-element has a <span>span-element with a component [singletag-string] within it.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
@@ -25,8 +25,6 @@ describe('Parser string hooks', () => {
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.singletag-component')).not.toBeNull();
-
-    console.log(fixture.nativeElement.innerHTML)
   });
 
   it('#should load a multi tag dynamic component', () => {
@@ -92,6 +90,53 @@ describe('Parser string hooks', () => {
     expect(hookIndex[2].value.closingTag).toBe('[/multitag-string]');
     expect(hookIndex[2].value.element).toBe(null);
     expect(hookIndex[2].value.elementSnapshot).toBe(null);
+  });
+
+  it('#should load components at their correct positions', () => {
+    const testText = `
+    <ul>
+      <li>This is the first li-element.</li>
+      <li>This is the [whatever-string]second[/whatever-string] li-element. It has a component [singletag-string] in it. Lets put another component [singletag-string] here.</li>
+      <li>This is the third li-element. It has a <a href="https://www.google.de" target="_blank">link</a>.</li>
+      <li>
+        <span>And this is the last</span>
+        [multitag-string]
+          <span>element in this test</span>
+        [/multitag-string]
+        <span>that we are looking at.</span>
+      </li>
+    </ul>`;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    const ul = fixture.nativeElement.children[0];
+    const firstLi = ul.children[0];
+    expect(firstLi.innerText).toBe('This is the first li-element.');
+
+    const secondLi = ul.children[1];
+    expect(secondLi.innerHTML).toContain('This is the <' + anchorElementTag);
+    expect(secondLi.children[0].children[0].className).toBe('whatever-component');
+    expect(secondLi.children[0].children[0].innerText.trim()).toBe('second');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> li-element. It has a component <' + anchorElementTag);
+    expect(secondLi.children[1].children[0].className).toBe('singletag-component');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> in it. Lets put another component <' + anchorElementTag);
+    expect(secondLi.children[2].children[0].className).toBe('singletag-component');
+    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> here.');
+
+    const thirdLi = ul.children[2];
+    expect(thirdLi.innerHTML).toContain('This is the third li-element. It has a <a ');
+    expect(thirdLi.children[0].tagName).toBe('A');
+    expect(thirdLi.children[0].textContent).toBe('link');
+    expect(thirdLi.innerHTML).toContain('</a>.');
+
+    const fourthLi = ul.children[3];
+    expect(fourthLi.children[0].tagName).toBe('SPAN');
+    expect(fourthLi.children[0].textContent).toBe('And this is the last');
+    expect(fourthLi.children[1].children[0].className).toBe('multitag-component');
+    expect(fourthLi.children[1].children[0].children[0].tagName).toBe('SPAN');
+    expect(fourthLi.children[1].children[0].children[0].textContent).toBe('element in this test');
+    expect(fourthLi.children[2].tagName).toBe('SPAN');
+    expect(fourthLi.children[2].textContent).toBe('that we are looking at.');
   });
   
   it('#should load nested content correctly', fakeAsync(() => {
@@ -185,53 +230,6 @@ describe('Parser string hooks', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(fixture.nativeElement.querySelector('.whatever-component')).toBe(null);
-  });
-
-  it('#should load components at their correct positions', () => {
-    const testText = `
-    <ul>
-      <li>This is the first li-element.</li>
-      <li>This is the [whatever-string]second[/whatever-string] li-element. It has a component [singletag-string] in it. Lets put another component [singletag-string] here.</li>
-      <li>This is the third li-element. It has a <a href="https://www.google.de" target="_blank">link</a>.</li>
-      <li>
-        <span>And this is the last</span>
-        [multitag-string]
-          <span>element in this test</span>
-        [/multitag-string]
-        <span>that we are looking at.</span>
-      </li>
-    </ul>`;
-    comp.content = testText;
-    comp.ngOnChanges({content: true} as any);
-
-    const ul = fixture.nativeElement.children[0];
-    const firstLi = ul.children[0];
-    expect(firstLi.innerText).toBe('This is the first li-element.');
-
-    const secondLi = ul.children[1];
-    expect(secondLi.innerHTML).toContain('This is the <' + anchorElementTag);
-    expect(secondLi.children[0].children[0].className).toBe('whatever-component');
-    expect(secondLi.children[0].children[0].innerText.trim()).toBe('second');
-    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> li-element. It has a component <' + anchorElementTag);
-    expect(secondLi.children[1].children[0].className).toBe('singletag-component');
-    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> in it. Lets put another component <' + anchorElementTag);
-    expect(secondLi.children[2].children[0].className).toBe('singletag-component');
-    expect(secondLi.innerHTML).toContain('</' + anchorElementTag + '> here.');
-
-    const thirdLi = ul.children[2];
-    expect(thirdLi.innerHTML).toContain('This is the third li-element. It has a <a ');
-    expect(thirdLi.children[0].tagName).toBe('A');
-    expect(thirdLi.children[0].textContent).toBe('link');
-    expect(thirdLi.innerHTML).toContain('</a>.');
-
-    const fourthLi = ul.children[3];
-    expect(fourthLi.children[0].tagName).toBe('SPAN');
-    expect(fourthLi.children[0].textContent).toBe('And this is the last');
-    expect(fourthLi.children[1].children[0].className).toBe('multitag-component');
-    expect(fourthLi.children[1].children[0].children[0].tagName).toBe('SPAN');
-    expect(fourthLi.children[1].children[0].children[0].textContent).toBe('element in this test');
-    expect(fourthLi.children[2].tagName).toBe('SPAN');
-    expect(fourthLi.children[2].textContent).toBe('that we are looking at.');
   });
 
   it('#should validate the found hook positions', () => {

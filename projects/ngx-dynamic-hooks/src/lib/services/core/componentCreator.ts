@@ -1,14 +1,14 @@
-import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
+import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, createComponent, EnvironmentInjector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
 
 import { Hook, HookIndex } from '../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../interfacesPublic';
-import { OutletOptions } from '../settings/options';
 import { ComponentUpdater } from './componentUpdater';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
+import { ParseOptions } from '../settings/options';
 
 /**
  * The service responsible for dynamically creating components for all found Hooks
@@ -36,10 +36,16 @@ export class ComponentCreator {
    * @param options - The current HookComponentOptions
    * @param injector - The injector to use for the dynamically-created components
    */
-  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: OutletOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
+  init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: ParseOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
     const anchorElements: {[key: string]: Element} = {};
+
+    // If no hooks found, no need to progress further
+    if (Object.keys(hookIndex).length === 0) {
+      allComponentsLoaded.next(true);
+      return allComponentsLoaded;
+    }
 
     // Check anchor elements in order of appearance and prepare loading components
     for (let anchorElement of this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}][${anchorAttrParseToken}]`)) {
@@ -180,7 +186,7 @@ export class ComponentCreator {
   }
 
   /**
-   * Creates a content slot dom element for each ng-content outlet of the dynamically loaded component.
+   * Creates a content slot dom element for each ng-content tag of the dynamically loaded component.
    *
    * This is to create a direct dom-representation of each entry in the projectableNodes array returned
    * by parser.loadComponent, so it can be cleanly resolved back into projectableNodes later on. Without these
@@ -290,7 +296,7 @@ export class ComponentCreator {
    * @param compClass - The component's class
    * @param injector - The default injector to use for the component
    */
-  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: OutletOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
+  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: ParseOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
     
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.

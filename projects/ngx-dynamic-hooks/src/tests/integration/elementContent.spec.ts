@@ -1,7 +1,8 @@
 // Testing api resources
+import { firstValueFrom } from 'rxjs';
 import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
-import { DynamicHooksComponent, DynamicHooksService, HookFinder, StringHookFinder, anchorElementTag } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookFinder, ParseResult, StringHookFinder, anchorElementTag } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
@@ -210,7 +211,7 @@ describe('Element content', () => {
     expect(section.children[0].children[0].textContent).toContain('This is the inner content.');
   });
 
-  it('#should disregard existing html elements when looking for string hooks', () => {
+  it('#should ignore html structures when looking for string hooks, just parse the pure text', () => {
     const multitagStringParser = TestBed.inject(GenericMultiTagStringParser);
     const hookFinder = TestBed.inject(HookFinder);
 
@@ -329,6 +330,85 @@ describe('Element content', () => {
 
     const scriptElement = multitagElement.children[0].childNodes[1];
     expect(scriptElement).not.toBeUndefined();
+  });
+
+  it('#should be not load components twice into the same elements when calling parse again (be idempotent)', async () => {
+    const dynHooksService = TestBed.inject(DynamicHooksService);
+    const componentCreator = TestBed.inject(ComponentCreator);
+    const spy = spyOn(componentCreator, 'init').and.callThrough();
+
+    const contentEl = document.createElement('div');
+    contentEl.innerHTML = `
+      <article>
+        <div>
+          <h1>Here is a string hook: [singletag-string]</h1>
+        </div>
+        <aside>
+          <span>And let's load an element hook here</span>
+          <multitag-element>
+            <p>With a nested hook</p>
+            <whatever-element>And deeply-nested content</whatever-element>
+          </multitag-element>
+        <aside>
+      </article>
+    `;
+
+    // Checks if the html of the initial three components is loaded
+    const expectInitialHTML = (result: ParseResult) => {
+      expect(result.element).toBe(contentEl)
+      const article = result.element.children[0];
+      const div = article.children[0];
+      const h1 = div.children[0];
+      expect(h1.textContent).toContain('Here is a string hook:');
+      const singleTagComponentEl = h1.children[0];
+      expect(singleTagComponentEl.tagName).toBe(anchorElementTag.toUpperCase());
+      expect(singleTagComponentEl.children[0].classList.contains('singletag-component')).toBeTrue();
+      const aside = article.children[1];
+      const span = aside.children[0];
+      expect(span.textContent).toContain("And let's load an element hook here");
+      const multiTagComponentEl = aside.children[1];
+      expect(multiTagComponentEl.tagName).toBe('MULTITAG-ELEMENT');
+      expect(multiTagComponentEl.children[0].classList.contains('multitag-component')).toBeTrue();
+      const p = multiTagComponentEl.children[0].children[0];
+      expect(p.textContent).toContain("With a nested hook");
+      const whateverComponentEl = multiTagComponentEl.children[0].children[1];
+      expect(whateverComponentEl.tagName).toBe('WHATEVER-ELEMENT');
+      expect(whateverComponentEl.children[0].classList.contains('whatever-component')).toBeTrue();
+      expect(whateverComponentEl.children[0].textContent).toContain('And deeply-nested content');
+    }
+
+    const firstResult = await firstValueFrom(dynHooksService.parse(contentEl));
+
+    // Make sure all is as expected
+    expect(Object.keys(firstResult.hookIndex).length).toBe(3);
+    const firstCompRef = firstResult.hookIndex[1].componentRef!;
+    const secondCompRef = firstResult.hookIndex[2].componentRef!;
+    const thirdCompRef = firstResult.hookIndex[3].componentRef!;
+    expect(firstCompRef.instance.constructor.name).toBe('SingleTagTestComponent');
+    expect(secondCompRef.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(thirdCompRef.instance.constructor.name).toBe('WhateverTestComponent');
+    expectInitialHTML(firstResult);
+
+    // Run again. Hooks should not be found again and nothing should have changed.
+    const secondResult = await firstValueFrom(dynHooksService.parse(contentEl));
+    expect(Object.keys(spy.calls.mostRecent().args[1]).length).toBe(0); // componentCreator.init should be passed empty hookIndex
+    expect(Object.keys(secondResult.hookIndex).length).toBe(0);
+    expectInitialHTML(secondResult);
+
+    // Now programmatically add new hook element. Should find it (and only it) on next parse
+    const newAnchorEl = document.createElement('multitag-element');
+    newAnchorEl.innerHTML = '<span>hello there!</span>';
+    contentEl.children[0].appendChild(newAnchorEl);
+
+    const thirdResult = await firstValueFrom(dynHooksService.parse(contentEl));
+    expect(Object.keys(spy.calls.mostRecent().args[1]).length).toBe(1);
+    expect(Object.keys(thirdResult.hookIndex).length).toBe(1);
+    expectInitialHTML(thirdResult);
+
+    const newComponentEl = contentEl.children[0].children[2];
+    expect(newComponentEl.tagName).toBe('MULTITAG-ELEMENT');
+    expect(newComponentEl.children[0].classList.contains('multitag-component')).toBeTrue();
+    expect(newComponentEl.children[0].textContent).toContain('hello there!');
   });
 
 });

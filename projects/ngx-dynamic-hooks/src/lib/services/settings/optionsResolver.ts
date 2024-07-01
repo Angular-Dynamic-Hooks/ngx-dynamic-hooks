@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { OutletOptions, getOutletOptionDefaults } from './options';
+import { ParseOptions, getParseOptionDefaults } from './options';
 
 /**
- * A helper class for resolving OutletOptions
+ * A helper class for resolving ParseOptions
  */
 @Injectable({
   providedIn: 'root'
@@ -10,12 +10,12 @@ import { OutletOptions, getOutletOptionDefaults } from './options';
 export class OptionsResolver {
 
   /**
-   * Overwrites the default options with a (partial) OutletOptions object and returns the result
+   * Overwrites the default options with a (partial) ParseOptions object and returns the result
    *
-   * @param uo - The (partial) OutletOptions object
+   * @param uo - The (partial) ParseOptions object
    */
-  resolve(content: any, uo: OutletOptions): OutletOptions {
-    const newOptions: OutletOptions = JSON.parse(JSON.stringify(getOutletOptionDefaults(content)));
+  resolve(content: any, uo: ParseOptions): ParseOptions {
+    const newOptions: ParseOptions = JSON.parse(JSON.stringify(getParseOptionDefaults(content)));
     if (uo) {
       for (const [optionName, optionValue] of Object.entries(uo)) {
         if (optionName === 'sanitize' && typeof optionValue === 'boolean') { newOptions.sanitize = optionValue; }

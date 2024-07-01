@@ -1,5 +1,5 @@
 // Testing api resources
-import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, OutletParseResult, provideDynamicHooks } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookComponentData, HookValue, ParseResult, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
@@ -106,7 +106,7 @@ describe('Injectors logic', () => {
     expect(latestUsedInjector).toEqual(dynHooksInjector);
 
     // Test again directly via DynHooksService without passing injectors. ComponentCreator should then use root injectors.
-    dynamicHooksService.parse(testText).subscribe((outletParseResult: OutletParseResult) => {
+    dynamicHooksService.parse(testText).subscribe((parseResult: ParseResult) => {
       let latestArgs = (componentCreator.createComponent as any)['calls'].mostRecent().args;
       let latestUsedEnvInjector = latestArgs[6];
       let latestUsedInjector = latestArgs[7];

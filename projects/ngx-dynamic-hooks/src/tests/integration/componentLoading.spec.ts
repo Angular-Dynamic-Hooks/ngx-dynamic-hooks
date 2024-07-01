@@ -1,4 +1,4 @@
-import { PLATFORM_ID } from '@angular/core';
+import { Component, PLATFORM_ID } from '@angular/core';
 import { ComponentFixtureAutoDetect, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { first } from 'rxjs/operators';
 
@@ -12,7 +12,6 @@ import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
-import { ModuleTestComponent } from '../resources/components/moduleTest/moduleTest.c';
 import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
 import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
@@ -50,9 +49,16 @@ describe('Component loading', () => {
   });
 
   it('#should be able to load module components', () => {
+    @Component({
+      selector: 'moduletest',
+      template: '<span class="module-component"><ng-content></ng-content></span>'
+    })
+    class ModuleTestComponent {}
+
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      declarations: [ModuleTestComponent],
+      // You don't event need this. createComponent miraculously also works with non-standalone, non-declared components.
+      // declarations: [ModuleTestComponent]
       providers: [
         {provide: ComponentFixtureAutoDetect, useValue: true},
         provideDynamicHooks({parsers: [GenericWhateverStringParser]})
@@ -64,12 +70,13 @@ describe('Component loading', () => {
   
     const fixture = TestBed.createComponent(DynamicHooksComponent);
     const comp = fixture.componentInstance;
-    comp.content = '[whatever-string][/whatever-string]';
+    comp.content = '[whatever-string]it works![/whatever-string]';
     comp.ngOnChanges({content: true} as any);
 
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef?.instance.constructor.name).toBe('ModuleTestComponent');
     expect(fixture.nativeElement.querySelector('.module-component')).not.toBe(null);
+    expect(fixture.nativeElement.innerHTML).toContain('it works!');
   });
 
   it('#should be able to load standalone components', () => {

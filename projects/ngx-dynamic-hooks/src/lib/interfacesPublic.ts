@@ -1,5 +1,5 @@
 import { ComponentRef, EnvironmentInjector, Injector } from '@angular/core';
-import { OutletOptions } from './services/settings/options';
+import { ParseOptions } from './services/settings/options';
 import { Subscription } from 'rxjs';
 import { DetailedStringifyResult } from './services/utils/deepComparer';
 
@@ -215,14 +215,18 @@ export interface DynamicContentChild {
     hookValue: HookValue;
 }
 
-// Other
+// Parsing interfaces
 // ---------------------------------
 
-export interface OutletParseResult {
+export interface ParseResult {
     element: any;
     hookIndex: HookIndex;
-    resolvedParsers: HookParser[];
-    resolvedOptions: OutletOptions;
+    context: any;
+    usedParsers: HookParser[];
+    usedOptions: ParseOptions;
+    usedInjector: Injector;
+    usedEnvironmentInjector: EnvironmentInjector;
+    destroy: () => void;
 }
 
 export interface LoadedComponent {

@@ -1,29 +1,19 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges, EnvironmentInjector } from '@angular/core';
-import { HookIndex, Hook } from '../../interfacesPublic';
-import { HookParser, LoadedComponent, OutletParseResult } from '../../interfacesPublic';
-import { OutletOptions, getOutletOptionDefaults } from '../../services/settings/options';
+import { HookIndex, Hook, ParseResult } from '../../interfacesPublic';
+import { HookParser, LoadedComponent } from '../../interfacesPublic';
 import { DynamicHooksService } from '../../services/dynamicHooksService';
 import { HookParserEntry } from '../../services/settings/parserEntry';
 import { ComponentUpdater } from '../../services/core/componentUpdater';
-import { PlatformService } from '../../services/platform/platformService';
 import { DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_PROVIDERS_REGISTERED } from '../../interfaces';
 import { AutoPlatformService } from '../../services/platform/autoPlatformService';
+import { ParseOptions, getParseOptionDefaults } from '../../../public-api';
 
 /**
 * Explanation in a nutshell:
-*
-*  1. A dynamic string of content is passed in as @Input() and an array of parsers is retrieved either as @Input() or from the global settings.
-*
-*  2. The content is given to all registered parsers who will find their respective hooks. The hooks are then replaced with dynamic component
-*     placeholder elements in the content string.
-*
-*  3. The content string is then parsed by the native browser HTML parser to create a DOM tree, which is then inserted as the innerHTML of the
-*     OutletComponent.
-*
-*  4. The corresponding components for each hook are dynamically loaded into the previously created placeholder elements as fully-functional
-*     Angular components via createComponent().
-*
-*  5. Any @Inputs() & @Outputs() for the components will be registered with them and automatically updated on following change detection runs.
+*  1. A dynamic piece of content is passed in as @Input() and an array of parsers is retrieved either as @Input() or from the global settings.
+*  2. The content is given to all registered parsers who will find their respective hooks. The hooks are then replaced/marked as hook anchor elements.
+*  3. The corresponding components for each hook are dynamically loaded into the previously created anchor elements as fully-functional Angular components via createComponent().
+*  4. @Inputs() & @Outputs() for the components are read from the hooks, passed along and automatically updated according to each parser's internal logic.
 */
 
 /**
@@ -53,10 +43,10 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
   @Input() globalParsersBlacklist: Array<string>|null = null;
   @Input() globalParsersWhitelist: Array<string>|null = null;
   @Input() parsers: Array<HookParserEntry>|null = null;
-  @Input() options: OutletOptions|null = null;
+  @Input() options: ParseOptions|null = null;
   @Output() componentsLoaded: EventEmitter<LoadedComponent[]> = new EventEmitter();
   hookIndex: HookIndex = {};
-  activeOptions: OutletOptions = getOutletOptionDefaults();
+  activeOptions: ParseOptions = getParseOptionDefaults();
   activeParsers: Array<HookParser> = [];
   token = Math.random().toString(36).substring(2, 12);
   initialized: boolean = false;
@@ -126,7 +116,7 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     // Reset state
     this.platformService.setInnerContent(this.hostElement.nativeElement, '');
     this.hookIndex = {};
-    this.activeOptions = getOutletOptionDefaults();
+    this.activeOptions = getParseOptionDefaults();
     this.activeParsers = [];
     this.initialized = false;
   }
@@ -148,10 +138,10 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
       this.hookIndex,
       this.environmentInjector,
       this.injector
-    ).subscribe((outletParseResult: OutletParseResult) => {
+    ).subscribe((parseResult: ParseResult) => {
       // hostElement and hookIndex are automatically filled
-      this.activeParsers = outletParseResult.resolvedParsers;
-      this.activeOptions = outletParseResult.resolvedOptions;
+      this.activeParsers = parseResult.usedParsers;
+      this.activeOptions = parseResult.usedOptions;
       this.initialized = true;
 
       // Return all loaded components

@@ -1,10 +1,10 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
-import { OutletOptions, getOutletOptionDefaults } from './options';
 import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
 import { ParserEntryResolver } from './parserEntryResolver';
 import { OptionsResolver } from './optionsResolver';
 import { HookParserEntry } from './parserEntry';
 import { HookParser } from '../../interfacesPublic';
+import { ParseOptions, getParseOptionDefaults } from './options';
 
 /**
  * A helper class for resolving settings object and merge potentially multiple ones from different child modules/injection contexts
@@ -15,26 +15,25 @@ import { HookParser } from '../../interfacesPublic';
 export class SettingsResolver {
 
   constructor(
-    private injector: Injector,
     private parserEntryResolver: ParserEntryResolver,
     private optionsResolver: OptionsResolver
   ) {
   }
 
   public resolve(
+    injector: Injector,
     content: any,
     allSettings: DynamicHooksSettings[],
     ancestorSettings: DynamicHooksSettings[],
     moduleSettings: DynamicHooksSettings, 
     localParsers: HookParserEntry[]|null = null, 
-    localOptions: OutletOptions|null = null,
+    localOptions: ParseOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
-    injector: Injector|null = null
   ): ResolvedSettings {
     let resolvedSettings: DynamicHooksSettings = {};
 
-    if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
+    if (moduleSettings === undefined || !moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
       // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
       // This is in case other settings were added to the back of allSettings after registering this module
       resolvedSettings = this.mergeSettings([...allSettings, ...ancestorSettings]);
@@ -43,13 +42,13 @@ export class SettingsResolver {
       resolvedSettings = this.mergeSettings(ancestorSettings);
 
     } else if (moduleSettings.inheritance === DynamicHooksInheritance.None) {
-      resolvedSettings = moduleSettings;
+      resolvedSettings = moduleSettings || {};
       
     } else {
       throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${moduleSettings.inheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
     }
 
-    const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector || this.injector, globalParsersBlacklist, globalParsersWhitelist);
+    const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
     const resolvedOptions = this.resolveOptions(content, resolvedSettings.options || null, localOptions);
 
     return {
@@ -92,10 +91,10 @@ export class SettingsResolver {
   }
 
   /**
-   * Loads the relevant outlet options
+   * Loads the relevant parse options
    */
-  private resolveOptions(content: any, globalOptions: OutletOptions|null, localOptions: OutletOptions|null): OutletOptions {
-    let resolvedOptions: OutletOptions;
+  private resolveOptions(content: any, globalOptions: ParseOptions|null, localOptions: ParseOptions|null): ParseOptions {
+    let resolvedOptions: ParseOptions;
 
     // If local
     if (localOptions) {
@@ -105,7 +104,7 @@ export class SettingsResolver {
       resolvedOptions = this.optionsResolver.resolve(content, globalOptions);
     // If none given
     } else {
-      resolvedOptions = getOutletOptionDefaults(content);
+      resolvedOptions = getParseOptionDefaults(content);
     }
 
     return resolvedOptions;

@@ -11,12 +11,12 @@ import { matchAll } from './utils';
 export class HookFinder {
 
   /**
-   * Finds all hooks that are non-enclosing in a string of text, e.g. <hook>
+   * Finds all string hooks that are non-enclosing in a piece of text, e.g. <hook>
    *
    * @param content - The text to search
    * @param hookRegex - The regex to use for the hook
    */
-  findStandaloneHooks(content: string, hookRegex: RegExp): Array<HookPosition> {
+  findSingletagHooks(content: string, hookRegex: RegExp): Array<HookPosition> {
     const result: HookPosition[] = [];
 
     // Find all hooks
@@ -35,7 +35,7 @@ export class HookFinder {
   }
 
   /**
-   * Finds all hooks that are enclosing in a string of text, e.g. <hook>...</hook>
+   * Finds all string hooks that are enclosing in a piece of text, e.g. <hook>...</hook>
    *
    * Correctly finding enclosing hooks requires a programmatic parser rather then just regex alone, as regex cannot handle
    * patterns that are potentially nested within themselves.

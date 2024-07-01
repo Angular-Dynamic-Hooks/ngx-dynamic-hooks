@@ -2,9 +2,8 @@ import { Injectable, Optional, Inject, Injector, EnvironmentInjector } from '@an
 import { of, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { HookIndex } from '../interfacesPublic';
-import { OutletParseResult } from '../interfacesPublic';
-import { OutletOptions } from './settings/options';
+import { HookIndex, ParseResult } from '../interfacesPublic';
+import { ParseOptions } from './settings/options';
 import { StringHookFinder } from './core/stringHookFinder';
 import { ComponentCreator } from './core/componentCreator';
 import { DynamicHooksSettings } from './settings/settings';
@@ -58,15 +57,18 @@ export class DynamicHooksService {
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
     parsers: HookParserEntry[]|null = null,
-    options: OutletOptions|null = null,
+    options: ParseOptions|null = null,
     targetElement: HTMLElement|null = null,
     targetHookIndex: HookIndex = {},
     environmentInjector: EnvironmentInjector|null = null,
     injector: Injector|null = null
-  ): Observable<OutletParseResult> {
+  ): Observable<ParseResult> {
+    const usedEnvironmentInjector = environmentInjector || this.environmentInjector;
+    const usedInjector = injector || this.injector;
 
     // Resolve options and parsers
-    const { parsers: resolvedParsers, options: resolvedOptions } = this.settingsResolver.resolve(
+    const { parsers: usedParsers, options: usedOptions } = this.settingsResolver.resolve(
+      usedInjector, // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
       content,
       this.allSettings, 
       this.ancestorSettings, 
@@ -74,8 +76,7 @@ export class DynamicHooksService {
       parsers, 
       options, 
       globalParsersBlacklist, 
-      globalParsersWhitelist, 
-      injector // Use element injector for resolving service parsers (instead of environment injector). Will fallback to environment injector anyway if doesn't find anything.
+      globalParsersWhitelist
     );
 
     // Needs string or element as content
@@ -83,8 +84,12 @@ export class DynamicHooksService {
       return of({
         element: targetElement || this.platformService.createElement('div'),
         hookIndex: targetHookIndex,
-        resolvedParsers,
-        resolvedOptions
+        context: context,
+        usedParsers,
+        usedOptions,
+        usedInjector,
+        usedEnvironmentInjector,
+        destroy: () => this.destroy(targetHookIndex)
       });
     }
 
@@ -94,20 +99,20 @@ export class DynamicHooksService {
     // a) Find all string hooks in string content
     if (typeof content === 'string') {
       contentElement = this.platformService.createElement('div');
-      const result = this.stringHookFinder.find(content, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+      const result = this.stringHookFinder.find(content, context, usedParsers, token, usedOptions, targetHookIndex);
       this.platformService.setInnerContent(contentElement, result.content);
       
     // b) Find all string hooks in element content
     } else {
       contentElement = content;
-      this.stringHookFinder.findInElement(contentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+      this.stringHookFinder.findInElement(contentElement, context, usedParsers, token, usedOptions, targetHookIndex);
     }
 
     // Find all element hooks
-    targetHookIndex = this.elementHookFinder.find(contentElement, context, resolvedParsers, token, resolvedOptions, targetHookIndex);
+    targetHookIndex = this.elementHookFinder.find(contentElement, context, usedParsers, token, usedOptions, targetHookIndex);
 
     // Sanitize?
-    if (resolvedOptions?.sanitize) {
+    if (usedOptions?.sanitize) {
       this.contentSanitizer.sanitize(contentElement, targetHookIndex, token);
     }
 
@@ -121,15 +126,19 @@ export class DynamicHooksService {
     }
 
     // Dynamically create components in component selector elements
-    return this.componentCreator.init(contentElement, targetHookIndex, token, context, resolvedOptions, environmentInjector || this.environmentInjector, injector || this.injector)
+    return this.componentCreator.init(contentElement, targetHookIndex, token, context, usedOptions, usedEnvironmentInjector, usedInjector)
     .pipe(first())
     .pipe(map((allComponentsLoaded: boolean) => {
       // Everything done! Return finished hookIndex and resolved parsers and options
       return {
         element: contentElement,
         hookIndex: targetHookIndex,
-        resolvedParsers,
-        resolvedOptions
+        context: context,
+        usedParsers,
+        usedOptions,
+        usedInjector,
+        usedEnvironmentInjector,
+        destroy: () => this.destroy(targetHookIndex)
       };
     }));
   }

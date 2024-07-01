@@ -426,7 +426,7 @@ describe('DefaultPlatformService', () => {
 
   it(`#should create text nodes`, () => {
     const textNode = platformService.createTextNode('innerText');
-    expect(textNode.nodeType === Node.TEXT_NODE);
+    expect(textNode.nodeType === Node.TEXT_NODE).toBeTrue();
   });
 
   // getTextContent
