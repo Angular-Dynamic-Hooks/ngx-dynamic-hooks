@@ -1,6 +1,6 @@
 import { Component, Inject, ElementRef } from '@angular/core';
 import { Route } from '@angular/router';
-import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooksForChild } from '../../testing-api';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooks } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -25,7 +25,7 @@ export class PlanetSpeciesComponent {
 export const getPlanetSpeciesRoutes: () => Route[] = () => {
   return [
     { path: '', component: PlanetSpeciesComponent, providers: [
-      provideDynamicHooksForChild({
+      provideDynamicHooks({
         parsers: [
           {component: DynamicPlanetSpeciesComponent}
         ],

@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject } from '@angular/core';
 import { Route } from '@angular/router';
-import { DynamicHooksSettings, DynamicHooksInheritance, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooksForChild, DynamicHooksComponent, DYNAMICHOOKS_MODULESETTINGS } from '../../testing-api';
+import { DynamicHooksSettings, DynamicHooksInheritance, DYNAMICHOOKS_ANCESTORSETTINGS, DynamicHooksService, provideDynamicHooks, DynamicHooksComponent, DYNAMICHOOKS_MODULESETTINGS } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -33,7 +33,7 @@ export class PlanetCountriesComponent {
 export const getPlanetCountriesRoutes: () => Route[] = () => {
   return [
     { path: '', component: PlanetCountriesComponent, providers: [
-      provideDynamicHooksForChild({
+      provideDynamicHooks({
         parsers: [
           {component: DynamicPlanetCountriesComponent}
         ],

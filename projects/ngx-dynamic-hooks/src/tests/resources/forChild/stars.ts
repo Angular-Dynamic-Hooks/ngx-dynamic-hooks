@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { CONTENT_STRING } from './contentString';
-import { DynamicHooksComponent, provideDynamicHooksForChild } from '../../testing-api';
+import { DynamicHooksComponent, provideDynamicHooks } from '../../testing-api';
 
 @Component({
   selector: 'app-dynamicstars',
@@ -25,7 +25,7 @@ export class StarsComponent {
 export const getStarsRoutes: () => Route[] = () => {
   return [
     { path: '', component: StarsComponent, providers: [
-      provideDynamicHooksForChild({
+      provideDynamicHooks({
         parsers: [
           {component: DynamicStarsComponent}
         ],

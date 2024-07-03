@@ -5,7 +5,7 @@
  */
 
 // Public module resources
-export { provideDynamicHooks, provideDynamicHooksForChild, resetDynamicHooks, allSettings } from '../lib/dynamicHooksProviders';
+export { provideDynamicHooks, resetDynamicHooks, allSettings } from '../lib/dynamicHooksProviders';
 export { parseHooks } from '../lib/standalone';
 export { DynamicHooksSettings, DynamicHooksInheritance } from '../lib/services/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, ParseResult, LoadedComponent, ComponentConfig } from '../lib/interfacesPublic';

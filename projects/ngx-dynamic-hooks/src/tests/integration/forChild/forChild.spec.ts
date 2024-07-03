@@ -135,7 +135,7 @@ describe('forChild', () => {
 
     const loadedParsers = mergedSettings.parsers.map(parser => (<StringSelectorHookParser>parser).config.component).flat(10);
 
-    // In sync configs, all provideDynamicHooksForChild functions are called immediately on app init, so allSettings is also immediately populated
+    // In sync configs, all provideDynamicHooks functions are called immediately on app init, so allSettings is also immediately populated
     expect(loadedParsers.length).toBe(8);
     expect(loadedParsers.includes(DynamicRootComponent)).toBeTrue();
     expect(loadedParsers.includes(DynamicHyperlanesComponent)).toBeTrue();
@@ -146,7 +146,7 @@ describe('forChild', () => {
     expect(loadedParsers.includes(DynamicPlanetCitiesElementInjectorComponent)).toBeTrue();
     expect(loadedParsers.includes(DynamicPlanetSpeciesComponent)).toBeTrue();
 
-    // Therefore, when merging options, it will be in the order of calling provideDynamicHooksForChild
+    // Therefore, when merging options, it will be in the order of calling provideDynamicHooks
     // This is the expected merged settings object based on the module import order used at the start of createTestingModuleSync():
     // root > hyperlanes > stars > planets > countries > cities > species
     expect(mergedSettings.options).toEqual(jasmine.objectContaining({

@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject, Optional } from '@angular/core';
 import { Route } from '@angular/router';
-import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, DynamicHooksSettings, DynamicHooksInheritance, DynamicHooksService, allSettings, provideDynamicHooksForChild } from '../../testing-api';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, DynamicHooksSettings, DynamicHooksInheritance, DynamicHooksService, allSettings, provideDynamicHooks } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -31,7 +31,7 @@ export const planetCitiesComponentProviderSettings = {
   </div>`,
   standalone: true,
   providers: [
-    provideDynamicHooksForChild(planetCitiesComponentProviderSettings)
+    provideDynamicHooks(planetCitiesComponentProviderSettings)
   ]
 })
 export class PlanetCitiesComponent {
@@ -54,7 +54,7 @@ export const getPlanetCitiesRoutes: () => Route[] = () => {
 
   return [
     { path: '', component: PlanetCitiesComponent, providers: [
-      provideDynamicHooksForChild({
+      provideDynamicHooks({
         parsers: [
           {component: DynamicPlanetCitiesComponent}
         ],

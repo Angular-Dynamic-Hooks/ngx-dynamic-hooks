@@ -4,7 +4,7 @@ import { CONTENT_STRING } from './contentString';
 import { getPlanetCitiesRoutes } from './planetCities';
 import { getPlanetCountriesRoutes } from './planetCountries';
 import { getPlanetSpeciesRoutes } from './planetSpecies';
-import { DynamicHooksComponent, provideDynamicHooksForChild } from '../../testing-api';
+import { DynamicHooksComponent, provideDynamicHooks } from '../../testing-api';
 
 @Component({
   selector: 'app-dynamicplanets',
@@ -31,7 +31,7 @@ export const getPlanetsRoutes: (lazyChildren: boolean) => Route[] = (lazyChildre
     { path: '', 
       component: PlanetsComponent, 
       providers: [
-        provideDynamicHooksForChild({
+        provideDynamicHooks({
           parsers: [
             {component: DynamicPlanetsComponent}
           ],

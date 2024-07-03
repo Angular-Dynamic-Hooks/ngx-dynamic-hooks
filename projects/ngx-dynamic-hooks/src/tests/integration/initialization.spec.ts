@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getParseOptionDefaults, provideDynamicHooks, provideDynamicHooksForChild } from '../testing-api';
+import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
@@ -144,22 +144,6 @@ describe('Initialization', () => {
     expect(allSettings[0].parsers!.length).toBe(2);
     expect(allSettings[0].parsers![0]).toBe(MultiTagTestComponent);
     expect((allSettings[0].parsers![1] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
-  });
-
-  it('#it should allow directly accepting a parsers array as a shorthand instead of a full settings object in provideDynamicHooksForChild', () => {
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        provideDynamicHooks([]),
-        provideDynamicHooksForChild([MultiTagTestComponent, {component: SingleTagTestComponent, enclosing: false}])
-      ]
-    });
-
-    let allSettings = TestBed.inject(DYNAMICHOOKS_ALLSETTINGS);
-    expect(allSettings.length).toBe(2);
-    expect(allSettings[1].parsers!.length).toBe(2);
-    expect(allSettings[1].parsers![0]).toBe(MultiTagTestComponent);
-    expect((allSettings[1].parsers![1] as SelectorHookParserConfig).component).toBe(SingleTagTestComponent);
   });
 
   it('#should set platformService provider to custom platformService if passed', () => {
