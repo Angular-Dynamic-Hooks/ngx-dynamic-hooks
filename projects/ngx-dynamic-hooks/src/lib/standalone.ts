@@ -1,93 +1,120 @@
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
 
 import { HookParserEntry } from './services/settings/parserEntry';
 import { ParseOptions } from './services/settings/options';
 import { HookIndex, ParseResult } from './interfacesPublic';
-import { EnvironmentInjector, Provider, Type, createEnvironmentInjector } from '@angular/core';
+import { EnvironmentInjector, Injector, Provider, Type, createEnvironmentInjector } from '@angular/core';
 import { createApplication } from '@angular/platform-browser';
 import { provideDynamicHooks } from './dynamicHooksProviders';
 import { DynamicHooksService } from '../public-api';
-import { PlatformService } from './services/platform/platformService';
+import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformService';
 
 // Global state
 // ----------
+let independentInjector: EnvironmentInjector|null = null;
+let scopes: ProvidersScope[] = [];
+let allParseResults: ParseResult[] = [];
 
-interface StandaloneState {
-  globalProviders: Provider[];
-  platformService: Type<PlatformService>|null;
-  globalInjector: EnvironmentInjector|null;
-  scopedInjectors: Map<Symbol, EnvironmentInjector>;
+const createInjector = async (providers: Provider[] = [], parent?: EnvironmentInjector) => {
+  // If no parent, create new root injector, so passed providers will also be actual root providers
+  return parent ? createEnvironmentInjector(providers, parent) : (await createApplication({providers})).injector;
 }
 
-const getDefaultState: () => StandaloneState = () => {
-  return {
-    globalProviders: [],
-    platformService: null,
-    globalInjector: null,
-    scopedInjectors: new Map()
+export const destroyAll = () => {
+  // Destroy all scopes
+  for (const scope of scopes) {
+    scope.destroy();
   }
+
+  // Then all remaining independent parseResults
+  for (const parseResult of allParseResults) {
+    parseResult.destroy();
+  }
+
+  independentInjector = null;
+  scopes = [];
+  allParseResults = [];
 }
 
-let state: StandaloneState = getDefaultState();
-
-// Providers
+// Providers scope
 // ----------
 
-export const provideGlobally = (providers: Provider[], platformService?: Type<PlatformService>) => {
-  resetGlobalProviders();
-  state.globalProviders = providers;
-  state.platformService = platformService || null;
+export const createProviders: (providers: Provider[], parentScope?: ProvidersScope) => ProvidersScope = (providers = [], parentScope) => {
+  return new ProvidersScope(providers, parentScope);
 }
 
-export const resetGlobalProviders = () => state = getDefaultState();
+export class ProvidersScope {
+  private _injector: EnvironmentInjector|null = null;
+  public get injector(): EnvironmentInjector|null { 
+    return this._injector;
+  };
+  private _parseResults: ParseResult[] = [];
+  public get parseResults(): ParseResult[] { 
+    return this._parseResults;
+  };
+  private _isDestroyed: boolean = false;
+  get isDestroyed(): boolean {
+    return this._isDestroyed;
+  };
 
-export interface ParseHooksScope {
-  parseHooks: (...args: ParseHooksParams) => Promise<ParseResult>;
-  resolveInjector: () => Promise<EnvironmentInjector>;
-}
+  constructor(private providers: Provider[] = [], private parentScope?: ProvidersScope) {
+    scopes.push(this);
+  }
 
-export const provideScope: (providers: Provider[], parentScope?: ParseHooksScope) => ParseHooksScope = (providers, parentScope) => {
-  const key = Symbol('ScopedInjectorKey');
-  const resolveInjector = async () => await resolveScopedInjector(key, providers, parentScope);
+  public async parseHooks(
+    content: any,
+    parsers: HookParserEntry[],
+    context: any = null,  
+    options: ParseOptions|null = null,
+    targetElement: HTMLElement|null = null,
+    targetHookIndex: HookIndex = {},
+    environmentInjector: EnvironmentInjector|null = null
+  ): Promise<ParseResult> {
+    this.checkIfDestroyed();
 
-  return {
-    parseHooks: async (content, parsers, context = null, options = null, targetElement = null, targetHookIndex = {}, environmentInjector = null) => {
-      return parseHooks(content, parsers, context, options, targetElement, targetHookIndex, environmentInjector || await resolveInjector());
-    },
-    resolveInjector
-  }  
-}
-
-// Injectors
-// ----------
-
-const resolveGlobalInjector = async () => {
-  if (!state.globalInjector) {
-    const app = await createApplication({
-      providers: [
-        ...state.globalProviders,
-        provideDynamicHooks(undefined, state.platformService || undefined)
-      ]
+    return parseHooks(content, parsers, context, options,  targetElement, targetHookIndex, environmentInjector || await this.resolveInjector())
+    .then(parseResult => {
+      this.parseResults.push(parseResult);
+      return parseResult;
     });
-    state.globalInjector = app.injector;
   }
 
-  return state.globalInjector;
-}
+  public async resolveInjector() {
+    this.checkIfDestroyed();
 
-const resolveScopedInjector = async (key: Symbol, providers: Provider[], parentScope?: ParseHooksScope) => {
-  if (!state.scopedInjectors.has(key)) {
-    const parentInjector = parentScope ? await parentScope.resolveInjector() : await resolveGlobalInjector();
-    state.scopedInjectors.set(key, createEnvironmentInjector(providers, parentInjector));
+    if (!this.injector) {
+      const parentInjector = this.parentScope ? await this.parentScope.resolveInjector() : undefined;
+      this._injector = await createInjector(this.providers, parentInjector);
+    }
+  
+    return this.injector!;
   }
 
-  return state.scopedInjectors.get(key)!;
+  public destroy(): void {
+    this.checkIfDestroyed();
+
+    for (const parseResult of this.parseResults) {
+      parseResult.destroy();
+      allParseResults = allParseResults.filter(entry => entry !== parseResult);
+    }
+
+    if (this.injector) {
+      this.injector.destroy();
+    }
+
+    scopes = scopes.filter(scope => scope !== this);
+    this._isDestroyed = true;
+  }
+
+  private checkIfDestroyed() {
+    if (this.isDestroyed) {
+      throw new Error('This scope has already been destroyed. It or its methods cannot be used any longer.');
+    }
+  }
 }
 
 // ParseHooks
 // ----------
-
-type ParseHooksParams = Parameters<typeof parseHooks>;
 
 export const parseHooks = async (
   content: any,
@@ -96,22 +123,34 @@ export const parseHooks = async (
   options: ParseOptions|null = null,
   targetElement: HTMLElement|null = null,
   targetHookIndex: HookIndex = {},
-  environmentInjector: EnvironmentInjector|null = null
+  environmentInjector: EnvironmentInjector|null = null,
 ): Promise<ParseResult> => {
 
-  const injector = environmentInjector || await resolveGlobalInjector();
-  const dynHooksService = injector.get(DynamicHooksService);
+  // Reuse the same global injector for all independent parseHooks calls
+  if (!environmentInjector) {
+    if (!independentInjector) {
+      independentInjector = await createInjector([provideDynamicHooks()]);
+    }
+    environmentInjector = independentInjector;
+  }
 
-  return firstValueFrom(dynHooksService.parse(
-    content, 
-    context, 
-    null, 
-    null, 
-    parsers, 
-    options, 
-    targetElement, 
-    targetHookIndex, 
-    injector, 
-    null)
-  );
+  const dynHooksService = environmentInjector.get(DynamicHooksService);
+
+  return firstValueFrom(dynHooksService
+    .parse(
+      content, 
+      context, 
+      null, 
+      null, 
+      parsers, 
+      options, 
+      targetElement, 
+      targetHookIndex, 
+      environmentInjector,
+      null
+    )
+  ).then(parseResult => {
+    allParseResults.push(parseResult);
+    return parseResult;
+  });
 }

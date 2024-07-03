@@ -1,6 +1,6 @@
 import { InjectionToken } from "@angular/core";
 
-export const PLATFORM_SERVICE = new InjectionToken<PlatformService>('An injection token to retrieve an optionally user-provded platformService');
+export const PLATFORM_SERVICE = new InjectionToken<PlatformService>('An injection token to retrieve an optionally user-provided PlatformService');
 
 /**
  * Extend this service to implement custom platform.

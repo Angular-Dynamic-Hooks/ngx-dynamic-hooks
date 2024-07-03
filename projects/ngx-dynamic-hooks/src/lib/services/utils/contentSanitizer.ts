@@ -6,6 +6,7 @@ import { HookFinder } from './hookFinder';
 import { matchAll } from './utils';
 
 const sanitizerPlaceholderTag = 'dynamic-hooks-sanitization-placeholder';
+const sanitizerPlaceholderRegex = new RegExp(`<\/?${sanitizerPlaceholderTag}.*?>`, 'g');
 
 /**
  * A utility service that sanitizes an Element and all of its children while exluding found hook elements
@@ -45,7 +46,7 @@ export class ContentSanitizer {
 
     // Encode sanitization placeholders (so they survive sanitization)
     let innerHTML = this.platformService.getInnerContent(contentElement);
-    innerHTML = this.findAndEncodeTags(innerHTML, new RegExp(`<\/?${sanitizerPlaceholderTag}.*?>`, 'g'));
+    innerHTML = this.findAndEncodeTags(innerHTML, sanitizerPlaceholderRegex);
 
     // Sanitize
     let sanitizedInnerHtml = this.platformService.sanitize(innerHTML);

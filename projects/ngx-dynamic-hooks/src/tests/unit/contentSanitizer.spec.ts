@@ -155,7 +155,6 @@ describe('ContentSanitizer', () => {
     expect(spanEl!.innerHTML).toContain('element');
   });
 
-
   it('#should keep anchor references when sanitizing', () => {
     const parseToken = "1a2b3c4d5e";
     const hookIndex = {

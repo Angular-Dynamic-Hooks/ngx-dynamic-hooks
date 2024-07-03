@@ -1,18 +1,27 @@
 // Testing api resources
-import { AutoPlatformService, PlatformService, anchorElementTag, parseHooks, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
+import { AutoPlatformService, PLATFORM_SERVICE, PlatformService, anchorElementTag, parseHooks, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { Injector } from '@angular/core';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { WhateverTestComponent } from '../resources/components/whateverTest/whateverTest.c';
-import { provideGlobally, provideScope, resetGlobalProviders } from '../../lib/standalone';
+import { createProviders, destroyAll } from '../../lib/standalone';
 import { createApplication } from '@angular/platform-browser';
+import { RootTestService } from '../resources/services/rootTestService';
+
+const getService = (injector: Injector, token: any) => {
+  try {
+    return injector.get(token);
+  } catch (e) {
+    return undefined;
+  }
+}
 
 describe('Standalone usage', () => {
 
   beforeEach(() => {
     resetDynamicHooks();
-    resetGlobalProviders();
+    destroyAll();
   });
 
   // ----------------------------------------------------------------------------
@@ -111,44 +120,46 @@ describe('Standalone usage', () => {
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    class CustomService { content = 'Custom service works!' };
+    class CustomInjectorService { content = 'Custom injector service works!' };
     const app = await createApplication({
       providers: [
         provideDynamicHooks({}),
-        CustomService
+        CustomInjectorService
       ]
     });
     const customInjector = app.injector;
 
-    // Test with parseHooks
-    class GlobalService { content = 'Global service works!' };
-    provideGlobally([GlobalService]);
+    // Test independently
+    const resultOne = await parseHooks(testText, parsers, context);
+    const originalRootTestService = getService(resultOne.usedEnvironmentInjector, RootTestService);
+    originalRootTestService.someString = 'This was modified!';
+    expect(originalRootTestService.someString).toBe('This was modified!');
+    expect(getService(resultOne.usedEnvironmentInjector, CustomInjectorService)).toBeUndefined();
 
-    const result = await parseHooks(testText, parsers, context, null, null, {}, customInjector);
-    expect(result.usedEnvironmentInjector).toBe(customInjector);
-    expect(result.usedEnvironmentInjector.get(CustomService).content).toBe('Custom service works!');
+    // When using custom injector, should create separate instance of RootTestService with default values
+    const resultTwo = await parseHooks(testText, parsers, context, null, null, {}, customInjector);
+    expect(getService(resultTwo.usedEnvironmentInjector, RootTestService)).not.toBe(originalRootTestService);
+    expect(getService(resultTwo.usedEnvironmentInjector, RootTestService).someString).toBe('RootTestService works!');
+    expect(getService(resultTwo.usedEnvironmentInjector, CustomInjectorService)).not.toBeUndefined();
+    expect(getService(resultTwo.usedEnvironmentInjector, CustomInjectorService).content).toBe('Custom injector service works!');
 
-    // Global providers should be overwritten and not available
-    let globalService;
-    try  {
-      globalService = result.usedEnvironmentInjector.get(GlobalService);
-    } catch (e) {}
-    expect(globalService).toBeUndefined();
+    // Test with scope
+    class ScopeService { content = 'Scope service works!' };
+    const scope = createProviders([
+      provideDynamicHooks(),
+      ScopeService
+    ]);
 
-    // Test with scope.parseHooks
-    class ScopeService { content = 'A service that is provided in a scope.' };
-    const scope = provideScope([ScopeService]);
+    const scopeResultOne = await scope.parseHooks(testText, parsers, context);
+    expect(getService(scopeResultOne.usedEnvironmentInjector, ScopeService)).not.toBeUndefined();
+    expect(getService(scopeResultOne.usedEnvironmentInjector, ScopeService).content).toBe('Scope service works!');
+    expect(getService(scopeResultOne.usedEnvironmentInjector, CustomInjectorService)).toBeUndefined();
 
-    const scopedResult = await scope.parseHooks(testText, parsers, context, null, null, {}, customInjector);
-    expect(scopedResult.usedEnvironmentInjector).toBe(customInjector);
-    expect(scopedResult.usedEnvironmentInjector.get(CustomService).content).toBe('Custom service works!');
-
-    // Scope providers should be overwritten and not available
-    let scopeService;
-    try  {
-      scopeService = scopedResult.usedEnvironmentInjector.get(ScopeService);
-    } catch (e) {}
-    expect(scopeService).toBeUndefined();
+    // When using custom injector in scope, should block out scope injector
+    const scopeResultTwo = await scope.parseHooks(testText, parsers, context, null, null, {}, customInjector);
+    expect(getService(scopeResultTwo.usedEnvironmentInjector, ScopeService)).toBeUndefined();
+    expect(getService(scopeResultTwo.usedEnvironmentInjector, CustomInjectorService)).not.toBeUndefined();
+    expect(getService(scopeResultTwo.usedEnvironmentInjector, CustomInjectorService).content).toBe('Custom injector service works!');
   });
 
   it('#should load a custom platformService', async () => {
@@ -161,9 +172,11 @@ describe('Standalone usage', () => {
         return 'TESTTAGNAME';
       }  
     }
-    provideGlobally([], UserPlatformService);
+    const scope = createProviders([
+      provideDynamicHooks([], UserPlatformService)
+    ]);
 
-    const result = await parseHooks(testText, parsers, context);
+    const result = await scope.parseHooks(testText, parsers, context);
 
     // Make sure AutoPlatformService used UserPlatformService method
     const autoPlatformService = result.usedEnvironmentInjector.get(AutoPlatformService);
@@ -171,38 +184,38 @@ describe('Standalone usage', () => {
     expect(tagName).toBe('TESTTAGNAME');
   });
 
-  it('#should load global providers', async () => {
+  it('#should load scoped providers', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    class GlobalService { content = 'Global service works!' };
-    provideGlobally([GlobalService]);
+    class ExampleService { content = 'Example service works!' };
+    const scope = createProviders([
+      provideDynamicHooks(),
+      ExampleService
+    ]);
 
-    const result = await parseHooks(testText, parsers, context);
+    const result = await scope.parseHooks(testText, parsers, context);
     const component: MultiTagTestComponent = result.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-    expect(component.injector.get(GlobalService).content).toBe('Global service works!');
+    expect(component.injector.get(ExampleService).content).toBe('Example service works!');
   });
 
-  it('#should load (multiple levels of) scoped providers', async () => {
+  it('#should load multiple levels of scoped providers', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    class GlobalService { content = 'Global service works!' };
-    provideGlobally([GlobalService]);
-
     class FirstScopeService { content = 'First scope service works!' };
-    const firstScope = provideScope([FirstScopeService]);
+    const firstChildScope = createProviders([provideDynamicHooks(), FirstScopeService]);
 
     class SecondScopeService { content = 'Second scope service works!' };
-    const secondScope = provideScope([SecondScopeService], firstScope);
+    const secondChildScope = createProviders([SecondScopeService], firstChildScope);
 
     class ThirdScopeService { content = 'Third scope service works!' };
-    const thirdScope = provideScope([ThirdScopeService], secondScope);
+    const thirdChildScope = createProviders([ThirdScopeService], secondChildScope);
     
     class ApartScopeService { content = 'Apart scope service works!' };
-    const apartScope = provideScope([ApartScopeService]);
+    const apartChildScope = createProviders([provideDynamicHooks(), ApartScopeService]);
 
     const get = (injector: Injector, token: any) => {
       try {
@@ -213,54 +226,41 @@ describe('Standalone usage', () => {
     }
 
     // Load all components
-    const noScopeResult = await parseHooks(testText, parsers, context);
-    const noScopeComponent: MultiTagTestComponent = noScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const firstChildScopeResult = await firstChildScope.parseHooks(testText, parsers, context);
+    const firstChildScopeComponent: MultiTagTestComponent = firstChildScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
 
-    const firstScopeResult = await firstScope.parseHooks(testText, parsers, context);
-    const firstScopeComponent: MultiTagTestComponent = firstScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const secondChildScopeResult = await secondChildScope.parseHooks(testText, parsers, context);
+    const secondChildScopeComponent: MultiTagTestComponent = secondChildScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
 
-    const secondScopeResult = await secondScope.parseHooks(testText, parsers, context);
-    const secondScopeComponent: MultiTagTestComponent = secondScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const thirdChildScopeResult = await thirdChildScope.parseHooks(testText, parsers, context);
+    const thirdChildScopeComponent: MultiTagTestComponent = thirdChildScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
 
-    const thirdScopeResult = await thirdScope.parseHooks(testText, parsers, context);
-    const thirdScopeComponent: MultiTagTestComponent = thirdScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-
-    const apartScopeResult = await apartScope.parseHooks(testText, parsers, context);
-    const apartScopeComponent: MultiTagTestComponent = apartScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const apartChildScopeResult = await apartChildScope.parseHooks(testText, parsers, context);
+    const apartChildScopeComponent: MultiTagTestComponent = apartChildScopeResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
 
     // Each component should only have access to its expected scopes
-    expect(get(noScopeComponent.injector, GlobalService).content).toBe('Global service works!');
-    expect(get(noScopeComponent.injector, FirstScopeService)).toBeUndefined();
-    expect(get(noScopeComponent.injector, SecondScopeService)).toBeUndefined();
-    expect(get(noScopeComponent.injector, ThirdScopeService)).toBeUndefined();
-    expect(get(noScopeComponent.injector, ApartScopeService)).toBeUndefined();
+    expect(get(firstChildScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
+    expect(get(firstChildScopeComponent.injector, SecondScopeService)).toBeUndefined();
+    expect(get(firstChildScopeComponent.injector, ThirdScopeService)).toBeUndefined();
+    expect(get(firstChildScopeComponent.injector, ApartScopeService)).toBeUndefined();
 
-    expect(get(firstScopeComponent.injector, GlobalService).content).toBe('Global service works!');
-    expect(get(firstScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
-    expect(get(firstScopeComponent.injector, SecondScopeService)).toBeUndefined();
-    expect(get(firstScopeComponent.injector, ThirdScopeService)).toBeUndefined();
-    expect(get(firstScopeComponent.injector, ApartScopeService)).toBeUndefined();
+    expect(get(secondChildScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
+    expect(get(secondChildScopeComponent.injector, SecondScopeService).content).toBe('Second scope service works!');
+    expect(get(secondChildScopeComponent.injector, ThirdScopeService)).toBeUndefined();
+    expect(get(secondChildScopeComponent.injector, ApartScopeService)).toBeUndefined();
 
-    expect(get(secondScopeComponent.injector, GlobalService).content).toBe('Global service works!');
-    expect(get(secondScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
-    expect(get(secondScopeComponent.injector, SecondScopeService).content).toBe('Second scope service works!');
-    expect(get(secondScopeComponent.injector, ThirdScopeService)).toBeUndefined();
-    expect(get(secondScopeComponent.injector, ApartScopeService)).toBeUndefined();
+    expect(get(thirdChildScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
+    expect(get(thirdChildScopeComponent.injector, SecondScopeService).content).toBe('Second scope service works!');
+    expect(get(thirdChildScopeComponent.injector, ThirdScopeService).content).toBe('Third scope service works!');
+    expect(get(thirdChildScopeComponent.injector, ApartScopeService)).toBeUndefined();
 
-    expect(get(thirdScopeComponent.injector, GlobalService).content).toBe('Global service works!');
-    expect(get(thirdScopeComponent.injector, FirstScopeService).content).toBe('First scope service works!');
-    expect(get(thirdScopeComponent.injector, SecondScopeService).content).toBe('Second scope service works!');
-    expect(get(thirdScopeComponent.injector, ThirdScopeService).content).toBe('Third scope service works!');
-    expect(get(thirdScopeComponent.injector, ApartScopeService)).toBeUndefined();
-
-    expect(get(apartScopeComponent.injector, GlobalService).content).toBe('Global service works!');
-    expect(get(apartScopeComponent.injector, FirstScopeService)).toBeUndefined();
-    expect(get(apartScopeComponent.injector, SecondScopeService)).toBeUndefined();
-    expect(get(apartScopeComponent.injector, ThirdScopeService)).toBeUndefined();
-    expect(get(apartScopeComponent.injector, ApartScopeService).content).toBe('Apart scope service works!');
+    expect(get(apartChildScopeComponent.injector, FirstScopeService)).toBeUndefined();
+    expect(get(apartChildScopeComponent.injector, SecondScopeService)).toBeUndefined();
+    expect(get(apartChildScopeComponent.injector, ThirdScopeService)).toBeUndefined();
+    expect(get(apartChildScopeComponent.injector, ApartScopeService).content).toBe('Apart scope service works!');
   });
 
-  it('#should share and reuse the global injector across multiple parseHooks uses', async () => {
+  it('#should share and reuse a global injector across multiple parseHooks uses', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];
@@ -286,7 +286,10 @@ describe('Standalone usage', () => {
     const parsers = [MultiTagTestComponent];
 
     class ScopedService { content = 'A service that is provided in a scope.' }
-    const scope = provideScope([ScopedService]);
+    const scope = createProviders([
+      provideDynamicHooks(),
+      ScopedService
+    ]);
 
     // First parse
     const resultOne = await scope.parseHooks(testText, parsers, context);
@@ -302,67 +305,97 @@ describe('Standalone usage', () => {
     expect(resultTwoService).toBe(resultOneService);
   });
   
-  it('#should be able to reset all resolved injectors', async () => {
+  it('#should have destroyAll destroy the shared global injector for multiple parseHooks uses', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];
 
     // Initial parse. Modify providers.
-    const result = await parseHooks(testText, parsers, context);
-    const component: MultiTagTestComponent = result.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-    const rootTestService = component.rootTestService;
-    rootTestService.someString = 'RootTestService has been modified!';
-
-    // Initial scoped parse. Modify providers.
-    class ScopeTestService {
-      content: string = 'Scope service works!';
-    }
-    const scope = provideScope([ScopeTestService]);
-    const scopedResult = await scope.parseHooks(testText, parsers, context);
-    const scopedComponent = (scopedResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent);
-    const scopedService = scopedComponent.injector.get(ScopeTestService);
-    scopedService.content = 'Scoped service was modified!';
+    const parseOneResult = await parseHooks(testText, parsers, context);
+    const parseOneComponent: MultiTagTestComponent = parseOneResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const parseOneRootTestService = parseOneComponent.rootTestService;
+    parseOneRootTestService.someString = 'RootTestService has been modified!';
 
     // Reset!
-    resetGlobalProviders();
+    destroyAll();
 
-    // Second parse. Should freshly re-resolve injectors/providers, so everything should be defaults again.
-    const resetResult = await parseHooks(testText, parsers, context);
-    const secondParseComponent: MultiTagTestComponent = resetResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-    expect(secondParseComponent.rootTestService).not.toBe(rootTestService);
-    expect(secondParseComponent.rootTestService.someString).toBe('RootTestService works!');
-
-    // Second scoped parse
-    const resetScopedResult = await scope.parseHooks(testText, parsers, context);
-    const resetScopedService = (resetScopedResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent).injector.get(ScopeTestService);
-    expect(resetScopedService).not.toBe(scopedService);
-    expect(resetScopedService.content).toBe('Scope service works!');
+    // Second parse. Should freshly recreate global injector, so everything should be defaults again.
+    const parseTwoResult = await parseHooks(testText, parsers, context);
+    const parseTwoComponent: MultiTagTestComponent = parseTwoResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
+    const parseTwoRootTestService = parseTwoComponent.rootTestService;
+    expect(parseTwoRootTestService).not.toBe(parseOneRootTestService);
+    expect(parseTwoRootTestService.someString).toBe('RootTestService works!');
   });
 
-  it('#should reset when providing global providers again', async () => {
+  it('#should have destroyAll destroy all created scopes', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    class FirstService {}
-    provideGlobally([FirstService]);
-    const firstResult = await parseHooks(testText, parsers, context);
-    const firstComponent: MultiTagTestComponent = firstResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-    expect(firstComponent.injector.get(FirstService)).not.toBeUndefined();
+    // Initial parse.
+    const scopeOne = createProviders([provideDynamicHooks()]);
+    const scopeOneResultA = await scopeOne.parseHooks(testText, parsers, context);
+    const scopeOneResultB = await scopeOne.parseHooks(testText, parsers, context);
+    const spyOneA = spyOn(scopeOneResultA, 'destroy').and.callThrough();
+    const spyOneB = spyOn(scopeOneResultB, 'destroy').and.callThrough();
 
-    // Reset via provideGlobally
-    class SecondService {}
-    provideGlobally([SecondService]);
-    const secondResult = await parseHooks(testText, parsers, context);
-    const secondComponent: MultiTagTestComponent = secondResult.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
-    let firstService;
-    try {
-      firstService = secondComponent.injector.get(FirstService);
-    } catch (e) {}
+    const scopeTwo = createProviders([provideDynamicHooks()]);
+    const scopeTwoResult = await scopeTwo.parseHooks(testText, parsers, context);
+    const spyTwo = spyOn(scopeTwoResult, 'destroy').and.callThrough();
 
-    // First service should be gone, second service should exist
-    expect(firstService).toBeUndefined();
-    expect(secondComponent.injector.get(SecondService)).not.toBeUndefined();
+    const scopeTwoChild = createProviders([provideDynamicHooks()], scopeTwo);
+    const scopeTwoChildResult = await scopeTwoChild.parseHooks(testText, parsers, context);
+    const spyThree = spyOn(scopeTwoChildResult, 'destroy').and.callThrough();
+
+    // Reset!
+    destroyAll();
+
+    expect(scopeOne.isDestroyed).toBe(true);
+    expect(scopeTwo.isDestroyed).toBe(true);
+    expect(scopeTwoChild.isDestroyed).toBe(true);
+    expect((scopeOne['injector']! as any).destroyed).toBe(true);
+    expect((scopeTwo['injector']! as any).destroyed).toBe(true);
+    expect((scopeTwoChild['injector']! as any).destroyed).toBe(true);
+    expect(spyOneA.calls.all().length).toBe(1);
+    expect(spyOneB.calls.all().length).toBe(1);
+    expect(spyTwo.calls.all().length).toBe(1);
+    expect(spyThree.calls.all().length).toBe(1);
+  });
+
+  it('#should be able to destroy individual scopes', async () => {
+    const testText = `<multitagtest></multitagtest>`;
+    const context = {};
+    const parsers = [MultiTagTestComponent];
+
+    const scope = createProviders([provideDynamicHooks()]);
+    const scopeResultA = await scope.parseHooks(testText, parsers, context);
+    const scopeResultB = await scope.parseHooks(testText, parsers, context);
+    const spyA = spyOn(scopeResultA, 'destroy').and.callThrough();
+    const spyB = spyOn(scopeResultB, 'destroy').and.callThrough();
+
+    scope.destroy();
+  
+    expect(scope.isDestroyed).toBe(true);
+    expect((scope['injector']! as any).destroyed).toBe(true);
+    expect(spyA.calls.all().length).toBe(1);
+    expect(spyB.calls.all().length).toBe(1);
+  });
+
+  it('#should habe a destroyed scope put out helpful errors when trying to parse again', async () => {
+    const testText = `<multitagtest></multitagtest>`;
+    const context = {};
+    const parsers = [MultiTagTestComponent];
+
+    const scope = createProviders([provideDynamicHooks()]);
+    const scopeResult = await scope.parseHooks(testText, parsers, context);
+
+    scope.destroy();
+
+    const expectedError = 'This scope has already been destroyed. It or its methods cannot be used any longer.';
+
+    await expectAsync(scope.parseHooks(testText, parsers, context)).toBeRejectedWithError(expectedError);
+    await expectAsync(scope.resolveInjector()).toBeRejectedWithError(expectedError);
+    await expect(() => scope.destroy()).toThrowError(expectedError);
   });
 
 });
