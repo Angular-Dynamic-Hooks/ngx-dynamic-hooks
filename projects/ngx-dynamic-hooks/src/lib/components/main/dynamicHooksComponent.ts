@@ -25,17 +25,7 @@ import { ParseOptions, getParseOptionDefaults } from '../../../public-api';
   selector: 'ngx-dynamic-hooks',
   template: '',
   standalone: true,
-  styles: [],
-  providers: [{
-    provide: DYNAMICHOOKS_PROVIDERS_CHECK,
-    useFactory: (providersRegistered: boolean) => {
-      if (!providersRegistered) {
-        throw new Error('It seems you\'re trying to use ngx-dynamic-hooks library without registering its providers first. To do so, call the "provideDynamicHooks" function in the main providers array of your app.');
-      }
-      return true;
-    },
-    deps: [[new Optional(), DYNAMICHOOKS_PROVIDERS_REGISTERED]]
-}]
+  styles: []
 })
 export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
   @Input() content: any = null;
@@ -55,8 +45,6 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
   // ----------------------------------------------------------------------
 
   constructor(
-    // Just needs to request injecting this to ensure that providers are registered
-    @Optional() @Inject(DYNAMICHOOKS_PROVIDERS_CHECK) private providersCheck: boolean,
     private hostElement: ElementRef,
     private dynamicHooksService: DynamicHooksService,
     private componentUpdater: ComponentUpdater,

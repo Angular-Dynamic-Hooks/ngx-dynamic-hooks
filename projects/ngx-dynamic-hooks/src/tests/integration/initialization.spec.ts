@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, EmptyPlatformService, PlatformService, SelectorHookParserConfig, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { AutoPlatformService, DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, PlatformService, SelectorHookParserConfig, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from './shared';
@@ -79,22 +79,46 @@ describe('Initialization', () => {
     expect(allSettings[0].parsers![0]).toBe(GenericMultiTagStringParser);
   }));
 
-  it('#should not crash if the user passes an empty object as global settings', () => {
+  it('#should not crash if the user does not call provideDynamicHooks at all', () => {
+    const testText = `<p>This p-element has a <span>span-element with a component [singletag-string]></span> within it.</p>`;
+
+    testBed.resetTestingModule();
+    ({fixture, comp} = prepareTestingModule(() => []));
+    comp.content = testText;
+    comp.parsers = [GenericSingleTagStringParser];
+    comp.ngOnChanges({content: true} as any);
+
+    expect(comp['dynamicHooksService']['allSettings']).toBe(null);
+    expect(comp['dynamicHooksService']['ancestorSettings']).toBe(null);
+    expect(comp['dynamicHooksService']['moduleSettings']).toBe(null);
+
+    // Options should be default
+    for (const [key, value] of Object.entries(comp.activeOptions)) {
+      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+    }
+
+    // Should load component even without global settings
+    expect(comp.activeParsers.length).toBe(1);
+    expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagStringParser));
+    expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+  });
+
+  it('#should not crash if the user passes no arguments to provideDynamicHooks()', () => {
     const testText = `<p>This is just a bit of text.</p>`;
 
     testBed.resetTestingModule();
     let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks({})
+      provideDynamicHooks()
     ]);
 
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
-    expect(comp['dynamicHooksService']['allSettings'].length).toBe(1);
-    expect(comp['dynamicHooksService']['allSettings'][0]).toEqual({});
-    expect(comp['dynamicHooksService']['ancestorSettings'].length).toBe(1);
-    expect(comp['dynamicHooksService']['ancestorSettings'][0]).toEqual({});
-    expect(comp['dynamicHooksService']['moduleSettings']).toEqual({});
+    expect(comp['dynamicHooksService']['allSettings']!.length).toBe(0);
+    expect(comp['dynamicHooksService']['ancestorSettings']!.length).toBe(0);
+    expect(comp['dynamicHooksService']['moduleSettings']).toBeUndefined();
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default
@@ -106,20 +130,22 @@ describe('Initialization', () => {
     expect(comp.activeParsers.length).toBe(0);
   });
 
-  it('#should not crash if the user passes no arguments at all to provideDynamicHooks()', () => {
+  it('#should not crash if the user passes an empty object as global settings', () => {
     const testText = `<p>This is just a bit of text.</p>`;
 
     testBed.resetTestingModule();
     let {fixture, comp} = prepareTestingModule(() => [
-      provideDynamicHooks()
+      provideDynamicHooks({})
     ]);
 
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
-    expect(comp['dynamicHooksService']['allSettings'].length).toBe(0);
-    expect(comp['dynamicHooksService']['ancestorSettings'].length).toBe(0);
-    expect(comp['dynamicHooksService']['moduleSettings']).toBeUndefined();
+    expect(comp['dynamicHooksService']['allSettings']!.length).toBe(1);
+    expect(comp['dynamicHooksService']['allSettings']![0]).toEqual({});
+    expect(comp['dynamicHooksService']['ancestorSettings']!.length).toBe(1);
+    expect(comp['dynamicHooksService']['ancestorSettings']![0]).toEqual({});
+    expect(comp['dynamicHooksService']['moduleSettings']).toEqual({});
     expect(fixture.nativeElement.innerHTML.trim()).toBe(testText);
 
     // Options should be default
@@ -152,12 +178,6 @@ describe('Initialization', () => {
 
     const providers = provideDynamicHooks({}, CustomPlatformService as any);
     const platformServiceProvider = providers.find((p: any) => p.useClass === CustomPlatformService);
-    expect(platformServiceProvider).not.toBeUndefined();
-  });
-
-  it('#should set platformService to EmptyPlatformService if custom platform not passed', () => {
-    const providers = provideDynamicHooks({});
-    const platformServiceProvider = providers.find((p: any) => p.useClass === EmptyPlatformService);
     expect(platformServiceProvider).not.toBeUndefined();
   });
 

@@ -18,7 +18,6 @@ export { SelectorHookParserConfig } from '../lib/parsers/selector/selectorHookPa
 export { DynamicHooksService } from '../lib/services/dynamicHooksService';
 export { AutoPlatformService } from '../lib/services/platform/autoPlatformService';
 export { DefaultPlatformService } from '../lib/services/platform/defaultPlatformService';
-export { EmptyPlatformService } from '../lib/services/platform/emptyPlatformService';
 export { PlatformService, PLATFORM_SERVICE } from '../lib/services/platform/platformService';
 export { DataTypeEncoder } from '../lib/services/utils/dataTypeEncoder';
 export { DataTypeParser } from '../lib/services/utils/dataTypeParser';

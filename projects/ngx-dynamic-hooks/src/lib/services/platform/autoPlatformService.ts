@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { CompletePlatformService, PLATFORM_SERVICE, PlatformService } from './platformService';
 import { DefaultPlatformService } from './defaultPlatformService';
 
@@ -10,11 +10,11 @@ import { DefaultPlatformService } from './defaultPlatformService';
 })
 export class AutoPlatformService implements CompletePlatformService {
 
-  constructor(@Inject(PLATFORM_SERVICE) private userPlatformService: PlatformService, private defaultPlatformService: DefaultPlatformService) {
+  constructor(@Optional() @Inject(PLATFORM_SERVICE) private userPlatformService: PlatformService, private defaultPlatformService: DefaultPlatformService) {
   }
 
   private getFor (methodName: string): PlatformService {
-    if (typeof (this.userPlatformService as any)[methodName] === 'function') {
+    if (this.userPlatformService && typeof (this.userPlatformService as any)[methodName] === 'function') {
       return this.userPlatformService
     } else {
       return this.defaultPlatformService;

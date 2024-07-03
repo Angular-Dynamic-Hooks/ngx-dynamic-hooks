@@ -24,9 +24,9 @@ import { ElementHookFinder } from './core/elementHookFinder';
 export class DynamicHooksService {
 
   constructor(
-    @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksSettings[],
-    @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[],
-    @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings,
+    @Optional() @Inject(DYNAMICHOOKS_ALLSETTINGS) private allSettings: DynamicHooksSettings[]|null,
+    @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[]|null,
+    @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings|null,
     private settingsResolver: SettingsResolver,
     private stringHookFinder: StringHookFinder,
     private elementHookFinder: ElementHookFinder,

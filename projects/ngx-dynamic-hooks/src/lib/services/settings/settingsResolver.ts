@@ -23,17 +23,20 @@ export class SettingsResolver {
   public resolve(
     injector: Injector,
     content: any,
-    allSettings: DynamicHooksSettings[],
-    ancestorSettings: DynamicHooksSettings[],
-    moduleSettings: DynamicHooksSettings, 
+    allSettings: DynamicHooksSettings[]|null,
+    ancestorSettings: DynamicHooksSettings[]|null,
+    moduleSettings: DynamicHooksSettings|null, 
     localParsers: HookParserEntry[]|null = null, 
     localOptions: ParseOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
   ): ResolvedSettings {
     let resolvedSettings: DynamicHooksSettings = {};
+    allSettings = allSettings || [];
+    ancestorSettings = ancestorSettings || [];
+    moduleSettings = moduleSettings || {};
 
-    if (moduleSettings === undefined || !moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
+    if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
       // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
       // This is in case other settings were added to the back of allSettings after registering this module
       resolvedSettings = this.mergeSettings([...allSettings, ...ancestorSettings]);
@@ -41,11 +44,9 @@ export class SettingsResolver {
     } else if (moduleSettings.inheritance === DynamicHooksInheritance.Linear) {
       resolvedSettings = this.mergeSettings(ancestorSettings);
 
-    } else if (moduleSettings.inheritance === DynamicHooksInheritance.None) {
-      resolvedSettings = moduleSettings || {};
-      
     } else {
-      throw new Error(`Incorrect DynamicHooks inheritance configuration. Used value "${moduleSettings.inheritance}" which is not part of DynamicHooksInheritance enum. Only "All", "Linear" and "None" enum options are allowed`);
+      resolvedSettings = moduleSettings || {};
+  
     }
 
     const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector, globalParsersBlacklist, globalParsersWhitelist);

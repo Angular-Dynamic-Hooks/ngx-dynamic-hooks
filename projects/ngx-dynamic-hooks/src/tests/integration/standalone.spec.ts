@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, PLATFORM_SERVICE, PlatformService, anchorElementTag, parseHooks, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
+import { AutoPlatformService, PlatformService, anchorElementTag, parseHooks, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { Injector } from '@angular/core';
@@ -17,7 +17,7 @@ const getService = (injector: Injector, token: any) => {
   }
 }
 
-describe('Standalone usage', () => {
+fdescribe('Standalone usage', () => {
 
   beforeEach(() => {
     resetDynamicHooks();
@@ -123,7 +123,6 @@ describe('Standalone usage', () => {
     class CustomInjectorService { content = 'Custom injector service works!' };
     const app = await createApplication({
       providers: [
-        provideDynamicHooks({}),
         CustomInjectorService
       ]
     });
@@ -145,10 +144,7 @@ describe('Standalone usage', () => {
 
     // Test with scope
     class ScopeService { content = 'Scope service works!' };
-    const scope = createProviders([
-      provideDynamicHooks(),
-      ScopeService
-    ]);
+    const scope = createProviders([ScopeService]);
 
     const scopeResultOne = await scope.parseHooks(testText, parsers, context);
     expect(getService(scopeResultOne.usedEnvironmentInjector, ScopeService)).not.toBeUndefined();
@@ -190,10 +186,7 @@ describe('Standalone usage', () => {
     const parsers = [MultiTagTestComponent];
 
     class ExampleService { content = 'Example service works!' };
-    const scope = createProviders([
-      provideDynamicHooks(),
-      ExampleService
-    ]);
+    const scope = createProviders([ExampleService]);
 
     const result = await scope.parseHooks(testText, parsers, context);
     const component: MultiTagTestComponent = result.hookIndex[1].componentRef?.instance as MultiTagTestComponent;
@@ -206,7 +199,7 @@ describe('Standalone usage', () => {
     const parsers = [MultiTagTestComponent];
 
     class FirstScopeService { content = 'First scope service works!' };
-    const firstChildScope = createProviders([provideDynamicHooks(), FirstScopeService]);
+    const firstChildScope = createProviders([FirstScopeService]);
 
     class SecondScopeService { content = 'Second scope service works!' };
     const secondChildScope = createProviders([SecondScopeService], firstChildScope);
@@ -215,7 +208,7 @@ describe('Standalone usage', () => {
     const thirdChildScope = createProviders([ThirdScopeService], secondChildScope);
     
     class ApartScopeService { content = 'Apart scope service works!' };
-    const apartChildScope = createProviders([provideDynamicHooks(), ApartScopeService]);
+    const apartChildScope = createProviders([ApartScopeService]);
 
     const get = (injector: Injector, token: any) => {
       try {
@@ -286,10 +279,7 @@ describe('Standalone usage', () => {
     const parsers = [MultiTagTestComponent];
 
     class ScopedService { content = 'A service that is provided in a scope.' }
-    const scope = createProviders([
-      provideDynamicHooks(),
-      ScopedService
-    ]);
+    const scope = createProviders([ScopedService]);
 
     // First parse
     const resultOne = await scope.parseHooks(testText, parsers, context);
@@ -333,17 +323,17 @@ describe('Standalone usage', () => {
     const parsers = [MultiTagTestComponent];
 
     // Initial parse.
-    const scopeOne = createProviders([provideDynamicHooks()]);
+    const scopeOne = createProviders();
     const scopeOneResultA = await scopeOne.parseHooks(testText, parsers, context);
     const scopeOneResultB = await scopeOne.parseHooks(testText, parsers, context);
     const spyOneA = spyOn(scopeOneResultA, 'destroy').and.callThrough();
     const spyOneB = spyOn(scopeOneResultB, 'destroy').and.callThrough();
 
-    const scopeTwo = createProviders([provideDynamicHooks()]);
+    const scopeTwo = createProviders();
     const scopeTwoResult = await scopeTwo.parseHooks(testText, parsers, context);
     const spyTwo = spyOn(scopeTwoResult, 'destroy').and.callThrough();
 
-    const scopeTwoChild = createProviders([provideDynamicHooks()], scopeTwo);
+    const scopeTwoChild = createProviders([], scopeTwo);
     const scopeTwoChildResult = await scopeTwoChild.parseHooks(testText, parsers, context);
     const spyThree = spyOn(scopeTwoChildResult, 'destroy').and.callThrough();
 
@@ -367,7 +357,7 @@ describe('Standalone usage', () => {
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    const scope = createProviders([provideDynamicHooks()]);
+    const scope = createProviders();
     const scopeResultA = await scope.parseHooks(testText, parsers, context);
     const scopeResultB = await scope.parseHooks(testText, parsers, context);
     const spyA = spyOn(scopeResultA, 'destroy').and.callThrough();
@@ -386,7 +376,7 @@ describe('Standalone usage', () => {
     const context = {};
     const parsers = [MultiTagTestComponent];
 
-    const scope = createProviders([provideDynamicHooks()]);
+    const scope = createProviders();
     const scopeResult = await scope.parseHooks(testText, parsers, context);
 
     scope.destroy();

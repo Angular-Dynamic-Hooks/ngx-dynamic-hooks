@@ -230,7 +230,7 @@ describe('forChild', () => {
 
     // Get ancestorSettings from PlanetCitiesComponent. It should have its own injector with its own DynamicHooksService, etc. (b/c of its uses forChild in its component-level-providers)
     const childDynamicHooksService = setup.fixture.debugElement.query(By.directive(PlanetCitiesComponent)).componentInstance.dynamicHooksService as DynamicHooksService;
-    const ancestorSettings = childDynamicHooksService['ancestorSettings'];
+    const ancestorSettings = childDynamicHooksService['ancestorSettings']!;
 
     // When assembling ancestors, should first look through all ElementInjectors, then all EnvironmentInjectors. B/c of that, settings set directly in providers array of
     // PlanetCitiesComponent should be the first ones to be found.

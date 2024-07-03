@@ -4,7 +4,6 @@ import { DynamicHooksService } from './services/dynamicHooksService';
 import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformService';
 import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
 import { HookParserEntry } from './services/settings/parserEntry';
-import { EmptyPlatformService } from './services/platform/emptyPlatformService';
 
 export const allSettings: DynamicHooksSettings[] = [];
 
@@ -20,17 +19,14 @@ export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParse
   if (settings !== undefined) {
     allSettings.push(settings);
   }
-  
-  return [
-    // General providers
+
+  const providers: Provider[] = [
     {
       provide: APP_INITIALIZER,
       useFactory: () => () => {},
       multi: true,
       deps: [DynamicHooksInitService]
     },
-    { provide: DYNAMICHOOKS_PROVIDERS_REGISTERED, useValue: true },
-    { provide: PLATFORM_SERVICE, useClass: platformService || EmptyPlatformService },
 
     // Settings
     { provide: DYNAMICHOOKS_ALLSETTINGS, useValue: allSettings },
@@ -53,8 +49,13 @@ export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParse
     // Must provide a separate instance of DynamicHooksService each time you call provideDynamicHooks, 
     // so it can see passed settings of this level
     DynamicHooksService
-    
-  ];
+  ]
+
+  if (platformService) {
+    providers.push({ provide: PLATFORM_SERVICE, useClass: platformService });
+  }
+  
+  return providers;
 }
 
 /**

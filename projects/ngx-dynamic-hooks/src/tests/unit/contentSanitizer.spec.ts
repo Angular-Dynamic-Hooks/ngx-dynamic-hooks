@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ContentSanitizer } from '../../lib/services/utils/contentSanitizer';
-import { DeepComparer, EmptyPlatformService, PLATFORM_SERVICE, anchorAttrHookId, anchorAttrParseToken } from '../testing-api';
+import { anchorAttrHookId, anchorAttrParseToken } from '../testing-api';
 
 /**
  * ContentSanitizer tests
@@ -12,7 +12,6 @@ describe('ContentSanitizer', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
-        { provide: PLATFORM_SERVICE, useClass: EmptyPlatformService },
         ContentSanitizer
       ]
     });

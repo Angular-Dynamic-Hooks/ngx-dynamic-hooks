@@ -5,9 +5,7 @@ import { ParseOptions } from './services/settings/options';
 import { HookIndex, ParseResult } from './interfacesPublic';
 import { EnvironmentInjector, Injector, Provider, Type, createEnvironmentInjector } from '@angular/core';
 import { createApplication } from '@angular/platform-browser';
-import { provideDynamicHooks } from './dynamicHooksProviders';
 import { DynamicHooksService } from '../public-api';
-import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformService';
 
 // Global state
 // ----------
@@ -39,7 +37,7 @@ export const destroyAll = () => {
 // Providers scope
 // ----------
 
-export const createProviders: (providers: Provider[], parentScope?: ProvidersScope) => ProvidersScope = (providers = [], parentScope) => {
+export const createProviders: (providers?: Provider[], parentScope?: ProvidersScope) => ProvidersScope = (providers = [], parentScope) => {
   return new ProvidersScope(providers, parentScope);
 }
 
@@ -129,7 +127,7 @@ export const parseHooks = async (
   // Reuse the same global injector for all independent parseHooks calls
   if (!environmentInjector) {
     if (!independentInjector) {
-      independentInjector = await createInjector([provideDynamicHooks()]);
+      independentInjector = await createInjector();
     }
     environmentInjector = independentInjector;
   }
