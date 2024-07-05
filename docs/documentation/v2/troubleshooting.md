@@ -7,7 +7,7 @@
 
 This might be due to sanitization. This library uses Angular's native DomSanitizer to remove potentially malicious code like `<script>`-tags from the content. To ensure maximum security, the sanitizer is fairly aggressive, however, and will also remove seemingly harmless elements, like `<input>` or attributes like `id`.
 
-You can turn off sanitization at any time through the [`OutletOptions`]({{ "documentation/v2/configuration#outletoptions" | relative_url }}). Note that you will then have to ensure that the content is safe to render by yourself!
+You can turn off sanitization at any time through the [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }}). Note that you will then have to ensure that the content is safe to render by yourself!
 
 ### **Error: `ngx-dynamic-hooks` is not a known element**
 
@@ -37,9 +37,9 @@ It is important to remember that `getBindings()` on hook parsers is called anyti
 
 You can avoid that by introducing a persistent state in your parsers and by remembering and reusing the previous references if they haven't changed. 
 
-If you need a way to tell if the bindings are deeply identical by value for this, you can import the `DeepComparer` service from this library and use the `isEqual()` method (or alternatively use Underscore's <a href="https://underscorejs.org/#isEqual" target="_blank">isEqual()</a> or Lodash's <a href="https://lodash.com/docs/#isEqual" target="_blank">isEqual()</a>.
+If you need a way to tell if the bindings are deeply identical by value for this, you can import the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/utils/deepComparer.ts" target="_blank">`Deep Comparer`</a> service from this library and use the `isEqual()` method (or alternatively use Underscore's <a href="https://underscorejs.org/#isEqual" target="_blank">isEqual()</a> or Lodash's <a href="https://lodash.com/docs/#isEqual" target="_blank">isEqual()</a>.
 
-If you don't want to bother with any of that, you can also simply set the `compareInputsByValue`/`compareOutputsByValue`-options in `OutletOptions` to true (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }})), which does this automatically, though it will then apply to all active parsers.
+If you don't want to bother with any of that, you can also simply set the `compareInputsByValue`/`compareOutputsByValue`-options in <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/options/options.ts" target="_blank">`OutletOptions`</a> to true (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }})), which does this automatically, though it will then apply to all active parsers.
 
 ### **Error: TypeError: Object(…) is not a function**
 

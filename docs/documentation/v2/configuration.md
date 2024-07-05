@@ -5,13 +5,13 @@
 
 ## Global settings
 
-When importing the library via `forRoot()`, you can provide a `DynamicHooksGlobalSettings`-object to set up the global configuration. We have already done this in the [Quick start example]({{ "documentation/v2/quickstart" | relative_url }}). All of those settings will be passed to `OutletComponent`s in your app automatically. The possible values are:
+When importing the library via `forRoot()`, you can provide a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/globalSettings.ts" target="_blank">`DynamicHooksGlobalSettings`</a>-object to set up the global configuration. We have already done this in the [Quick start example]({{ "documentation/v2/quickstart" | relative_url }}). All of those settings will be passed to `OutletComponent`s in your app automatically. The possible values are:
 
 Name | Type | Description
 --- | --- | ---
-`globalParsers` | `HookParserEntry[]` | An list of hook parsers to provide to all `OutletComponents` (see [Parsers]({{ "documentation/v2/parsers" | relative_url }}))
-`globalOptions` | `OutletOptions` | An options object to provide to all `OutletComponents` (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }}))
-`lazyInheritance` | `number` | An enum option from `DynamicHooksInheritance` (see [Child modules]({{ "documentation/v2/configuration#child-modules" | relative_url }}))
+`globalParsers` | <a href="{{ '/documentation/v2/parsers' | relative_url }}">HookParserEntry</a>`[]` | An list of hook parsers to provide to all `OutletComponents`
+`globalOptions` | <a href="{{ '/documentation/v2/configuration#outletoptions' | relative_url }}">OutletOptions</a> | An options object to provide to all `OutletComponents`
+`lazyInheritance` | `number` | An enum option from <a href="{{ '/documentation/v2/configuration#child-modules' | relative_url }}">DynamicHooksInheritance</a>
 
 Note that you don't have to define a global settings object. You can also configure each `OutletComponent` with their [own parsers and options]({{ "documentation/v2/configuration#component-bindings" | relative_url }}) as inputs.
 
@@ -25,16 +25,16 @@ Input name | Type | Description
 `context` | `any` | An optional object to pass data to the dynamically-loaded components
 `globalParsersBlacklist` | `string[]` | An optional list of global parsers to blacklist, identified by their name
 `globalParsersWhitelist` | `string[]` | An optional list of global parsers to whitelist, identified by their name
-`parsers` | `HookParserEntry[]` | An optional list of hook parsers to use instead of the global parsers (see [Parsers]({{ "documentation/v2/parsers" | relative_url }}))
-`options` | `OutletOptions` | An optional options object to use instead of the global options (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }}))
+`parsers` | <a href="{{ '/documentation/v2/parsers' | relative_url }}">HookParserEntry</a>`[]` | An optional list of hook parsers to use instead of the global parsers
+`options` | <a href="{{ '/documentation/v2/configuration#outletoptions' | relative_url }}">OutletOptions</a> | An optional options object to use instead of the global options
 
 There is also an output you may subscribe to:
 
 Output name | Type | Description
 --- | --- | ---
-`componentsLoaded` | `Observable<LoadedComponent[]>` | Will trigger once all components have loaded (including [lazy-loaded ones]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}))
+`componentsLoaded` | <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L214" target="_blank">`Observable<LoadedComponent[]>`</a> | Will trigger once all components have loaded (including [lazy-loaded ones]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}))
 
-Each `LoadedComponent` from the output represents a dynamically-created component and contains some information you may find interesting:
+Each <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L214" target="_blank">`LoadedComponent`</a> from the output represents a dynamically-created component and contains some information you may find interesting:
 
 ```ts
 interface LoadedComponent {
@@ -46,7 +46,7 @@ interface LoadedComponent {
 ```
 
 ## OutletOptions
-You can define `OutletOptions` both in the global settings as well as on each `OutletComponent` indidually (to overwrite the global values). 
+You can define <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/options/options.ts" target="_blank">`OutletOptions`</a> both in the global settings as well as on each `OutletComponent` indidually (to overwrite the global values). 
 
 These options determine the overall behaviour of the outlet, such as of how the content string is rendered and how dynamic components are managed.
 
@@ -72,11 +72,11 @@ You can however also use this function to register additional parsers and option
 
 In **eagerly** imported child modules, the `forChild()` parsers will be added to the global root parsers. As a result, every `<ngx-dynamic-hooks>` component in your app will use the same list of parsers. This ultimately behaves the same as registering all parsers via `forRoot()`. Meanwhile, options are merged in the order of importing them.
 
-In **lazily** loaded child modules, you can modify what parsers & options are available to the child module via the optional `lazyInheritance` option in [DynamicHooksGlobalSettings]({{ "documentation/v2/configuration#global-settings" | relative_url }}). It accepts a value from the `DynamicHooksInheritance` enum, which are as follows:
+In **lazily** loaded child modules, you can modify what parsers & options are available to the child module via the optional `lazyInheritance` option in [DynamicHooksGlobalSettings]({{ "documentation/v2/configuration#global-settings" | relative_url }}). It accepts a value from the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/globalSettings.ts" target="_blank">`DynamicHooksInheritance`</a> enum, which are as follows:
 
-1. `DynamicHooksInheritance.All`: The module uses all parsers & options from anywhere in the app. (default) 
-2. `DynamicHooksInheritance.Linear`: The module only uses parsers & options from direct module ancestors (such a father and grandfather modules, but not "uncle" modules)
-3. `DynamicHooksInheritance.None`: The module only uses parsers & options defined by itself
+1. <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/globalSettings.ts" target="_blank">`DynamicHooksInheritance.All`</a> : The module uses all parsers & options from anywhere in the app. (default) 
+2. <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/globalSettings.ts" target="_blank">`DynamicHooksInheritance.Linear`</a> : The module only uses parsers & options from direct module ancestors (such a father and grandfather modules, but not "uncle" modules)
+3. <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/globalSettings.ts" target="_blank">`DynamicHooksInheritance.None`</a> : The module only uses parsers & options defined by itself
 
 If relevant, module options overwrite each other in the following order: Any module, direct ancestor modules, then own module.
 
@@ -110,7 +110,7 @@ export class LazilyLoadedChildModule {}
 ## Lazy-loading components
 If you are using the Ivy templating engine (Angular 9+), you can configure your hook parsers in such a way that they lazy-load the component class only if it is needed and the corresponding hook appears in the content string.
 
-You may have noticed that the component-property in `SelectorHookParserConfig` has the type `ComponentConfig` (see [HookParserEntry]({{ "documentation/v2/parsers" | relative_url }})). This means it can be the component class, but also a `LazyLoadComponentConfig`:
+You may have noticed that the component-property in <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/parsers/selector/config/selectorHookParserConfig.ts" target="_blank">`SelectorHookParserConfig`</a> has the type <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L126" target="_blank">`ComponentConfig`</a> (see [Parsers]({{ "documentation/v2/parsers#selectorhookparserconfig" | relative_url }}) section). This means it can be the component class, but also a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L140" target="_blank">`LazyLoadComponentConfig`</a>:
 
 ```ts
 interface LazyLoadComponentConfig {
@@ -121,7 +121,7 @@ interface LazyLoadComponentConfig {
 
 `importPromise` should be a function that returns the import promise for the component while `importName` should be the name of the component class to be used.  As the selector of the component cannot be known before loading the component class, you will also have to manually specify a selector of your choice for the hook.
 
-The full `SelectorHookParserConfig` for a lazy-loaded component could then look like so:
+The full <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/parsers/selector/config/selectorHookParserConfig.ts" target="_blank">`SelectorHookParserConfig`</a> for a lazy-loaded component could then look like so:
 
 ```ts
 {

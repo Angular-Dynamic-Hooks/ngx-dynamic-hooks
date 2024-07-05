@@ -5,11 +5,11 @@
 
 ## Introduction
 
-To load components from the content string, each hook needs a corresponding `HookParser`. These are the most important thing that you configure in the [settings]({{ "documentation/v2/configuration#global-settings" | relative_url }}) via the `globalParsers` field when importing the library. It expects a `HookParserEntry`-array, which is just a fancy alias for several kinds of possible values. Each can either be:
+To load components from the content string, each hook needs a corresponding <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a>. These are the most important thing that you configure in the [settings]({{ "documentation/v2/configuration#global-settings" | relative_url }}) when importing the library. It expects a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/options/parserEntry.ts" target="_blank">`HookParserEntry`</a>-array, which is just a fancy alias for several kinds of possible values. Each can either be:
 
-1. A `SelectorHookParserConfig` object literal.
-2. A custom `HookParser` instance.
-3. A custom `HookParser` class. If this class is registered as a provider in the nearest injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
+1. A <a href="{{ "documentation/v2/parsers#selectorhookparserconfig" | relative_url }}">SelectorHookParserConfig</a> object literal.
+2. A custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> instance.
+3. A custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> class. If this class is registered as a provider in the nearest injector, it will used as a service, otherwise it will be instantiated without constructor arguments.
 
 Option 1 is the easiest and meant to be used if you simply want to load components like in Angular templates. We have actually already used it in the [Quick Start Example]({{ "documentation/v2/quickstart" | relative_url }})!
 
@@ -17,16 +17,16 @@ Option 2 and 3 are only needed if you want to write your own parser. See the sec
 
 ## SelectorHookParserConfig
 
-Each `SelectorHookParserConfig` is an object literal that automatically creates a `SelectorHookParser` for you, which loads components by their selectors similarly to Angular. In its simplest form, it just contains the component class like `{component: ExampleComponent}`, but it also accepts additional properties: 
+Each <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/parsers/selector/config/selectorHookParserConfig.ts" target="_blank">`SelectorHookParserConfig`</a> is an object literal that automatically creates a `SelectorHookParser` for you, which loads components by their selectors similarly to Angular. In its simplest form, it just contains the component class like `{component: ExampleComponent}`, but it also accepts additional properties: 
 
 These mostly determine the details about how the component selector is parsed from the content string. The only required property is `component`.
 
 Property | Type | Default | Description
 --- | --- | --- | ---
-`component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}).
+`component` | <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L126" target="_blank">`ComponentConfig`</a> | - | The component to be used. Can be its class or a [LazyLoadComponentConfig]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }}).
 `name` | `string` | - | The name of the parser. Only required if you want to black- or whitelist it.
 `selector` | `string` | The component selector | The selector to use for the hook. Please note that currently only tag names are supported.
-`injector` | `Injector` | The nearest injector | The injector to create the component with
+`injector` | <a href="https://v17.angular.io/api/core/Injector" target="_blank">`Injector`</a> | The nearest injector | The injector to create the component with
 `enclosing` | `boolean` | `true` | Whether the selector is enclosing (`<app-hook>...</app-hook>`) or not (`<app-hook>`)
 `bracketStyle` | `{opening: string, closing: string}` | `{opening: '<', closing: '>'}` | The brackets to use for the selector
 `parseInputs` | `boolean` | `true` | Whether to parse inputs into live variables or leave them as strings
@@ -46,7 +46,7 @@ So far, we have only used the standard `SelectorHookParser`, which is included i
 
 ### What makes a parser
 
-A hook parser is a class that follows the `HookParser` interface, which may look daunting at first, but is actually pretty simple:
+A hook parser is a class that follows the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> interface, which may look daunting at first, but is actually pretty simple:
 
 ```ts
 interface HookParser {
@@ -62,10 +62,10 @@ interface HookParser {
 * `loadComponent()` is called once for each hook. Its job is to specify how to create the component.
 * `getBindings()` is called any time the inputs and outputs for the component are to be determined. Its job is to return their names and current values.
 
-It is recommended to create a dedicated `HookParser` for each custom hook (handling multiple different hooks with the same parser is messy and difficult). Here are some more details about the three main functions:
+It is recommended to create a dedicated <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> for each custom hook (handling multiple different hooks with the same parser is messy and difficult). Here are some more details about the three main functions:
 
-### `findHooks()`
-Is given the content string as well as the context object as parameters and is expected to return a `HookPosition` array. Each `HookPosition` represents a found hook and specifies its position within the content string with the form:
+### findHooks()
+Is given the content string as well as the context object as parameters and is expected to return a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L96" target="_blank">`HookPosition`</a> array. Each <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L96" target="_blank">`HookPosition`</a> represents a found hook and specifies its position within the content string with the form:
 
 ```ts
 interface HookPosition {
@@ -80,10 +80,10 @@ The opening and closing tags simply refer to the text patterns that signal the s
 
 How your hook looks like and how you find these indexes is completely up to you. You may look for them using Regex patterns or any other parsing method. Though, as a word of warning, do not try to parse enclosing hooks with Regex alone. <a href="https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454" target="_blank">It is a road that leads to madness</a>.
 
-To make your life easier, you can just use the `HookFinder` service that comes with this library (which the `SelectorHookParser` uses internally as well). Its easy-to-use and safely finds both standalone and enclosing patterns in a string. You can see it in action [in the examples below]({{ "documentation/v2/parsers#example-1-emoji-parser-standalone" | relative_url }}).
+To make your life easier, you can just use the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/utils/hookFinder.ts" target="_blank">`HookFinder`</a> service that comes with this library (which the `SelectorHookParser` uses internally as well). Its easy-to-use and safely finds both standalone and enclosing patterns in a string. You can see it in action [in the examples below]({{ "documentation/v2/parsers#example-1-emoji-parser-standalone" | relative_url }}).
 
-### `loadComponent()`
-Is given the (unique) id of this hook, the `HookValue` (the hook as it appears in the text), the context object as well as all child nodes of the hook as parameters. It is expected to return a `HookComponentData` object, which tells the library how to create the component for this hook:
+### loadComponent()
+Is given the (unique) id of this hook, the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L106" target="_blank">`HookValue`</a> (the hook as it appears in the text), the context object as well as all child nodes of the hook as parameters. It is expected to return a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L114" target="_blank">`HookComponentData`</a> object, which tells the library how to create the component for this hook:
 
 ```ts
 interface HookComponentData {
@@ -93,10 +93,10 @@ interface HookComponentData {
 }
 ```
 
-You usually only need to fill out the `component` field, which can be the component class or a `LazyLoadComponentConfig` (see [Lazy-loading components]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }})). You may optionally also provide your own injector and custom nodes to replace the existing `<ng-content>` of the component (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
+You usually only need to fill out the `component` field, which can be the component class or a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L140" target="_blank">`LazyLoadComponentConfig`</a> (see [Lazy-loading components]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }})). You may optionally also provide your own injector and custom nodes to replace the existing `<ng-content>` of the component (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
 
-### `getBindings()`
-Is given the (unique) id of this hook, the `HookValue` (the hook as it appears in the text) and the context object as parameters. It is expected to return a `HookBindings` object, which lists all the inputs to set and outputs to subscribe to in the loaded component:
+### getBindings()
+Is given the (unique) id of this hook, the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L106" target="_blank">`HookValue`</a> and the context object as parameters. It is expected to return a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L148" target="_blank">`HookBindings`</a> object, which lists all the inputs to set and outputs to subscribe to in the loaded component:
 
 ```ts
 interface HookBindings {
@@ -107,18 +107,18 @@ interface HookBindings {
 
 Both `inputs` and `outputs` must contain an object where each key is the name of the binding and each value what should be used for it. The functions you put in `outputs` will be called when the corresponding @Output() triggers and are automatically given the event object as well as the current context object as parameters. To disallow or ignore inputs/outputs, simply don't include them here.
 
-How you determine the values for the component bindings is - again - completely up to you. You could for example have a look at the `HookValue` and read them from the hook itself (like property bindings in selector hooks, e.g. `[input]="'Hello!'`"). You could of course also just pass static values into the component.
+How you determine the values for the component bindings is - again - completely up to you. You could for example have a look at the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L106" target="_blank">`HookValue`</a> and read them from the hook itself (like property bindings in selector hooks, e.g. `[input]="'Hello!'`"). You could of course also just pass static values into the component.
 
 {% include docs/widgets/notice.html content="
   <h4>Warning</h4>
-  <p>Don't use JavaScript's <code>eval()</code> function to parse values from text into code, if you can help it. It can create massive security loopholes. If all you need is a way to safely parse strings into standard JavaScript data types like strings, numbers, arrays, object literals etc., you can simply use the <code>evaluate()</code> method from the <code>DataTypeParser</code> service that you can also import from this library.</p>
+  <p>Don't use JavaScript's <code>eval()</code> function to parse values from text into code, if you can help it. It can create massive security loopholes. If all you need is a way to safely parse strings into standard JavaScript data types like strings, numbers, arrays, object literals etc., you can simply use the <code>evaluate()</code> method from the <a href='https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/utils/dataTypeParser.ts' target='_blank'><code>DataTypeParser</code></a> service that you can also import from this library.</p>
 " %}
 
 ## Example 1: Emoji parser (standalone)
 
 Let's say we want to automatically replace all emoticons (smileys etc.) in the content string with an `EmojiComponent` that renders proper emojis for them. In this simple example, the `EmojiComponent` supports three emojis and has a `type`-string-input that that determines which one to load (can be either `laugh`, `wow` or `love`). 
 
-What we need then, is to write a custom `HookParser` that finds the corresponding emoticons `:-D`, `:-O` and `:-*` in the content string, replaces them with `EmojiComponent`s and sets the correct `type` input depending on the emoticon replaced. This isn't very hard at all. Let's start with the parser:
+What we need then, is to write a custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that finds the corresponding emoticons `:-D`, `:-O` and `:-*` in the content string, replaces them with `EmojiComponent`s and sets the correct `type` input depending on the emoticon replaced. This isn't very hard at all. Let's start with the parser:
 
 ```ts
 import { Injectable } from '@angular/core';
@@ -167,7 +167,7 @@ export class EmojiHookParser implements HookParser {
 }
 ```
 
-* In `findHooks()`, we create a regex for the three emoticons we want to replace and (for convenience) hand it over to the `HookFinder` service, which finds their indexes in the content string for us and returns them as a `HookPosition` array.
+* In `findHooks()`, we create a regex for the three emoticons we want to replace and (for convenience) hand it over to the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/utils/hookFinder.ts" target="_blank">`HookFinder`</a> service, which finds their indexes in the content string for us and returns them as a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L96" target="_blank">`HookPosition`</a> array.
 * In `loadComponent()`, we simply tell the library which component class to load for each hook/emoticon.
 * In `getBindings()`, we have a look at each found hook/emoticon and infer the corresponding emoji-type for it, which we then set as the `type`-input for the `EmojiComponent`.
 
@@ -206,11 +206,11 @@ Have a look at this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-custo
 ## Example 2: Internal link parser (enclosing)
 Normally, when we include links to other parts of our app, we use the neat `[routerLink]`-directive that allows us to navigate smoothly within the single-page-app. However, this is not usually possible in dynamic content (inserted via `[innerHTML]` for example): Contained `<a>`-elements are rendered without Angular magic and clicking on them will reload the whole app, which is slow and costly.
 
-**The solution:** Let's write a custom `HookParser` that looks for internal links in dynamic content and automatically replaces them with proper `[routerLink]`s, so that they behave just like any other link in the app.
+**The solution:** Let's write a custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that looks for internal links in dynamic content and automatically replaces them with proper `[routerLink]`s, so that they behave just like any other link in the app.
 
-This example is a bit more advanced than the `EmojiParser` from before, as we are now looking for **enclosing** (rather than **standalone**) hooks: Each link naturally consists of an opening (`<a href="internalUrl">`) and a closing (`</a>`) tag and we have to correctly find both of them. Don't worry, though, we can once again use the `HookFinder` service to do the actual searching. We just need to write two regexes for the opening and closing tag and hand them over.
+This example is a bit more advanced than the `EmojiParser` from before, as we are now looking for **enclosing** (rather than **standalone**) hooks: Each link naturally consists of an opening (`<a href="internalUrl">`) and a closing (`</a>`) tag and we have to correctly find both of them. Don't worry, though, we can once again use the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/utils/hookFinder.ts" target="_blank">`HookFinder`</a> service to do the actual searching. We just need to write two regexes for the opening and closing tag and hand them over.
 
-Let's assume we have prepared a simple `DynamicRouterLinkComponent` that is supposed to replace the normal links in the dynamic content string. It renders a single `[routerLink]`-element based on the inputs `link` (the relative part of the url), `queryParams` and `anchorFragment`. Here then, would be our custom `HookParser` to load it:
+Let's assume we have prepared a simple `DynamicRouterLinkComponent` that is supposed to replace the normal links in the dynamic content string. It renders a single `[routerLink]`-element based on the inputs `link` (the relative part of the url), `queryParams` and `anchorFragment`. Here then, would be our custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> to load it:
 
 ```ts
 import { Injectable, Inject } from '@angular/core';

@@ -12,7 +12,7 @@ It then adds a lot of custom code around this core function to render the compon
 If you are curious about the inner workings of the library, here's a short description:
 
 1. A content string is passed as @Input() to the `OutletComponent` and an array of parsers is retrieved either as another @Input() or from the global settings.
-2. The `findHooks()`-method of all registered parsers is called and (with the help of the returned `HookPosition[]`) all found hooks are replaced with placeholders.
+2. The `findHooks()`-method of all registered parsers is called and (with the help of the returned <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L96" target="_blank">`HookPosition[]`</a>) all found hooks are replaced with placeholders.
 3. The content string is then parsed by the native browser HTML parser to create a DOM tree, which is then inserted as the innerHTML of the `OutletComponent`.
 4. For each found hook, the `loadComponent()`-method of its parser is called to get the component class. The placeholder elements are replaced with the final component host elements and the components dynamically loaded via `ComponentFactory.create()`.
 5. For each created component, the `getBindings()`-method of its parser is called and the returned inputs/outputs passed to and subscribed with the component.

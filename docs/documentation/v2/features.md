@@ -98,11 +98,11 @@ There are two small caveats, however:
 
 All of Angular's lifecycle methods work normally in dynamically-loaded components. In addition, this library introduces two new lifecycle methods that you can optionally implement: 
 
-* `onDynamicMount()` is called once as soon as **all** dynamic components have rendered (including [lazy-loaded ones]({{ "documentation/v2/configuration#lazy-loading-components" | relative_url }})). It is given an `OnDynamicData`-object as its parameter, containing the context object as well as the content children of the component.
-* `onDynamicChanges()` is called any time one of these two change. It is also given an `OnDynamicData`-object that will only contain the changed value. The method is therefore called:
-    1. Immediately when the component is created (`OnDynamicData` will contain the context object, if not undefined)
-    2. Once all components have loaded (`OnDynamicData` will contain the content children)
-    3. Any time that context changes by reference (`OnDynamicData` will contain the new context object)
+* <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L166" target="_blank">`OnDynamicMount`</a>: Is called once as soon as **all** dynamic components have rendered (including lazy-loaded ones). It is given an <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L189" target="_blank">`OnDynamicData`</a>-object as its parameter, containing the context object as well as the content children of the component.
+* <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L182" target="_blank">`OnDynamicChanges`</a>: Is called any time one of these two change. It is also given an <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L189" target="_blank">`OnDynamicData`</a>-object that will only contain the changed value. The method is therefore called:
+    1. Immediately when the component is created (<a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L189" target="_blank">`OnDynamicData`</a> will contain the context object, if not undefined)
+    2. Once all components have loaded (<a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L189" target="_blank">`OnDynamicData`</a> will contain the content children)
+    3. Any time that context changes by reference (<a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L189" target="_blank">`OnDynamicData`</a> will contain the new context object)
 
 You can implement them like so:
 ```ts
@@ -128,12 +128,12 @@ export class DynamicComponent implements OnDynamicMount, OnDynamicChanges {
 }
 ```
 
-**Note:** You may have spotted that content children are given as `DynamicContentChild`-arrays. Each `DynamicContentChild` consists of the `ComponentRef`, the selector and the `HookValue` of the component, as well as all of its own content children, again given as a `DynamicContentChild` array. It is therefore a hierarchical list of all content children, not a flat one.
+**Note:** You may have spotted that content children are given as <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L197" target="_blank">`DynamicContentChild`</a>-arrays. Each <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L197" target="_blank">`DynamicContentChild`</a> consists of the `ComponentRef`, the selector and the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L106" target="_blank">`HookValue`</a> of the component, as well as all of its own content children, again given as a <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L197" target="_blank">`DynamicContentChild`</a> array. It is therefore a hierarchical list of all content children, not a flat one.
 
 ## Change detection
 
 Dynamically-loaded components are connected to Angular change detection and will be checked when it is triggered like any other part of the app. Setting `ChangeDetectionStrategy.OnPush` on them to limit change detection will work as well. 
 
-The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. This way, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger ` ngOnChanges()`.
+The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. This way, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger `ngOnChanges()`.
 
 Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [OutletOptions]({{ "documentation/v2/configuration#outletoptions" | relative_url }})).
