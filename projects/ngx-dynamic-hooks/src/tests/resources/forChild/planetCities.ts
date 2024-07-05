@@ -19,7 +19,7 @@ export const planetCitiesComponentProviderSettings = {
   parsers: [
     {component: DynamicPlanetCitiesElementInjectorComponent}
   ],
-  inheritance: DynamicHooksInheritance.Linear
+  // inheritance: DynamicHooksInheritance.Linear <-- Should be default
 };
 
 @Component({

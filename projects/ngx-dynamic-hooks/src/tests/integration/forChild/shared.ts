@@ -2,7 +2,7 @@ import { RouterModule, Router } from '@angular/router';
 import { TestBed, TestBedStatic, ComponentFixtureAutoDetect, ComponentFixture } from '@angular/core/testing';
 
 // Testing api resources
-import { provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksInheritance, provideDynamicHooks } from '../../testing-api';
 
 // Resources
 import { CONTENT_STRING, contentString } from '../../resources/forChild/contentString';
@@ -24,7 +24,8 @@ export const createForChildTestingModule = (mode: 'lazy'|'sync') => {
   const rootHooksProviders = provideDynamicHooks({
     parsers: [
       {component: DynamicRootComponent}
-    ]
+    ],
+    inheritance: DynamicHooksInheritance.All
   });
 
   TestBed.configureTestingModule({

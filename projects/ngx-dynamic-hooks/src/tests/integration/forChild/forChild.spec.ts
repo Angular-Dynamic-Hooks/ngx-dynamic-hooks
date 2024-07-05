@@ -356,8 +356,6 @@ describe('forChild', () => {
     expect(html).toContain('DYNAMIC PLANET CITIES FROM ELEMENTINJECTOR COMPONENT');
     expect(html).not.toContain('DYNAMIC PLANET SPECIES COMPONENT');
 
-    console.log('LOADING UP SPECIES COMPONENT');
-
     // Planets.species route (DynamicHooksInheritance.None)
     router.navigate(['planets', {outlets: {nestedOutlet: 'species'}} ]);
     tick(1000);

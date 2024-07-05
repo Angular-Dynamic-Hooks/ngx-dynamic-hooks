@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { CONTENT_STRING } from './contentString';
-import { DynamicHooksComponent, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooks } from '../../testing-api';
 
 @Component({
   selector: 'app-dynamichyperlanes',
@@ -28,7 +28,8 @@ export const getHyperlaneRoutes: () => Route[] = () => {
       provideDynamicHooks({
         parsers: [
           {component: DynamicHyperlanesComponent}
-        ]
+        ],
+        inheritance: DynamicHooksInheritance.All
       })
     ]}
   ];

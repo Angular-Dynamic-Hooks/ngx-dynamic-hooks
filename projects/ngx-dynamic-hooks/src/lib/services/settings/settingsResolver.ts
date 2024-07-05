@@ -36,13 +36,13 @@ export class SettingsResolver {
     ancestorSettings = ancestorSettings || [];
     moduleSettings = moduleSettings || {};
 
-    if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.All) {
+    if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.Linear) {
+      resolvedSettings = this.mergeSettings(ancestorSettings);
+
+    } else if (moduleSettings.inheritance === DynamicHooksInheritance.All) {
       // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
       // This is in case other settings were added to the back of allSettings after registering this module
       resolvedSettings = this.mergeSettings([...allSettings, ...ancestorSettings]);
-
-    } else if (moduleSettings.inheritance === DynamicHooksInheritance.Linear) {
-      resolvedSettings = this.mergeSettings(ancestorSettings);
 
     } else {
       resolvedSettings = moduleSettings || {};
