@@ -311,10 +311,8 @@ export class ComponentCreator {
     // Track component
     hook.componentRef = dynamicComponentRef;
 
-    // Set initial bindings
-    hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
-    this.componentUpdater.updateComponentWithNewOutputs(hook, context, options);
-    this.componentUpdater.updateComponentWithNewInputs(hook, options);
+    // Pass in initial bindings
+    this.componentUpdater.updateBindings(hook, context, options);
 
     // Call initial OnDynamicChanges with context (if not undefined)
     if (typeof hook.componentRef.instance['onDynamicChanges'] === 'function' && context !== undefined) {

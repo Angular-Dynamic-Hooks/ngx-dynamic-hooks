@@ -26,24 +26,12 @@ export class ComponentUpdater {
    */
   refresh(hookIndex: HookIndex, context: any, options: ParseOptions, triggerOnDynamicChanges: boolean): void {
 
+    // Update bindings for all loaded hooks
     for (const [hookId, hook] of Object.entries(hookIndex)) {
-      if (!hook.componentRef) { 
-        return; 
-      }
-
-      // Save previous bindings
-      hook.previousBindings = {
-        inputs: this.savePreviousBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!),
-        outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!)
-      };
-
-      // Update bindings
-      hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
-      this.updateComponentWithNewOutputs(hook, context, options);
-      this.updateComponentWithNewInputs(hook, options);
+      this.updateBindings(hook, context, options);
     }
 
-    // If context has changed by reference, call OnDynamicChanges() for all created components.
+    // Also: If context has changed by reference, call OnDynamicChanges() for all created components.
     if (triggerOnDynamicChanges) {
       for (const hook of Object.values(hookIndex)) {
         if (!hook.componentRef) { 
@@ -55,6 +43,30 @@ export class ComponentUpdater {
         }
       }
     }
+  }
+
+  /**
+   * Creates or updates bindings for a hook with a loaded component
+   * 
+   * @param hook - THe hook to update
+   * @param context - The context object
+   * @param options - The current ParseOptions
+   */
+  updateBindings(hook: Hook, context: any, options: ParseOptions) {
+    if (!hook.componentRef) { 
+      return; 
+    }
+
+    // Update bindings
+    hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
+    this.updateComponentWithNewOutputs(hook, context, options);
+    this.updateComponentWithNewInputs(hook, options);
+
+    // Snapshot bindings for comparison next time
+    hook.previousBindings = {
+      inputs: this.savePreviousBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!),
+      outputs: this.savePreviousBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!)
+    };
   }
 
   /**

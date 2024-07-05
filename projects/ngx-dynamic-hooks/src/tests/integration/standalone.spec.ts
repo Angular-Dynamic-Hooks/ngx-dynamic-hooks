@@ -17,7 +17,7 @@ const getService = (injector: Injector, token: any) => {
   }
 }
 
-fdescribe('Standalone usage', () => {
+describe('Standalone usage', () => {
 
   beforeEach(() => {
     resetDynamicHooks();

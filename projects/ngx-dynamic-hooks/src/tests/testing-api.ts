@@ -9,7 +9,8 @@ export { provideDynamicHooks, resetDynamicHooks, allSettings } from '../lib/dyna
 export { parseHooks } from '../lib/standalone';
 export { DynamicHooksSettings, DynamicHooksInheritance } from '../lib/services/settings/settings';
 export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, ParseResult, LoadedComponent, ComponentConfig } from '../lib/interfacesPublic';
-export { DynamicHooksComponent } from '../lib/components/main/dynamicHooksComponent';
+export { DynamicHooksComponent } from '../lib/components/dynamicHooksComponent';
+export { DynamicSingleComponent } from '../lib/components/dynamicSingleComponent';
 export { ParseOptions, getParseOptionDefaults } from '../lib/services/settings/options';
 export { HookParserEntry } from '../lib/services/settings/parserEntry';
 export { StringSelectorHookParser } from '../lib/parsers/selector/string/stringSelectorHookParser';

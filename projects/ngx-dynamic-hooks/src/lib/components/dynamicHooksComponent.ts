@@ -1,12 +1,11 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges, EnvironmentInjector } from '@angular/core';
-import { HookIndex, Hook, ParseResult } from '../../interfacesPublic';
-import { HookParser, LoadedComponent } from '../../interfacesPublic';
-import { DynamicHooksService } from '../../services/dynamicHooksService';
-import { HookParserEntry } from '../../services/settings/parserEntry';
-import { ComponentUpdater } from '../../services/core/componentUpdater';
-import { DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_PROVIDERS_REGISTERED } from '../../interfaces';
-import { AutoPlatformService } from '../../services/platform/autoPlatformService';
-import { ParseOptions, getParseOptionDefaults } from '../../../public-api';
+import { HookIndex, Hook, ParseResult } from '../interfacesPublic';
+import { HookParser, LoadedComponent } from '../interfacesPublic';
+import { DynamicHooksService } from '../services/dynamicHooksService';
+import { HookParserEntry } from '../services/settings/parserEntry';
+import { ComponentUpdater } from '../services/core/componentUpdater';
+import { AutoPlatformService } from '../services/platform/autoPlatformService';
+import { ParseOptions, getParseOptionDefaults } from '../../public-api';
 
 /**
 * Explanation in a nutshell:
@@ -27,7 +26,7 @@ import { ParseOptions, getParseOptionDefaults } from '../../../public-api';
   standalone: true,
   styles: []
 })
-export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
+export class DynamicHooksComponent implements DoCheck, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
   @Input() content: any = null;
   @Input() context: any = null;
   @Input() globalParsersBlacklist: Array<string>|null = null;
@@ -40,9 +39,6 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
   activeParsers: Array<HookParser> = [];
   token = Math.random().toString(36).substring(2, 12);
   initialized: boolean = false;
-
-  // Lifecycle methods
-  // ----------------------------------------------------------------------
 
   constructor(
     private hostElement: ElementRef,
@@ -61,9 +57,6 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     }
   }
 
-  ngOnInit(): void {
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     // If text or options change, reset and parse from scratch
     if (
@@ -75,7 +68,6 @@ export class DynamicHooksComponent implements DoCheck, OnInit, OnChanges, AfterV
     ) {
       this.reset();
       this.parse(this.content);
-      return;
 
     // If only context changed, just refresh hook inputs/outputs
     } else if (changes.hasOwnProperty('context')) {
