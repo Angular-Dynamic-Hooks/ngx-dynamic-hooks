@@ -10,7 +10,7 @@
   [![License](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
 </div>
 
-With ngx-dynamic-hooks, you can load fully-functional Angular components from string variables - based on their selector (as in normal templates) or **any pattern of your choice**.
+With Angular Dynamic Hooks, you can load fully-functional Angular components from string variables - based on their selector (as in normal templates) or **any pattern of your choice**.
 
 ![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/331b830b-0f98-4c64-917a-9e1b9cf63f22)
 

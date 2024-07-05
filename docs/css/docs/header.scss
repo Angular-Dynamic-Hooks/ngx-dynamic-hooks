@@ -61,7 +61,6 @@
       .site-name {
         font-size: 13px;
         color: white;
-        font-family: "Roboto Mono", monospace;
 
         @include minLg() {
           font-size: 18px;
@@ -76,7 +75,7 @@
         color: #a2a2a2;
         font-size: 15px;
         text-transform: uppercase;
-        font-family: monospace;
+        font-family: "Roboto Mono", monospace;
 
         @include minLg() {
           display: block;

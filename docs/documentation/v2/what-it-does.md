@@ -11,7 +11,7 @@ By default, **this is not easily possible**.
 
 Even the `[innerHTML]`-directive provided by Angular, which is typically used to render dynamic HTML content, does not parse Angular template syntax and thus will not load components (not least due to security concerns).
 
-The `ngx-dynamic-hooks` library aims to solve this shortcoming by providing a component that acts as an enhanced version of `[innerHTML]` of sorts, allowing developers to dynamically load components from strings in a controlled and secure manner by using so-called **hooks**.
+<a href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">Angular Dynamic Hooks</a> aims to solve this shortcoming by providing a component that acts as an enhanced version of `[innerHTML]` of sorts, allowing developers to dynamically load components from strings in a controlled and secure manner by using so-called **hooks**.
 
 ![How hooks work](https://i.imgur.com/e9ygec4.png)
 

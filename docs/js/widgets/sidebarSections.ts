@@ -1,7 +1,7 @@
 import { GenericWidgetController, Widget } from "../widgetBootstrap";
 
 export class SidebarSectionsWidget implements Widget {
-  static selector: string = '.sidebar-section.active.hasChildren';
+  static selector: string = '.sidebar-section.hasChildren';
   public section: HTMLElement|null = null;
   public toggleButtonElement: HTMLElement|null = null;
   public articleElement: HTMLElement|null = null;
@@ -16,10 +16,13 @@ export class SidebarSectionsWidget implements Widget {
     this.articleTitleElements = this.articleElement?.querySelectorAll('.article > h1, .article > h2, .article > h3, .article > h4') || null;
 
     this.registerToggleButton();
-    this.registerActiveSectionScrollListener();
+
+    if (hostElement.classList.contains('active')) {
+      this.registerActiveSectionScrollListener();
+    }
   }
 
-  private registerToggleButton() {      
+  private registerToggleButton() {
     if (!this.toggleButtonElement) {
       return;
     }

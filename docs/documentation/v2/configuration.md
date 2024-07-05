@@ -70,7 +70,7 @@ If you have child modules, you can use `DynamicHooksModule.forChild()` to import
 
 You can however also use this function to register additional parsers and options instead of loading all of them at once via `forRoot()` on the main module. This works with both with eagerly imported child modules as well as <a href="https://v17.angular.io/guide/lazy-loading-ngmodules" target="_blank">lazily-loaded child modules</a>. But there are some differences in how they behave:
 
-In **eagerly** imported child modules, the `forChild()` parsers will be added to the global root parsers. As a result, every instance of `<ngx-dynamic-hooks>` in your app will use the same list of parsers. This ultimately behaves the same as registering all parsers via `forRoot()`. Meanwhile, options are merged in the order of importing them.
+In **eagerly** imported child modules, the `forChild()` parsers will be added to the global root parsers. As a result, every `<ngx-dynamic-hooks>` component in your app will use the same list of parsers. This ultimately behaves the same as registering all parsers via `forRoot()`. Meanwhile, options are merged in the order of importing them.
 
 In **lazily** loaded child modules, you can modify what parsers & options are available to the child module via the optional `lazyInheritance` option in [DynamicHooksGlobalSettings]({{ "documentation/v2/configuration#global-settings" | relative_url }}). It accepts a value from the `DynamicHooksInheritance` enum, which are as follows:
 

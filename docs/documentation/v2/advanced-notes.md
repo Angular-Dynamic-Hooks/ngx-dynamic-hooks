@@ -59,7 +59,7 @@ class SomeComponentOrService {
 
 ## Alternative platforms
 
-The default implementation of `ngx-dynamic-hooks` should work in both [browsers](https://v17.angular.io/api/platform-browser) as well as during [server-side-rendering](https://v17.angular.io/guide/ssr). However, there may be more specialized use cases on platforms that are not directly supported.
+The default implementation of the library should work in both [browsers](https://v17.angular.io/api/platform-browser) as well as during [server-side-rendering](https://v17.angular.io/guide/ssr). However, there may be more specialized use cases on platforms that are not directly supported.
 
 In such cases, all you need is to implement the `PlatformService` abstract class and pass it as the second parameter to the `DynamicHooksModule.forRoot` method:
 

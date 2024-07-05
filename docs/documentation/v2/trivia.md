@@ -54,7 +54,7 @@ However, there are a number of advantages this library offers compared to Angula
 
 ### <a href="https://github.com/lacolaco/ng-dynamic" target="_blank">Ng-Dynamic</a>
 
-This library was one of the inspirations for Ngx-Dynamic-Hooks and is unfortunately not maintained anymore. It consited of two parts, but I'll just focus on its `<dynamic-html>`-component, which worked like a simpler version of this library. In short, it looked for a component selector in a content string and simply replaced it with the corresponding component, also using `ComponentFactory.create()`. As that is pretty much all it focused on, it:
+Ng-Dynamic was one of the inspirations for this library and is unfortunately not maintained anymore. It consited of two parts, but I'll just focus on its `<dynamic-html>`-component, which worked like a simpler version of this library. In short, it looked for a component selector in a content string and simply replaced it with the corresponding component, also using `ComponentFactory.create()`. As that is pretty much all it focused on, it:
 
 * required selector elements to load components (hooks can be anything)
 * provided no direct line of communication to the parent component like the context object
@@ -63,7 +63,7 @@ This library was one of the inspirations for Ngx-Dynamic-Hooks and is unfortunat
 * had no security features whatsoever
 * could not be customized through options
 
-Simply think of ngx-dynamic-hooks as a library that picks up the torch from ng-dynamic's `<dynamic-html>`-component and takes it further.
+One can think of Angular Dynamic Hooks picking up the torch from ng-dynamic's `<dynamic-html>`-component and taking it further.
 
 ### Runtime compilation, <a href="https://github.com/patrikx3/angular-compile" target="_blank">Angular compile</a>, etc.
 There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. Many of them do not offer support for AoT-compilation (which Ivy uses by default). While it is <a href="https://github.com/angular/angular/issues/20156#issuecomment-468686933" target="_blank">technically possible</a> to load the JiT-compiler during runtime in AoT-mode, it is quite hacky and may break without warning. 

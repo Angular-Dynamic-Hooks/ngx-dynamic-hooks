@@ -136,7 +136,7 @@ export class EmojiHookParser implements HookParser {
         // As an example, this regex finds the emoticons :-D, :-O and :-*
         const emoticonRegex = /(?::-D|:-O|:-\*)/gm;
 
-        // We can use the HookFinder service from ngx-dynamic-hooks library to easily
+        // We can use the HookFinder service provided by the library to easily
         // find the HookPositions of any regex in the content string
         return this.hookFinder.findStandaloneHooks(content, emoticonRegex);
     }
