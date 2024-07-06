@@ -1,3 +1,5 @@
+<img align="left" width="45" height="90" src="https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/5322c5e3-121b-4a43-906d-6a440b909919" alt="The logo for the Angular Dynamic Hooks library">
+
 # Angular Dynamic Hooks
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MTobisch/ngx-dynamic-hooks/ci-test.yml?style=flat-square&logo=github&label=CI%20tests)](https://github.com/MTobisch/ngx-dynamic-hooks/actions/workflows/ci-test.yml)
@@ -7,9 +9,9 @@
 [![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)
 ](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
 
-Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as arbitrary html strings (similar to a "dynamic" template) or even already-existing html trees. Works as part of an Angular app or fully standalone. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/quickstart).
+Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as html strings (similar to a "dynamic" template) or even already-existing html trees. Works as part of an Angular app or fully standalone. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/quickstart).
 
-![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/272a259c-d332-4e95-a0c9-620cc12bc4fa)
+![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/331b830b-0f98-4c64-917a-9e1b9cf63f22)
 
 # Installation
 
@@ -54,18 +56,18 @@ Then give `<ngx-dynamic-hooks>` a list of components to look for via the `parser
 
 That's it! If `<app-example>` is the selector of `ExampleComponent`, it will automatically be loaded in its place, just like in a normal template.
 
-# Docs
+# Documentation
 
 Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/) to find out how to tailor the library to your exact needs. Highlights include:
 
 * Loads fully-functional Angular component into dynamic content
 * Supports both strings or existing HTML elements as content to parse
 * Can be used fully standalone (load Angular components directly from vanilla js)
-* Works **without** needing JiT
+* Works **without** needing the JiT compiler
 * Works **with** Server-Side-Rendering
 * Loads components by their selectors, custom selectors or **any text pattern of your choice**
 * Services, Inputs/Outputs, Lifecycle Methods and other standard component features all work normally
-* Allows lazy-loading dynamic components only if they appear in the content
+* Allows lazy-loading components only if they appear in the content
 * Can pass custom data safely to your components via an optional context object
 
 # Donate
