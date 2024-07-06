@@ -9,7 +9,9 @@
 [![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)
 ](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
 
-Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as html strings (similar to a "dynamic" template) or even already-existing html trees. Works as part of an Angular app or fully standalone. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/quickstart).
+Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as html strings (similar to a "dynamic" template) or even already-existing html trees. 
+
+Works as part of an Angular app or fully standalone. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/quickstart).
 
 ![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/272a259c-d332-4e95-a0c9-620cc12bc4fa)
 
