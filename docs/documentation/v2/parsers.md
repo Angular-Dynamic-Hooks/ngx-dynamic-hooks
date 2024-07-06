@@ -201,7 +201,12 @@ That's it! If you now hand a content string like this to the `OutletComponent`, 
 
 Have a look at this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone" target="_blank">Stackblitz</a> to see our `EmojiHookParser` in action. 
 
-<iframe src="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone?embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1"></iframe>
+<div 
+  class='stackblitz' 
+  data-baseurl="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone" 
+  data-desktopqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1"
+  data-mobileqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1&view=preview"
+></div>
 
 ## Example 2: Internal link parser (enclosing)
 Normally, when we include links to other parts of our app, we use the neat `[routerLink]`-directive that allows us to navigate smoothly within the single-page-app. However, this is not usually possible in dynamic content (inserted via `[innerHTML]` for example): Contained `<a>`-elements are rendered without Angular magic and clicking on them will reload the whole app, which is slow and costly.
@@ -311,4 +316,9 @@ Just register the parser with the library as in other examples and that's it! Al
 
 Have a look at the full, working example in this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed" target="_blank">Stackblitz</a>.
 
-<iframe src="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed?embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1"></iframe>
+<div 
+  class='stackblitz' 
+  data-baseurl="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed" 
+  data-desktopqp="embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1"
+  data-mobileqp="embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1&view=preview"
+></div>

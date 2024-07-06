@@ -61,8 +61,6 @@ export class SidebarSectionsWidget implements Widget {
         }
       }
 
-      console.log(visibilityStates);
-
       const firstVisibleTitleState = visibilityStates.find(state => state.visible);
       if (firstVisibleTitleState) {
           // Reset all

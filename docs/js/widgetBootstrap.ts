@@ -75,16 +75,16 @@ function findWidgetAnchorsAndData(container: Element, selector: string): {anchor
     if (container.matches(selector)) {
         result.push({
             anchor: container, 
-            data: container.hasOwnProperty('dataset') ? processDataAttrs((container as HTMLElement).dataset) : {}
+            data: processDataAttrs((container as HTMLElement).dataset)
         });
     }
 
     // Check element children
     const anchors = container.querySelectorAll(selector);
-    for (const anchor of anchors) {
+    for (const anchor of anchors) {      
         result.push({
             anchor: anchor, 
-            data: anchor.hasOwnProperty('dataset') ? processDataAttrs((anchor as HTMLElement).dataset) : {}
+            data: processDataAttrs((anchor as HTMLElement).dataset)
         });
     }
 
@@ -102,5 +102,6 @@ function processDataAttrs(data: DOMStringMap) {
         result[key] = value;
       }
     }
+
     return result;
 }
