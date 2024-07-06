@@ -13,7 +13,7 @@ Angular Dynamic Hooks allows you to load Angular components into dynamic content
 
 Works as part of an Angular app or fully standalone. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/quickstart).
 
-![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/272a259c-d332-4e95-a0c9-620cc12bc4fa)
+![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
 
 # Installation
 
