@@ -88,6 +88,15 @@ export class ComponentCreator {
       anchorElements[hookId] = anchorElement;
     }
 
+    // For safety: Remove hooks from index whose anchor element for whatever reason could no longer be found
+    const foundHookIds = Object.keys(anchorElements).map(hookId => parseInt(hookId));
+    for (const [hookId, hook] of Object.entries(hookIndex)) {
+      if (!foundHookIds.includes(parseInt(hookId))) {
+        if (isDevMode()) { console.warn('Error when trying to load components - The anchor element for the following hook was found initially, but could not be found again for loading the component. Ignoring.', hook); }
+        delete hookIndex[hookId];
+      }
+    }
+
     // Load components
     for (const [hookId, anchorElement] of Object.entries(anchorElements)) {
       const hook = hookIndex[hookId];

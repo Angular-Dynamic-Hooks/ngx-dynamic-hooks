@@ -208,7 +208,7 @@ describe('Parser element hooks', () => {
     const elementHookFinder = comp['dynamicHooksService']['elementHookFinder'];
     spyOn(console, 'warn').and.callThrough();
 
-    // Should warn and ignore found elements that are already marked as anchors
+    // Should warn and ignore found elements that are already marked with anchors attrs
     let contentElement = document.createElement('div');
     let harmlessElement = document.createElement('div');
     let problemElement = document.createElement('div');
@@ -229,6 +229,28 @@ describe('Parser element hooks', () => {
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
+
+    // Reset
+    ({testBed, fixture, comp, context} = defaultBeforeEach());
+
+    // Should warn and ignore if the same element is found twice
+    contentElement = document.createElement('div');
+    problemElement = document.createElement('div');
+
+    parserResults = [
+      {
+        parser: genericMultiTagElementParser,
+        hookElement: problemElement
+      },
+      {
+        parser: genericMultiTagElementParser,
+        hookElement: problemElement
+      }
+    ];
+    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse.');
+    expect(checkedParserResults.length).toBe(1);
+    expect(checkedParserResults[0].hookElement).toBe(problemElement);
 
     // Reset
     ({testBed, fixture, comp, context} = defaultBeforeEach());

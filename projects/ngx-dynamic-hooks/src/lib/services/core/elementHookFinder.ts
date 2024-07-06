@@ -82,9 +82,12 @@ export class ElementHookFinder {
     const checkedParserResults = [];
 
     for (const [index, parserResult] of parserResults.entries()) {
+      const previousCheckedParserResults = checkedParserResults.slice(0, index);
+      const wasFoundAsElementHookAlready = previousCheckedParserResults.findIndex(entry => entry.hookElement === parserResult.hookElement) >= 0;
 
-      // Must not already be hook anchor (either from string hook finder or previous iteration of loops. prob check attrs)
+      // Must not already be hook anchor (either from previous iteration of loop or string hook finder)
       if (
+        wasFoundAsElementHookAlready ||
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrHookId) || 
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrParseToken)
       ) {

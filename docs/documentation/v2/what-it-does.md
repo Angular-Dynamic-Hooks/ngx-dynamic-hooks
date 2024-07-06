@@ -19,7 +19,7 @@ Even the `[innerHTML]`-directive provided by Angular, which is typically used to
 
 Simply put, hooks are any piece of text in the content string to be replaced by an Angular component. 
 
-Hooks can be **standalone** (`<hook>`) or **enclosing** (`<hook>...</hook>`). In most cases, you may simply want to use the normal component selectors as their hooks. You can easily do that with the out-of-the-box `SelectorHookParser` that comes included with this library. 
+Hooks can be **singletags** (`<hook>`) or **enclosing** (`<hook>...</hook>`). In most cases, you may simply want to use the normal component selectors as their hooks. You can easily do that with the out-of-the-box `SelectorHookParser` that comes included with this library. 
 
 Just write your selectors just as you would in a normal Angular template (such as `<app-mycomponent [someInput]="'hello!'">...</app-mycomponent>`) and the corresponding components will be loaded in their place.
 

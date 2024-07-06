@@ -21,16 +21,19 @@ export class StackblitzWidget implements Widget {
     loadSpinner.classList.add('load-spinner');
     this.hostElement.appendChild(loadSpinner);
   
-    const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && !this.isVisible) {
-        this.isVisible = true;
-        this.refreshIframe();
-      }
-    }, {
-      rootMargin: "0px",
-      threshold: 1.0,
-    });
-    observer.observe(this.hostElement);
+    // Delay checking visibility until dom stable
+    setTimeout(() => {
+      const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+        if (entries[0].isIntersecting && !this.isVisible) {
+          this.isVisible = true;
+          this.refreshIframe();
+        }
+      }, {
+        rootMargin: "0px",
+        threshold: 1.0,
+      });
+      observer.observe(this.hostElement!);
+    }, 50);
 
     window.addEventListener('resize', event => {
       const oldMode = this.currentMode;
