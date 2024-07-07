@@ -25,11 +25,11 @@ npm install ngx-dynamic-hooks --save
 
 # Compatibility
 
-| Angular | Version | JiT | AoT | Ivy | NPM |
-| --- | --- | --- | --- | --- | --- |
-| 6 - 12  | 1.x.x | yes | yes | yes | `ngx-dynamic-hooks@^1` |
-| 13-16  | 2.x.x | - | yes | yes | `ngx-dynamic-hooks@^2` |
-| 17+  | 3.x.x | - | yes | yes | `ngx-dynamic-hooks@^3` |
+| Angular | Version | NPM |
+| --- | --- | --- |
+| 6 - 12  | 1.x.x | `ngx-dynamic-hooks@^1` |
+| 13-16  | 2.x.x | `ngx-dynamic-hooks@^2` |
+| 17+  | 3.x.x | `ngx-dynamic-hooks@^3` |
 
 As the library does not rely on a runtime compiler, it works in both JiT- and AoT-environments.
 
@@ -47,13 +47,14 @@ import { ExampleComponent } from 'somewhere';
 })
 
 export class AppComponent {
-    parsers = [ExampleComponent]
+    // A list of components to look for
+    components = [ExampleComponent]
 }
 ```
-Then give `<ngx-dynamic-hooks>` a list of components to look for via the `parsers`-input and the content to render via the `content`-input:
+Then just use `<ngx-dynamic-hooks>` where you want to render the content:
 
 ```html
-<ngx-dynamic-hooks [parsers]="parsers" [content]="'Load a component here: <app-example></app-example>'"></ngx-dynamic-hooks>
+<ngx-dynamic-hooks [parsers]="components" [content]="'Load a component here: <app-example></app-example>'"></ngx-dynamic-hooks>
 ```
 
 That's it! If `<app-example>` is the selector of `ExampleComponent`, it will automatically be loaded in its place, just like in a normal template.
