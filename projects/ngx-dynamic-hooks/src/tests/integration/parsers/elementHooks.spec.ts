@@ -226,7 +226,7 @@ describe('Parser element hooks', () => {
       }
     ];
     let checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
 
@@ -248,7 +248,7 @@ describe('Parser element hooks', () => {
       }
     ];
     checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(problemElement);
 
@@ -272,7 +272,7 @@ describe('Parser element hooks', () => {
       }
     ];
     checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Note: The following element was found as a hook, but is already being used as an active host or view element for an Angular component. Ignoring.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('A hook element was found that is already a host or view element of an active Angular component. Ignoring.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
   });

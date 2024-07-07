@@ -91,13 +91,13 @@ export class ElementHookFinder {
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrHookId) || 
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrParseToken)
       ) {
-        if (isDevMode()) { console.warn('Error when checking hook elements - The following element was already found as a hook element, but was found again in the same parse. There may be multiple identical parsers active that are looking for the same hook. Ignoring.', parserResult.hookElement); }
+        if (isDevMode()) { console.warn('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.', parserResult.hookElement); }
         continue;
       }
 
       // Must not already be host or view element for an Angular component
       if (this.isAngularManagedElement(parserResult.hookElement)) {
-        if (isDevMode()) { console.warn('Note: The following element was found as a hook, but is already being used as an active host or view element for an Angular component. Ignoring.', parserResult.hookElement); }
+        if (isDevMode()) { console.warn('A hook element was found that is already a host or view element of an active Angular component. Ignoring.', parserResult.hookElement); }
         continue;
       }
 

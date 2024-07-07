@@ -248,7 +248,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('String hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.');
 
     // closingTag must start after openingTag
     parserResults = [{
@@ -261,7 +261,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('String hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.');
 
     // closingTagEndIndex must be greater than closingTagStartIndex
     parserResults = [{
@@ -274,7 +274,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions - closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.');
+    expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('String hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.');
 
     // 2. The opening/closing tags of a hook must not overlap with those of another hook
     // ---------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('A hook with the same position as another hook was found. There may be multiple identical parsers active that are looking for the same hook. Ignoring duplicates.');
+    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('A string hook with the same position as another string hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.');
 
     // Opening tag must begin after previous opening tag has ended
     parserResults = [{
@@ -316,7 +316,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
+    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('String hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
 
     // Opening tag must not overlap with previous closing tag
     parserResults = [{
@@ -337,7 +337,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
+    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('String hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Closing tag must not overlap with previous closing tag
     parserResults = [{
@@ -358,7 +358,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
+    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('String hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Check if hooks are incorrectly nested
     parserResults = [{
@@ -379,7 +379,7 @@ describe('Parser string hooks', () => {
       }
     }];
     stringHookFinder['validateHookPositions'](parserResults, '');
-    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
+    expect((stringHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('String hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
   });
 
 

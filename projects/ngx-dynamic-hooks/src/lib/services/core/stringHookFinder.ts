@@ -100,15 +100,12 @@ export class StringHookFinder {
       const prevHookCount = Object.keys(hookIndex).length;
       const result = this.find(collectedText, context, parsers, token, options, hookIndex);
 
-      // If hooks were found
+      // If hooks were found, replace element.innerHTML with result.content
       if (prevHookCount < Object.keys(hookIndex).length) {
-
-        // Render string anchors into actual html elements
         const tmpDiv = this.platformService.createElement('div');
         this.platformService.setInnerContent(tmpDiv, result.content);
         childNodes = this.platformService.getChildNodes(tmpDiv);
 
-        // Replace existing child nodes with result
         this.platformService.clearChildNodes(element);
         for (const node of childNodes) {
           this.platformService.appendChild(element, node);
@@ -116,7 +113,7 @@ export class StringHookFinder {
       }
     }
 
-    // Then reinsert previously extracted non-text nodes again
+    // Then replace placeholders with previously extracted non-text nodes again
     for (const childNode of childNodes) {
       if (this.platformService.isTextNode(childNode)) {
         let text = this.platformService.getTextContent(childNode);
@@ -301,15 +298,15 @@ export class StringHookFinder {
 
       // Check if hook is in itself well-formed
       if (hookPos.openingTagStartIndex >= hookPos.openingTagEndIndex) {
-        if (isDevMode()) { console.warn('Error when checking hook positions - openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('String hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
       if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex!) {
-        if (isDevMode()) { console.warn('Error when checking hook positions - closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('String hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
         continue;
       }
       if (enclosing && hookPos.closingTagStartIndex! >= hookPos.closingTagEndIndex!) {
-        if (isDevMode()) { console.warn('Error when checking hook positions - closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('String hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
 
@@ -328,13 +325,13 @@ export class StringHookFinder {
             hookPos.closingTagEndIndex === prevHookPos.closingTagEndIndex
           ))
           ) {
-          this.generateHookPosWarning('A hook with the same position as another hook was found. There may be multiple identical parsers active that are looking for the same hook. Ignoring duplicates.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('A string hook with the same position as another string hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
         // Opening tag must begin after previous opening tag has ended
         if (hookPos.openingTagStartIndex < prevHookPos.openingTagEndIndex) {
-          this.generateHookPosWarning('Error when checking hook positions: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('String hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -345,7 +342,7 @@ export class StringHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! ||
           hookPos.openingTagStartIndex >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('Error when checking hook positions: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('String hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -354,7 +351,7 @@ export class StringHookFinder {
           hookPos.closingTagEndIndex! <= prevHookPos.closingTagStartIndex! ||
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('Error when checking hook positions: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('String hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -363,7 +360,7 @@ export class StringHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! &&
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
           ) {
-            this.generateHookPosWarning('Error when checking hook positions: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
+            this.generateHookPosWarning('String hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
             continue outerloop;
         }
       }
