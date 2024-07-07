@@ -74,7 +74,7 @@ Please note that the above is a very minimal example and that there are plenty m
 
 # Donate
 
-If you like the the library and would like to support the ongoing development, maintenance and free technical support, you can [consider making a small donation](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC). Your help is greatly appreciated - Thank you! ❤️
+If you like the the library and would like to support the ongoing development, maintenance and free technical support, you can [consider making a small donation](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC). Your help is greatly appreciated - Thank you!
 
 # Issues
 
