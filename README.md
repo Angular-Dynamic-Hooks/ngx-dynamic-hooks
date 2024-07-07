@@ -54,7 +54,7 @@ export class AppComponent {
 Then just use `<ngx-dynamic-hooks>` where you want to render the content:
 
 ```html
-<ngx-dynamic-hooks [parsers]="components" [content]="'Load a component here: <app-example></app-example>'"></ngx-dynamic-hooks>
+<ngx-dynamic-hooks [content]="'Load a component here: <app-example></app-example>'" [parsers]="components"></ngx-dynamic-hooks>
 ```
 
 That's it! If `<app-example>` is the selector of `ExampleComponent`, it will automatically be loaded in its place, just like in a normal template.
