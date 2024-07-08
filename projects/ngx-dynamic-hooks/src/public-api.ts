@@ -3,7 +3,8 @@
  */
 
 // General
-export { provideDynamicHooks, resetDynamicHooks } from './lib/dynamicHooksProviders';
+export * from './lib/dynamicHooksProviders';
+export * from './lib/standalone';
 export * from './lib/interfacesPublic';
 
 // Settings

@@ -28,7 +28,7 @@ export { regexes } from '../lib/constants/regexes';
 export { matchAll } from '../lib/services/utils/utils';
 
 // Private module resources
-export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED, DYNAMICHOOKS_PROVIDERS_CHECK, DYNAMICHOOKS_MODULESETTINGS, SavedBindings} from '../lib/interfaces';
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, SavedBindings} from '../lib/interfaces';
 export { OptionsResolver } from '../lib/services/settings/optionsResolver';
 export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/services/core/componentCreator';

@@ -2,7 +2,7 @@ import { Type, SkipSelf, Optional, Provider, APP_INITIALIZER, Injectable, OnDest
 import { DynamicHooksSettings } from './services/settings/settings';
 import { DynamicHooksService } from './services/dynamicHooksService';
 import { PLATFORM_SERVICE, PlatformService } from './services/platform/platformService';
-import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, DYNAMICHOOKS_PROVIDERS_REGISTERED } from './interfaces';
+import { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS } from './interfaces';
 import { HookParserEntry } from './services/settings/parserEntry';
 
 export const allSettings: DynamicHooksSettings[] = [];
@@ -64,7 +64,7 @@ export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParse
 @Injectable({
   providedIn: 'root'
 })
-export class DynamicHooksInitService implements OnDestroy {
+class DynamicHooksInitService implements OnDestroy {
   ngOnDestroy(): void {
     // Reset allSettings on app close for the benefit of vite live reloads and tests (which does not destroy allSettings reference between app reloads)
     // Safer to do this only on app close rather than on app start as it acts like a cleanup function and the order of execution matters less

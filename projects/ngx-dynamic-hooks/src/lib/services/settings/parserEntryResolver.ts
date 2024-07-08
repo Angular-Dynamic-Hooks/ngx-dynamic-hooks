@@ -112,7 +112,12 @@ export class ParserEntryResolver {
       } else {
         try {
           return this.createSelectorHookParser(parserEntry as SelectorHookParserConfig);
-        } catch (e)  {}
+        } catch (e: any)  {
+          if (isDevMode()) {
+            console.error('Invalid parser config - ' + e.message, parserEntry);
+            return null;
+          }
+        }
       }
     }
     

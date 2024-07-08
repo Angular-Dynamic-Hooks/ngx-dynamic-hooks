@@ -1,4 +1,4 @@
-import { firstValueFrom, map, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { HookParserEntry } from './services/settings/parserEntry';
 import { ParseOptions } from './services/settings/options';

@@ -25,7 +25,10 @@
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/core": ">=17"
+    "@angular/core": ">=17",
+    "@angular/common": ">=17",
+    "@angular/platform-browser": ">=17",
+    "rxjs": ">=7"
   },
   "sideEffects": false
 }
