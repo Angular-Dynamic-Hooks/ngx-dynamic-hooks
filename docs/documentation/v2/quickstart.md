@@ -5,7 +5,13 @@
 
 ## Minimal example
 
-Import `DynamicHooksModule` into your main app module and configure via `forRoot()`:
+Make sure you have installed the library with:
+
+```sh
+npm install ngx-dynamic-hooks
+```
+
+Then import `DynamicHooksModule` into your main app module and configure via `forRoot()`:
 
 ```ts
 import { DynamicHooksModule, HookParserEntry } from 'ngx-dynamic-hooks';
@@ -33,7 +39,7 @@ const componentParsers: Array<HookParserEntry> = [
 })
 export class AppModule { }
 ```
-Then use the `OutletComponent` (`<ngx-dynamic-hooks>`) where you want to render the content string and pass it in via the `[content]`-input:
+You can now use the `OutletComponent` (`<ngx-dynamic-hooks>`) where you want to render the content string and pass it in via the `[content]`-input:
 
 ```html
 <ngx-dynamic-hooks [content]="'Load a component here: <app-example></app-example>'"></ngx-dynamic-hooks>

@@ -92,8 +92,8 @@ describe('ElementSelectorHookParser', () => {
     expect(topDiv.childNodes[9].textContent.trim()).toBe('And a last paragraph element');
   });
 
-  it('#should parse inputs properly', () => {
-    const testText = `
+  fit('#should parse inputs properly', () => {
+    const testContent = `
     <multitag-element-selector [simpleArray]="['test', 'something', 'here']"></multitag-element-selector>
     <multitag-element-selector
       id="someid"
@@ -147,80 +147,98 @@ describe('ElementSelectorHookParser', () => {
       ]"
     ></multitag-element-selector>
     <p>This should be untouched</p>`;
-    comp.content = testText;
+
+    const checkBindings = () => {
+      const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+      const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+
+      // Make sure components are loaded properly
+      expect(Object.keys(comp.hookIndex).length).toBe(2);
+      expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
+      expect(secondComp.constructor.name).toBe('MultiTagTestComponent');
+      expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
+
+      // Check all inputs
+      expect(firstComp.simpleArray).toEqual(['test', 'something', 'here']);
+
+      expect((secondComp as any)['id']).toBe(undefined);
+      expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
+      expect(secondComp.emptyInputWithoutBrackets).toBe('');
+      expect(secondComp.emptyInput).toBeUndefined();
+      expect(secondComp.emptyStringInput).toBe('');
+      expect(secondComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
+      expect(secondComp.nonInputProperty).toBe('this is the default value');
+      expect(secondComp.stringProp).toBe('this is just a test string');
+      expect(secondComp.dataSomeValue).toBe('this is a data value');
+      expect(secondComp.numberProp).toBe(846);
+      expect(secondComp.booleanProp).toBe(true);
+      expect(secondComp.nullProp).toBe(null);
+      expect(secondComp.undefinedProp).toBe(undefined);
+      expect(secondComp.simpleObject).toEqual({
+        config: {
+          lightbox: false,
+          size: {
+            height: '100px',
+            width: '200px'
+          }
+        }
+      });
+      expect(secondComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
+      expect(secondComp.variable).toBe('orange');
+      expect(secondComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
+      expect(secondComp.variableInObject).toEqual({
+        propInObj: 'kashyyyk'
+      });
+      expect(secondComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
+      expect(secondComp.contextWithoutAnything).toEqual(context);
+      expect(secondComp.nestedFunctions).toEqual({
+        dangerousStr: 'heres a couple of (dangerous) , chars',
+        functionsProp: ['Combo: defending Leia! and attacking the evil Wampa!']
+      });
+      expect(secondComp.nestedFunctionsInBrackets).toEqual([
+        'meditating!', 'vigilant'
+      ]);
+      expect(secondComp.everythingTogether).toEqual([
+        'Jar-Jar Binks',
+        35,
+        {
+          someObjProp: [
+            true,
+            'hello',
+            null,
+            76,
+            '02:46am',
+            'Hello there!'
+          ]
+        }, [
+          'another',
+          'variable',
+          undefined,
+          'laststring',
+          {
+            complexFunctionCall: 'calm'
+          }
+        ]
+      ]);
+    };
+
+    // Test with string content
+    comp.content = testContent;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
-    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
-    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+    checkBindings();
 
-    // Make sure components are loaded properly
-    expect(Object.keys(comp.hookIndex).length).toBe(2);
-    expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
-    expect(secondComp.constructor.name).toBe('MultiTagTestComponent');
-    expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
+    // Reset
+    comp.reset();
 
-    // Check all inputs
-    expect(firstComp.simpleArray).toEqual(['test', 'something', 'here']);
+    // Test with element content
+    const div = document.createElement('div');
+    div.innerHTML = testContent;
+    comp.content = div;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true} as any);
+    checkBindings();
 
-    expect((secondComp as any)['id']).toBe(undefined);
-    expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
-    expect(secondComp.emptyInputWithoutBrackets).toBe('');
-    expect(secondComp.emptyInput).toBeUndefined();
-    expect(secondComp.emptyStringInput).toBe('');
-    expect(secondComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
-    expect(secondComp.nonInputProperty).toBe('this is the default value');
-    expect(secondComp.stringProp).toBe('this is just a test string');
-    expect(secondComp.dataSomeValue).toBe('this is a data value');
-    expect(secondComp.numberProp).toBe(846);
-    expect(secondComp.booleanProp).toBe(true);
-    expect(secondComp.nullProp).toBe(null);
-    expect(secondComp.undefinedProp).toBe(undefined);
-    expect(secondComp.simpleObject).toEqual({
-      config: {
-        lightbox: false,
-        size: {
-          height: '100px',
-          width: '200px'
-        }
-      }
-    });
-    expect(secondComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
-    expect(secondComp.variable).toBe('orange');
-    expect(secondComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
-    expect(secondComp.variableInObject).toEqual({
-      propInObj: 'kashyyyk'
-    });
-    expect(secondComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
-    expect(secondComp.contextWithoutAnything).toEqual(context);
-    expect(secondComp.nestedFunctions).toEqual({
-      dangerousStr: 'heres a couple of (dangerous) , chars',
-      functionsProp: ['Combo: defending Leia! and attacking the evil Wampa!']
-    });
-    expect(secondComp.nestedFunctionsInBrackets).toEqual([
-      'meditating!', 'vigilant'
-    ]);
-    expect(secondComp.everythingTogether).toEqual([
-      'Jar-Jar Binks',
-      35,
-      {
-        someObjProp: [
-          true,
-          'hello',
-          null,
-          76,
-          '02:46am',
-          'Hello there!'
-        ]
-      }, [
-        'another',
-        'variable',
-        undefined,
-        'laststring',
-        {
-          complexFunctionCall: 'calm'
-        }
-      ]
-    ]);
   });
 
   it('#should parse outputs properly', () => {

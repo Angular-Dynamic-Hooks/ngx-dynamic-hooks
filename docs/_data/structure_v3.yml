@@ -1,0 +1,101 @@
+
+- title: Introduction
+  url: /documentation/v3/
+  icon: /assets/images/icons/hand.svg
+  children:
+    - title: Installation
+      url: /documentation/v3#installation
+    - title: Compatibility
+      url: /documentation/v3#compatibility
+    - title: What it does
+      url: /documentation/v3#introduction
+    - title: What's a hook?
+      url: /documentation/v3#whats-a-hook
+    - title: Do the components work normally?
+      url: /documentation/v3#do-the-components-work-normally
+    - title: What this library doesn't do
+      url: /documentation/v3#what-this-library-doesnt-do
+
+- title: Quick start
+  url: /documentation/v3/quickstart
+  icon: /assets/images/icons/rocket.svg
+  children:
+    - title: Minimal example
+      url: /documentation/v3/quickstart#minimal-example
+    - title: See it in action
+      url: /documentation/v3/quickstart#see-it-in-action
+
+- title: Features
+  url: /documentation/v3/features
+  icon: /assets/images/icons/star.svg
+  children:
+    - title: Context & Dependency Injection
+      url: /documentation/v3/features#context--dependency-injection
+    - title: Inputs
+      url: /documentation/v3/features#inputs
+    - title: Outputs
+      url: /documentation/v3/features#outputs
+    - title: Content projection
+      url: /documentation/v3/features#content-projection
+    - title: Lifecycle methods
+      url: /documentation/v3/features#lifecycle-methods
+    - title: Change detection
+      url: /documentation/v3/features#change-detection
+
+- title: Configuration
+  url: /documentation/v3/configuration
+  icon: /assets/images/icons/cog.svg
+  children:
+    - title: Global settings
+      url: /documentation/v3/configuration#global-settings
+    - title: Component bindings
+      url: /documentation/v3/configuration#component-bindings
+    - title: OutletOptions
+      url: /documentation/v3/configuration#outletoptions
+    - title: Child modules
+      url: /documentation/v3/configuration#child-modules
+    - title: Lazy-loading components
+      url: /documentation/v3/configuration#lazy-loading-components
+
+- title: Parsers
+  url: /documentation/v3/parsers
+  icon: /assets/images/icons/brackets.svg
+  children:
+  - title: Introduction
+    url: /documentation/v3/parsers#introduction
+  - title: SelectorHookParserConfig
+    url: /documentation/v3/parsers#selectorhookparserconfig
+  - title: Writing your own HookParser
+    url: /documentation/v3/parsers#writing-your-own-hookparser
+  - title: Example 1 - Emoji parser (standalone)
+    url: /documentation/v3/parsers#example-1-emoji-parser-standalone
+  - title: Example 2 - Internal link parser (enclosing)
+    url: /documentation/v3/parsers#example-2-internal-link-parser-enclosing
+
+- title: Advanced uses
+  url: /documentation/v3/advanced-notes
+  icon: /assets/images/icons/squiggly_brackets.svg
+  children:
+  - title: Programmatic usage (without component)
+    url: /documentation/v3/advanced-notes#programmatic-usage-without-component
+  - title: Alternative platforms
+    url: /documentation/v3/advanced-notes#alternative-platforms
+
+- title: Trivia
+  url: /documentation/v3/trivia
+  icon: /assets/images/icons/list.svg
+  children:
+    - title: How it works
+      url: /documentation/v3/trivia#how-it-works
+    - title: Security
+      url: /documentation/v3/trivia#security
+    - title: Caveats
+      url: /documentation/v3/trivia#caveats
+    - title: Comparison with similar libraries
+      url: /documentation/v3/trivia#comparison-with-similar-libraries
+
+- title: Troubleshooting
+  url: /documentation/v3/troubleshooting
+
+- title: Special thanks
+  url: /documentation/v3/special-thanks

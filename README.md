@@ -17,7 +17,7 @@ Works as part of an Angular app or fully standalone. Load components by selector
 
 # Installation
 
-Simply install via npm 
+Simply install via npm (or yarn)
 
 ```sh
 npm install ngx-dynamic-hooks
@@ -62,13 +62,13 @@ That's it! If `<app-example>` is the selector of `ExampleComponent`, it will aut
 
 Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/) to find out how to tailor the library to your exact needs. Highlights include:
 
-* ⭐ Loads fully-functional Angular component into dynamic content
+* ⭐ Loads fully-functional Angular components into dynamic content
 * 📖 Supports both strings and existing HTML elements as content to parse
-* 🚀 Can be used fully standalone (load components into DOM elements without Angular)
+* 🚀 Can be used fully standalone (load components into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
 * 🔍 Loads components by their selectors, custom selectors or **any text pattern of your choice**
-* ⚙️ Services, Inputs/Outputs, Lifecycle Methods and other standard component features all work normally
+* ⚙️ Services, Inputs/Outputs, Lifecycle Methods and other standard features all work normally
 * 💤 Allows lazy-loading components only if they appear in the content
 * 🔒 Can pass custom data safely to your components via an optional context object
 

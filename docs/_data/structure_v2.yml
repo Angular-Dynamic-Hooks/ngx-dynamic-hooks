@@ -7,19 +7,14 @@
       url: /documentation/v2#installation
     - title: Compatibility
       url: /documentation/v2#compatibility
-
-- title: What it does
-  url: /documentation/v2/what-it-does
-  icon: /assets/images/icons/info.svg
-  children:
-    - title: Introduction
-      url: /documentation/v2/what-it-does#introduction
+    - title: What it does
+      url: /documentation/v2#introduction
     - title: What's a hook?
-      url: /documentation/v2/what-it-does#whats-a-hook
+      url: /documentation/v2#whats-a-hook
     - title: Do the components work normally?
-      url: /documentation/v2/what-it-does#do-the-components-work-normally
+      url: /documentation/v2#do-the-components-work-normally
     - title: What this library doesn't do
-      url: /documentation/v2/what-it-does#what-this-library-doesnt-do
+      url: /documentation/v2#what-this-library-doesnt-do
 
 - title: Quick start
   url: /documentation/v2/quickstart
