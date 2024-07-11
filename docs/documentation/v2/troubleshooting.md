@@ -19,7 +19,7 @@ You most likely have a typo in the input. If its a string, remember to put quota
 
 ### **In my output function, `this` does not point to the parent object of the function**
 
-See the [Outputs-section]({{ "documentation/v2/features#outputs" | relative_url }}) for a solution to this problem.
+See the [Outputs-section]({{ "documentation/v2/component-features#outputs" | relative_url }}) for a solution to this problem.
 
 ### **globalParsersBlacklist/whitelist for the `OutletComponent` doesn't work**
 

@@ -25,22 +25,22 @@
     - title: See it in action
       url: /documentation/v2/quickstart#see-it-in-action
 
-- title: Features
-  url: /documentation/v2/features
+- title: Component features
+  url: /documentation/v2/component-features
   icon: /assets/images/icons/star.svg
   children:
     - title: Context & Dependency Injection
-      url: /documentation/v2/features#context--dependency-injection
+      url: /documentation/v2/component-features#context--dependency-injection
     - title: Inputs
-      url: /documentation/v2/features#inputs
+      url: /documentation/v2/component-features#inputs
     - title: Outputs
-      url: /documentation/v2/features#outputs
+      url: /documentation/v2/component-features#outputs
     - title: Content projection
-      url: /documentation/v2/features#content-projection
+      url: /documentation/v2/component-features#content-projection
     - title: Lifecycle methods
-      url: /documentation/v2/features#lifecycle-methods
+      url: /documentation/v2/component-features#lifecycle-methods
     - title: Change detection
-      url: /documentation/v2/features#change-detection
+      url: /documentation/v2/component-features#change-detection
 
 - title: Configuration
   url: /documentation/v2/configuration

@@ -8,8 +8,7 @@
   [![Coverage](https://img.shields.io/codecov/c/gh/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/MTobisch/ngx-dynamic-hooks)
   [![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?color=orange&style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
   [![License](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
-  [![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)
-  ](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
+  [![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
 </div>
 
 Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as html strings (similar to a "dynamic" template) or even already-existing html trees. 
@@ -41,7 +40,7 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 ## Highlights
 
 * ⭐ Loads fully-functional Angular components into dynamic content
-* 📖 Supports both strings and existing HTML elements as content to parse
+* 📖 Parses both strings and HTML structures
 * 🚀 Can be used fully standalone (load components into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
@@ -53,11 +52,13 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 
 ## What it does
 
-In Angular, you normally load components by placing their selectors in a template. But what if you wanted to load components not just from static templates, but from arbitrary dynamic content as well - such as normal string variables, HTML elements or even the whole DOM?
+In Angular, you normally load components by placing their selectors in a template. But what if you wanted to load components not just from static templates, but from arbitrary dynamic content as well - such as string variables, HTML elements or even by parsing the whole DOM?
 
 By default, **this is not easily possible**.
 
-<a href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">Angular Dynamic Hooks</a> aims to solve this shortcoming by providing a component (as well as a service and standalone function) that accepts any content of your choice and automatically loads components into it at runtime - similar to a "dynamic template". It is able to do this in a controlled and secure manner by using so-called **hooks**.
+<a href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">Angular Dynamic Hooks</a> aims to solve this shortcoming by providing a component (as well as a service and standalone function) that accepts any content of your choice and automatically loads components into it at runtime - similar to a "dynamic template". The library does not need the Just-in-Time Angular compiler to do so, allowing for much smaller bundle sizes. 
+
+It is able to do all this in a controlled and secure manner by using so-called **hooks**.
 
 ![How hooks work](https://i.imgur.com/e9ygec4.png)
 
@@ -71,9 +72,9 @@ Just use your selectors just as you would in a normal Angular template (such as 
 
 ![Selector hook](https://i.imgur.com/tjAX6uU.png)
 
-Something to note, though, is that hooks can be anything - not just component selector elements! 
+What is especially neat: Hooks can be anything - not just component selectors! 
 
-Each hook internally has a corresponding <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that tells the library where and how to instantiate the component. You can easily create [your own hook parsers]({{ "/documentation/v2/parsers" | relative_url }}) that replace any HTML element or text pattern of your choice with Angular components!
+Each hook internally has a corresponding `HookParser` that tells the library where and how to instantiate the component. You can easily create [your own hook parsers]({{ "/documentation/v2/parsers" | relative_url }}) that replace any HTML element or text pattern of your choice with Angular components!
 
 ## Do the components work normally?
 
@@ -96,4 +97,4 @@ Please note that this library does not aim to be a full Angular template parser.
 
 This means that other special Angular template syntax (such as *ngIf, *ngFor or other directives) **will not work**.
 
-However, in terms of loading components, it allows for a lot more flexibility and possibilities than Vanilla Angular itself, such as allowing you to load them at runtime, use normal strings or even HTML as "templates", load them by any text pattern, etc.
+However, in terms of loading components, it allows for a lot more flexibility and possibilities than Vanilla Angular itself, such as allowing you to load them at runtime from normal strings or HTML trees, replace text patterns with components and more.

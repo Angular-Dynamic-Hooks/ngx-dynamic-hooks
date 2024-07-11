@@ -7,6 +7,8 @@
       url: /documentation/v3#installation
     - title: Compatibility
       url: /documentation/v3#compatibility
+    - title: Highlights
+      url: /documentation/v3#highlights
     - title: What it does
       url: /documentation/v3#introduction
     - title: What's a hook?
@@ -24,23 +26,33 @@
       url: /documentation/v3/quickstart#minimal-example
     - title: See it in action
       url: /documentation/v3/quickstart#see-it-in-action
+    - title: Next steps
+      url: /documentation/v3/quickstart#next-steps
 
-- title: Features
-  url: /documentation/v3/features
+- title: General usage
+  url: /documentation/v3/general-usage
+  icon: /assets/images/icons/star.svg
+
+- title: Standalone
+  url: /documentation/v3/standalone
+  icon: /assets/images/icons/star.svg
+
+- title: Component features
+  url: /documentation/v3/component-features
   icon: /assets/images/icons/star.svg
   children:
     - title: Context & Dependency Injection
-      url: /documentation/v3/features#context--dependency-injection
+      url: /documentation/v3/component-features#context--dependency-injection
     - title: Inputs
-      url: /documentation/v3/features#inputs
+      url: /documentation/v3/component-features#inputs
     - title: Outputs
-      url: /documentation/v3/features#outputs
+      url: /documentation/v3/component-features#outputs
     - title: Content projection
-      url: /documentation/v3/features#content-projection
+      url: /documentation/v3/component-features#content-projection
     - title: Lifecycle methods
-      url: /documentation/v3/features#lifecycle-methods
+      url: /documentation/v3/component-features#lifecycle-methods
     - title: Change detection
-      url: /documentation/v3/features#change-detection
+      url: /documentation/v3/component-features#change-detection
 
 - title: Configuration
   url: /documentation/v3/configuration

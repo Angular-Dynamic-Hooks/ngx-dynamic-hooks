@@ -5,7 +5,7 @@
 
 ## Minimal example
 
-Make sure you have installed the library with:
+Install the library with:
 
 ```sh
 npm install ngx-dynamic-hooks

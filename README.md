@@ -38,6 +38,7 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 Import the `DynamicHooksComponent` as well as your dynamic component(s) to load:
 
 ```ts
+import { Component } from '@angular/core';
 import { DynamicHooksComponent } from 'ngx-dynamic-hooks';
 import { ExampleComponent } from 'somewhere';
 
@@ -63,7 +64,7 @@ That's it! If `<app-example>` is the selector of `ExampleComponent`, it will aut
 Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/v3/) to find out how to tailor the library to your exact needs. Highlights include:
 
 * ⭐ Loads fully-functional Angular components into dynamic content
-* 📖 Supports both strings and existing HTML elements as content to parse
+* 📖 Parses both strings and HTML structures
 * 🚀 Can be used fully standalone (load components into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
