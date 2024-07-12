@@ -73,7 +73,7 @@ export class ComponentCreator {
       * Explanation: 
       * When a component is created, one of its projectableNodes happens to be another components anchor element, but the parent component doesn't render the anchor right away
       * (due to *ngIf, for example), you can't replace that anchor anymore as it is now tracked in Angular's memory as a reference. And that exact reference will 
-      * be rendered when the component's *ngIf eventually resolved to true.
+      * be rendered when the component's *ngIf eventually resolved to true. So need to process all custom host element requests before loading components.
       */
       if (hook.data.hostElementTag) {
         anchorElement = this.useCustomHostElement(anchorElement, hook.data.hostElementTag);
@@ -133,7 +133,7 @@ export class ComponentCreator {
       // Call dynamic lifecycle methods for all created components
       for (const hook of Object.values(hookIndex)) {
         // Find all content children components
-        const contentChildren: Array<DynamicContentChild> = [];
+        const contentChildren: DynamicContentChild[] = [];
         if (typeof hook.componentRef!.instance['onDynamicMount'] === 'function' || typeof hook.componentRef!.instance['onDynamicChanges'] === 'function') {
           this.findContentChildren(hook.componentRef!.location.nativeElement, contentChildren, hookIndex, token);
         }
@@ -305,7 +305,7 @@ export class ComponentCreator {
    * @param compClass - The component's class
    * @param injector - The default injector to use for the component
    */
-  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: Array<Array<any>>, options: ParseOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
+  createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: any[][], options: ParseOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
     
     // Dynamically create component
     // Note: Transcluded content (including components) for ng-content can simply be added here in the form of the projectableNodes-argument.
@@ -349,7 +349,7 @@ export class ComponentCreator {
    * @param hookIndex - The current hookIndex
    * @param token - The current parseToken
    */
-  findContentChildren(node: any, treeLevel: Array<DynamicContentChild> = [], hookIndex: HookIndex, token: string): void {
+  findContentChildren(node: any, treeLevel: DynamicContentChild[] = [], hookIndex: HookIndex, token: string): void {
     const childNodes = this.platformService.getChildNodes(node);
     if (childNodes != undefined && childNodes.length > 0) {
       childNodes.forEach((childNode, key) => {

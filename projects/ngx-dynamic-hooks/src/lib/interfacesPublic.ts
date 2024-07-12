@@ -211,7 +211,7 @@ export interface OnDynamicData {
  */
 export interface DynamicContentChild {
     componentRef: ComponentRef<any>;
-    contentChildren: Array<DynamicContentChild>;
+    contentChildren: DynamicContentChild[];
     hookValue: HookValue;
 }
 

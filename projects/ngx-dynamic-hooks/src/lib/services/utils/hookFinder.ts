@@ -16,7 +16,7 @@ export class HookFinder {
    * @param content - The text to search
    * @param hookRegex - The regex to use for the hook
    */
-  findSingletagHooks(content: string, hookRegex: RegExp): Array<HookPosition> {
+  findSingletagHooks(content: string, hookRegex: RegExp): HookPosition[] {
     const result: HookPosition[] = [];
 
     // Find all hooks
@@ -55,9 +55,9 @@ export class HookFinder {
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
    */
-  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested: boolean = true): Array<HookPosition> {
+  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested: boolean = true): HookPosition[] {
     const allTags = [];
-    const result: Array<HookPosition> = [];
+    const result: HookPosition[] = [];
 
     // Find all opening tags
     const openingTagMatches = matchAll(content, openingTagRegex);

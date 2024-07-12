@@ -29,14 +29,14 @@ import { ParseOptions, getParseOptionDefaults } from '../../public-api';
 export class DynamicHooksComponent implements DoCheck, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy {
   @Input() content: any = null;
   @Input() context: any = null;
-  @Input() globalParsersBlacklist: Array<string>|null = null;
-  @Input() globalParsersWhitelist: Array<string>|null = null;
-  @Input() parsers: Array<HookParserEntry>|null = null;
+  @Input() globalParsersBlacklist: string[]|null = null;
+  @Input() globalParsersWhitelist: string[]|null = null;
+  @Input() parsers: HookParserEntry[]|null = null;
   @Input() options: ParseOptions|null = null;
   @Output() componentsLoaded: EventEmitter<LoadedComponent[]> = new EventEmitter();
   hookIndex: HookIndex = {};
   activeOptions: ParseOptions = getParseOptionDefaults();
-  activeParsers: Array<HookParser> = [];
+  activeParsers: HookParser[] = [];
   token = Math.random().toString(36).substring(2, 12);
   initialized: boolean = false;
 

@@ -381,7 +381,7 @@ export class DataTypeParser {
    * @param contextLevel - The object to travel
    * @param path - The property path array
    */
-  fetchContextVariable(contextLevel: any, path: Array<any>): any {
+  fetchContextVariable(contextLevel: any, path: any[]): any {
     // Prevent accessing protected properties
     if (path[0].value ===  '__proto__') {
       throw Error('Accessing the __proto__ property through a context variable is not allowed.');

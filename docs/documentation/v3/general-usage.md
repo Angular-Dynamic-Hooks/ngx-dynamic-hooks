@@ -30,7 +30,7 @@ export class AppComponent {
 ```
 
 {% include docs/widgets/notice.html content='
-  <span>This example uses a string as the content, but you can always also use an actual HTML element. The hooks/components will be loaded in the same way from its content.</span>
+  <span>This example uses a string as the content, but you can always also use an actual HTML element. The hooks/components will be loaded in the same way.</span>
 ' %}
 
 ## Context and options
@@ -138,7 +138,7 @@ export class AppComponent {
 }
 ```
 
-As you can see, we replaced the `ExampleComponent` class in the parsers array with a more explicit configuration object that specifies a `selector`. This is a `SelectorHookParserConfig` and it offers several more options to customize how a component is parsed from the content (see the [SelectorHookParserConfig]({{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}) section for the full list).
+As you can see, we replaced the `ExampleComponent` class in the parsers array with a more explicit configuration object that specifies a `selector`. This is a `SelectorHookParserConfig` and it offers several options to customize how a component is parsed from the content (see the [SelectorHookParserConfig]({{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}) section for the full list).
 
 See it in action in this Stackblitz:
 
@@ -150,7 +150,7 @@ See it in action in this Stackblitz:
 
 If you need even more flexiblity (such as replacing pure text with components), you can consider implement your own `HookParser`!
 
-A `HookParser` is quite simple and just needs three methods: One that tells the library where the hooks are in the content, one that says which component class to load and one that specifies the inputs/outputs.
+A `HookParser` is quite simple and just needs three methods: One that tells the library where the hooks are in the content, one that says which component class to load and one that returns the input/output values.
 
 For a full guide with stackblitz examples, see the [Writing your own HookParser](http://localhost:4000/ngx-dynamic-hooks/documentation/v2/parsers#writing-your-own-hookparser) section.
 
@@ -177,7 +177,7 @@ This looks complicated, but most of the parameters are actually just [the inputs
 
 Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify custom injectors for the created components. If you don't, the library defaults to the current ones.
 
-The function will return an observable that contains an `ParseResult` with the form:
+The function will return an `ParseResult` observable:
 
 ```ts
 interface ParseResult {
@@ -191,9 +191,7 @@ interface ParseResult {
     destroy: () => void;                          // Destroys all loaded components of this result
 }
 ```
-`element` is probably the most interesting part here as it contains the finished content with all loaded component elements. 
-
-`hookIndex` might also prove useful, as it is a fairly in-depth data object that holds various tidbits of info concerning the loaded components (as well as the componentRefs). 
+`element` is probably the most interesting part here as it contains the finished content with all loaded component elements. `hookIndex` might also prove useful, as it is a fairly in-depth data object that holds various tidbits of info concerning the loaded components (as well as the componentRefs). 
 
 Calling this function could then look like so:
 
@@ -203,10 +201,14 @@ import { DynamicHooksService } from 'ngx-dynamic-hooks';
 ...
 class AppComponent {
   constructor(private dynamicHooksService: DynamicHooksService) {
+    
     const content = 'Load a component here: <app-example></app-example>';
+    // const content = document.querySelector('#content'); // Also possible
+
     dynamicHooksService.parse(content).subscribe(result => {
       // Do whatever with it
-    })
+    });
+
   }
 }
 ```
@@ -220,6 +222,5 @@ See it in action in this Stackblitz:
 {% include docs/widgets/notice.html content="
   <h4>About component lifecycles</h4>
   <p>When loading components this way, keep in mind that the submitted content is only parsed once. The inputs of contained components aren't automatically updated.</p>
-  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks.</p>
-  <p>You can simply use <code>ParseResult.destroy()</code> or <a href='https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts#L119' target='_blank'><code>OutletService.destroy(hookIndex: HookIndex)</code></a> for this purpose.</p>
+  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <code>ParseResult.destroy()</code> or <a href='https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts#L119' target='_blank'><code>OutletService.destroy(hookIndex: HookIndex)</code></a> for this purpose.</p>
 " %}

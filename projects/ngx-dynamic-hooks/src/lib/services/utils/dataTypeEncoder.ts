@@ -35,7 +35,7 @@ export class DataTypeEncoder {
     allQuotes.sort((a, b) => a['index'] - b['index']);
 
     // Create quotes text segments
-    const quoteSegments: Array<TextSegment> = [];
+    const quoteSegments: TextSegment[] = [];
     let outermostOpenedQuote = null;
     for (const quote of allQuotes) {
       if (!outermostOpenedQuote) {
@@ -122,7 +122,7 @@ export class DataTypeEncoder {
     allBrackets.sort((a, b) => a['index'] - b['index']);
 
     // Create functions text segments
-    const functionSegments: Array<TextSegment> = [];
+    const functionSegments: TextSegment[] = [];
     const openedBrackets = [];
     for (const bracket of allBrackets) {
       if (bracket[0] === '(') {
@@ -194,7 +194,7 @@ export class DataTypeEncoder {
     // bracket doesn't have a uniquely identifiable syntax. Might also be array endings.
 
     // Find the corresponding closing bracket for each opening bracket by parsing the following brackets
-    const bracketSegments: Array<TextSegment> = [];
+    const bracketSegments: TextSegment[] = [];
     for (const openingBracket of openingBrackets) {
       const followingText = text.substring(openingBracket.index + 2); // openingBracket.index + 2, b/c the regex starts at the character before the opening bracket and followingText is supposed to start after the opening bracket
       const followingOpeningBrackets = matchAll(followingText, /\[/gm);
@@ -304,7 +304,7 @@ export class DataTypeEncoder {
    * @param specialTextSegments - The segments in the text to encode
    * @param encodingFunction - The encoding function to use
    */
-  private encodeTextSegments(text: string, specialTextSegments: Array<TextSegment>, encodingFunction: any): string {
+  private encodeTextSegments(text: string, specialTextSegments: TextSegment[], encodingFunction: any): string {
     // 1. Divide whole text into two types of segments: Those to be encoded and those to be left as they are
     const allTextSegments = [];
     for (const specialTextSegment of specialTextSegments) {

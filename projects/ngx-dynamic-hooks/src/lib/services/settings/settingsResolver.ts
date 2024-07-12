@@ -114,8 +114,8 @@ export class SettingsResolver {
   /**
    * Loads the relevant parser configuration
    */
-  private resolveParsers(globalParsers: HookParserEntry[]|null, localParsers: HookParserEntry[]|null, injector: Injector, globalParsersBlacklist: string[]|null, globalParsersWhitelist: string[]|null): Array<HookParser> {
-    let resolvedParsers: Array<HookParser>;
+  private resolveParsers(globalParsers: HookParserEntry[]|null, localParsers: HookParserEntry[]|null, injector: Injector, globalParsersBlacklist: string[]|null, globalParsersWhitelist: string[]|null): HookParser[] {
+    let resolvedParsers: HookParser[];
 
     // If local
     if (localParsers) {

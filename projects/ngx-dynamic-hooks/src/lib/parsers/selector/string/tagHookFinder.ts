@@ -23,7 +23,7 @@ export class TagHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): HookPosition[] {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
@@ -37,7 +37,7 @@ export class TagHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): Array<HookPosition> {
+  findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): HookPosition[] {
     // Create opening and closing tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
     const closingTagRegex =  this.generateClosingTagRegex(selector, bracketStyle);

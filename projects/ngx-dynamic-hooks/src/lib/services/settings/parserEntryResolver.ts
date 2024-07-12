@@ -29,7 +29,7 @@ export class ParserEntryResolver {
    * @param blacklist - (optional) Which parsers to blacklist by name
    * @param whitelist - (optional) Which parsers to whitelist by name
    */
-  resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist?: string[]|null, whitelist?: string[]|null): Array<HookParser> {
+  resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist?: string[]|null, whitelist?: string[]|null): HookParser[] {
 
     // Load all requested parsers
     const parsers: HookParser[] = [];
@@ -148,7 +148,7 @@ export class ParserEntryResolver {
    *
    * @param parsers - The parsers in question
    */
-  validateParserFunctions(parsers: Array<HookParser>): Array<HookParser> {
+  validateParserFunctions(parsers: HookParser[]): HookParser[] {
     const validParsers = [];
     for (const parser of parsers) {
       if (typeof parser.findHooks !== 'function' && typeof parser.findHookElements !== 'function') {
@@ -173,7 +173,7 @@ export class ParserEntryResolver {
    *
    * @param parsers - The parsers in question
    */
-  checkParserNames(parsers: Array<HookParser>): void {
+  checkParserNames(parsers: HookParser[]): void {
     const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
     const previousNames: string[] = [];
     const alreadyWarnedNames: string[] = [];

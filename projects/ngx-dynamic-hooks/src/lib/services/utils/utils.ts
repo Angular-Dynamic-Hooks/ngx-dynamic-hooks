@@ -7,7 +7,7 @@
  * @param text - The text to search
  * @param regExp - The RegExp object to use
  */
-export function matchAll(text: string, regExp: RegExp): Array<{[index: number]: string, index: number, input: string}> {
+export function matchAll(text: string, regExp: RegExp): {[index: number]: string, index: number, input: string}[] {
   // Must be global
   if (!regExp.global) {
     throw Error('TypeError: matchAll called with a non-global RegExp argument');
