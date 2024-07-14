@@ -11,7 +11,7 @@ import { GenericMultiTagStringParser } from '../../resources/parsers/genericMult
 import { GenericWhateverStringParser } from '../../resources/parsers/genericWhateverStringParser';
 import { TestBed } from '@angular/core/testing';
 import { GenericWhateverElementParser } from '../../resources/parsers/genericWhateverElementParser';
-import { GenericMultiTagElementParser } from '../../resources/parsers/genericMultiTagElementParser';
+import { GenericElementParser } from '../../resources/parsers/genericElementParser';
 
 describe('Parser configuration', () => {
   let testBed;
@@ -33,7 +33,7 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0]).toEqual(jasmine.any(GenericSingleTagStringParser));
     expect(comp.activeParsers[1]).toEqual(jasmine.any(GenericMultiTagStringParser));
     expect(comp.activeParsers[2]).toEqual(jasmine.any(GenericWhateverStringParser));
-    expect(comp.activeParsers[3]).toEqual(jasmine.any(GenericMultiTagElementParser));
+    expect(comp.activeParsers[3]).toEqual(jasmine.any(GenericElementParser));
     expect(comp.activeParsers[4]).toEqual(jasmine.any(GenericWhateverElementParser));
     expect(comp.activeParsers[5]).toEqual(jasmine.any(StringSelectorHookParser));
     expect(comp.activeParsers[6]).toEqual(jasmine.any(StringSelectorHookParser));

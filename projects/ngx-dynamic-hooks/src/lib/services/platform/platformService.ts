@@ -1,5 +1,7 @@
 import { InjectionToken } from "@angular/core";
 
+export type PlatformService =  Partial<CompletePlatformService>;
+
 export const PLATFORM_SERVICE = new InjectionToken<PlatformService>('An injection token to retrieve an optionally user-provided PlatformService');
 
 /**
@@ -170,5 +172,3 @@ export interface CompletePlatformService {
    */
   getTextContent(element: any): string|null;
 }
-
-export type PlatformService =  Partial<CompletePlatformService>;

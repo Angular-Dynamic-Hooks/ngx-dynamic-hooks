@@ -7,7 +7,7 @@ import { Hook, HookIndex } from '../../interfacesPublic';
 import { DynamicContentChild, ComponentConfig, LazyLoadComponentConfig } from '../../interfacesPublic';
 import { ComponentUpdater } from './componentUpdater';
 import { AutoPlatformService } from '../platform/autoPlatformService';
-import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
+import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag, voidElementTags } from '../../constants/core';
 import { ParseOptions } from '../settings/options';
 
 /**
@@ -65,6 +65,11 @@ export class ComponentCreator {
       if (!isPlatformBrowser(this.platformId) && hook.isLazy) {
         delete hookIndex[hookId];
         continue;
+      }
+
+      // If anchor element is a void element and no custom host element specified, fallback to default anchor element
+      if (!hook.data.hostElementTag && voidElementTags.includes(this.platformService.getTagName(anchorElement).toLowerCase())) {
+        hook.data.hostElementTag = anchorElementTag;
       }
 
       /*

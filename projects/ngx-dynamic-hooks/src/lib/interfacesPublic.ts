@@ -83,7 +83,7 @@ export interface HookParser {
      * @param context - The current context object
      * @param childNodes - The current child nodes of this hook
      */
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Node[]): HookComponentData;
+    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData;
 
     /**
      * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.
@@ -129,7 +129,7 @@ export interface HookComponentData {
     hostElementTag?: string;
     injector?: Injector;
     environmentInjector?: EnvironmentInjector;
-    content?: Node[][];
+    content?: any[][];
 }
 
 /**

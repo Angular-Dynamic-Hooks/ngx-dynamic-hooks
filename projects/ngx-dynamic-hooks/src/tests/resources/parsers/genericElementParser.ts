@@ -5,8 +5,8 @@ import { MultiTagTestComponent } from '../components/multiTagTest/multiTagTest.c
 @Injectable({
   providedIn: 'root'
 })
-export class GenericMultiTagElementParser implements HookParser {
-  name: string = 'GenericMultiTagElementParser';
+export class GenericElementParser implements HookParser {
+  name: string = 'GenericElementParser';
   component: ComponentConfig = MultiTagTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHookElements: (contentElement: Element, context: any) => any[] = (contentElement, context) => {

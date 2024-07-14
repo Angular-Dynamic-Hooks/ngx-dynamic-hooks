@@ -5,9 +5,6 @@ import { anchorElementTag, DynamicHooksComponent } from '../testing-api';
 import { defaultBeforeEach, prepareTestingModule } from './shared';
 import { TestBed } from '@angular/core/testing';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
-import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
-import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
-import { GenericWhateverElementParser } from '../resources/parsers/genericWhateverElementParser';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 

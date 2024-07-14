@@ -12,7 +12,7 @@ import { LazyTestComponent } from '../resources/components/lazyTest/lazyTest.c';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
-import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
+import { GenericElementParser } from '../resources/parsers/genericElementParser';
 import { NgContentTestComponent } from '../resources/components/ngContentTest/ngContentTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 
@@ -145,8 +145,8 @@ describe('Component loading', () => {
       };
     }
 
-    const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser);
-    genericMultiTagElementParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
+    const genericElementParser = TestBed.inject(GenericElementParser);
+    genericElementParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
       return {
         component: MultiTagTestComponent,
         hostElementTag: 'yet-another-custom-element'
@@ -180,8 +180,8 @@ describe('Component loading', () => {
   });
 
   it('#should load custom ng-content properly', () => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagElementParser);
-    genericMultiTagParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
+    const genericElementParser = TestBed.inject(GenericElementParser);
+    genericElementParser.onLoadComponent = (hookId, hookValue, context, childNodes) => {
       const customSpan = document.createElement('span');
       customSpan.innerHTML = 'this should be highlighted';
   

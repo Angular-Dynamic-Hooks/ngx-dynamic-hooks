@@ -1,6 +1,6 @@
 // Testing api resources
 import { firstValueFrom } from 'rxjs';
-import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
+import { GenericElementParser } from '../resources/parsers/genericElementParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookFinder, ParseResult, StringHookFinder, anchorElementTag } from '../testing-api';
 
@@ -238,7 +238,7 @@ describe('Element content', () => {
 
   it('#should only look for string hooks if there even are string parsers', () => {
     const stringHookFinder = TestBed.inject(StringHookFinder);
-    const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser)
+    const genericElementParser = TestBed.inject(GenericElementParser)
     spyOn(stringHookFinder, 'checkElement').and.callThrough();
 
     const div = document.createElement('div');
@@ -251,7 +251,7 @@ describe('Element content', () => {
     `;
 
     comp.content = div;
-    comp.parsers = [genericMultiTagElementParser];
+    comp.parsers = [GenericElementParser];
     comp.ngOnChanges({content: true} as any);
 
     expect((stringHookFinder.checkElement as jasmine.Spy).calls.all().length).toBe(0);

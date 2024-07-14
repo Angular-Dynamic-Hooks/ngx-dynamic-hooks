@@ -26,7 +26,7 @@ export class StringSelectorHookParser implements HookParser {
       this.tagHookFinder.findSingleTags(content, this.config.selector!, this.config.bracketStyle);
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
     return {
       component: this.config.component,
       hostElementTag: this.config.hostElementTag,

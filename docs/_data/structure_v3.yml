@@ -84,15 +84,6 @@
   - title: Example 2 - Internal link parser (enclosing)
     url: /documentation/v3/parsers#example-2-internal-link-parser-enclosing
 
-- title: Advanced uses
-  url: /documentation/v3/advanced-notes
-  icon: /assets/images/icons/squiggly_brackets.svg
-  children:
-  - title: Programmatic usage (without component)
-    url: /documentation/v3/advanced-notes#programmatic-usage-without-component
-  - title: Alternative platforms
-    url: /documentation/v3/advanced-notes#alternative-platforms
-
 - title: Trivia
   url: /documentation/v3/trivia
   icon: /assets/images/icons/list.svg

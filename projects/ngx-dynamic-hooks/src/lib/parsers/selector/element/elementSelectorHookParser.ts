@@ -22,7 +22,7 @@ export class ElementSelectorHookParser implements HookParser {
     return Array.from(this.platformService.querySelectorAll(contentElement, this.config.selector!));
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
 
     // Always scrub potential []-input- and ()-output-attrs from anchor elements 
     this.scrubAngularBindingAttrs(hookValue.element);

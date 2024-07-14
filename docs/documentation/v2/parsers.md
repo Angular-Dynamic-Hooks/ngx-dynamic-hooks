@@ -52,7 +52,7 @@ A hook parser is a class that follows the <a href="https://github.com/MTobisch/n
 interface HookParser {
     name?: string;
     findHooks(content: string, context: any): Array<HookPosition>;
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData;
+    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData;
     getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings;
 }
 ```
@@ -116,7 +116,7 @@ How you determine the values for the component bindings is - again - completely 
 
 ## Example 1: Emoji parser (singletag)
 
-Let's say we want to automatically replace all emoticons (smileys etc.) in the content string with an `EmojiComponent` that renders proper emojis for them. In this simple example, the `EmojiComponent` supports three emojis and has a `type`-string-input that that determines which one to load (can be either `laugh`, `wow` or `love`). 
+Let's say we want to automatically replace all emoticons (smileys etc.) in the content string with an `EmojiComponent` that renders proper emojis for them. In this simple example, the `EmojiComponent` supports three emojis and has a `type`-string-input that determines which one to load (can be either `laugh`, `wow` or `love`). 
 
 What we need then, is to write a custom <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that finds the corresponding emoticons `:-D`, `:-O` and `:-*` in the content string, replaces them with `EmojiComponent`s and sets the correct `type` input depending on the emoticon replaced. This isn't very hard at all. Let's start with the parser:
 
@@ -141,7 +141,7 @@ export class EmojiHookParser implements HookParser {
         return this.hookFinder.findStandaloneHooks(content, emoticonRegex);
     }
 
-    public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData {
+    public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
         // Simply return the component class here
         return {
             component: EmojiComponent
@@ -251,7 +251,7 @@ export class DynamicRouterLinkParser implements HookParser {
         return this.hookFinder.findEnclosingHooks(content, this.linkOpeningTagRegex, this.linkClosingTagRegex);
     }
 
-    public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData {
+    public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
         // Simply return the component class here
         return {
             component: DynamicRouterLinkComponent

@@ -20,7 +20,7 @@ import { ExampleComponent } from 'somewhere';
 
 @Component({
   ...
-  imports: [DynamicHooksComponent, ExampleComponent]
+  imports: [DynamicHooksComponent]
 })
 export class AppComponent {
 

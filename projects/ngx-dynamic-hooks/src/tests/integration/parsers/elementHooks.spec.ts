@@ -3,7 +3,7 @@ import { defaultBeforeEach } from '../shared';
 import { TestBed, TestBedStatic, fakeAsync } from '@angular/core/testing';
 import { DynamicHooksComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../testing-api';
 import { ParserFindHookElementsResult } from '../../../lib/services/core/elementHookFinder';
-import { GenericMultiTagElementParser } from '../../resources/parsers/genericMultiTagElementParser';
+import { GenericElementParser } from '../../resources/parsers/genericElementParser';
 
 describe('Parser element hooks', () => {
   let testBed: TestBedStatic;
@@ -204,7 +204,7 @@ describe('Parser element hooks', () => {
   });
 
   it('#should validate the found hook elements', () => {
-    const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser);
+    const genericElementParser = TestBed.inject(GenericElementParser);
     const elementHookFinder = comp['dynamicHooksService']['elementHookFinder'];
     spyOn(console, 'warn').and.callThrough();
 
@@ -217,11 +217,11 @@ describe('Parser element hooks', () => {
 
     let parserResults: ParserFindHookElementsResult[] = [
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: harmlessElement
       },
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: problemElement
       }
     ];
@@ -239,11 +239,11 @@ describe('Parser element hooks', () => {
 
     parserResults = [
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: problemElement
       },
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: problemElement
       }
     ];
@@ -263,11 +263,11 @@ describe('Parser element hooks', () => {
 
     parserResults = [
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: harmlessElement
       },
       {
-        parser: genericMultiTagElementParser,
+        parser: genericElementParser,
         hookElement: problemElement
       }
     ];
@@ -278,8 +278,8 @@ describe('Parser element hooks', () => {
   });
   
   it('#should be able to load element hooks via a variety of selectors', () => {
-    const genericMultiTagElementParser = TestBed.inject(GenericMultiTagElementParser);
-    const setSelector = (selector: string) => genericMultiTagElementParser.onFindHookElements = (contentElement, context) => Array.from(contentElement.querySelectorAll(selector));
+    const genericElementParser = TestBed.inject(GenericElementParser);
+    const setSelector = (selector: string) => genericElementParser.onFindHookElements = (contentElement, context) => Array.from(contentElement.querySelectorAll(selector));
     
     // Custom element
     setSelector(`app-mycustomcomponent`);
@@ -289,7 +289,7 @@ describe('Parser element hooks', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.innerText).toBe('With some content');
 
     // Generic html element
@@ -300,7 +300,7 @@ describe('Parser element hooks', () => {
     expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
     expect(Object.values(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.innerText).toBe('With some content');
 
     // Complex selector
@@ -328,11 +328,10 @@ describe('Parser element hooks', () => {
     expect(fixture.nativeElement.querySelector('ul li:nth-child(4)').textContent).toContain('This is the second component');
     
     expect(Object.values(comp.hookIndex).length).toBe(2);
+    expect(fixture.nativeElement.querySelectorAll('.multitag-component').length).toBe(2);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.innerText).toBe('This is the first component');
     expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[2].componentRef!.location.nativeElement.querySelector('.multitag-component')).not.toBeNull();
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.innerText).toBe('This is the second component');
   });
 
@@ -390,5 +389,25 @@ describe('Parser element hooks', () => {
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('Nested string hook');
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
+  });
+
+  it('#should automatically replace void element hook anchors with default anchor elements', () => {
+    const genericElementParser = TestBed.inject(GenericElementParser);
+    genericElementParser.onFindHookElements = (contentElement, context) => Array.from(contentElement.querySelectorAll('img'));
+    
+    let testText = `<div>Let's load a component for an img element here: <img src="https://i.imgur.com/J6Z3OTM.jpeg"></div>`;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    console.log(fixture.nativeElement.innerHTML)
+
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    
+    const div = fixture.nativeElement.children[0];
+    expect(div.childNodes[0].textContent).toBe("Let's load a component for an img element here: ");
+    expect(div.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
+    expect(div.childNodes[1].children[0].classList.contains('multitag-component')).toBe(true);
   });
 });

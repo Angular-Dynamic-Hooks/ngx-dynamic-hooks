@@ -17,7 +17,7 @@ import { ExampleComponent } from 'somewhere';
 
 @Component({
   ...
-  imports: [DynamicHooksComponent, ExampleComponent]
+  imports: [DynamicHooksComponent]
 })
 export class AppComponent {
   content = 'Load a component here: <app-example></app-example>';
@@ -40,7 +40,7 @@ There are several more inputs for the `DynamicHooksComponent` that you can use t
 ```ts
 @Component({
   ...
-  imports: [DynamicHooksComponent, ExampleComponent]
+  imports: [DynamicHooksComponent]
 })
 export class AppComponent {
   content = 'Load a component here: <app-example [message]="context.someString"></app-example>';

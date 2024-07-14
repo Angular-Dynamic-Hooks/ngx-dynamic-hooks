@@ -17,7 +17,7 @@ import { MultiTagTestComponent } from '../resources/components/multiTagTest/mult
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
 import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
-import { GenericMultiTagElementParser } from '../resources/parsers/genericMultiTagElementParser';
+import { GenericElementParser } from '../resources/parsers/genericElementParser';
 import { GenericWhateverElementParser } from '../resources/parsers/genericWhateverElementParser';
 
 
@@ -28,7 +28,7 @@ export const testParsers: Array<HookParserEntry> = [
   GenericMultiTagStringParser,
   GenericWhateverStringParser,
   // Generic element hook parsers
-  GenericMultiTagElementParser,
+  GenericElementParser,
   GenericWhateverElementParser,
   // String SelectorHookParsers
   {

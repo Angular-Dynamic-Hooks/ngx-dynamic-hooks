@@ -44,7 +44,7 @@ import { ExampleComponent } from 'somewhere';
 
 @Component({
   ...
-  imports: [DynamicHooksComponent, ExampleComponent]
+  imports: [DynamicHooksComponent]
 })
 export class AppComponent {
   // The content to parse

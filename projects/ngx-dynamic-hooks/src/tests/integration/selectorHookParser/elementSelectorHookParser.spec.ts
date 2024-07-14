@@ -92,7 +92,7 @@ describe('ElementSelectorHookParser', () => {
     expect(topDiv.childNodes[9].textContent.trim()).toBe('And a last paragraph element');
   });
 
-  fit('#should parse inputs properly', () => {
+  it('#should parse inputs properly', () => {
     const testContent = `
     <multitag-element-selector [simpleArray]="['test', 'something', 'here']"></multitag-element-selector>
     <multitag-element-selector

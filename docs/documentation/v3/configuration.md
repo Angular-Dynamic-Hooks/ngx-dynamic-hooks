@@ -103,7 +103,7 @@ interface LazyLoadComponentConfig {
 
 `importPromise` should be a function that returns the import promise for the component file while `importName` should be the name of the exported component class to be used.
 
-With standard selector hooks, you can use this `LazyLoadComponentConfig` in the `component`-field of a `SelectorHookParserConfig` (see [Parsers]({{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}) section). You also need to manually specify a selector to look for, as it cannot be known before loading the component class. All this would look like so:
+With standard selector hooks, you can use this `LazyLoadComponentConfig` in the `component`-field of a [SelectorHookParserConfig]({{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}). You also need to manually specify a selector to look for, as it cannot be known before loading the component class. All this would look like so:
 
 ```ts
 import { Component } from '@angular/core';
@@ -138,3 +138,13 @@ That's all there is to it! `LazyComponent` will now be lazily-loaded if `<app-la
 {% include docs/widgets/notice.html content="
   <p>Note that <code>importPromise</code> must contain a function returning the import-promise, not the import-promise itself! Otherwise the promise would be executed right where it is defined, which defeats the point of lazy-loading.</p>
 " %}
+
+## Alternative platforms
+
+The default implementation of the library should work in both <a href="https://v17.angular.io/api/platform-browser" target="_blank">browsers</a> as well as during <a href="https://v17.angular.io/guide/ssr" target="_blank">server-side-rendering</a>. However, there may be more specialized use cases on platforms that are not directly supported.
+
+In such cases, you can create your own `PlatformService`. The `PlatformService` is internally used as a layer of abstraction between the library and the platform it runs on. It offers several functions to interact with the platform and handles platform-specific objects (such as `document` and `HTMLElement` in the case of the default `PlatformService`).
+
+You can implement your own `PlatformService` by creating a class that follows the `PlatformService` interface and pass it as the second parameter to `provideDynamicHooks`.
+
+**Tip:** You can partially implement as many methods as you need. For all non-implemented methods, the library falls back to the default `PlatformService`.
