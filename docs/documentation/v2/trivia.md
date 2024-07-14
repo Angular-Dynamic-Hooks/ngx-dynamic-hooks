@@ -46,7 +46,7 @@ Angular elements allows you to register custom HTML elements (like component sel
 
 However, there are a number of advantages this library offers compared to Angular elements:
 
-* **Pattern flexibility:** You are not limited to load components by their selector HTML tags. A hook can have any form and doesn't have to be an HTML element at all. You can automatically replace anything you want with a component (see ["emoji" example]({{ "documentation/v2/parsers#example-1-emoji-parser-singletag" | relative_url }}) or ["link" example]({{ "documentation/v2/parsers#example-2-internal-link-parser-enclosing" | relative_url }})).
+* **Pattern flexibility:** You are not limited to load components by unique HTML elements. A hook can have any form, be any element or even consist of just text (see ["emoji" example]({{ "documentation/v2/parsers#example-1-emoji-parser-singletag" | relative_url }}) or ["link" example]({{ "documentation/v2/parsers#example-2-internal-link-parser-enclosing" | relative_url }})).
 * **Scope:** When using Angular elements, web components will automatically load from anywhere in the DOM as they are globally registered with the browser. With this library, you can to specify on each `OutletComponent` individually which exact components to look for.
 * **Communication:** In Angular elements, there is no direct line of communication between the parent component rendering the dynamic content and dynamic components loaded as children (such as the [context object]({{ "documentation/v2/component-features" | relative_url }}) from this library). You will have to fallback on services to transfer data.
 * **Bindings:** Though Angular elements allows passing static inputs as HTML attributes to components, it doesn't parse them. This means that all inputs are strings by default and you will have to manually turn them into booleans, arrays, objects etc. yourself. This library parses them automatically for you, much like a normal Angular template - in addition to accepting actual variables from the context object as well.
@@ -66,8 +66,15 @@ Ng-Dynamic was one of the inspirations for this library and is unfortunately not
 One can think of Angular Dynamic Hooks picking up the torch from ng-dynamic's `<dynamic-html>`-component and taking it further.
 
 ### Runtime compilation, <a href="https://github.com/patrikx3/angular-compile" target="_blank">Angular compile</a>, etc.
+
 There are also multiple libraries out there that render full Angular templates dynamically and rely on the JiT-compiler to do so. Many of them do not offer support for AoT-compilation (which Ivy uses by default). While it is <a href="https://github.com/angular/angular/issues/20156#issuecomment-468686933" target="_blank">technically possible</a> to load the JiT-compiler during runtime in AoT-mode, it is quite hacky and may break without warning. 
 
 Also, note that rendering a dynamic template as though it were a static file is dangerous if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. 
 
-Runtime compilation also also suffers from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
+Runtime compilation also suffers from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here.
+
+## Special thanks
+
+Thanks to <a href="https://github.com/lacolaco/ng-dynamic" target="_blank">Ng-Dynamic</a> for giving me the idea for this library (as well <a href="https://www.arka.com/blog/dynamically-generate-angular-components-from-external-html" target="_blank">this blog post</a>, which explains it more).
+
+I am also grateful to Jesus Rodriguez & Ward Bell for their <a href="https://www.youtube.com/watch?v=XDzxs00iIDE" target="_blank">in-depth presentation on the topic</a>.

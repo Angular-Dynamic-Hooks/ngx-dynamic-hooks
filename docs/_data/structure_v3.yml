@@ -96,9 +96,8 @@
       url: /documentation/v3/trivia#caveats
     - title: Comparison with similar libraries
       url: /documentation/v3/trivia#comparison-with-similar-libraries
+    - title: Special thanks
+      url: /documentation/v2/trivia#special-thanks
 
 - title: Troubleshooting
   url: /documentation/v3/troubleshooting
-
-- title: Special thanks
-  url: /documentation/v3/special-thanks
