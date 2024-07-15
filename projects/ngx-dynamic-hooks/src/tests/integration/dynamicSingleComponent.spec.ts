@@ -98,7 +98,6 @@ describe('DynamicSingleComponent', () => {
     const dynHooksService = testBed.inject(DynamicHooksService);
     spyOn(dynHooksService, 'parse').and.callThrough();
     spyOn(comp, 'reset').and.callThrough();
-    spyOn(comp, 'resolveOptions').and.callThrough();
     spyOn(comp, 'loadComponent').and.callThrough();
 
     // Initialize
@@ -108,7 +107,6 @@ describe('DynamicSingleComponent', () => {
     expect(Object.values(comp.parseResult!.hookIndex).length).toBe(1);
     expect(comp.parseResult!.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect((comp.reset as any)['calls'].count()).toBe(1);
-    expect((comp.resolveOptions as any)['calls'].count()).toBe(1);
     expect((comp.loadComponent as any)['calls'].count()).toBe(1);
     expect((dynHooksService.parse as any)['calls'].count()).toBe(1);
 
@@ -119,20 +117,8 @@ describe('DynamicSingleComponent', () => {
     expect(Object.values(comp.parseResult!.hookIndex).length).toBe(1);
     expect(comp.parseResult!.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect((comp.reset as any)['calls'].count()).toBe(2);
-    expect((comp.resolveOptions as any)['calls'].count()).toBe(2);
     expect((comp.loadComponent as any)['calls'].count()).toBe(2);
     expect((dynHooksService.parse as any)['calls'].count()).toBe(2);
-
-    // Change options
-    comp.options = {compareInputsByValue: true};
-    comp.ngOnChanges({options: true} as any);
-    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
-    expect(Object.values(comp.parseResult!.hookIndex).length).toBe(1);
-    expect(comp.parseResult!.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect((comp.reset as any)['calls'].count()).toBe(3);
-    expect((comp.resolveOptions as any)['calls'].count()).toBe(3);
-    expect((comp.loadComponent as any)['calls'].count()).toBe(3);
-    expect((dynHooksService.parse as any)['calls'].count()).toBe(3);
   });
 
   it('#should update bindings on any change detection run by default', () => {
@@ -197,13 +183,15 @@ describe('DynamicSingleComponent', () => {
 
   it('#should merge DynamicHooksSingleOptions into default ParseOptions', () => {
     const dynHooksService = testBed.inject(DynamicHooksService);
-    const spy = spyOn(dynHooksService, 'parse').and.callThrough();
+    const componentUpdater = testBed.inject(ComponentUpdater);
+    const parseSpy = spyOn(dynHooksService, 'parse').and.callThrough();
+    const updateSpy = spyOn(componentUpdater, 'refresh').and.callThrough();
 
     comp.component = MultiTagTestComponent;
     comp.ngOnChanges({component: true} as any);
 
     expect(comp.parseOptions).toEqual(getParseOptionDefaults());
-    expect(spy.calls.mostRecent().args[5]).toEqual(getParseOptionDefaults());
+    expect(parseSpy.calls.mostRecent().args[5]).toEqual(getParseOptionDefaults());
 
     // Just some non-default options
     const customOptions: DynamicHooksSingleOptions = {
@@ -222,7 +210,7 @@ describe('DynamicSingleComponent', () => {
       ...customOptions
     };
     expect(comp.parseOptions).toEqual(merged);
-    expect(spy.calls.mostRecent().args[5]).toEqual(merged);
+    expect(updateSpy.calls.mostRecent().args[2]).toEqual(merged);
   });
 
   it('#should output the loaded componentRef when done', () => {

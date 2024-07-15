@@ -2,7 +2,6 @@ import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementR
 import { HookIndex, Hook, ParseResult, HookComponentData, HookValue, HookBindings } from '../interfacesPublic';
 import { HookParser, LoadedComponent } from '../interfacesPublic';
 import { DynamicHooksService } from '../services/dynamicHooksService';
-import { HookParserEntry } from '../services/settings/parserEntry';
 import { ComponentUpdater } from '../services/core/componentUpdater';
 import { AutoPlatformService } from '../services/platform/autoPlatformService';
 import { ParseOptions, getParseOptionDefaults } from '../../public-api';
@@ -43,27 +42,29 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
   }
 
   ngDoCheck(): void {
-    // Update bindings on every change detection run?
+    // Update on every change detection run?
     if (!this.parseOptions.updateOnPushOnly) {
       this.updateComponent();
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // If compoment or options change, reset and load from scratch
+    // If component changed, reset and load from scratch
     if (
-      changes.hasOwnProperty('component') ||
-      changes.hasOwnProperty('options')
+      changes.hasOwnProperty('component')
     ) {
       this.reset();
-      this.resolveOptions();
+      this.parseOptions = {...getParseOptionDefaults(), ...this.options};
       this.loadComponent();
 
-    // If only context changed, just refresh inputs/outputs
+    // If anything else changed, just refresh inputs/outputs
     } else if (
       changes.hasOwnProperty('inputs') ||
-      changes.hasOwnProperty('outputs')
+      changes.hasOwnProperty('outputs') || 
+      changes.hasOwnProperty('options')
     ) {
+      
+      this.parseOptions = {...getParseOptionDefaults(), ...this.options};
       this.updateComponent();
     }
   }
@@ -88,10 +89,6 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
     this.platformService.setInnerContent(this.hostElement.nativeElement, '');
     this.parseResult = null;
     this.parseOptions = {};
-  }
-
-  resolveOptions() {
-    this.parseOptions = {...getParseOptionDefaults(), ...this.options};
   }
 
   loadComponent() {

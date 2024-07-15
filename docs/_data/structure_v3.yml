@@ -84,6 +84,10 @@
   - title: Example 2 - Internal link parser (enclosing)
     url: /documentation/v3/parsers#example-2-internal-link-parser-enclosing
 
+- title: Single component
+  url: /documentation/v3/single-component
+  icon: /assets/images/icons/star.svg
+
 - title: Trivia
   url: /documentation/v3/trivia
   icon: /assets/images/icons/list.svg
