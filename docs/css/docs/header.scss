@@ -10,6 +10,9 @@
   color: white;
   z-index: 100;
 }
+[data-theme="dark"] .header {
+  background-color: #202228;
+}
 
   .header-left {
     display: flex;
@@ -48,19 +51,18 @@
     }
 
       .site-logo {
-        display: none;
         height: 30px;
         margin: 0px 10px 0px 0px;
-
-        @include minSm() {
-          display: block;
-          font-size: 18px;
-        }
       }
 
       .site-name {
+        display: none;
         font-size: 13px;
         color: white;
+
+        @include minMd() {
+          display: block;
+        }
 
         @include minLg() {
           font-size: 18px;
@@ -78,6 +80,22 @@
         font-family: "Roboto Mono", monospace;
 
         @include minLg() {
+          display: block;
+        }
+      }
+
+      .v3-changes-link {
+        display: none;
+        margin: 0px 0px 0px 15px;
+        text-decoration: initial;
+        color: white !important;
+        font-size: 13px;
+
+        b {
+          margin: 0px 5px 0px 0px;
+        }
+
+        @include minSm() {
           display: block;
         }
       }

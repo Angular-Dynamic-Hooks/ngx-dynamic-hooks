@@ -16,6 +16,7 @@ With Angular Dynamic Hooks, you can load fully-functional Angular components fro
 ![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
 
 ## Installation
+
 Simply install via npm 
 
 ```sh
@@ -29,8 +30,6 @@ yarn add ngx-dynamic-hooks
 ```
 
 [See the Quickstart page]( {{ "/documentation/v2/quickstart" | relative_url }} ) for an example on how to get going right away.
-
-## Compatibility
 
 | Angular | Version | JiT | AoT | Ivy | NPM |
 | --- | --- | --- | --- | --- | --- |

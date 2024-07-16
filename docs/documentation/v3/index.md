@@ -27,8 +27,6 @@ npm install ngx-dynamic-hooks
 
 [See the Quickstart page]( {{ "/documentation/v3/quickstart" | relative_url }} ) for an example on how to get going right away.
 
-## Compatibility
-
 | Angular | Version | NPM |
 | --- | --- | --- |
 | 6 - 12  | 1.x.x | `ngx-dynamic-hooks@^1` |
@@ -41,14 +39,13 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 
 * ⭐ Loads fully-functional Angular components into dynamic content
 * 📖 Parses both strings and HTML structures
-* 🚀 Can be used fully standalone (load components into HTML without Angular)
+* 🚀 Can be used [fully standalone]({{ "documentation/v3/standalone" | relative_url }}) (load components into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
-* 🔍 Loads components by their selectors, custom selectors or **any text pattern of your choice**
+* 🔍 Loads components by their selectors, custom selectors or [any text pattern of your choice]({{ "documentation/v3/parsers#writing-your-own-hookparser" | relative_url }})
 * ⚙️ Services, Inputs/Outputs, Lifecycle Methods and other standard features all work normally
-* 💤 Allows lazy-loading components only if they appear in the content
-* 🔒 Can pass custom data safely to your components via an optional context object
-
+* 💤 Allows [lazy-loading components]({{ "documentation/v3/configuration#lazy-loading-components" | relative_url }}) only if they appear in the content
+* 🔒 Can pass custom data safely to your components via an optional [context object]({{ "documentation/v3/component-features" | relative_url }})
 
 ## What it does
 
@@ -74,7 +71,7 @@ Just use your selectors just as you would in a normal Angular template (such as 
 
 What is especially neat: Hooks can be anything - not just component selectors! 
 
-Each hook internally has a corresponding `HookParser` that tells the library where and how to instantiate the component. You can easily create [your own hook parsers]({{ "/documentation/v2/parsers" | relative_url }}) that replace any HTML element or text pattern of your choice with Angular components!
+Each hook internally has a corresponding `HookParser` that tells the library where and how to instantiate the component. You can easily create [your own hook parsers]({{ "/documentation/v3/parsers" | relative_url }}) that replace any HTML element or text pattern of your choice with Angular components!
 
 ## Do the components work normally?
 

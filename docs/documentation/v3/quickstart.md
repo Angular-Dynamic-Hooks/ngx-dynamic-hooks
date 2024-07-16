@@ -60,8 +60,6 @@ export class AppModule {}
 
 ```
 
-then use `<ngx-dynamic-hooks` like you would any other component of your module.
-
 ## Next steps
 
 Please note that the above is a minimal example and that there are plenty more features and options available to you. You can read about them on the next pages:

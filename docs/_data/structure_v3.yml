@@ -1,12 +1,9 @@
-
 - title: Introduction
   url: /documentation/v3/
   icon: /assets/images/icons/hand.svg
   children:
     - title: Installation
       url: /documentation/v3#installation
-    - title: Compatibility
-      url: /documentation/v3#compatibility
     - title: Highlights
       url: /documentation/v3#highlights
     - title: What it does
@@ -62,8 +59,8 @@
       url: /documentation/v3/configuration#global-settings
     - title: Component bindings
       url: /documentation/v3/configuration#component-bindings
-    - title: OutletOptions
-      url: /documentation/v3/configuration#outletoptions
+    - title: ParseOptions
+      url: /documentation/v3/configuration#parseoptions
     - title: Child modules
       url: /documentation/v3/configuration#child-modules
     - title: Lazy-loading components
@@ -101,7 +98,7 @@
     - title: Comparison with similar libraries
       url: /documentation/v3/trivia#comparison-with-similar-libraries
     - title: Special thanks
-      url: /documentation/v2/trivia#special-thanks
+      url: /documentation/v3/trivia#special-thanks
 
 - title: Troubleshooting
   url: /documentation/v3/troubleshooting

@@ -5,7 +5,7 @@
 
 ## Introduction
 
-Components are loaded from [hooks]({{ "documentation/v3/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by its `HookParser`. These are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
+Components are loaded from [hooks]({{ "documentation/v3/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by **HookParsers**. These are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
 
 1. The component class itself.
 2. A <a href="{{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}">SelectorHookParserConfig</a> object literal.
@@ -55,6 +55,8 @@ See the [General Usage]({{ "documentation/v3/general-usage#load-by-any-selector"
 
 So far, we have only used the standard `SelectorHookParser`, which is included in this library for convenience and is easy to use if all you need is to load components by their selectors. However, by creating custom parsers, any element or text pattern you want can be replaced by an Angular component.
 
+Custom parsers can look for either **element hooks** or **string hooks**. Element hooks are straightforward and load components into found html elements while the more powerful string hooks can replace any arbitrary text pattern with components.
+
 ### What makes a parser
 
 A hook parser is a class that follows the `HookParser` interface, which may look daunting at first, but is actually pretty simple:
@@ -99,7 +101,7 @@ The opening and closing tags simply refer to the text patterns that signal the s
 
 How your hook looks like and how you find these indexes is completely up to you. You may look for them using Regex patterns or any other parsing method. Though, as a word of warning, do not try to parse enclosing hooks with Regex alone. <a href="https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454" target="_blank">That road leads to madness</a>.
 
-To make your life easier, you can just use the `HookFinder` service that comes with this library. Its easy to use and safely finds both singletag and enclosing patterns in a string. You can see it in action [in the examples below]({{ "documentation/v3/parsers#example-1-emoji-parser-singletag" | relative_url }}).
+To make your life easier, you can just use the `HookFinder` service that comes with this library. Its easy to use and safely finds both singletag and enclosing patterns in a string. You can see it in action in the ["Emoji parser" example]({{ "documentation/v3/parsers#example-2-emoji-parser" | relative_url }}).
 
 ### findHookElements()
 

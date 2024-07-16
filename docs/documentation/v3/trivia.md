@@ -39,7 +39,7 @@ Finally, which components/hooks can be used by the author can be [freely adjuste
 
 ## Comparison with similar libraries
 
-### <a href="https://angular.io/guide/elements" target="_blank">Angular elements</a>
+### <a href="https://angular.dev/guide/elements" target="_blank">Angular elements</a>
 
 Angular elements allows you to register custom HTML elements with the browser that automatically load and host an Angular component when they appear anywhere in the DOM (see <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components" target="_blank">Web components</a>) - even outside of the Angular app. 
 
@@ -50,7 +50,7 @@ However, there are a number of advantages this library offers compared to Angula
 * **Pattern flexibility:** You are not limited to load components by unique HTML elements. A hook can have any form, be any element or even consist of just text (see the ["Emoji parser" example]({{ "documentation/v3/parsers#example-2-emoji-parser" | relative_url }})).
 * **Lazy-loading:** You can easily set up components to [lazily-load]({{ "documentation/v3/configuration#lazy-loading-components" | relative_url }}) only when they appear in the content instead of having to load all the code upfront.
 * **Scope:** When using Angular elements, web components will automatically load from anywhere in the DOM as they are globally registered with the browser. With this library, you can always specify exactly which components to look for in which content.
-* **Communication:** In Angular elements, it can be difficult to establish communication between all loaded components. With the [Standalone mode]({{ "documentation/v3/standalone" | relative_url }}) of this library, they are naturally connected through the same injector and call call upon the same providers/services to transfer data.
+* **Communication:** If you have a parent app that uses Angular elements to load components into a piece of content, it is difficult to communicate with them. With this library, you can easily use the [context object (or dependency injection)]({{ "documentation/v3/component-features" | relative_url }}) to transfer data.
 * **Bindings:** In Angular elements, all inputs are strings by default and you will have to manually turn them into booleans, arrays, objects etc. yourself. This library parses them automatically for you, much like a normal Angular template.
 * **Projected content:** Angular elements doesn't normally render projected content in the component's `<ng-content>`. There is a workaround involving `<slot>`, but its not ideal. This library renders `<ng-content>` normally.
 
@@ -71,11 +71,11 @@ One can think of Angular Dynamic Hooks picking up the torch from ng-dynamic's `<
 
 There are also multiple libraries out there that render full Angular templates dynamically, but rely on the JiT-compiler to do so. Many of them do not offer support for AoT-compilation (which Angular uses by default) and its many advantages. 
 
-Another significant downside is that including the JiT-compiler in your bundled code will unfortunately increase its size dramatically.
+A significant downside with all of them is that including the JiT-compiler in your bundled code will unfortunately increase its size dramatically.
 
-Depending in the content, rendering a dynamic template as though it were a static file is dangerous if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. 
+Depending in the content, rendering a dynamic template as though it were a static file can also be dangerous if you do not fully control the content, as all Angular components, directives or template syntax expressions are blindly executed just like in a static template. 
 
-Runtime compilation also suffers from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here. 
+In general, runtime compilation suffers from most of the same drawbacks as the other libraries listed here, such as the lack of flexbility and control etc., so I won't list them seperately here. 
 
 ## Special thanks
 

@@ -3,6 +3,8 @@
 
 # Component features
 
+This page is all about the **dynamically-loaded components**: How they behave, how you can exchange data with them and what lifecycle methods can be registered.
+
 ## Context & Dependency Injection
 
 Often, you may want to communicate with the dynamically-loaded components or pass data to them from the rest of the app. To do so, you have two options:
@@ -136,4 +138,4 @@ Dynamically-loaded components are connected to Angular change detection and will
 
 The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. When using zone.js, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger `ngOnChanges()`.
 
-Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [OutletOptions]({{ "documentation/v3/configuration#outletoptions" | relative_url }})).
+Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).

@@ -35,7 +35,7 @@ export class AppComponent {
 
 ## Context and options
 
-There are several more inputs for the `DynamicHooksComponent` that you can use to fine-tune how it works, most notably **context** to pass data to the loaded components and **options** to configure how the content should be parsed. 
+There are several more inputs for the `DynamicHooksComponent`, most notably **context** to pass data to the loaded components and **options** to configure how the content should be parsed. 
 
 ```ts
 @Component({
@@ -60,7 +60,7 @@ export class AppComponent {
 
 In this example, we're passing the value of `context.someString` from the parent component to the `[message]`-input of `ExampleComponent` with the help of the context object. [See here]({{ 'documentation/v3/component-features#context--dependency-injection' | relative_url }}) for detailed info about how to use it.
 
-Also, as we know the content string is safe and does not contain malicous code, we can set the `sanitize`-option to `false` (`true` by default). You can read about all available options on the [configuration page]({{ 'documentation/v3/configuration' | relative_url }}).
+Also, as we know the content string is safe and does not contain malicous code, we can set the `sanitize`-option to `false` (`true` by default). You can read about all available options on the [configuration page]({{ 'documentation/v3/configuration#parseoptions' | relative_url }}).
 
 See it in action in this Stackblitz:
 
@@ -72,7 +72,7 @@ See it in action in this Stackblitz:
 
 If you use `DynamicHooksComponent` more than once, it can become tedious to manually pass along the desired parsers and options every time.
 
-Instead, you can also register them globally in your app providers:
+Instead, you can also register them [globally]({{ "documentation/v3/configuration#global-settings" | relative_url }}) in your app providers:
 
 ```ts
 import { ApplicationConfig } from '@angular/core';
@@ -108,7 +108,7 @@ See it in action in this Stackblitz:
   <span>If you are using modules, you can put the call to "provideDynamicHooks" into the "providers" decorator field of your module instead.</span>
 ' %}
 
-You can also call `provideDynamicHooks` again in the providers fields of child injectors, such as in lazily-loaded routes. These [child settings]({{ "documentation/v3/configuration#child-modules" | relative_url }}) will automatically inherit the root settings according to the Angular injector hierarchy.
+You can also call `provideDynamicHooks` again in the providers fields of child injectors, such as in lazily-loaded routes. These [child settings]({{ "documentation/v3/configuration#child-settings" | relative_url }}) will automatically inherit the root settings according to the Angular injector hierarchy.
 
 ## Load by any selector
 
@@ -152,7 +152,7 @@ If you need even more flexiblity (such as replacing pure text with components), 
 
 A `HookParser` is quite simple and just needs three methods: One that tells the library where the hooks are in the content, one that says which component class to load and one that returns the input/output values.
 
-For a full guide with stackblitz examples, see the [Writing your own HookParser](http://localhost:4000/ngx-dynamic-hooks/documentation/v2/parsers#writing-your-own-hookparser) section.
+For a full guide with stackblitz examples, see the [Writing your own HookParser](http://localhost:4000/ngx-dynamic-hooks/documentation/v3/parsers#writing-your-own-hookparser) section.
 
 ## Programmatic usage (with service)
 
@@ -173,7 +173,7 @@ You can also parse dynamic content directly in Typescript by injecting the `Dyna
   ): Observable<ParseResult>
 ```
 
-This looks complicated, but most of the parameters are actually just [the inputs]({{ "documentation/v3/configuration#component-bindings" | relative_url }}) for the `DynamicHooksComponent` component and therefore optional. You really only need to pass the `content` as you would with the component. 
+This looks complicated, but most of the parameters are actually just [the inputs]({{ "documentation/v3/configuration#dynamichookscomponent" | relative_url }}) for the `DynamicHooksComponent` component and therefore optional. You really only need to pass the `content` as you would with the component. 
 
 Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify custom injectors for the created components. If you don't, the library defaults to the current ones.
 
@@ -222,5 +222,5 @@ See it in action in this Stackblitz:
 {% include docs/widgets/notice.html content="
   <h4>About component lifecycles</h4>
   <p>When loading components this way, keep in mind that the submitted content is only parsed once. The inputs of contained components aren't automatically updated.</p>
-  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <code>ParseResult.destroy()</code> or <a href='https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts#L119' target='_blank'><code>OutletService.destroy(hookIndex: HookIndex)</code></a> for this purpose.</p>
+  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <code>ParseResult.destroy()</code> or <code>DynamicHooksService.destroy(hookIndex: HookIndex)</code> for this purpose.</p>
 " %}

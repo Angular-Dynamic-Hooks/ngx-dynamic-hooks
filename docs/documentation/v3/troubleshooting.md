@@ -21,7 +21,7 @@ You most likely have a typo in the input. If its a string, remember to put quota
 
 See the [Outputs-section]({{ "documentation/v3/component-features#outputs" | relative_url }}) for a solution to this problem.
 
-### **globalParsersBlacklist/whitelist for the `OutletComponent` doesn't work**
+### **globalParsersBlacklist/whitelist for the `DynamicHooksComponent` doesn't work**
 
 Make sure you have explicitly given the parsers a name (see the [Parsers]({{ "documentation/v3/parsers" | relative_url }})-section on how to do so) that correlates with the black/whitelisted name.
 
