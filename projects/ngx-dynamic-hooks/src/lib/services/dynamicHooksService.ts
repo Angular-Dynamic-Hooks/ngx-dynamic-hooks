@@ -159,10 +159,11 @@ export class DynamicHooksService {
 
       // Unsubscribe from hook outputs
       for (const hook of Object.values(hookIndex)) {
-        for (const sub of Object.values(hook.outputSubscriptions)) {
-          if (sub) {
-            sub.unsubscribe();
-          }
+        for (const parserSub of Object.values(hook.outputSubscriptions)) {
+          if (parserSub) { parserSub.unsubscribe(); }
+        }
+        for (const htmlEventSub of Object.values(hook.htmlEventSubscriptions)) {
+          if (htmlEventSub) { htmlEventSub.unsubscribe(); }
         }
       }
     }

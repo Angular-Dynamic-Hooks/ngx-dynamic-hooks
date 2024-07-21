@@ -47,7 +47,7 @@ describe('SelectorHookParserConfig', () => {
       component: {importPromise: () => new Promise(() => {}), importName: 'someComponent'}
     };
     expect(() => configResolver.processConfig(config as any))
-      .toThrow(new Error(`When using lazy-loaded dynamic components, you have to specify the "selector" property in the parser config (that will be used to find it in the text), as the real selector can't be known before the component is loaded.`));
+      .toThrow(new Error(`When using lazy-loaded dynamic components, you have to specify the "selector" property in the parser config, as the real selector can't be known before the component is loaded.`));
 
     // Wrong component type
     config = { component: true };

@@ -36,6 +36,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
   @Input() everythingTogether!: Array<any>;
   nonOutputEventEmitter: EventEmitter<number> = new EventEmitter();
   @Output() genericOutput: EventEmitter<number> = new EventEmitter();
+  @Output() genericOtherOutput: EventEmitter<number> = new EventEmitter();
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() onDestroyEmitter: EventEmitter<string> = new EventEmitter();

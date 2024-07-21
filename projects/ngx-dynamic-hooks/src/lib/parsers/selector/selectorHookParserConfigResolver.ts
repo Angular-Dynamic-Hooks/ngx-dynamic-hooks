@@ -34,7 +34,7 @@ export class SelectorHookParserConfigResolver {
     // If is LazyLoadingComponentConfig
     } else if (userParserConfig.component.hasOwnProperty('importPromise') && userParserConfig.component.hasOwnProperty('importName')) {
       if (!userParserConfig.hasOwnProperty('selector')) {
-        throw Error(`When using lazy-loaded dynamic components, you have to specify the "selector" property in the parser config (that will be used to find it in the text), as the real selector can't be known before the component is loaded.`); 
+        throw Error(`When using lazy-loaded dynamic components, you have to specify the "selector" property in the parser config, as the real selector can't be known before the component is loaded.`); 
       }
     // If is neither
     } else {

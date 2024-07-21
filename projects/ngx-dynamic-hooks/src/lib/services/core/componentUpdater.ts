@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../interfacesPublic';
 import { ParseOptions } from '../../services/settings/options';
 import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
+import { AutoPlatformService } from '../platform/autoPlatformService';
 
 /**
  * The service responsible for updating dynamically created components
@@ -13,7 +14,7 @@ import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
 })
 export class ComponentUpdater {
 
-  constructor(private deepComparer: DeepComparer) {
+  constructor(private platformService: AutoPlatformService, private deepComparer: DeepComparer) {
   }
 
   /**
@@ -59,8 +60,8 @@ export class ComponentUpdater {
 
     // Update bindings
     hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
-    this.updateComponentWithNewOutputs(hook, context, options);
     this.updateComponentWithNewInputs(hook, options);
+    this.updateComponentWithNewOutputs(hook, context, options);
 
     // Snapshot bindings for comparison next time
     hook.previousBindings = {
@@ -94,6 +95,75 @@ export class ComponentUpdater {
   // ----------------------------------------------------------------------------------------------------------------
 
   /**
+   * Processes a hook object and updates the inputs of a dynamic component where required
+   *
+   * @param hook - The hook in question
+   * @param options - The current HookComponentOptions
+   */
+  updateComponentWithNewInputs(hook: Hook, options: ParseOptions): void {
+    const component = hook.componentRef!.instance;
+
+    // Find out which inputs have changed
+    const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!);
+
+    // Check if inputs exists on component
+    const existingInputs: {[key: string]: any} = {};
+    if (options.acceptInputsForAnyProperty) {
+      for (const [inputName, inputValue] of Object.entries(changedInputs)) {
+        // If property exists (in a case-agnostic way), use it. Otherwise create literal new property.
+        let foundInputProp = 
+          Object.getOwnPropertyNames(component).find(propName => inputName === propName) ||
+          Object.getOwnPropertyNames(component).find(propName => inputName.toLowerCase() === propName.toLowerCase());
+
+        const finalInputProp = foundInputProp || inputName;
+
+        // Even this setting has limits. Don't allow setting fundamental JavaScript object properties.
+        if (!['__proto__', 'prototype', 'constructor'].includes(finalInputProp)) {
+          existingInputs[finalInputProp] = inputValue;
+        } else {
+          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + finalInputProp + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
+          continue;
+        }
+      }
+    } else {
+      const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
+      const compMetaInputs = compMeta.inputs.map(inputObject => { return {
+        propName: inputObject.propName, 
+        name: options.ignoreInputAliases ? inputObject.propName : inputObject.templateName
+      }; })
+
+      for (const [inputName, inputValue] of Object.entries(changedInputs)) {
+        // Some naming tolerance: Input name can be case-insensitive and in dash-case.
+        // Look for more literal matches first (transformed dash-case + case-insensitive has lowest priority)
+        const inputEntry = 
+          compMetaInputs.find(inputObject => inputName === inputObject.name) ||
+          compMetaInputs.find(inputObject => inputName.toLowerCase() === inputObject.name.toLowerCase()) ||
+          compMetaInputs.find(inputObject => inputName.replace(/-/g, '') === inputObject.name) ||
+          compMetaInputs.find(inputObject => inputName.replace(/-/g, '').toLowerCase() === inputObject.name.toLowerCase())
+
+        if (inputEntry) {
+          // Save in existingInputs with actual property name, not alias
+          existingInputs[inputEntry.propName] = inputValue;
+        }
+      }
+    }
+
+    // Pass in Inputs, create SimpleChanges object
+    const simpleChanges: {[key: string]: SimpleChange} = {};
+    for (const [inputPropName, inputValue] of Object.entries(existingInputs)) {
+      hook.componentRef!.instance[inputPropName] = inputValue;
+      const previousValue = hook.previousBindings && hook.previousBindings.inputs.hasOwnProperty(inputPropName) ? hook.previousBindings.inputs[inputPropName].reference : undefined;
+      simpleChanges[inputPropName] = new SimpleChange(previousValue, inputValue, !hook.dirtyInputs.has(inputPropName));
+      hook.dirtyInputs.add(inputPropName);
+    }
+
+    // Call ngOnChanges()
+    if (Object.keys(simpleChanges).length > 0 && typeof hook.componentRef!.instance['ngOnChanges'] === 'function') {
+      hook.componentRef!.instance.ngOnChanges(simpleChanges);
+    }
+  }
+
+  /**
    * Processes a hook object and (re)subscribes the outputs of a dynamic component where required
    *
    * @param hook - The hook in question
@@ -110,6 +180,7 @@ export class ComponentUpdater {
     const existingOutputs: {[key: string]: (e: any, c: any) => any} = {};
     if (options.acceptOutputsForAnyObservable) {
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
+        // If observable exists (in a case-agnostic way), use it
         let foundOutputProp = 
           Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && outputName === propName) ||
           Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && outputName.toLowerCase() === propName.toLowerCase());
@@ -120,82 +191,30 @@ export class ComponentUpdater {
       }
     } else {
       const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
+      const compMetaOutputs = compMeta.outputs.map(outputObject => { return {
+        propName: outputObject.propName, 
+        name: options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName
+      }; })
+
       for (const [outputName, outputCallback] of Object.entries(changedOutputs)) {
-        let outputEntry = 
-          compMeta.outputs.find(outputObject => outputName === (options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName)) ||
-          compMeta.outputs.find(outputObject => outputName.toLowerCase() === (options.ignoreOutputAliases ? outputObject.propName.toLowerCase() : outputObject.templateName.toLowerCase()));
+        const outputEntry = 
+          compMetaOutputs.find(outputObject => outputName === outputObject.name) ||
+          compMetaOutputs.find(outputObject => outputName.toLowerCase() === outputObject.name.toLowerCase()) ||
+          compMetaOutputs.find(outputObject => outputName.replace(/-/g, '') === outputObject.name) ||
+          compMetaOutputs.find(outputObject => outputName.replace(/-/g, '').toLowerCase() === outputObject.name.toLowerCase())
 
         if (outputEntry) {
-          // Save in existingInputs with actual property name, not alias
           existingOutputs[outputEntry.propName] = outputCallback;
         }
       }
-    }
+    }    
 
     // (Re)subscribe to outputs, store subscription in Hook
-    for (const [outputName, outputCallback] of Object.entries(existingOutputs)) {
-      if (hook.outputSubscriptions[outputName]) { hook.outputSubscriptions[outputName].unsubscribe(); }
-      hook.outputSubscriptions[outputName] = hook.componentRef!.instance[outputName].subscribe((event: any) => outputCallback(event, context));
-    }
-  }
-
-  /**
-   * Processes a hook object and updates the inputs of a dynamic component where required
-   *
-   * @param hook - The hook in question
-   * @param options - The current HookComponentOptions
-   */
-  updateComponentWithNewInputs(hook: Hook, options: ParseOptions): void {
-    const component = hook.componentRef!.instance;
-
-    // Find out which inputs have changed
-    const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!);
-
-    // Check if inputs exists on component
-    const existingInputs: {[key: string]: any} = {};
-    if (options.acceptInputsForAnyProperty) {
-      for (const [inputName, inputValue] of Object.entries(changedInputs)) {
-        let foundInputProp = 
-          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && inputName === propName) ||
-          Object.getOwnPropertyNames(component).find(propName => component[propName] instanceof Observable && inputName.toLowerCase() === propName.toLowerCase());
-      
-        // If property exists (in a case-agnostic way), use it. Otherwise create literal new property.
-        const finalInputProp = foundInputProp || inputName;
-
-        // Even this setting has limits. Don't allow setting fundamental JavaScript object properties.
-        if (!['__proto__', 'prototype', 'constructor'].includes(finalInputProp)) {
-          existingInputs[finalInputProp] = inputValue;
-        } else {
-          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + finalInputProp + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
-          continue;
-        }
-      }
-    } else {
-      const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
-      for (const [inputName, inputValue] of Object.entries(changedInputs)) {
-        let inputEntry = 
-          compMeta.inputs.find(inputObject => inputName === (options.ignoreInputAliases ? inputObject.propName : inputObject.templateName)) ||
-          compMeta.inputs.find(inputObject => inputName.toLowerCase() === (options.ignoreOutputAliases ? inputObject.propName.toLowerCase() : inputObject.templateName.toLowerCase()));
-
-        if (inputEntry) {
-          // Save in existingInputs with actual property name, not alias
-          existingInputs[inputEntry.propName] = inputValue;
-        }
-      }
-    }
-
-    // Pass in Inputs, create SimpleChanges object
-    const simpleChanges: {[key: string]: SimpleChange} = {};
-    for (const [inputName, inputValue] of Object.entries(existingInputs)) {
-      hook.componentRef!.instance[inputName] = inputValue;
-      const previousValue = hook.previousBindings && hook.previousBindings.inputs.hasOwnProperty(inputName) ? hook.previousBindings.inputs[inputName].reference : undefined;
-      simpleChanges[inputName] = new SimpleChange(previousValue, inputValue, !hook.dirtyInputs.has(inputName));
-      hook.dirtyInputs.add(inputName);
-    }
-
-    // Call ngOnChanges()
-    if (Object.keys(simpleChanges).length > 0 && typeof hook.componentRef!.instance['ngOnChanges'] === 'function') {
-      hook.componentRef!.instance.ngOnChanges(simpleChanges);
+    for (const [outputPropName, outputCallback] of Object.entries(existingOutputs)) {
+      if (hook.outputSubscriptions[outputPropName]) { hook.outputSubscriptions[outputPropName].unsubscribe(); }
+      hook.outputSubscriptions[outputPropName] = hook.componentRef!.instance[outputPropName].subscribe((event: any) => {
+        outputCallback(event, context);
+      });
     }
   }
 

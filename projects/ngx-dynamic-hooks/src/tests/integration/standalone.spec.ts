@@ -388,4 +388,59 @@ describe('Standalone usage', () => {
     await expect(() => scope.destroy()).toThrowError(expectedError);
   });
 
+  it('#should emit HTML events from outputs by default', async () => {
+    let elementEventValue: any = null;
+    let documentEventValue: any = null;
+
+    const testText = `<multitagtest></multitagtest>`;
+    const context = {};
+    const parsers = [MultiTagTestComponent];
+
+    const result = await parseHooks(testText, parsers, context);
+
+    // Register html event listeners
+    const compRef = result.hookIndex[1].componentRef;
+    compRef?.location.nativeElement.addEventListener('genericOutput', (event: CustomEvent) => {
+      elementEventValue = (event as CustomEvent).detail;
+    });
+    document.addEventListener('MultiTagTestComponent.genericOutput', event => {
+      documentEventValue = (event as CustomEvent).detail;
+    });
+
+    // Trigger output
+    compRef?.instance.genericOutput.emit("The payload!");
+
+    // Custom events should not have fired
+    expect(elementEventValue).toBe("The payload!");
+    expect(documentEventValue).toBe("The payload!");  
+  });
+
+  it('#should not emit HTML events from outputs if requested', async () => {
+    let elementEventValue: any = null;
+    let documentEventValue: any = null;
+
+    const testText = `<multitagtest></multitagtest>`;
+    const context = {};
+    const options = { triggerElementEvents: false, triggerGlobalEvents: false };
+    const parsers = [MultiTagTestComponent];
+
+    const result = await parseHooks(testText, parsers, context, options);
+
+    // Register html event listeners
+    const compRef = result.hookIndex[1].componentRef;
+    compRef?.location.nativeElement.addEventListener('genericOutput', (event: CustomEvent) => {
+      elementEventValue = (event as CustomEvent).detail;
+    });
+    document.addEventListener('MultiTagTestComponent.genericOutput', event => {
+      documentEventValue = (event as CustomEvent).detail;
+    });
+
+    // Trigger output
+    compRef?.instance.genericOutput.emit("The payload!");
+
+    // Custom events should not have fired
+    expect(elementEventValue).toBe(null);
+    expect(documentEventValue).toBe(null);  
+  });
+
 });

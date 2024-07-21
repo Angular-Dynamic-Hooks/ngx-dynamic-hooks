@@ -83,6 +83,8 @@ Option name | Type | Default | Description
 `compareInputsByValue` | `boolean` | `false` | Whether to deeply-compare inputs for dynamic components by their value instead of by their reference on updates.
 `compareOutputsByValue` | `boolean` | `false` | Whether to deeply-compare outputs for dynamic components by their value instead of by their reference on updates.
 `compareByValueDepth` | `number` | `5` | When comparing by value, how many levels deep to compare them (may impact performance).
+`triggerElementEvents` | `boolean` | `depends` | Whether to emit <a href="https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events" target="_blank">CustomEvents</a> from the component host element when an output emits. The event name will be the output name. Defaults to true in standalone mode, otherwise false.
+`triggerGlobalEvents` | `boolean` | `depends` | Whether to emit <a href="https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events" target="_blank">CustomEvents</a> from `document` when an output emits. The event name follows the format `MyComponent.myOutput`. Defaults to true in standalone mode, otherwise false.
 `ignoreInputAliases` | `boolean` | `false` | Whether to ignore input aliases like `@Input('someAlias')` in dynamic components and use the actual property names instead.
 `ignoreOutputAliases` | `boolean` | `false` | Whether to ignore output aliases like `@Output('someAlias')` in dynamic components and use the actual property names instead.
 `acceptInputsForAnyProperty` | `boolean` | `false` | Whether to disregard `@Input()`-decorators completely and allow passing in values to any property in dynamic components.

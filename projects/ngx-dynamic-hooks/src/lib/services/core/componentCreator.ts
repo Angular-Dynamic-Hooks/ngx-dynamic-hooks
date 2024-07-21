@@ -1,4 +1,4 @@
-import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, createComponent, EnvironmentInjector } from '@angular/core';
+import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
@@ -325,6 +325,9 @@ export class ComponentCreator {
     // Track component
     hook.componentRef = dynamicComponentRef;
 
+    // Optionally trigger HTML events when outputs emit
+    this.mapOutputsToHTMLEvents(hook, options);
+
     // Pass in initial bindings
     this.componentUpdater.updateBindings(hook, context, options);
 
@@ -342,8 +345,32 @@ export class ComponentCreator {
     dynamicComponentRef.changeDetectorRef.detectChanges();
   }
 
-  // After component creation
+  // Other
   // ----------------------------------------------------------------------------------------------------------------
+
+  mapOutputsToHTMLEvents(hook: Hook, options: ParseOptions) {
+    const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
+
+    for (const outputObject of compMeta.outputs) {
+      const outputName = options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName;
+      
+      // Trigger event in host element, if requested
+      hook.htmlEventSubscriptions[outputName] = hook.componentRef!.instance[outputObject.propName].subscribe((event: any) => {
+        if (options.triggerElementEvents) {
+          this.platformService.dispatchEvent(hook.componentRef?.location.nativeElement, outputName, event);
+        }
+      });
+      
+
+      // Trigger event globally, if requested
+      const globalEventName = `${hook.componentRef!.componentType.name}.${outputName}`;
+      hook.htmlEventSubscriptions[globalEventName] = hook.componentRef!.instance[outputObject.propName].subscribe((event: any) => {
+        if (options.triggerGlobalEvents) {
+          this.platformService.dispatchGlobalEvent(globalEventName, event);
+        }
+      });
+    }
+  }
 
   /**
    * Find all components that would be the ContentChildren of a dynamic component and returns them in a hierarchical tree object

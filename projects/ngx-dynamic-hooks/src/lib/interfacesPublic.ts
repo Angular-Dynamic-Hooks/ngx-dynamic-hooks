@@ -27,6 +27,7 @@ export interface Hook {
     previousBindings: PreviousHookBindings|null;
     dirtyInputs: Set<string>;
     outputSubscriptions: {[key: string]: Subscription};
+    htmlEventSubscriptions: {[key: string]: Subscription};
 }
 
 /**

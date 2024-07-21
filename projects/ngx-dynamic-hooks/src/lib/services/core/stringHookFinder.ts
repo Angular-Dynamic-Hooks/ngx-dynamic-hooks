@@ -233,7 +233,8 @@ export class StringHookFinder {
         previousBindings: null,
         componentRef: null,
         dirtyInputs: new Set(),
-        outputSubscriptions: {}
+        outputSubscriptions: {},
+        htmlEventSubscriptions: {}
       };
 
       // Remove tag artifacts (does not change parser results indexes)

@@ -25,6 +25,8 @@ export class OptionsResolver {
         else if (optionName === 'compareInputsByValue' && typeof optionValue === 'boolean') { newOptions.compareInputsByValue = optionValue; }
         else if (optionName === 'compareOutputsByValue' && typeof optionValue === 'boolean') { newOptions.compareOutputsByValue = optionValue; }
         else if (optionName === 'compareByValueDepth' && typeof optionValue === 'number') { newOptions.compareByValueDepth = optionValue; }
+        else if (optionName === 'triggerElementEvents' && typeof optionValue === 'boolean') { newOptions.triggerElementEvents = optionValue; }
+        else if (optionName === 'triggerGlobalEvents' && typeof optionValue === 'boolean') { newOptions.triggerGlobalEvents = optionValue; }
         else if (optionName === 'ignoreInputAliases' && typeof optionValue === 'boolean') { newOptions.ignoreInputAliases = optionValue; }
         else if (optionName === 'ignoreOutputAliases' && typeof optionValue === 'boolean') { newOptions.ignoreOutputAliases = optionValue; }
         else if (optionName === 'acceptInputsForAnyProperty' && typeof optionValue === 'boolean') { newOptions.acceptInputsForAnyProperty = optionValue; }

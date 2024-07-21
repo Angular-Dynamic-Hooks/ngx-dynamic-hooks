@@ -59,6 +59,8 @@ You can pass data of almost any type to component `@Input()`s in selector hooks,
 
 The inputs are automatically passed to the dynamic component and will trigger `ngOnChanges()`/`ngOnInit()` normally.
 
+Input names are case-insensitive and can even have dash-case (`inputname` or `input-name` also work for `inputName`).
+
 If using []-brackets, the inputs are also safely parsed into their corresponding variable data type. Because of this, take care to write them code-like, as if this was a TS/JS-file (e.g. don't forget put quotes around strings **in addition** to the HTML attribute quotes).
 
 Alternatively, you may also write inputs without []-brackets as normal HTML-attributes, in which case they won't be parsed at all and will simply be considered strings.
@@ -71,6 +73,8 @@ You can subscribe to `@Output()` events from selector hooks with functions from 
 '...some dynamic content... <app-jedi (wasDefeated)="context.goIntoExile($event)"></app-jedi> ...more dynamic content...'
 ```
 As with normal Angular output bindings, the special `$event`-keyword can optionally be used to pass the emitted event object as a parameter to the function.
+
+**Tip**: If you want, you can also enable automatically triggering DOM events when component outputs emit, so you can listen to those from anywhere in the browser (see `triggerElementEvents` and `triggerGlobalEvents` in [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).
 
 ### A note about `this`
 

@@ -58,7 +58,8 @@ export class ElementHookFinder {
         previousBindings: null,
         componentRef: null,
         dirtyInputs: new Set(),
-        outputSubscriptions: {}
+        outputSubscriptions: {},
+        htmlEventSubscriptions: {}
       };
 
       // Add anchor attrs
@@ -110,6 +111,6 @@ export class ElementHookFinder {
   
   private isAngularManagedElement(element: any): boolean {
     // Angular gives component host and view elements the following property, so can simply check for that
-    return !!element.__ngContext__;
+    return element.__ngContext__ !== undefined;
   }
 }

@@ -171,4 +171,19 @@ export interface CompletePlatformService {
    * @param element An element
    */
   getTextContent(element: any): string|null;
+
+  /**
+   * Dispatches an event locally on an element
+   * @param element The element to dispatch the event from
+   * @param name The event name
+   * @param payload The event content
+   */
+  dispatchEvent(element: any, name: string, payload: any): void
+
+  /**
+   * Dispatches an event globally on the top element (like document)
+   * @param name The event name
+   * @param payload The event content
+   */
+  dispatchGlobalEvent(name: string, payload: any): void
 }

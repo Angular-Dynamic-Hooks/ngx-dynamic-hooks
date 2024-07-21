@@ -64,7 +64,7 @@ describe('Component bindings', () => {
     expect(testVar).toBe(`Output callback was triggered with value 777!`);
   });
 
-  it('#should ignore letter-casing when when receiving bindings from parsers', () => {
+  it('#should ignore letter-casing in binding names from parsers', () => {
     const someObj = {
       someArr: ['hello', 'from', 'the', 'parser!']
     };
@@ -90,6 +90,35 @@ describe('Component bindings', () => {
     const loadedComp = comp.hookIndex[1].componentRef!.instance;
     expect(loadedComp.simpleObject).toBe(someObj);
     loadedComp.genericOutput.emit('successfully');
+    expect(testVar).toBe(`Triggered successfully!`);
+  });
+
+  it('#should transform dash-separated binding names from parsers', () => {
+    const someObj = {
+      someArr: ['hello', 'from', 'the', 'parser!']
+    };
+    let testVar: any = null;
+
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          "variable-in-object": someObj
+        },
+        outputs: {
+          "generic-other-output": event => { testVar = `Triggered ${event}!`; }
+        }
+      }
+    }
+
+    const testText = `Just some component: [singletag-string]">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+
+    const loadedComp = comp.hookIndex[1].componentRef!.instance;
+    expect(loadedComp.variableInObject).toBe(someObj);
+    loadedComp.genericOtherOutput.emit('successfully');
     expect(testVar).toBe(`Triggered successfully!`);
   });
 
@@ -154,13 +183,15 @@ describe('Component bindings', () => {
   });
 
   it('#should unsubscribe from outputs on destroy', () => {
-    let testVar: any = null;
+    let emitValue: any = null;
+    let elementEventValue: any = null;
+    let documentEventValue: any = null;
 
     const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
     genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
       return {
         outputs: {
-          genericOutput: event => { testVar = `Output callback was triggered with value ${event}!`; }
+          genericOutput: event => { emitValue = `Output callback was triggered with value ${event}!`; }
         }
       }
     }
@@ -168,16 +199,31 @@ describe('Component bindings', () => {
     const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
+    comp.options = { triggerElementEvents: true, triggerGlobalEvents: true };
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     const loadedComp = comp.hookIndex[1].componentRef!.instance;
+    const loadedCompElement: HTMLElement = comp.hookIndex[1].componentRef?.location.nativeElement;
+
+    expect(Object.keys(comp.hookIndex[1].outputSubscriptions).length).toBe(1);
+    expect(Object.keys(comp.hookIndex[1].htmlEventSubscriptions).length).toBeGreaterThan(0); // Exact number various with nr of outputs
+
+    // Register html event listeners
+    loadedCompElement.addEventListener('genericOutput', event => {
+      elementEventValue = (event as CustomEvent).detail;
+    });
+    document.addEventListener('SingleTagTestComponent.genericOutput', event => {
+      documentEventValue = (event as CustomEvent).detail;
+    });
 
     // Destroy loaded components
     comp.reset();
 
-    // Callback should not be triggered, so testVar still null
+    // Callback or events should not be triggered, so vars still null
     loadedComp.genericOutput.emit(777);
-    expect(testVar).toBe(null);
+    expect(emitValue).toBe(null);
+    expect(elementEventValue).toBe(null);
+    expect(documentEventValue).toBe(null);
   });
 
 });

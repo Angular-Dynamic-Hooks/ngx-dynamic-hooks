@@ -9,7 +9,7 @@ import { DynamicHooksService } from '../public-api';
 
 // Global state
 // ----------
-let independentInjector: EnvironmentInjector|null = null;
+let sharedInjector: EnvironmentInjector|null = null;
 let scopes: ProvidersScope[] = [];
 let allParseResults: ParseResult[] = [];
 
@@ -29,7 +29,7 @@ export const destroyAll = () => {
     parseResult.destroy();
   }
 
-  independentInjector = null;
+  sharedInjector = null;
   scopes = [];
   allParseResults = [];
 }
@@ -126,10 +126,21 @@ export const parseHooks = async (
 
   // Reuse the same global injector for all independent parseHooks calls
   if (!environmentInjector) {
-    if (!independentInjector) {
-      independentInjector = await createInjector();
+    if (!sharedInjector) {
+      sharedInjector = await createInjector();
     }
-    environmentInjector = independentInjector;
+    environmentInjector = sharedInjector;
+  }
+
+  // In standalone mode, emit HTML events from outputs by default
+  if (!options) {
+    options = {}
+  }
+  if (!options.hasOwnProperty('triggerElementEvents')) {
+    options.triggerElementEvents = true;
+  }
+  if (!options.hasOwnProperty('triggerGlobalEvents')) {
+    options.triggerGlobalEvents = true;
   }
 
   const dynHooksService = environmentInjector.get(DynamicHooksService);

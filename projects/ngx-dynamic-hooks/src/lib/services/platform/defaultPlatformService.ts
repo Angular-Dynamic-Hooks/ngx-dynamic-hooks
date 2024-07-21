@@ -151,4 +151,12 @@ export class DefaultPlatformService implements CompletePlatformService {
     return element.textContent;
   }
 
+  dispatchEvent(element: Node, name: string, payload: any) {
+    element.dispatchEvent(new CustomEvent(name, { detail: payload }));
+  }
+
+  dispatchGlobalEvent(name: string, payload: any) {
+    this.document.dispatchEvent(new CustomEvent(name, { detail: payload }));
+  }
+
 }

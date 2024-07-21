@@ -134,7 +134,6 @@ describe('DefaultPlatformService', () => {
     expect(platformService.getClosingTag(p)).toBe('</p>');
   });
 
-
   // getAttributeNames
   // ------------------
 
@@ -441,6 +440,36 @@ describe('DefaultPlatformService', () => {
     // InnerText should automatically convert html entities
     expect(returnedText).toBe('>');
     expect(element.innerText).toBe(returnedText);
+  });
+
+  // dispatchEvent
+  // ------------------
+
+  it(`#should dispatch events`, () => {
+    const element = document.createElement('div');
+
+    let val: any = null;
+    element.addEventListener('customEvent', event => {
+      val = (event as CustomEvent).detail;
+    });
+
+    platformService.dispatchEvent(element, 'customEvent', 777);
+
+    expect(val).toBe(777);
+  });
+
+  // dispatchGlobalEvent
+  // ------------------
+
+  it(`#should dispatch global events`, () => {
+    let val: any = null;
+    document.addEventListener('customEvent', event => {
+      val = (event as CustomEvent).detail;
+    });
+
+    platformService.dispatchGlobalEvent('customEvent', 777);
+
+    expect(val).toBe(777);
   });
 
 });

@@ -13,11 +13,11 @@ export const allSettings: DynamicHooksSettings[] = [];
  * @param rootSettings - Settings that all loaded DynamicHooksComponents will use
  * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
  */
-export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (rootSettings, platformService) => {
-  const settings: DynamicHooksSettings|undefined = Array.isArray(rootSettings) ? {parsers: rootSettings} : rootSettings;
+export const provideDynamicHooks: (settings?: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (settings, platformService) => {
+  const moduleSettings: DynamicHooksSettings|undefined = Array.isArray(settings) ? {parsers: settings} : settings;
 
-  if (settings !== undefined) {
-    allSettings.push(settings);
+  if (moduleSettings !== undefined) {
+    allSettings.push(moduleSettings);
   }
 
   const providers: Provider[] = [
@@ -39,12 +39,12 @@ export const provideDynamicHooks: (rootSettings?: DynamicHooksSettings|HookParse
       provide: DYNAMICHOOKS_ANCESTORSETTINGS,
       useFactory: (ancestorSettings: DynamicHooksSettings[]) => {
         ancestorSettings = Array.isArray(ancestorSettings) ? ancestorSettings : [];
-        ancestorSettings = settings !== undefined ? [...ancestorSettings, settings] : ancestorSettings;
+        ancestorSettings = moduleSettings !== undefined ? [...ancestorSettings, moduleSettings] : ancestorSettings;
         return ancestorSettings;
       },
       deps: [[new SkipSelf(), new Optional(), DYNAMICHOOKS_ANCESTORSETTINGS]]
     },
-    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: settings },
+    { provide: DYNAMICHOOKS_MODULESETTINGS, useValue: moduleSettings },
 
     // Must provide a separate instance of DynamicHooksService each time you call provideDynamicHooks, 
     // so it can see passed settings of this level

@@ -9,6 +9,8 @@ export interface ParseOptions {
     compareInputsByValue?: boolean;
     compareOutputsByValue?: boolean;
     compareByValueDepth?: number;
+    triggerElementEvents?: boolean;
+    triggerGlobalEvents?: boolean;
     ignoreInputAliases?: boolean;
     ignoreOutputAliases?: boolean;
     acceptInputsForAnyProperty?: boolean;
@@ -28,6 +30,8 @@ export const getParseOptionDefaults: (content?: any) => ParseOptions = (content 
         compareInputsByValue: false,
         compareOutputsByValue: false,
         compareByValueDepth: 5,
+        triggerElementEvents: false,
+        triggerGlobalEvents: false,
         ignoreInputAliases: false,
         ignoreOutputAliases: false,
         acceptInputsForAnyProperty: false,
