@@ -38,18 +38,18 @@ export interface HookSegments {
 }
 
 /**
- * The service responsible for finding all string hooks in the content and replacing them with component anchors
+ * The service responsible for finding all text hooks in the content and replacing them with component anchors
  */
 @Injectable({
   providedIn: 'root'
 })
-export class StringHookFinder {
+export class TextHookFinder {
 
   constructor(private platformService: AutoPlatformService) {
   }
 
   /**
-   * Finds all string hooks in an existing element and creates the corresponding anchors
+   * Finds all text hooks in an existing element and creates the corresponding anchors
    * 
    * @param element - The element to parse
    * @param context - The current context object
@@ -59,7 +59,7 @@ export class StringHookFinder {
    * @param hookIndex - The hookIndex object to fill
    */
   findInElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex) {
-    // Only bother looking for string hooks if there even are string hook parsers
+    // Only bother looking for text hooks if there even are text hook parsers
     for (const parser of parsers) {
       if (typeof parser.findHooks === 'function') {
         this.checkElement(element, context, parsers, token, options, hookIndex, {});
@@ -80,8 +80,8 @@ export class StringHookFinder {
    * @param extractedNodes - A recursively-used object holding all temporarily extracted nodes
    */
   checkElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex, extractedNodes: {[key: string]: any} = {}, ) {
-    // To find string hooks in an already existing node, first replace non-text child nodes with string placeholders, then concat all text content.
-    // This is so enclosing string hooks can be found even if they are separated by other elements
+    // To find text hooks in an already existing node, first replace non-text child nodes with string placeholders, then concat all text content.
+    // This is so enclosing text hooks can be found even if they are separated by other elements
     let childNodes = this.platformService.getChildNodes(element);
     let collectedText = '';
 
@@ -167,7 +167,7 @@ export class StringHookFinder {
   }
 
   /**
-   * Finds all string hooks in a string variable and creates the corresponding anchors
+   * Finds all text hooks in a string variable and creates the corresponding anchors
    *
    * @param content - The text to parse
    * @param context - The current context object
@@ -299,15 +299,15 @@ export class StringHookFinder {
 
       // Check if hook is in itself well-formed
       if (hookPos.openingTagStartIndex >= hookPos.openingTagEndIndex) {
-        if (isDevMode()) { console.warn('String hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('Text hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
       if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex!) {
-        if (isDevMode()) { console.warn('String hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('Text hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
         continue;
       }
       if (enclosing && hookPos.closingTagStartIndex! >= hookPos.closingTagEndIndex!) {
-        if (isDevMode()) { console.warn('String hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
+        if (isDevMode()) { console.warn('Text hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
         continue;
       }
 
@@ -326,13 +326,13 @@ export class StringHookFinder {
             hookPos.closingTagEndIndex === prevHookPos.closingTagEndIndex
           ))
           ) {
-          this.generateHookPosWarning('A string hook with the same position as another string hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('A text hook with the same position as another text hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
         // Opening tag must begin after previous opening tag has ended
         if (hookPos.openingTagStartIndex < prevHookPos.openingTagEndIndex) {
-          this.generateHookPosWarning('String hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -343,7 +343,7 @@ export class StringHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! ||
           hookPos.openingTagStartIndex >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('String hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -352,7 +352,7 @@ export class StringHookFinder {
           hookPos.closingTagEndIndex! <= prevHookPos.closingTagStartIndex! ||
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('String hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
           continue outerloop;
         }
 
@@ -361,7 +361,7 @@ export class StringHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! &&
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
           ) {
-            this.generateHookPosWarning('String hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
+            this.generateHookPosWarning('Text hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
             continue outerloop;
         }
       }

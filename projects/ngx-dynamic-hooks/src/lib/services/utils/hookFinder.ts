@@ -11,7 +11,7 @@ import { matchAll } from './utils';
 export class HookFinder {
 
   /**
-   * Finds all string hooks in a piece of content, e.g. <hook>...</hook>, and returns their positions
+   * Finds all text hooks in a piece of content, e.g. <hook>...</hook>, and returns their positions
    * 
    * @param content - The text to parse
    * @param openingTagRegex - The regex for the opening tag
@@ -27,7 +27,7 @@ export class HookFinder {
   }
 
   /**
-   * Finds all string hooks that are non-enclosing in a piece of text, e.g. <hook>
+   * Finds all text hooks that are non-enclosing in a piece of text, e.g. <hook>
    *
    * @param content - The text to search
    * @param hookRegex - The regex to use for the hook
@@ -51,7 +51,7 @@ export class HookFinder {
   }
 
   /**
-   * Finds all string hooks that are enclosing in a piece of text, e.g. <hook>...</hook>
+   * Finds all text hooks that are enclosing in a piece of text, e.g. <hook>...</hook>
    *
    * Correctly finding enclosing hooks requires a programmatic parser rather then just regex alone, as regex cannot handle
    * patterns that are potentially nested within themselves.

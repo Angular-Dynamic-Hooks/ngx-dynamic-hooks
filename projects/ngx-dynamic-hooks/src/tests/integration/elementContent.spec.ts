@@ -2,7 +2,7 @@
 import { firstValueFrom } from 'rxjs';
 import { GenericElementParser } from '../resources/parsers/genericElementParser';
 import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
-import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookFinder, ParseResult, StringHookFinder, anchorElementTag } from '../testing-api';
+import { ComponentCreator, DynamicHooksComponent, DynamicHooksService, HookFinder, ParseResult, TextHookFinder, anchorElementTag } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach } from './shared';
@@ -19,9 +19,9 @@ describe('Element content', () => {
     ({testBed, fixture, comp, context} = defaultBeforeEach());
   });
   
-  it('#should load string hooks (even if enclosing ones are separated by nodes)', () => {
-    const stringHookFinder = TestBed.inject(StringHookFinder);
-    spyOn(stringHookFinder, 'checkElement').and.callThrough();
+  it('#should load text hooks (even if enclosing ones are separated by nodes)', () => {
+    const textHookFinder = TestBed.inject(TextHookFinder);
+    spyOn(textHookFinder, 'checkElement').and.callThrough();
 
     const div = document.createElement('div')
     div.innerHTML = `
@@ -47,7 +47,7 @@ describe('Element content', () => {
     comp.content = div;
     comp.ngOnChanges({content: true} as any);
 
-    expect((stringHookFinder.checkElement as jasmine.Spy).calls.all().length).not.toBe(0);
+    expect((textHookFinder.checkElement as jasmine.Spy).calls.all().length).not.toBe(0);
 
     // Expect everything to be loaded in have to expected structure
     expect(Object.values(comp.hookIndex).length).toBe(3);
@@ -83,8 +83,8 @@ describe('Element content', () => {
   });
 
   it('#should load element hooks', () => {
-    const stringHookFinder = TestBed.inject(StringHookFinder);
-    spyOn(stringHookFinder, 'findInElement').and.callThrough();
+    const textHookFinder = TestBed.inject(TextHookFinder);
+    spyOn(textHookFinder, 'findInElement').and.callThrough();
 
     const div = document.createElement('div')
     div.innerHTML = `
@@ -110,7 +110,7 @@ describe('Element content', () => {
     comp.content = div;
     comp.ngOnChanges({content: true} as any);
 
-    expect((stringHookFinder.findInElement as jasmine.Spy).calls.all().length).not.toBe(0);
+    expect((textHookFinder.findInElement as jasmine.Spy).calls.all().length).not.toBe(0);
 
     // Expect everything to be loaded in have to expected structure
     expect(Object.values(comp.hookIndex).length).toBe(3);
@@ -145,13 +145,13 @@ describe('Element content', () => {
     expect(deeplyNestedDiv.childNodes[2].textContent).toContain('Pretty neat.'); 
   });
 
-  it('#should load string hooks and element hooks side-by-side', () => {
+  it('#should load text hooks and element hooks side-by-side', () => {
     const div = document.createElement('div')
     div.innerHTML = `
       <section>
         Here should be the first component: 
         <multitag-element>
-          And it contains a string hook [singletag-string]. Should work.
+          And it contains a text hook [singletag-string]. Should work.
         </multitag-element>
         [multitag-string]
           Lets invert the nesting here <whatever-element>Inner content</whatever-element>. Should also work.
@@ -174,7 +174,7 @@ describe('Element content', () => {
     expect(section.childNodes[1].children[0].classList.contains('multitag-component')).toBeTrue();
 
     const elementMultitag = section.childNodes[1].children[0];
-    expect(elementMultitag.childNodes[0].textContent).toContain('And it contains a string hook');
+    expect(elementMultitag.childNodes[0].textContent).toContain('And it contains a text hook');
     expect(elementMultitag.childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     expect(elementMultitag.childNodes[1].children[0].classList.contains('singletag-component')).toBeTrue();
     expect(elementMultitag.childNodes[2].textContent).toContain('Should work');
@@ -211,7 +211,7 @@ describe('Element content', () => {
     expect(section.children[0].children[0].textContent).toContain('This is the inner content.');
   });
 
-  it('#should ignore html structures when looking for string hooks, just parse the pure text', () => {
+  it('#should ignore html structures when looking for text hooks, just parse the pure text', () => {
     const multitagStringParser = TestBed.inject(GenericMultiTagStringParser);
     const hookFinder = TestBed.inject(HookFinder);
 
@@ -236,10 +236,10 @@ describe('Element content', () => {
     expect(customElement.textContent).toContain('This is the inner content.');
   });
 
-  it('#should only look for string hooks if there even are string parsers', () => {
-    const stringHookFinder = TestBed.inject(StringHookFinder);
+  it('#should only look for text hooks if there even are string parsers', () => {
+    const textHookFinder = TestBed.inject(TextHookFinder);
     const genericElementParser = TestBed.inject(GenericElementParser)
-    spyOn(stringHookFinder, 'checkElement').and.callThrough();
+    spyOn(textHookFinder, 'checkElement').and.callThrough();
 
     const div = document.createElement('div');
     div.innerHTML = `
@@ -254,7 +254,7 @@ describe('Element content', () => {
     comp.parsers = [GenericElementParser];
     comp.ngOnChanges({content: true} as any);
 
-    expect((stringHookFinder.checkElement as jasmine.Spy).calls.all().length).toBe(0);
+    expect((textHookFinder.checkElement as jasmine.Spy).calls.all().length).toBe(0);
 
     expect(Object.values(comp.hookIndex).length).toBe(1);
     const componentElement = fixture.nativeElement.children[0].children[0];
@@ -341,7 +341,7 @@ describe('Element content', () => {
     contentEl.innerHTML = `
       <article>
         <div>
-          <h1>Here is a string hook: [singletag-string]</h1>
+          <h1>Here is a text hook: [singletag-string]</h1>
         </div>
         <aside>
           <span>And let's load an element hook here</span>
@@ -359,7 +359,7 @@ describe('Element content', () => {
       const article = result.element.children[0];
       const div = article.children[0];
       const h1 = div.children[0];
-      expect(h1.textContent).toContain('Here is a string hook:');
+      expect(h1.textContent).toContain('Here is a text hook:');
       const singleTagComponentEl = h1.children[0];
       expect(singleTagComponentEl.tagName).toBe(anchorElementTag.toUpperCase());
       expect(singleTagComponentEl.children[0].classList.contains('singletag-component')).toBeTrue();

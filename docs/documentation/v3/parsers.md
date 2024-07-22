@@ -55,7 +55,7 @@ See the [General Usage]({{ "documentation/v3/general-usage#load-by-any-selector"
 
 So far, we have only used the standard `SelectorHookParser`, which is included in this library for convenience and is easy to use if all you need is to load components by their selectors. However, by creating custom parsers, any element or text pattern you want can be replaced by an Angular component.
 
-Custom parsers can look for either **element hooks** or **string hooks**. Element hooks are straightforward and load components into found html elements while the more powerful string hooks can replace any arbitrary text pattern with components.
+Custom parsers can look for either **element hooks** or **text hooks**. Element hooks are straightforward and load components into found html elements while text hooks can replace any arbitrary text pattern with components.
 
 ### What makes a parser
 
@@ -83,10 +83,10 @@ It is recommended to create a dedicated `HookParser` for each custom hook/compon
 ### findHooks()
 
 {% include docs/widgets/notice.html content="
-  <span>Only needed if you want to find string hooks. For element hooks, see <code>findHookElements()</code>.</span>
+  <span>Only needed if you want to find text hooks. For element hooks, see <code>findHookElements()</code>.</span>
 " %}
 
-Is given a string of content and is expected to return a `HookPosition` array from it. Each `HookPosition` represents a found string hook and specifies its position within the content string:
+Is given a string of content and is expected to return a `HookPosition` array from it. Each `HookPosition` represents a found text hook and specifies its position within the content string:
 
 ```ts
 interface HookPosition {
@@ -106,7 +106,7 @@ To make your life easier, you can just use the `HookFinder` service that comes w
 ### findHookElements()
 
 {% include docs/widgets/notice.html content="
-  <span>Only needed if you want to find element hooks. For string hooks, see <code>findHooks()</code>.</span>
+  <span>Only needed if you want to find element hooks. For text hooks, see <code>findHooks()</code>.</span>
 " %}
 
 Is given the main content element and is expected to return an array of child elements that should be used as element hooks.

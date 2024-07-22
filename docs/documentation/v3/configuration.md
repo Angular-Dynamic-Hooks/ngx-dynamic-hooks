@@ -78,7 +78,7 @@ Option name | Type | Default | Description
 --- | --- | --- | ---
 `sanitize` | `boolean` | `depends` | Whether to use Angular's `DomSanitizer` to sanitize the content (hooks are unaffected by this). Defaults to `true` if content is a string, `false` if its an HTML element.
 `convertHTMLEntities` | `boolean` | `true` | Whether to replace HTML entities like `&amp;` with normal characters.
-`fixParagraphTags` | `boolean` | `true` | When using a WYSIWYG-editor, enclosing string hooks may collide with its generated HTML (the `<p>`-tag starting before the hook and the corresponding `</p>`-tag ending inside, and vice versa). This will result in faulty HTML when rendered in a browser. This setting removes these ripped-apart tags.
+`fixParagraphTags` | `boolean` | `true` | When using a WYSIWYG-editor, enclosing text hooks may collide with its generated HTML (the `<p>`-tag starting before the hook and the corresponding `</p>`-tag ending inside, and vice versa). This will result in faulty HTML when rendered in a browser. This setting removes these ripped-apart tags.
 `updateOnPushOnly` | `boolean` | `false` | Whether to update the bindings of dynamic components only when the context object passed to the `DynamicHooksComponent` changes by reference.
 `compareInputsByValue` | `boolean` | `false` | Whether to deeply-compare inputs for dynamic components by their value instead of by their reference on updates.
 `compareOutputsByValue` | `boolean` | `false` | Whether to deeply-compare outputs for dynamic components by their value instead of by their reference on updates.

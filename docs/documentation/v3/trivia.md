@@ -11,7 +11,7 @@ It then adds a lot of custom code around this core function to render the compon
 
 If you are curious about the inner workings of the library, here's a general description:
 
-1. The submitted content is parsed for string hooks via the `findHooks()` function of all submitted parsers. The found hooks are replaced with marked anchor elements.
+1. The submitted content is parsed for text hooks via the `findHooks()` function of all submitted parsers. The found hooks are replaced with marked anchor elements.
 2. If it isn't already one, the content is parsed by the native browser HTML parser into actual an HTML element.
 3. The library then looks for all element hooks via the `findHookElements()` function of all submitted parsers and marks those elements as well.
 4. For each found hook, the `loadComponent()`-method of its parser is called to get the component class. With it, the components are loaded into the marked anchor elements via Angular's `createComponent()`.

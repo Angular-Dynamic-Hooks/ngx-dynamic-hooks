@@ -23,7 +23,7 @@ import { GenericWhateverElementParser } from '../resources/parsers/genericWhatev
 
 // The standard parsers to be used for most tests
 export const testParsers: Array<HookParserEntry> = [
-  // Generic string hook parsers
+  // Generic text hook parsers
   GenericSingleTagStringParser,
   GenericMultiTagStringParser,
   GenericWhateverStringParser,

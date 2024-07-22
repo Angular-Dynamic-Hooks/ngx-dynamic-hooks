@@ -97,7 +97,7 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('removeChild').removeChild!(parentElement, childElement);
   }
 
-  getInnerContent(element: Node) {
+  getInnerContent(element: any) {
     return this.getFor('getInnerContent').getInnerContent!(element);
   }
 

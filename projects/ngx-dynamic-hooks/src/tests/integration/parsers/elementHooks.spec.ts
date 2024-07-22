@@ -335,23 +335,23 @@ describe('Parser element hooks', () => {
     expect(comp.hookIndex[2].componentRef!.location.nativeElement.innerText).toBe('This is the second component');
   });
 
-  it('#should be able to load both string hooks and element hooks side by side', () => {
+  it('#should be able to load both text hooks and element hooks side by side', () => {
     let testText = `
       <div>
-        <div>Let's load a singletag string hook here: [singletag-string]</div>
+        <div>Let's load a singletag text hook here: [singletag-string]</div>
         <div>
           And an enclosing one here 
           [multitag-string]
             Nested element hook
             <multitag-element>
-              And another singletag string hook [singletag-string]
+              And another singletag text hook [singletag-string]
             </multitag-element>
           [/multitag-string]
         </div>
         <div>
           Reverse the nesting here
           <multitag-element>
-            Nested string hook
+            Nested text hook
             [multitag-string]
               With some content
             [/multitag-string]
@@ -364,7 +364,7 @@ describe('Parser element hooks', () => {
 
     expect(Object.values(comp.hookIndex).length).toBe(6);
 
-    // Note about hook index order: String hooks come first, followed by all element hooks
+    // Note about hook index order: Text hooks come first, followed by all element hooks
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
     expect(comp.hookIndex[1].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('singletag-component')).toBeTrue();
 
@@ -382,12 +382,12 @@ describe('Parser element hooks', () => {
 
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.tagName).toBe('MULTITAG-ELEMENT');
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
-    expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('And another singletag string hook');
+    expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('And another singletag text hook');
     expect(comp.hookIndex[5].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
     
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.tagName).toBe('MULTITAG-ELEMENT');
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.querySelector(':first-child').classList.contains('multitag-component')).toBeTrue();
-    expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('Nested string hook');
+    expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[0].textContent.trim()).toBe('Nested text hook');
     expect(comp.hookIndex[6].componentRef!.location.nativeElement.children[0].childNodes[1].tagName).toBe(anchorElementTag.toUpperCase());
   });
 

@@ -132,7 +132,7 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
         return that.platformService.querySelectorAll(contentElement, selector);
       }
 
-      loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Node[]): HookComponentData {
+      loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
         return {
           component: that.component!
         }

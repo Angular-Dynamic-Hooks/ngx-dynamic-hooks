@@ -27,7 +27,7 @@ describe('Standalone usage', () => {
   // ----------------------------------------------------------------------------
 
   it('#should use the content and parsers params correctly', async () => {
-    // Test both string hook and element hook with inputs
+    // Test both text hook and element hook with inputs
     const testText = `
       <p>Some generic paragraph</p>
       [whatevertest [config]="{someProp: 123}"]

@@ -35,7 +35,7 @@ Previously, you could only pass strings as the `content` input to the library. W
 
 ### New: Element hooks
 
-Related to that, you can now look for **element hooks** in addition to **string hooks**. Element hooks find and load components into HTML elements (instead of replacing text patterns), so custom parsers can use [simple browser methods]({{ "documentation/v3/parsers#findhookelements" | relative_url }}) to find them (`querySelectorAll` etc.). Note that element hooks **also work with string content** as input like before!
+Related to that, you can now look for **element hooks** in addition to **text hooks**. Element hooks find and load components into HTML elements (instead of replacing text patterns), so custom parsers can use [simple browser methods]({{ "documentation/v3/parsers#findhookelements" | relative_url }}) to find them (`querySelectorAll` etc.). Note that element hooks **also work with string content** as input like before!
 
 The standard `SelectorHookParser` now also uses the new element hooks under the mood. This has the benefit that it is now able to use proper CSS selectors (`.myComponent`) for finding hooks instead of just tag names like before.
 
@@ -76,5 +76,5 @@ Several classes, interfaces, methods etc. were renamed to better reflect their n
 
 ## Minor changes
 
-- Traditional string hook parsers from version 2 remain mostly unchanged - with one exception: They will now use `<dynamic-component-anchor>`-elements for components by default. If you want to continue using the component selector, you must specify it manually via the [`hostElementTag` property]({{ "documentation/v3/parsers#loadcomponent" | relative_url }}).
+- Traditional text hook parsers from version 2 remain mostly unchanged - with one exception: They will now use `<dynamic-component-anchor>`-elements for components by default. If you want to continue using the component selector, you must specify it manually via the [`hostElementTag` property]({{ "documentation/v3/parsers#loadcomponent" | relative_url }}).
 - `DynamicContentChild.componentSelector` field has been removed. you can mostly accomplish the same via `DynamicContentChild.componentRef.location.nativeElement.tagName`.

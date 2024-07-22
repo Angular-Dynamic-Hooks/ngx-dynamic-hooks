@@ -20,8 +20,8 @@ export class ContentSanitizer {
 
   constructor(private platformService: AutoPlatformService) {}
 
-  sanitize(contentElement: Element, hookIndex: HookIndex, token: string): Element {
-    const originalHookAnchors: {[key: string]: Element} = {};
+  sanitize(contentElement: any, hookIndex: HookIndex, token: string): any {
+    const originalHookAnchors: {[key: string]: any} = {};
 
     // Replace all hook anchors with custom placeholder elements
     // This is so the browser has no predefined rules where they can and can't exist in the dom hierarchy and doesn't edit the html.

@@ -55,7 +55,7 @@ export interface HookParser {
     name?: string;
 
     /**
-     * Returns the positions of all string hooks in the content string.
+     * Returns the positions of all text hooks in the content string.
      *
      * Note: Each parser needs to implement either findHooks or findHookElements. The function is then called once for each parser.
      *

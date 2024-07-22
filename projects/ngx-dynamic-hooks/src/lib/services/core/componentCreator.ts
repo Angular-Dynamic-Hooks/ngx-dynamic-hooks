@@ -39,7 +39,7 @@ export class ComponentCreator {
   init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: ParseOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
     const allComponentsLoaded: ReplaySubject<boolean> = new ReplaySubject(1);
     const componentLoadSubjects = [];
-    const anchorElements: {[key: string]: Element} = {};
+    const anchorElements: {[key: string]: any} = {};
 
     // If no hooks found, no need to progress further
     if (Object.keys(hookIndex).length === 0) {
@@ -244,9 +244,9 @@ export class ComponentCreator {
    * @param componentHostElement - The dom element with the content slots
    * @param token - The current parse token
    */
-  extractContentSlotElements(componentHostElement: any, token: string): Node[][] {
+  extractContentSlotElements(componentHostElement: any, token: string): any[][] {
     // Resolve ng-content from content slots
-    const projectableNodes: Node[][] = [];
+    const projectableNodes: any[][] = [];
     const contentSlotElements = this.platformService.getChildNodes(componentHostElement)
       .filter(entry => this.platformService.getTagName(entry) === 'DYNAMIC-COMPONENT-CONTENTSLOT' && this.platformService.getAttribute(entry, 'parsetoken') === token);
 

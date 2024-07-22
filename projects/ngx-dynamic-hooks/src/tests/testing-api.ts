@@ -32,7 +32,7 @@ export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_M
 export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
 export { ComponentCreator } from '../lib/services/core/componentCreator';
 export { ComponentUpdater } from '../lib/services/core/componentUpdater';
-export { StringHookFinder } from '../lib/services/core/stringHookFinder';
+export { TextHookFinder } from '../lib/services/core/textHookFinder';
 export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/selectorHookParserConfigResolver';
 export { BindingsValueManager } from '../lib/parsers/selector/bindingsValueManager';
 export { TagHookFinder } from '../lib/parsers/selector/string/tagHookFinder';

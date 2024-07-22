@@ -4,7 +4,7 @@ import { first, map } from 'rxjs/operators';
 
 import { HookIndex, ParseResult } from '../interfacesPublic';
 import { ParseOptions } from './settings/options';
-import { StringHookFinder } from './core/stringHookFinder';
+import { TextHookFinder } from './core/textHookFinder';
 import { ComponentCreator } from './core/componentCreator';
 import { DynamicHooksSettings } from './settings/settings';
 import { HookParserEntry } from './settings/parserEntry';
@@ -28,7 +28,7 @@ export class DynamicHooksService {
     @Optional() @Inject(DYNAMICHOOKS_ANCESTORSETTINGS) public ancestorSettings: DynamicHooksSettings[]|null,
     @Optional() @Inject(DYNAMICHOOKS_MODULESETTINGS) private moduleSettings: DynamicHooksSettings|null,
     private settingsResolver: SettingsResolver,
-    private stringHookFinder: StringHookFinder,
+    private textHookFinder: TextHookFinder,
     private elementHookFinder: ElementHookFinder,
     private contentSanitizer: ContentSanitizer,
     private componentCreator: ComponentCreator,
@@ -96,16 +96,16 @@ export class DynamicHooksService {
     const token = Math.random().toString(36).substring(2, 12);
     let contentElement;
 
-    // a) Find all string hooks in string content
+    // a) Find all text hooks in string content
     if (typeof content === 'string') {
       contentElement = this.platformService.createElement('div');
-      const result = this.stringHookFinder.find(content, context, usedParsers, token, usedOptions, targetHookIndex);
+      const result = this.textHookFinder.find(content, context, usedParsers, token, usedOptions, targetHookIndex);
       this.platformService.setInnerContent(contentElement, result.content);
       
-    // b) Find all string hooks in element content
+    // b) Find all text hooks in element content
     } else {
       contentElement = content;
-      this.stringHookFinder.findInElement(contentElement, context, usedParsers, token, usedOptions, targetHookIndex);
+      this.textHookFinder.findInElement(contentElement, context, usedParsers, token, usedOptions, targetHookIndex);
     }
 
     // Find all element hooks
