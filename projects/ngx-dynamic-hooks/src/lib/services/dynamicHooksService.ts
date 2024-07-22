@@ -42,22 +42,22 @@ export class DynamicHooksService {
    * Parses a string of content and loads components for all found hooks
    *
    * @param content - The content to parse
+   * @param parsers - An optional list of parsers to use instead of the global ones
    * @param context - An optional context object
+   * @param options - An optional list of options to use instead of the global ones
    * @param globalParsersBlacklist - An optional list of global parsers to blacklist
    * @param globalParsersWhitelist - An optional list of global parsers to whitelist
-   * @param parsers - An optional list of parsers to use instead of the global ones
-   * @param options - An optional list of options to use instead of the global ones
    * @param targetElement - An optional HTML element to use as the container for the loaded content. If none is provided, one is created and returned for you.
    * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
    * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the injector of the module this library is imported to is used.
    */
   parse(
     content: any = null,
+    parsers: HookParserEntry[]|null = null,
     context: any = null,
+    options: ParseOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
-    parsers: HookParserEntry[]|null = null,
-    options: ParseOptions|null = null,
     targetElement: HTMLElement|null = null,
     targetHookIndex: HookIndex = {},
     environmentInjector: EnvironmentInjector|null = null,

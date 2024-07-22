@@ -293,7 +293,7 @@ describe('Element content', () => {
     const divChild = div.children[0];
     const article = document.createElement('article');
 
-    dynHooksService.parse(div, {}, null, null, null, {sanitize: false}, article).subscribe(result => {
+    dynHooksService.parse(div, null, null, {sanitize: false}, null, null, article).subscribe(result => {
       expect(result.element).toBe(article);
       expect(result.element.children[0]).toBe(divChild);
     });

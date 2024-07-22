@@ -121,10 +121,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     ...
     provideDynamicHooks({
-      parsers: [{
-        component: ExampleComponent,
-        selector: ".myWidget" // Accepts any CSS selector
-      }]
+      parsers: [
+        {
+          component: ExampleComponent,
+          selector: ".myWidget" // Accepts any CSS selector
+        }
+      ]
     })
   ]
 };
@@ -161,11 +163,11 @@ You can also parse dynamic content directly in Typescript by injecting the `Dyna
 ```ts
   parse(
     content: any = null,
+    parsers: HookParserEntry[]|null = null,
     context: any = null,
+    options: ParseOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
-    parsers: HookParserEntry[]|null = null,
-    options: ParseOptions|null = null,
     targetElement: HTMLElement|null = null,
     targetHookIndex: HookIndex = {},
     environmentInjector: EnvironmentInjector|null = null,
@@ -175,7 +177,7 @@ You can also parse dynamic content directly in Typescript by injecting the `Dyna
 
 This looks complicated, but most of the parameters are actually just [the inputs]({{ "documentation/v3/configuration#dynamichookscomponent" | relative_url }}) for the `DynamicHooksComponent` component and therefore optional. You really only need to pass the `content` as you would with the component. 
 
-Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify custom injectors for the created components. If you don't, the library defaults to the current ones.
+Only some parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify custom injectors for the created components. If you don't, the library defaults to the current ones.
 
 The function will return an `ParseResult` observable:
 

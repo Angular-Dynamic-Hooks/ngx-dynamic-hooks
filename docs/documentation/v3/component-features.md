@@ -3,7 +3,7 @@
 
 # Component features
 
-This page is all about the **dynamically-loaded components**: How they behave, how you can exchange data with them and what lifecycle methods can be registered.
+This page is all about the **dynamically-loaded components**: How they behave, how you can exchange data with them and what new lifecycle methods can be used.
 
 ## Context & Dependency Injection
 
@@ -59,7 +59,7 @@ You can pass data of almost any type to component `@Input()`s in selector hooks,
 
 The inputs are automatically passed to the dynamic component and will trigger `ngOnChanges()`/`ngOnInit()` normally.
 
-Input names are case-insensitive and can even have dash-case (`inputname` or `input-name` also work for `inputName`).
+Input names are case-insensitive and can even have dash-case (`inputname` or `input-name` also work).
 
 If using []-brackets, the inputs are also safely parsed into their corresponding variable data type. Because of this, take care to write them code-like, as if this was a TS/JS-file (e.g. don't forget put quotes around strings **in addition** to the HTML attribute quotes).
 

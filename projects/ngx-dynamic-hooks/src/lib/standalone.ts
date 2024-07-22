@@ -145,11 +145,11 @@ export const parseHooks = async (
   return firstValueFrom(dynHooksService
     .parse(
       content, 
+      parsers,
       context, 
-      null, 
-      null, 
-      parsers, 
       options, 
+      null, 
+      null,
       targetElement, 
       targetHookIndex, 
       environmentInjector,

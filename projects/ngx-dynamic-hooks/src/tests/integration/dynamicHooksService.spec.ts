@@ -65,7 +65,7 @@ describe('DynamicHooksService', () => {
     `;
 
     const dynamicHooksService = testBed.inject(DynamicHooksService);
-    const result = await firstValueFrom(dynamicHooksService.parse(testText, {}, null, null, parsers));
+    const result = await firstValueFrom(dynamicHooksService.parse(testText, parsers));
 
     const hookIndex = result.hookIndex;
     const rootElement = result.element;
@@ -133,7 +133,7 @@ describe('DynamicHooksService', () => {
       TestBed.inject(EnvironmentInjector),
       'MyCustomEnvInjector'
     );
-    dynamicHooksService.parse('[singletag-string]', {someProp: 'hello!'}, null, null, [GenericSingleTagStringParser], options, div, hookIndex, customEnvInjector, customInjector).subscribe((parseResult: ParseResult) => {
+    dynamicHooksService.parse('[singletag-string]', [GenericSingleTagStringParser], {someProp: 'hello!'}, options, null, null, div, hookIndex, customEnvInjector, customInjector).subscribe((parseResult: ParseResult) => {
       expect(Object.values(parseResult.hookIndex).length).toBe(1);
       expect(parseResult.element instanceof Node).toBeTrue();
       expect(parseResult.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
@@ -216,7 +216,7 @@ describe('DynamicHooksService', () => {
     const existingElement = document.createElement('article');
     existingElement.setAttribute('id', 'myExistingElement');
 
-    dynamicHooksService.parse(testText, {}, null, null, null, null, existingElement, {}).subscribe((parseResult: ParseResult) => {
+    dynamicHooksService.parse(testText, null, null, null, null, null, existingElement, {}).subscribe((parseResult: ParseResult) => {
       expect(Object.values(parseResult.hookIndex).length).toBe(2);
 
       expect(existingElement.getAttribute('id')).toBe('myExistingElement');
@@ -249,7 +249,7 @@ describe('DynamicHooksService', () => {
 
     let errorMsg = '';
     try {
-      dynamicHooksService.parse(testText, {}, null, null, null, null, targetElement, {});
+      dynamicHooksService.parse(testText, null, null, null, null, null, targetElement, {});
     } catch (e) {
       errorMsg = (e as Error).message;
     }
@@ -338,7 +338,7 @@ describe('DynamicHooksService', () => {
 
     const testText = `[singletag-string]`;
 
-    dynamicHooksService.parse(testText, context).subscribe((parseResult: ParseResult) => {
+    dynamicHooksService.parse(testText, null, context).subscribe((parseResult: ParseResult) => {
       expect(testValue).toBe('');
       dynamicHooksService.destroy(parseResult.hookIndex);
       expect(testValue).toBe('Event triggered from onDestroy!');

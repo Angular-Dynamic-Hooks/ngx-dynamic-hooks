@@ -49,11 +49,11 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 
 ## What it does
 
-In Angular, you normally load components by placing their selectors in a template. But what if you wanted to load components not just from static templates, but from arbitrary dynamic content as well - such as string variables, HTML elements or even by parsing the whole DOM?
+In Angular, you normally load components by placing their selectors in a template. But what if you wanted to load components not just from static templates, but from arbitrary dynamic content as well - such as string variables, HTML elements or even the whole browser DOM?
 
 By default, **this is not easily possible**.
 
-<a href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">Angular Dynamic Hooks</a> aims to solve this shortcoming by providing a component (as well as a service and standalone function) that accepts any content of your choice and automatically loads components into it at runtime - similar to a "dynamic template". The library does not need the Just-in-Time Angular compiler to do so, allowing for much smaller bundle sizes. 
+<a href="https://www.npmjs.com/package/ngx-dynamic-hooks" target="_blank">Angular Dynamic Hooks</a> solves this shortcoming by providing a component (as well as a service and standalone function) that accepts any content of your choice and automatically loads components into it at runtime - similar to a "dynamic template". The library does not need the Just-in-Time Angular compiler to do so, allowing for much smaller bundle sizes. 
 
 It is able to do all this in a controlled and secure manner by using so-called **hooks**.
 
@@ -65,7 +65,7 @@ Simply put, hooks are any HTML element or text pattern in the content to be repl
 
 Hooks can be **singletags** (`<hook>`) or **enclosing** (`<hook>...</hook>`). In most cases, you may simply want to use the normal component selectors as their hooks. You can easily do that with the out-of-the-box `SelectorHookParser` that comes included with this library. 
 
-Just use your selectors just as you would in a normal Angular template (such as `<app-mycomponent [someInput]="'hello!'">...</app-mycomponent>`) and the corresponding components will be loaded in their place. Inputs/Outputs will work even on already-existing HTML elements.
+Just use your selectors like in a normal Angular template (such as `<app-mycomponent [someInput]="'hello!'">...</app-mycomponent>`) and the corresponding components will be loaded in their place.
 
 ![Selector hook](https://i.imgur.com/tjAX6uU.png)
 
@@ -84,14 +84,14 @@ Yes, the dynamically-loaded components are fully-functional as they are created 
 * *Dependency injection / services*
 * *All lifecycle methods*
 
-You can even lazy-load components only when they appear in the content, allowing for much smaller bundle sizes.
+You can even lazy-load components only when they appear in the content to minimize the initial bundle size.
 
 For more details about all of these topics, see the following sections.
 
 ## What this library doesn't do
 
-Please note that this library does not aim to be a full Angular template parser. It merely looks for all registered hooks and replaces them with their corresponding Angular components, nothing more. 
+Please note that this library does not aim to be a full Angular template compiler. It implements its own parsing logic that specifically looks for registered hooks and replaces them with their corresponding Angular components - nothing more. 
 
 This means that other special Angular template syntax (such as *ngIf, *ngFor or other directives) **will not work**.
 
-However, in terms of loading components, it allows for a lot more flexibility and possibilities than Vanilla Angular itself, such as allowing you to load them at runtime from normal strings or HTML trees, replace text patterns with components and more.
+However, in terms of loading components, it allows for a lot more flexibility and possibilities than Vanilla Angular itself, such as allowing you to load them at runtime from normal strings or HTML trees, replacing text patterns with components and more.

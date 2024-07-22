@@ -69,7 +69,7 @@ Several classes, interfaces, methods etc. were renamed to better reflect their n
 
 - `DynamicHooksGlobalSettings` and its properties `globalParsers`, `globalOptions`, `lazyInheritance` are now just `DynamicHooksSettings`, `parsers`, `options` and `inheritance`
 - `OutletComponent` is now `DynamicHooksComponent`
-- `OutletService` is now `DynamicHooksService`
+- `OutletService` is now `DynamicHooksService`. Also, the order of the parameters for the `parse` method [has changed]({{ "documentation/v3/general-usage#programmatic-usage-with-service" | relative_url }}).
 - `OutletParseResult` is now `ParseResult` and returns more properties
 - `OutletOptions` is now `ParseOptions`
 - `HookFinder.findStandaloneHooks` is now `HookFinder.findSingletagHooks`. You can now also just use `HookFinder.find` for both singletag or enclosing hooks.

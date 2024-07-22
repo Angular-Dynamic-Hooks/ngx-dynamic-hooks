@@ -191,7 +191,7 @@ describe('DynamicSingleComponent', () => {
     comp.ngOnChanges({component: true} as any);
 
     expect(comp.parseOptions).toEqual(getParseOptionDefaults());
-    expect(parseSpy.calls.mostRecent().args[5]).toEqual(getParseOptionDefaults());
+    expect(parseSpy.calls.mostRecent().args[3]).toEqual(getParseOptionDefaults());
 
     // Just some non-default options
     const customOptions: DynamicHooksSingleOptions = {

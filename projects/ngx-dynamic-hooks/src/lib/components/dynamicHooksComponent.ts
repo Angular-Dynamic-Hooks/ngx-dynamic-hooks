@@ -109,11 +109,11 @@ export class DynamicHooksComponent implements DoCheck, OnChanges, AfterViewInit,
   parse(content: any): void {
     this.dynamicHooksService.parse(
       content,
+      this.parsers,
       this.context,
+      this.options,
       this.globalParsersBlacklist,
       this.globalParsersWhitelist,
-      this.parsers,
-      this.options,
       this.hostElement.nativeElement,
       this.hookIndex,
       this.environmentInjector,

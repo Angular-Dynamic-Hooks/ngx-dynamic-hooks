@@ -115,7 +115,7 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
       // Create parser that finds created hostElement as hook and loads requested component into it
       const parser = this.createAdHocParser(selector);
 
-      this.dynamicHooksService.parse(this.hostElement.nativeElement, {}, null, null, [parser], this.parseOptions)
+      this.dynamicHooksService.parse(this.hostElement.nativeElement, [parser], {}, this.parseOptions)
       .subscribe(parseResult => {
         this.parseResult = parseResult;
         this.componentLoaded.next(parseResult.hookIndex[1].componentRef!);
