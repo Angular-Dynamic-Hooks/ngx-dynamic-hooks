@@ -72,7 +72,7 @@ Several classes, interfaces, methods etc. were renamed to better reflect their n
 - `OutletService` is now `DynamicHooksService`
 - `OutletParseResult` is now `ParseResult` and returns more properties
 - `OutletOptions` is now `ParseOptions`
-- `HookFinder.findStandaloneHooks` is now `HookFinder.findSingletagHooks`
+- `HookFinder.findStandaloneHooks` is now `HookFinder.findSingletagHooks`. You can now also just use `HookFinder.find` for both singletag or enclosing hooks.
 
 ## Minor changes
 

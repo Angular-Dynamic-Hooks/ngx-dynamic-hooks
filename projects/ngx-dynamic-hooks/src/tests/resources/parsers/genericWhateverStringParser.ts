@@ -10,7 +10,7 @@ export class GenericWhateverStringParser implements HookParser {
   component: ComponentConfig = WhateverTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findEnclosingHooks(content, /\[whatever-string\]/g, /\[\/whatever-string\]/g);
+    return this.hookFinder.find(content, /\[whatever-string\]/g, /\[\/whatever-string\]/g);
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {

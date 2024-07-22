@@ -11,6 +11,22 @@ import { matchAll } from './utils';
 export class HookFinder {
 
   /**
+   * Finds all string hooks in a piece of content, e.g. <hook>...</hook>, and returns their positions
+   * 
+   * @param content - The text to parse
+   * @param openingTagRegex - The regex for the opening tag
+   * @param closingTagRegex - The regex for the closing tag
+   * @param includeNested - Whether to include nested hooks in the result
+   */
+  find(content: string, openingTagRegex: RegExp, closingTagRegex?: RegExp, includeNested?: boolean): HookPosition[] {
+    if (!closingTagRegex) {
+      return this.findSingletagHooks(content, openingTagRegex);
+    } else {
+      return this.findEnclosingHooks(content, openingTagRegex, closingTagRegex, includeNested)
+    }
+  }
+
+  /**
    * Finds all string hooks that are non-enclosing in a piece of text, e.g. <hook>
    *
    * @param content - The text to search
@@ -55,7 +71,7 @@ export class HookFinder {
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
    */
-  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested: boolean = true): HookPosition[] {
+  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested?: boolean): HookPosition[] {
     const allTags = [];
     const result: HookPosition[] = [];
 
@@ -109,7 +125,7 @@ export class HookFinder {
         }
 
         // If nested hooks not allowed and more than one tag is open, discard both this closing tag and the latest opening tag
-        if (!includeNested && openedTags.length > 1) {
+        if (includeNested === false && openedTags.length > 1) {
           openedTags.pop();
           continue;
         }

@@ -10,7 +10,7 @@ export class GenericMultiTagStringParser implements HookParser {
   component: ComponentConfig = MultiTagTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findEnclosingHooks(content, /\[multitag-string\]/g, /\[\/multitag-string\]/g);
+    return this.hookFinder.find(content, /\[multitag-string\]/g, /\[\/multitag-string\]/g);
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {

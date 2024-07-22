@@ -15,7 +15,7 @@ describe('HookFinder', () => {
       <p>Somewhere in the middle of the content. And another openingTag at the end</p>
     `;
 
-    const position = hookFinder.findSingletagHooks(content, openingTagRegex);
+    const position = hookFinder.find(content, openingTagRegex);
 
     expect(position).toEqual([
       {
@@ -43,7 +43,7 @@ describe('HookFinder', () => {
       <p>And then the outer closingTag</p>
     `;
 
-    const position = hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex);
+    const position = hookFinder.find(content, openingTagRegex, closingTagRegex);
 
     expect(position).toEqual([
       {
@@ -67,7 +67,7 @@ describe('HookFinder', () => {
     const closingTagRegex = /Tag/g;
     const content = 'Here is an openingTag.';
 
-    expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex)).toEqual([]);
+    expect(hookFinder.find(content, openingTagRegex, closingTagRegex)).toEqual([]);
     expect((console as any).warn['calls'].allArgs()[0])
       .toContain('Syntax error - New tag "Tag" started at position 18 before previous tag "openingTag" ended at position 21. Ignoring.');
   });
@@ -78,7 +78,7 @@ describe('HookFinder', () => {
     const closingTagRegex = /closingTag/g;
 
     const content = 'Here is an openingTag and a closingTag. Here is just a closingTag.';
-    expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex)).toEqual([{ openingTagStartIndex: 11, openingTagEndIndex: 21, closingTagStartIndex: 28, closingTagEndIndex: 38 }]);
+    expect(hookFinder.find(content, openingTagRegex, closingTagRegex)).toEqual([{ openingTagStartIndex: 11, openingTagEndIndex: 21, closingTagStartIndex: 28, closingTagEndIndex: 38 }]);
     expect((console as any).warn['calls'].allArgs()[0])
       .toContain('Syntax error - Closing tag without preceding opening tag found: "closingTag". Ignoring.');
   });
@@ -88,7 +88,7 @@ describe('HookFinder', () => {
     const closingTagRegex = /closingTag/g;
 
     const content = 'Here is the outer openingTag, an inner openingTag, an inner closingTag and an outer closingTag.';
-    expect(hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex, false)).toEqual([{ openingTagStartIndex: 18, openingTagEndIndex: 28, closingTagStartIndex: 84, closingTagEndIndex: 94 }]);
+    expect(hookFinder.find(content, openingTagRegex, closingTagRegex, false)).toEqual([{ openingTagStartIndex: 18, openingTagEndIndex: 28, closingTagStartIndex: 84, closingTagEndIndex: 94 }]);
   });
 
 });

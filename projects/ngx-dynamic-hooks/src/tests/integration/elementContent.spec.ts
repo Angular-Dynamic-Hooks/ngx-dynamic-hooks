@@ -216,7 +216,7 @@ describe('Element content', () => {
     const hookFinder = TestBed.inject(HookFinder);
 
     multitagStringParser.onFindHooks = (content, context) => {
-      return hookFinder.findEnclosingHooks(content, /<my-custom-element>/g, /<\/my-custom-element>/g);
+      return hookFinder.find(content, /<my-custom-element>/g, /<\/my-custom-element>/g);
     };
 
     const div = document.createElement('div');

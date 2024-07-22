@@ -10,7 +10,7 @@ export class GenericSingleTagStringParser implements HookParser {
   component: ComponentConfig = SingleTagTestComponent;
   // Callbacks that you can overwrite for testing
   onFindHooks: (content: string, context: any) => HookPosition[] = (content, context) => {
-    return this.hookFinder.findSingletagHooks(content, /\[singletag-string\]/g);
+    return this.hookFinder.find(content, /\[singletag-string\]/g);
   };
   onLoadComponent: (hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>) => HookComponentData = (hookId, hookValue, context, childNodes) => {
     return {

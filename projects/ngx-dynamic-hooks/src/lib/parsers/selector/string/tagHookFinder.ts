@@ -27,7 +27,7 @@ export class TagHookFinder {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.findSingletagHooks(content, openingTagRegex);
+    return this.hookFinder.find(content, openingTagRegex);
   }
 
   /**
@@ -42,7 +42,7 @@ export class TagHookFinder {
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
     const closingTagRegex =  this.generateClosingTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.findEnclosingHooks(content, openingTagRegex, closingTagRegex, true);
+    return this.hookFinder.find(content, openingTagRegex, closingTagRegex, true);
   }
 
   // Hook regex helper

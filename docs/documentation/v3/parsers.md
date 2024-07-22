@@ -230,7 +230,7 @@ export class EmojiParser implements HookParser {
 
     // We can use the HookFinder service provided by the library to easily
     // find the HookPositions of any regex in the content string
-    return this.hookFinder.findSingletagHooks(content, emoticonRegex);
+    return this.hookFinder.findHooks(content, emoticonRegex);
   }
 
   loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
