@@ -136,11 +136,8 @@ export const parseHooks = async (
   if (!options) {
     options = {}
   }
-  if (!options.hasOwnProperty('triggerElementEvents')) {
-    options.triggerElementEvents = true;
-  }
-  if (!options.hasOwnProperty('triggerGlobalEvents')) {
-    options.triggerGlobalEvents = true;
+  if (!options.hasOwnProperty('triggerDOMEvents')) {
+    options.triggerDOMEvents = true;
   }
 
   const dynHooksService = environmentInjector.get(DynamicHooksService);

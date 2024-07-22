@@ -199,7 +199,7 @@ describe('Component bindings', () => {
     const testText = `Just some component: [singletag-string]">`;
     comp.content = testText;
     comp.context = context;
-    comp.options = { triggerElementEvents: true, triggerGlobalEvents: true };
+    comp.options = { triggerDOMEvents: true };
     comp.ngOnChanges({content: true, context: true, options: true} as any);
 
     const loadedComp = comp.hookIndex[1].componentRef!.instance;

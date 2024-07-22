@@ -1,7 +1,6 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
 import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
 import { ParserEntryResolver } from './parserEntryResolver';
-import { OptionsResolver } from './optionsResolver';
 import { HookParserEntry } from './parserEntry';
 import { HookParser } from '../../interfacesPublic';
 import { ParseOptions, getParseOptionDefaults } from './options';
@@ -15,8 +14,7 @@ import { ParseOptions, getParseOptionDefaults } from './options';
 export class SettingsResolver {
 
   constructor(
-    private parserEntryResolver: ParserEntryResolver,
-    private optionsResolver: OptionsResolver
+    private parserEntryResolver: ParserEntryResolver
   ) {
   }
 
@@ -35,26 +33,51 @@ export class SettingsResolver {
     allSettings = allSettings || [];
     ancestorSettings = ancestorSettings || [];
     moduleSettings = moduleSettings || {};
+    const defaultSettings: DynamicHooksSettings = { options: getParseOptionDefaults() };
 
+    // Merge settings according to inheritance
     if (!moduleSettings.hasOwnProperty('inheritance') || moduleSettings.inheritance === DynamicHooksInheritance.Linear) {
-      resolvedSettings = this.mergeSettings(ancestorSettings);
+      resolvedSettings = this.mergeSettings([
+        defaultSettings,
+        ...ancestorSettings,
+        {parsers: localParsers || undefined, options: localOptions || undefined}
+      ]);
 
     } else if (moduleSettings.inheritance === DynamicHooksInheritance.All) {
-      // Make sure the options of ancestorSettings (which include current moduleSettings as last entry) are last to be merged so that they always overwrite all others
-      // This is in case other settings were added to the back of allSettings after registering this module
-      resolvedSettings = this.mergeSettings([...allSettings, ...ancestorSettings]);
+      // Additionally merge ancestorSettings after allSettings to give settings closer to the current injector priority
+      resolvedSettings = this.mergeSettings([
+        defaultSettings,
+        ...allSettings, 
+        ...ancestorSettings,
+        {options: localOptions || undefined}
+      ]);
 
     } else {
-      resolvedSettings = moduleSettings || {};
-  
+      resolvedSettings = this.mergeSettings([
+        defaultSettings,
+        moduleSettings || {},
+        {options: localOptions || undefined}
+      ])  
     }
 
-    const resolvedParsers = this.resolveParsers(resolvedSettings.parsers || null, localParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
-    const resolvedOptions = this.resolveOptions(content, resolvedSettings.options || null, localOptions);
+    const finalOptions = resolvedSettings.options!;
+
+    // Disabled sanitization if content is not string
+    if (content && typeof content !== 'string') {
+      finalOptions.sanitize = false;
+  }
+    
+    // Process parsers entries. Local parsers fully replace global ones.
+    let finalParsers: HookParser[] = [];
+    if (localParsers) {
+      finalParsers = this.parserEntryResolver.resolve(localParsers, injector);
+    } else if (resolvedSettings.parsers) {
+      finalParsers = this.parserEntryResolver.resolve(resolvedSettings.parsers, injector, globalParsersBlacklist, globalParsersWhitelist);
+    }
 
     return {
-      parsers: resolvedParsers,
-      options: resolvedOptions
+      parsers: finalParsers,
+      options: finalOptions
     };
   }
 
@@ -91,43 +114,4 @@ export class SettingsResolver {
     return mergedSettings;
   }
 
-  /**
-   * Loads the relevant parse options
-   */
-  private resolveOptions(content: any, globalOptions: ParseOptions|null, localOptions: ParseOptions|null): ParseOptions {
-    let resolvedOptions: ParseOptions;
-
-    // If local
-    if (localOptions) {
-      resolvedOptions = this.optionsResolver.resolve(content, localOptions);
-    // If global
-    } else if (globalOptions) {
-      resolvedOptions = this.optionsResolver.resolve(content, globalOptions);
-    // If none given
-    } else {
-      resolvedOptions = getParseOptionDefaults(content);
-    }
-
-    return resolvedOptions;
-  }
-
-  /**
-   * Loads the relevant parser configuration
-   */
-  private resolveParsers(globalParsers: HookParserEntry[]|null, localParsers: HookParserEntry[]|null, injector: Injector, globalParsersBlacklist: string[]|null, globalParsersWhitelist: string[]|null): HookParser[] {
-    let resolvedParsers: HookParser[];
-
-    // If local
-    if (localParsers) {
-      resolvedParsers = this.parserEntryResolver.resolve(localParsers, injector);
-    // If global
-    } else if (globalParsers) {
-      resolvedParsers = this.parserEntryResolver.resolve(globalParsers, injector, globalParsersBlacklist, globalParsersWhitelist);
-    // If none given
-    } else {
-      resolvedParsers = [];
-    }
-
-    return resolvedParsers;
-  }
 }

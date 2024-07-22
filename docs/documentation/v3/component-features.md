@@ -74,7 +74,7 @@ You can subscribe to `@Output()` events from selector hooks with functions from 
 ```
 As with normal Angular output bindings, the special `$event`-keyword can optionally be used to pass the emitted event object as a parameter to the function.
 
-**Tip**: If you want, you can also enable automatically triggering DOM events when component outputs emit, so you can listen to those from anywhere in the browser (see `triggerElementEvents` and `triggerGlobalEvents` in [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).
+**Tip**: If you want, you can also enable automatically triggering DOM events when component outputs emit, so you can listen to those from anywhere in the browser (see `triggerDOMEvents` in [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).
 
 ### A note about `this`
 

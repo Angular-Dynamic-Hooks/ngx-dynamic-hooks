@@ -61,18 +61,26 @@ describe('ParserOptions', () => {
     }
   });
 
-  it('#should ignore invalid options', () => {
-    const invalidOptions = {
-      invalidOption: true
-    };
-
-    comp.options = invalidOptions as ParseOptions;
-    comp.ngOnChanges({content: true, options: true} as any);
-
+  it('#should merge global and local options correctly', () => {
     const defaults = getParseOptionDefaults();
-    for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((defaults as any)[key]);
-    }
+    const globalOptions: ParseOptions = {};
+    const localOptions: ParseOptions = {};
+    globalOptions.sanitize = !defaults.sanitize;
+    localOptions.triggerDOMEvents = !defaults.triggerDOMEvents;
+
+    let {fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        parsers: testParsers,
+        options: globalOptions
+      })
+    ]);
+
+    comp.content = 'something';
+    comp.options = localOptions;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(comp.activeOptions.sanitize).toBe(!defaults.sanitize);
+    expect(comp.activeOptions.triggerDOMEvents).toBe(!defaults.triggerDOMEvents);
   });
 
   it('#should load fine without options', () => {
@@ -415,9 +423,8 @@ describe('ParserOptions', () => {
     expect(loadedComp.ngOnChanges['calls'].count()).toBe(1);
   });
 
-  it('should not trigger any html events by default', () => {
-    let elementEventValue: any = null;
-    let documentEventValue: any = null;
+  it('should not trigger DOM events by default', () => {
+    let eventValue: any = null;
 
     const testText = `[singletag-string]`;
     comp.content = testText;
@@ -427,72 +434,36 @@ describe('ParserOptions', () => {
 
     // Register html event listeners
     loadedCompElement.addEventListener('genericOutput', event => {
-      elementEventValue = (event as CustomEvent).detail;
-    });
-    document.addEventListener('SingleTagTestComponent.genericOutput', event => {
-      documentEventValue = (event as CustomEvent).detail;
+      eventValue = (event as CustomEvent).detail;
     });
 
     // Trigger output
     loadedComp.genericOutput.emit("The payload!");
 
     // Custom events should not have fired
-    expect(elementEventValue).toBe(null);
-    expect(documentEventValue).toBe(null);   
+    expect(eventValue).toBe(null);
   });
 
-  it('should triggerElementEvents, if requested', () => {
-    let elementEventValue: any = null;
-    let documentEventValue: any = null;
+  it('should triggerDOMEvents, if requested', () => {
+    let eventValue: any = null;
 
     const testText = `[singletag-string]`;
     comp.content = testText;
-    comp.options = { triggerElementEvents: true }
+    comp.options = { triggerDOMEvents: true }
     comp.ngOnChanges({content: true, options: true} as any);
     let loadedComp = comp.hookIndex[1].componentRef!.instance;
     let loadedCompElement: HTMLElement = comp.hookIndex[1].componentRef?.location.nativeElement;
 
     // Register html event listeners
     loadedCompElement.addEventListener('genericOutput', event => {
-      elementEventValue = (event as CustomEvent).detail;
-    });
-    document.addEventListener('SingleTagTestComponent.genericOutput', event => {
-      documentEventValue = (event as CustomEvent).detail;
+      eventValue = (event as CustomEvent).detail;
     });
 
     // Trigger output
     loadedComp.genericOutput.emit("The payload!");
 
-    // Custom events should not have fired
-    expect(elementEventValue).toBe("The payload!");
-    expect(documentEventValue).toBe(null);   
-  });
-
-  it('should triggerGlobalEvents, if requested', () => {
-    let elementEventValue: any = null;
-    let documentEventValue: any = null;
-
-    const testText = `[singletag-string]`;
-    comp.content = testText;
-    comp.options = { triggerGlobalEvents: true }
-    comp.ngOnChanges({content: true, options: true} as any);
-    let loadedComp = comp.hookIndex[1].componentRef!.instance;
-    let loadedCompElement: HTMLElement = comp.hookIndex[1].componentRef?.location.nativeElement;
-
-    // Register html event listeners
-    loadedCompElement.addEventListener('genericOutput', event => {
-      elementEventValue = (event as CustomEvent).detail;
-    });
-    document.addEventListener('SingleTagTestComponent.genericOutput', event => {
-      documentEventValue = (event as CustomEvent).detail;
-    });
-
-    // Trigger output
-    loadedComp.genericOutput.emit("The payload!");
-
-    // Custom events should not have fired
-    expect(elementEventValue).toBe(null);
-    expect(documentEventValue).toBe("The payload!");   
+    // Custom events should have fired
+    expect(eventValue).toBe("The payload!");
   });
 
   it('#should ignoreInputAliases, if requested', () => {

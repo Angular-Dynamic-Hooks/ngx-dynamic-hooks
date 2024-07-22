@@ -457,19 +457,4 @@ describe('DefaultPlatformService', () => {
 
     expect(val).toBe(777);
   });
-
-  // dispatchGlobalEvent
-  // ------------------
-
-  it(`#should dispatch global events`, () => {
-    let val: any = null;
-    document.addEventListener('customEvent', event => {
-      val = (event as CustomEvent).detail;
-    });
-
-    platformService.dispatchGlobalEvent('customEvent', 777);
-
-    expect(val).toBe(777);
-  });
-
 });

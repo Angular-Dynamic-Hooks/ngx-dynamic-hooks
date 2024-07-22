@@ -121,8 +121,4 @@ export class AutoPlatformService implements CompletePlatformService {
     return this.getFor('dispatchEvent').dispatchEvent!(element, name, payload);
   }
 
-  dispatchGlobalEvent(name: string, payload: any) {
-    return this.getFor('dispatchGlobalEvent').dispatchGlobalEvent!(name, payload);
-  }
-
 }

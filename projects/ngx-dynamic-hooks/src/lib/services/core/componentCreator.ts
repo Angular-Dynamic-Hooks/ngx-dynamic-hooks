@@ -354,19 +354,10 @@ export class ComponentCreator {
     for (const outputObject of compMeta.outputs) {
       const outputName = options.ignoreOutputAliases ? outputObject.propName : outputObject.templateName;
       
-      // Trigger event in host element, if requested
+      // Trigger events, if requested
       hook.htmlEventSubscriptions[outputName] = hook.componentRef!.instance[outputObject.propName].subscribe((event: any) => {
-        if (options.triggerElementEvents) {
+        if (options.triggerDOMEvents) {
           this.platformService.dispatchEvent(hook.componentRef?.location.nativeElement, outputName, event);
-        }
-      });
-      
-
-      // Trigger event globally, if requested
-      const globalEventName = `${hook.componentRef!.componentType.name}.${outputName}`;
-      hook.htmlEventSubscriptions[globalEventName] = hook.componentRef!.instance[outputObject.propName].subscribe((event: any) => {
-        if (options.triggerGlobalEvents) {
-          this.platformService.dispatchGlobalEvent(globalEventName, event);
         }
       });
     }

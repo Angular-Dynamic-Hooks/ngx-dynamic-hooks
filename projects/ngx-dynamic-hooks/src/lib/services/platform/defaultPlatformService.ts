@@ -152,11 +152,6 @@ export class DefaultPlatformService implements CompletePlatformService {
   }
 
   dispatchEvent(element: Node, name: string, payload: any) {
-    element.dispatchEvent(new CustomEvent(name, { detail: payload }));
+    element.dispatchEvent(new CustomEvent(name, { detail: payload, bubbles: true }));
   }
-
-  dispatchGlobalEvent(name: string, payload: any) {
-    this.document.dispatchEvent(new CustomEvent(name, { detail: payload }));
-  }
-
 }

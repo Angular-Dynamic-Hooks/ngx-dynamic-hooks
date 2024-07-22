@@ -388,9 +388,8 @@ describe('Standalone usage', () => {
     await expect(() => scope.destroy()).toThrowError(expectedError);
   });
 
-  it('#should emit HTML events from outputs by default', async () => {
-    let elementEventValue: any = null;
-    let documentEventValue: any = null;
+  it('#should emit DOM events by default', async () => {
+    let eventValue: any = null;
 
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
@@ -401,27 +400,22 @@ describe('Standalone usage', () => {
     // Register html event listeners
     const compRef = result.hookIndex[1].componentRef;
     compRef?.location.nativeElement.addEventListener('genericOutput', (event: CustomEvent) => {
-      elementEventValue = (event as CustomEvent).detail;
-    });
-    document.addEventListener('MultiTagTestComponent.genericOutput', event => {
-      documentEventValue = (event as CustomEvent).detail;
+      eventValue = (event as CustomEvent).detail;
     });
 
     // Trigger output
     compRef?.instance.genericOutput.emit("The payload!");
 
     // Custom events should not have fired
-    expect(elementEventValue).toBe("The payload!");
-    expect(documentEventValue).toBe("The payload!");  
+    expect(eventValue).toBe("The payload!");
   });
 
   it('#should not emit HTML events from outputs if requested', async () => {
-    let elementEventValue: any = null;
-    let documentEventValue: any = null;
+    let eventValue: any = null;
 
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
-    const options = { triggerElementEvents: false, triggerGlobalEvents: false };
+    const options = { triggerDOMEvents: false };
     const parsers = [MultiTagTestComponent];
 
     const result = await parseHooks(testText, parsers, context, options);
@@ -429,18 +423,14 @@ describe('Standalone usage', () => {
     // Register html event listeners
     const compRef = result.hookIndex[1].componentRef;
     compRef?.location.nativeElement.addEventListener('genericOutput', (event: CustomEvent) => {
-      elementEventValue = (event as CustomEvent).detail;
-    });
-    document.addEventListener('MultiTagTestComponent.genericOutput', event => {
-      documentEventValue = (event as CustomEvent).detail;
+      eventValue = (event as CustomEvent).detail;
     });
 
     // Trigger output
     compRef?.instance.genericOutput.emit("The payload!");
 
     // Custom events should not have fired
-    expect(elementEventValue).toBe(null);
-    expect(documentEventValue).toBe(null);  
+    expect(eventValue).toBe(null);
   });
 
 });

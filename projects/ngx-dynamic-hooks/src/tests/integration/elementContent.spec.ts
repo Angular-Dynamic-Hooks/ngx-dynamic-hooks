@@ -332,7 +332,7 @@ describe('Element content', () => {
     expect(scriptElement).not.toBeUndefined();
   });
 
-  it('#should be not load components twice into the same elements when calling parse again (be idempotent)', async () => {
+  it('#should not load components twice into the same elements when calling parse again (be idempotent)', async () => {
     const dynHooksService = TestBed.inject(DynamicHooksService);
     const componentCreator = TestBed.inject(ComponentCreator);
     const spy = spyOn(componentCreator, 'init').and.callThrough();
