@@ -10,7 +10,7 @@ $dm-background-color-2:       #32343c !default;
 $dm-background-color-code:    #343640 !default;
 $dm-background-color-hover:   #dddddd0f !default;
 
-$dm-link-base-color:       lighten($brand-color, 0%) !default;
+$dm-link-base-color:       desaturate($brand-color, 12%) !default;
 $dm-link-visited-color:    $dm-link-base-color !default;
 $dm-link-hover-color:      $dm-text-color !default;
 
