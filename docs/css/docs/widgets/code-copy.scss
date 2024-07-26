@@ -1,0 +1,24 @@
+.copyToClipboard {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border: none;
+  padding: 7px 14px;
+  cursor: pointer;
+  border-radius: 0px 0px 0px 5px;
+  font-size: 11px;
+  font-family: 'Roboto Mono';
+  background-color: transparent;
+  color: var(--text-color);
+  opacity: 0;
+}
+*:hover > .copyToClipboard,
+*:focus > .copyToClipboard {
+  opacity: 0.9;
+}
+
+*:hover >.copyToClipboard:hover,
+*:focus >.copyToClipboard:focus {
+  opacity: 1;
+  // color: var(--brand-color);
+}

@@ -8,6 +8,7 @@ import { initCopyrightDate } from './misc';
 import { SidebarToggleWidget } from './widgets/sidebarToggle';
 import { VersionLogoLinkWidget } from './widgets/version/versionLogoLink';
 import { StackblitzWidget } from './widgets/stackblitz';
+import { CodeCopyWidget } from './widgets/codeCopy';
 
 // Init misc logic
 initCopyrightDate();
@@ -21,5 +22,6 @@ const widgets = bootstrapWidgets(document.body, [
   SidebarSectionsWidget,
   ArticleTocWidget,
   VersionWarningLinkWidget,
-  StackblitzWidget
+  StackblitzWidget,
+  CodeCopyWidget
 ]);

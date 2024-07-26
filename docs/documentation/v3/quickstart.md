@@ -57,7 +57,6 @@ If your app uses modules instead of the new standalone components structure, you
   declarations: [ExampleComponent]
 })
 export class AppModule {}
-
 ```
 
 ## Next steps
