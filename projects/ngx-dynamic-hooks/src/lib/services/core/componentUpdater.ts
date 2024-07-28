@@ -1,10 +1,11 @@
-import { SimpleChange, isDevMode, Injectable, reflectComponentType} from '@angular/core';
+import { SimpleChange, Injectable, reflectComponentType} from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../interfacesPublic';
 import { ParseOptions } from '../../services/settings/options';
 import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
 import { AutoPlatformService } from '../platform/autoPlatformService';
+import { Logger } from '../utils/logger';
 
 /**
  * The service responsible for updating dynamically created components
@@ -14,7 +15,7 @@ import { AutoPlatformService } from '../platform/autoPlatformService';
 })
 export class ComponentUpdater {
 
-  constructor(private platformService: AutoPlatformService, private deepComparer: DeepComparer) {
+  constructor(private platformService: AutoPlatformService, private deepComparer: DeepComparer, private logger: Logger) {
   }
 
   /**
@@ -59,7 +60,7 @@ export class ComponentUpdater {
     }
 
     // Update bindings
-    hook.bindings = hook.parser.getBindings(hook.id, hook.value, context);
+    hook.bindings = hook.parser.getBindings(hook.id, hook.value, context, options);
     this.updateComponentWithNewInputs(hook, options);
     this.updateComponentWithNewOutputs(hook, context, options);
 
@@ -104,7 +105,7 @@ export class ComponentUpdater {
     const component = hook.componentRef!.instance;
 
     // Find out which inputs have changed
-    const changedInputs = this.getChangedBindings(hook, 'inputs', options.compareInputsByValue!, options.compareByValueDepth!);
+    const changedInputs = this.getChangedBindings(hook, 'inputs', options);
 
     // Check if inputs exists on component
     const existingInputs: {[key: string]: any} = {};
@@ -121,7 +122,7 @@ export class ComponentUpdater {
         if (!['__proto__', 'prototype', 'constructor'].includes(finalInputProp)) {
           existingInputs[finalInputProp] = inputValue;
         } else {
-          console.error('Tried to overwrite a __proto__, prototype or constructor property with input "' + finalInputProp + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.');
+          this.logger.error(['Tried to overwrite a __proto__, prototype or constructor property with input "' + finalInputProp + '" for hook "' + hook.componentRef!.componentType.name + '". This is not allowed.'], options);
           continue;
         }
       }
@@ -174,7 +175,7 @@ export class ComponentUpdater {
     const component = hook.componentRef!.instance;
 
     // Find out which outputs have changed
-    const changedOutputs: {[key: string]: (e: any, c: any) => any} = this.getChangedBindings(hook, 'outputs', options.compareOutputsByValue!, options.compareByValueDepth!);
+    const changedOutputs: {[key: string]: (e: any, c: any) => any} = this.getChangedBindings(hook, 'outputs', options);
 
     // Check if outputs exist on component
     const existingOutputs: {[key: string]: (e: any, c: any) => any} = {};
@@ -225,7 +226,7 @@ export class ComponentUpdater {
    * @param type - What kind of binding to check
    * @param compareByValue - Whether to compare by reference or value
    */
-  getChangedBindings(hook: Hook, type: 'inputs'|'outputs', compareByValue: boolean, compareDepth: number): {[key: string]: any} {
+  getChangedBindings(hook: Hook, type: 'inputs'|'outputs', options: ParseOptions): {[key: string]: any} {
     const changedBindings: {[key: string]: any} = {};
     if (hook.bindings!.hasOwnProperty(type)) {
       for (const [key, binding] of Object.entries(hook.bindings![type] as any)) {
@@ -238,14 +239,14 @@ export class ComponentUpdater {
 
         // Compare old with new
         // a) By reference
-        if (!compareByValue) {
+        if (type === 'inputs' ? !options.compareInputsByValue : !options.compareOutputsByValue) {
           if (binding !== hook.previousBindings[type][key].reference) {
             changedBindings[key] = binding;
           }
         // b) By value
         } else {
-          const stringifiedBinding = this.deepComparer.detailedStringify(binding, compareDepth);
-          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef!.componentType.name, compareDepth, hook.previousBindings[type][key].stringified!, stringifiedBinding);
+          const stringifiedBinding = this.deepComparer.detailedStringify(binding, options.compareByValueDepth);
+          const canBeComparedByValue = this.checkDetailedStringifyResultPair(key, hook.componentRef!.componentType.name, options, hook.previousBindings[type][key].stringified!, stringifiedBinding);
 
           if (canBeComparedByValue) {
             if (stringifiedBinding.result !== hook.previousBindings[type][key].stringified!.result) {
@@ -272,49 +273,37 @@ export class ComponentUpdater {
    * @param oldResult - The detailedStringifiedResult for the old value
    * @param newResult - The detailedStringifiedResult for the new value
    */
-  checkDetailedStringifyResultPair(bindingName: string, componentName: string, compareDepth: number, oldResult: DetailedStringifyResult, newResult: DetailedStringifyResult): boolean {
+  checkDetailedStringifyResultPair(bindingName: string, componentName: string, options: ParseOptions, oldResult: DetailedStringifyResult, newResult: DetailedStringifyResult): boolean {
     // Stringify successful?
     if (oldResult.result === null && newResult.result === null) {
-      if (isDevMode()) {
-        console.warn('Could stringify neither new nor old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
-        return false;
-      }
+      this.logger.warn(['Could stringify neither new nor old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.'], options);
+      return false;
     }
     if (oldResult.result === null) {
-      if (isDevMode()) {
-        console.warn('Could not stringify old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
-        return false;
-      }
+      this.logger.warn(['Could not stringify old value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.'], options);
+      return false;
     }
     if (newResult.result === null) {
-      if (isDevMode()) {
-        console.warn('Could not stringify new value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.');
-        return false;
-      }
+      this.logger.warn(['Could not stringify new value for hook binding "' + bindingName + '" for component "' + componentName + '" to compare by value. Defaulting to comparison by reference instead.'], options);
+      return false;
     }
 
     // Max depth reached?
     if (oldResult.depthReachedCount > 0 && newResult.depthReachedCount > 0) {
-      if (isDevMode()) {
-        console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value and ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
-          'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.'
-        );
-      }
+      this.logger.warn([
+        'Maximum compareByValueDepth of ' + options.compareByValueDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value and ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+        'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.'
+      ], options);
     } else if (oldResult.depthReachedCount > 0) {
-      if (isDevMode()) {
-        console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
-          'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
-        );
-      }
+      this.logger.warn([
+        'Maximum compareByValueDepth of ' + options.compareByValueDepth + ' reached ' + oldResult.depthReachedCount + ' time(s) for old value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+        'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
+      ], options);
     } else if (newResult.depthReachedCount > 0) {
-      if (isDevMode()) {
-        console.warn(
-          'Maximum compareByValueDepth of ' + compareDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
-          'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
-        );
-      }
+      this.logger.warn([
+        'Maximum compareByValueDepth of ' + options.compareByValueDepth + ' reached ' + newResult.depthReachedCount + ' time(s) for new value while comparing binding "' + bindingName + '" for component "' + componentName + '.\n',
+        'If this impacts performance, consider simplifying this binding, reducing comparison depth or setting compareInputsByValue/compareOutputsByValue to false.',
+      ], options);
     }
 
     return true;

@@ -94,7 +94,7 @@ describe('Initialization', () => {
 
     // Options should be default
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+      expect(value).toEqual((getParseOptionDefaults() as any)[key]);
     }
 
     // Should load component even without global settings
@@ -123,7 +123,7 @@ describe('Initialization', () => {
 
     // Options should be default
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+      expect(value).toEqual((getParseOptionDefaults() as any)[key]);
     }
 
     // Parsers should be empty
@@ -150,7 +150,7 @@ describe('Initialization', () => {
 
     // Options should be default
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+      expect(value).toEqual((getParseOptionDefaults() as any)[key]);
     }
 
     // Parsers should be empty

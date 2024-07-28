@@ -6,6 +6,7 @@ import { SelectorHookParserConfig } from '../selectorHookParserConfig';
 import { SelectorHookParserConfigResolver } from '../selectorHookParserConfigResolver';
 import { regexes } from '../../../constants/regexes';
 import { matchAll } from '../../../services/utils/utils';
+import { ParseOptions } from '../../../services/settings/options';
 
 /**
  * A powerful parser for standard Angular component selectors that comes with this library
@@ -20,13 +21,13 @@ export class StringSelectorHookParser implements HookParser {
     this.name = this.config.name;
   }
 
-  public findHooks(content: string, context: any): HookPosition[] {
+  public findHooks(content: string, context: any, options: ParseOptions): HookPosition[] {
     return this.config.enclosing ?
-      this.tagHookFinder.findEnclosingTags(content, this.config.selector!, this.config.bracketStyle) :
-      this.tagHookFinder.findSingleTags(content, this.config.selector!, this.config.bracketStyle);
+      this.tagHookFinder.findEnclosingTags(content, this.config.selector!, this.config.bracketStyle, options) :
+      this.tagHookFinder.findSingleTags(content, this.config.selector!, this.config.bracketStyle, options);
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
     return {
       component: this.config.component,
       hostElementTag: this.config.hostElementTag,
@@ -35,7 +36,7 @@ export class StringSelectorHookParser implements HookParser {
     };
   }
 
-  public getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  public getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     let hookBindings = this.savedBindings[hookId];
 
     // Parse bindings once from hookValue, then reuse on subsequent runs
@@ -45,8 +46,8 @@ export class StringSelectorHookParser implements HookParser {
     }
 
     // (Re)evaluate if needed
-    this.bindingsValueManager.checkInputBindings(hookBindings.inputs!, context, this.config);
-    this.bindingsValueManager.checkOutputBindings(hookBindings.outputs!, this.config);
+    this.bindingsValueManager.checkInputBindings(hookBindings.inputs!, context, this.config, options);
+    this.bindingsValueManager.checkOutputBindings(hookBindings.outputs!, this.config, options);
 
     return {
       inputs: this.getValuesFromSavedBindings(hookBindings.inputs!),

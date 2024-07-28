@@ -62,7 +62,7 @@ export interface HookParser {
      * @param content - The content to search for hooks
      * @param context - The current context object
      */
-    findHooks?(content: string, context: any): HookPosition[];
+    findHooks?(content: string, context: any, options: ParseOptions): HookPosition[];
 
     /**
      * Returns the hook elements that should serve as host elements for components in the content.
@@ -72,7 +72,7 @@ export interface HookParser {
      * @param content - The content element to search for hooks (usually a standard Element)
      * @param context - The current context object
      */
-    findHookElements?(contentElement: any, context: any): any[];
+    findHookElements?(contentElement: any, context: any, options: ParseOptions): any[];
 
     /**
      * How to instantiate the component for this hook.
@@ -84,7 +84,7 @@ export interface HookParser {
      * @param context - The current context object
      * @param childNodes - The current child nodes of this hook
      */
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData;
+    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData;
 
     /**
      * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.
@@ -95,7 +95,7 @@ export interface HookParser {
      * @param hookValue - The hook as it appears in the text
      * @param context - The current context object
      */
-    getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings;
+    getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings;
 }
 
 

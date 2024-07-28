@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ContentSanitizer } from '../../lib/services/utils/contentSanitizer';
-import { anchorAttrHookId, anchorAttrParseToken } from '../testing-api';
+import { anchorAttrHookId, anchorAttrParseToken, getParseOptionDefaults } from '../testing-api';
 
 /**
  * ContentSanitizer tests

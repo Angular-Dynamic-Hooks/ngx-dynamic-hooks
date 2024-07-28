@@ -56,7 +56,6 @@ export class ArticleTocWidget implements Widget {
         this.tocWrapperElement!.querySelectorAll('.toc-entry').forEach(element => element.classList.remove('active'));
       
         // Set new title to active
-        // console.log(firstVisibleTitle[1].element)
         this.tocWrapperElement!.querySelector('#toc-' + firstVisibleTitle[0])!.classList.add('active');
       }
     }, {

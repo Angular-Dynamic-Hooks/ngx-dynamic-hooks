@@ -1,6 +1,8 @@
-import { isDevMode, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HookPosition } from '../../interfacesPublic';
 import { matchAll } from './utils';
+import { Logger } from './logger';
+import { getParseOptionDefaults, ParseOptions } from '../settings/options';
 
 /**
  * A utility service to easily parse hooks from a string of text
@@ -10,6 +12,8 @@ import { matchAll } from './utils';
 })
 export class HookFinder {
 
+  constructor(private logger: Logger) {}
+
   /**
    * Finds all text hooks in a piece of content, e.g. <hook>...</hook>, and returns their positions
    * 
@@ -18,11 +22,11 @@ export class HookFinder {
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
    */
-  find(content: string, openingTagRegex: RegExp, closingTagRegex?: RegExp, includeNested?: boolean): HookPosition[] {
+  find(content: string, openingTagRegex: RegExp, closingTagRegex?: RegExp, includeNested?: boolean, options: ParseOptions = getParseOptionDefaults()): HookPosition[] {
     if (!closingTagRegex) {
       return this.findSingletagHooks(content, openingTagRegex);
     } else {
-      return this.findEnclosingHooks(content, openingTagRegex, closingTagRegex, includeNested)
+      return this.findEnclosingHooks(content, openingTagRegex, closingTagRegex, includeNested, options)
     }
   }
 
@@ -71,7 +75,7 @@ export class HookFinder {
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
    */
-  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested?: boolean): HookPosition[] {
+  findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested?: boolean, options: ParseOptions = getParseOptionDefaults()): HookPosition[] {
     const allTags = [];
     const result: HookPosition[] = [];
 
@@ -106,9 +110,7 @@ export class HookFinder {
 
       // Any subsequent tag is only allowed to start after previous tag has ended
       if (index > 0 && tag.startIndex < allTags[index - 1].endIndex) {
-        if (isDevMode()) {
-          console.warn('Syntax error - New tag "' + tag.value + '" started at position ' + tag.startIndex + ' before previous tag "' + allTags[index - 1].value + '" ended at position ' + allTags[index - 1].endIndex + '. Ignoring.');
-        }
+        this.logger.warn(['Syntax error - New tag "' + tag.value + '" started at position ' + tag.startIndex + ' before previous tag "' + allTags[index - 1].value + '" ended at position ' + allTags[index - 1].endIndex + '. Ignoring.'], options);
         continue;
       }
 
@@ -118,9 +120,7 @@ export class HookFinder {
       } else {
         // Syntax error: Closing tag without preceding opening tag. Syntax error.
         if (openedTags.length === 0) {
-          if (isDevMode()) {
-            console.warn('Syntax error - Closing tag without preceding opening tag found: "' + tag.value + '". Ignoring.');
-          }
+          this.logger.warn(['Syntax error - Closing tag without preceding opening tag found: "' + tag.value + '". Ignoring.'], options);
           continue;
         }
 
@@ -143,9 +143,7 @@ export class HookFinder {
     }
 
     if (openedTags.length > 0) {
-      if (isDevMode()) {
-        console.warn('Syntax error - Opening tags without corresponding closing tags found.');
-      }
+      this.logger.warn(['Syntax error - Opening tags without corresponding closing tags found.'], options);
     }
 
     return result;

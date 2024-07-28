@@ -1,4 +1,4 @@
-import { Inject, Injector, PLATFORM_ID, ApplicationRef, isDevMode, Injectable, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
+import { Inject, Injector, PLATFORM_ID, ApplicationRef, Injectable, createComponent, EnvironmentInjector, reflectComponentType } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { combineLatest, ReplaySubject, of } from 'rxjs';
 import { first, mergeMap, tap, catchError } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { ComponentUpdater } from './componentUpdater';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag, voidElementTags } from '../../constants/core';
 import { ParseOptions } from '../settings/options';
+import { Logger } from '../utils/logger';
 
 /**
  * The service responsible for dynamically creating components for all found Hooks
@@ -19,10 +20,11 @@ import { ParseOptions } from '../settings/options';
 export class ComponentCreator {
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: number,
+    @Inject(PLATFORM_ID) private platformId: string,
     private appRef: ApplicationRef,
     private componentUpdater: ComponentUpdater, 
-    private platformService: AutoPlatformService
+    private platformService: AutoPlatformService,
+    private logger: Logger
   ) {
   }
 
@@ -58,7 +60,7 @@ export class ComponentCreator {
       }
 
       const hook = hookIndex[hookId];
-      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(anchorElement));
+      hook.data = hook.parser.loadComponent(hook.id, hook.value, context, this.platformService.getChildNodes(anchorElement), options);
       hook.isLazy = hook.data.component.hasOwnProperty('importPromise') && hook.data.component.hasOwnProperty('importName');
 
       // Skip loading lazy components during SSR
@@ -97,7 +99,7 @@ export class ComponentCreator {
     const foundHookIds = Object.keys(anchorElements).map(hookId => parseInt(hookId));
     for (const [hookId, hook] of Object.entries(hookIndex)) {
       if (!foundHookIds.includes(parseInt(hookId))) {
-        if (isDevMode()) { console.warn('Error when trying to load components - The anchor element for the following hook was found initially, but could not be found again for loading the component. Ignoring.', hook); }
+        this.logger.warn(['Error when trying to load components - The anchor element for the following hook was found initially, but could not be found again for loading the component. Ignoring.', hook], options);
         delete hookIndex[hookId];
       }
     }
@@ -118,9 +120,7 @@ export class ComponentCreator {
         }))
         // If could not be created, remove from hookIndex
         .pipe(catchError((e) => {
-          if (isDevMode()) {
-            console.error(e.stack);
-          }
+          this.logger.error([e.stack], options);
           delete hookIndex[hook.id];
           return of(null);
         })));

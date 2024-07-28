@@ -1,3 +1,4 @@
+import { Logger } from '../../lib/services/utils/logger';
 import { HookFinder } from '../testing-api';
 
 /**
@@ -5,7 +6,7 @@ import { HookFinder } from '../testing-api';
  */
 describe('HookFinder', () => {
   let hookFinder: HookFinder;
-  beforeEach(() => { hookFinder = new HookFinder(); });
+  beforeEach(() => { hookFinder = new HookFinder(new Logger('browser')); });
 
   it('#should find singletag hook positions as expected', () => {
     const openingTagRegex = /openingTag/g;

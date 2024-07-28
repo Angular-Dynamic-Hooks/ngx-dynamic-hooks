@@ -1,12 +1,14 @@
 // Testing api resources
 import { TestBed } from '@angular/core/testing';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { DynamicHooksComponent, ParseOptions, anchorElementTag, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
+import { DynamicHooksComponent, Logger, ParseOptions, anchorElementTag, getParseOptionDefaults, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
 import { GenericElementParser } from '../resources/parsers/genericElementParser';
+import { enableProdMode, isDevMode, PLATFORM_ID } from '@angular/core';
+import * as angularCore from "@angular/core";
 
 describe('ParserOptions', () => {
   let testBed;
@@ -95,7 +97,7 @@ describe('ParserOptions', () => {
 
     expect(fixture.nativeElement.innerHTML.trim()).toBe('something');
     for (const [key, value] of Object.entries(comp.activeOptions)) {
-      expect(value).toBe((getParseOptionDefaults() as any)[key]);
+      expect(value).toEqual((getParseOptionDefaults() as any)[key]);
     }
   });
 
@@ -338,7 +340,7 @@ describe('ParserOptions', () => {
       }}}
     };
 
-    const changedBindings = componentUpdater.getChangedBindings(testHook as any, 'inputs', true, 5);
+    const changedBindings = componentUpdater.getChangedBindings(testHook as any, 'inputs', getParseOptionDefaults());
     expect(changedBindings['testInput']).not.toBeUndefined();
   });
 
@@ -348,32 +350,32 @@ describe('ParserOptions', () => {
 
     let oldResult: any = {result: null, depthReachedCount: 0};
     let newResult: any = {result: null, depthReachedCount: 0};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Could stringify neither new nor old value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
 
     oldResult = {result: null, depthReachedCount: 0};
     newResult = {result: true, depthReachedCount: 0};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Could not stringify old value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
 
     oldResult = {result: true, depthReachedCount: 0};
     newResult = {result: null, depthReachedCount: 0};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Could not stringify new value for hook binding "someBinding" for component "someComponent" to compare by value. Defaulting to comparison by reference instead.');
 
     oldResult = {result: true, depthReachedCount: 1};
     newResult = {result: true, depthReachedCount: 1};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
 
     oldResult = {result: true, depthReachedCount: 0};
     newResult = {result: true, depthReachedCount: 1};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
 
     oldResult = {result: true, depthReachedCount: 1};
     newResult = {result: true, depthReachedCount: 0};
-    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', 5, oldResult, newResult);
+    componentUpdater.checkDetailedStringifyResultPair('someBinding', 'someComponent', getParseOptionDefaults(), oldResult, newResult);
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('Maximum compareByValueDepth of');
   });
 
@@ -629,6 +631,53 @@ describe('ParserOptions', () => {
 
     // Expect property not to be set when not declared as @Output()
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeUndefined();
+  });
+
+  fit('#should should adhere to the passed logOptions', () => {
+    const logger = TestBed.inject(Logger);
+    const logSpy = spyOn(console, 'log').and.callThrough();
+    const warnSpy = spyOn(console, 'warn').and.callThrough();
+    const errorSpy = spyOn(console, 'error').and.callThrough();
+
+    const testText = `[singletag-string-selector [genericInput]="context.asd"]`
+
+    // By default, should log in dev
+    comp.content = testText;
+    comp.options = { sanitize: false };
+    comp.ngOnChanges({content: true, options: true} as any);
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(warnSpy.calls.all().length).toBe(1);
+
+    // Should not log in prod by default
+    const isDevModeSpy = spyOn(logger as any, 'isDevMode').and.returnValue(false);
+    comp.options = { sanitize: false }
+    comp.ngOnChanges({content: true, options: true} as any);
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(warnSpy.calls.all().length).toBe(1);
+
+    // Should work after setting prod to true
+    comp.options = { sanitize: false, logOptions: {prod: true} }
+    comp.ngOnChanges({content: true, options: true} as any);
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(warnSpy.calls.all().length).toBe(2);
+    isDevModeSpy.and.callThrough();
+
+    // Should not log during SSR by default
+    const { comp: ssrComp } = prepareTestingModule(() => [
+      provideDynamicHooks({parsers: testParsers}),
+      {provide: PLATFORM_ID, useValue: 'server'}
+    ]);
+    ssrComp.content = testText;
+    ssrComp.options = {sanitize: false}
+    ssrComp.ngOnChanges({content: true, options: true} as any);
+    expect(Object.keys(ssrComp.hookIndex).length).toBe(1);
+    expect(warnSpy.calls.all().length).toBe(2);
+
+    // Should work after setting ssr to true
+    ssrComp.options = { sanitize: false, logOptions: {ssr: true} }
+    ssrComp.ngOnChanges({content: true, options: true} as any);
+    expect(Object.keys(ssrComp.hookIndex).length).toBe(1);
+    expect(warnSpy.calls.all().length).toBe(3);
   });
  
 });

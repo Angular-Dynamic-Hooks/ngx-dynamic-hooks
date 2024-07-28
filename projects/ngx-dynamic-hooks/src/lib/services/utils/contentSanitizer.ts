@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HookIndex } from '../../interfacesPublic';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
-import { HookFinder } from './hookFinder';
 import { matchAll } from './utils';
 
 const sanitizerPlaceholderTag = 'dynamic-hooks-sanitization-placeholder';
@@ -125,7 +124,7 @@ export class ContentSanitizer {
    * @param content - The stringified html content to search
    * @param substrRegex - The regex that matches the element tags
    */
-  findAndEncodeTags(content: string, substrRegex: RegExp): string {
+  private findAndEncodeTags(content: string, substrRegex: RegExp): string {
     let encodedContent = content;
 
     const matches = matchAll(content, substrRegex);

@@ -1,8 +1,10 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { regexes } from '../../constants/regexes';
 import { DataTypeEncoder } from './dataTypeEncoder';
 import { matchAll } from './utils';
+import { Logger } from './logger';
+import { getParseOptionDefaults, ParseOptions } from '../settings/options';
 
 
 /**
@@ -13,7 +15,7 @@ import { matchAll } from './utils';
 })
 export class DataTypeParser {
 
-  constructor(private dataTypeEncoder: DataTypeEncoder) {
+  constructor(private dataTypeEncoder: DataTypeEncoder, private logger: Logger) {
   }
 
   /**
@@ -30,7 +32,7 @@ export class DataTypeParser {
    * @param trackContextVariables - (optional) An object that will be filled out with all found context vars
    * @param allowContextFunctionCalls - (optional) Whether to allow function calls in context vars
    */
-  evaluate(dataTypeString: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
+  evaluate(dataTypeString: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true, options: ParseOptions = getParseOptionDefaults()): any {
 
     // a) Simple types
     // --------------------
@@ -70,7 +72,7 @@ export class DataTypeParser {
       // Prepare string and parse as JSON
       const json = this.parseAsJSON(dataTypeString, unescapeStrings);
       // Load variables
-      return this.loadVariables(json, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);
+      return this.loadJSONVariables(json, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls, options);
     }
 
     // event variable name
@@ -80,7 +82,7 @@ export class DataTypeParser {
 
     // context variable name
     if (dataTypeString.match(new RegExp('^\\s*' + regexes.contextVariableRegex + '\\s*$', 'gm'))) {
-      return this.safelyLoadContextVariable(dataTypeString, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);
+      return this.loadContextVariable(dataTypeString, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls, options);
     }
 
     throw Error('Data type for following input was not recognized and could not be parsed: "' + dataTypeString + '"');
@@ -118,7 +120,7 @@ export class DataTypeParser {
    * @param JSONString - The string to be given to JSON.parse()
    * @param unescapeStrings - Whether to unescape the strings of this JSON
    */
-  parseAsJSON(JSONString: string, unescapeStrings: boolean = true): any {
+  private parseAsJSON(JSONString: string, unescapeStrings: boolean): any {
 
     // Find all single- and grave-quote-delimited strings and convert them to double quote strings
     const singleQuoteStringRegex = /\'(\\.|[^\'])*?\'/gm;
@@ -175,7 +177,7 @@ export class DataTypeParser {
    * @param valueRegex - The values to find
    * @param callbackFn - A callback fn that returns what you want to replace them with
    */
-  replaceValuesInJSONString(JSONString: string, valueRegex: string, callbackFn: (match: string) => string): string {
+  private replaceValuesInJSONString(JSONString: string, valueRegex: string, callbackFn: (match: string) => string): string {
     // With lookbehinds (too new for some browsers)
     const withLookBehindsRegex = '(?:' +
       '(?<=:\\s*)' + valueRegex + '(?=\\s*[,}])' + '|' +
@@ -201,7 +203,7 @@ export class DataTypeParser {
    * @param jsonLevel - The current level of parsing
    * @param unescapeStrings - Whether to unescape the decoded strings as well
    */
-  decodeJSONStrings(jsonLevel: any, unescapeStrings: boolean = true): void {
+  private decodeJSONStrings(jsonLevel: any, unescapeStrings: boolean): void {
     for (const prop in jsonLevel) {
       if (typeof jsonLevel[prop] === 'string') {
         // Ignore var placeholders
@@ -222,24 +224,6 @@ export class DataTypeParser {
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
   /**
-   * Takes a parsed input data type, looks for variable placeholder strings and replaces them with the actual variables
-   *
-   * IMPORTANT: To correctly find variables, their substrings, subfunction and subbrackets must be encoded (done in evaluate())
-   *
-   * @param input - The input variable to check
-   * @param context - The current context object, if any
-   * @param event - The current event object, if any
-   * @param unescapeStrings - Whether to unescape strings or not
-   * @param trackContextVariables - An optional object that will be filled out with all found context vars
-   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
-   */
-  loadVariables(input: any, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
-    const wrapper = {result: input};
-    this.loadVariablesLoop(wrapper, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);
-    return wrapper.result;
-  }
-
-  /**
    * Travels a JSON-like object to find all context vars and event objects and replaces their placeholders with the actual values
    *
    * @param arrayOrObject - The property of the JSON to analyze
@@ -249,47 +233,25 @@ export class DataTypeParser {
    * @param trackContextVariables - Whether to unescape strings or not
    * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
-  loadVariablesLoop(arrayOrObject: any, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): void {
+  private loadJSONVariables(arrayOrObject: any, context: any, event: any, unescapeStrings: boolean, trackContextVariables: any, allowContextFunctionCalls: boolean, options: ParseOptions): any {
     for (const prop in arrayOrObject) {
       // Only interested in strings
       if (typeof arrayOrObject[prop] === 'string') {
         // If event placeholder
         if (arrayOrObject[prop] === '__EVENT__') {
           arrayOrObject[prop] = event;
-        } else
+
         // If context var placeholder
-        if (arrayOrObject[prop].match(new RegExp('^\\s*' + regexes.placeholderContextVariableRegex + '\\s*$', 'gm'))) {
+        } else if (arrayOrObject[prop].match(new RegExp('^\\s*' + regexes.placeholderContextVariableRegex + '\\s*$', 'gm'))) {
           const contextVar = this.dataTypeEncoder.transformPlaceholderIntoContextVar(arrayOrObject[prop].trim());
-          arrayOrObject[prop] = this.safelyLoadContextVariable(contextVar, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);
+          arrayOrObject[prop] = this.loadContextVariable(contextVar, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls, options);
         }
       } else if (typeof arrayOrObject[prop] === 'object') {
-        this.loadVariablesLoop(arrayOrObject[prop], context, event, unescapeStrings, trackContextVariables);
+        this.loadJSONVariables(arrayOrObject[prop], context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls, options);
       }
     }
-  }
 
-  /**
-   * A safe wrapper around the loadContextVariable function. Returns undefined if there is any error.
-   *
-   * @param contextVar - The context var
-   * @param context - The context object
-   * @param event - An event object, if available
-   * @param unescapeStrings - Whether to unescape strings or not
-   * @param trackContextVariables - An optional object that will be filled out with all found context vars
-   * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
-   */
-  safelyLoadContextVariable(contextVar: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
-    try {
-      const resolvedContextVariable = this.loadContextVariable(contextVar, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);
-      trackContextVariables[this.decodeDataTypeString(contextVar)] = resolvedContextVariable;
-      return resolvedContextVariable;
-    } catch (e) {
-      if (isDevMode()) {
-        console.warn(e);
-      }
-      trackContextVariables[this.decodeDataTypeString(contextVar)] = undefined;
-      return undefined;
-    }
+    return arrayOrObject;
   }
 
   /**
@@ -304,73 +266,78 @@ export class DataTypeParser {
    * @param trackContextVariables - An optional object that will be filled out with all found context vars
    * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
    */
-  loadContextVariable(contextVar: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true): any {
-    const shortContextVar = contextVar.substring(7);  // Cut off 'context' from the front
-
-    // If context object is requested directly
-    if (shortContextVar.trim() === '') {
-      return context;
-    }
-
-    // Otherwise, create variable path array and fetch value, so the context object can be easily travelled.
-    // Variable path example: 'restaurants["newOrleans"].reviews[5]' becomes ['restaurants', 'newOrleans', 'reviews', 5],
-    const path = [];
-    const pathMatches = matchAll(shortContextVar, new RegExp(regexes.variablePathPartRegex, 'gm'));
-    for (const match of pathMatches) {
-
-      // 1. If dot notation
-      if (match[0].startsWith('.')) {
-        path.push({
-          type: 'property',
-          value: match[0].substring(1)
-        });
-      }
-
-      // 2. If bracket notation
-      if (match[0].startsWith('[') && match[0].endsWith(']')) {
-        let bracketValue = match[0].substring(1, match[0].length - 1);
-
-        // Evaluate bracket parameter
-        bracketValue = this.decodeDataTypeString(bracketValue);                                                                                             // Decode variable
-        bracketValue = this.evaluate(bracketValue, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);    // Recursively repeat the process
-        path.push({
-          type: 'property',
-          value: bracketValue
-        });
-      }
-
-      // 3. If function call
-      if (match[0].startsWith('(') && match[0].endsWith(')')) {
-        // Check if function calls are allowed
-        if (!allowContextFunctionCalls) {
-          throw Error('Tried to call a function in a context variable. This has been disallowed in the current config.');
-        }
-
-        const funcParams = match[0].substring(1, match[0].length - 1);  // Strip outer brackets
-        // Evaluate function parameters
-        const paramsArray = [];
-        if (funcParams !== '') {
-          for (const param of funcParams.split(',')) {
-            let p = this.decodeDataTypeString(param);                                                                   // Decode variable
-            p = this.evaluate(p, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);    // Recursively repeat the process
-            paramsArray.push(p);
-          }
-        }
-        // Add function to path
-        path.push({
-          type: 'function',
-          value: paramsArray
-        });
-      }
-    }
-
+  loadContextVariable(contextVar: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true, options: ParseOptions = getParseOptionDefaults()): any {
     try {
-      return this.fetchContextVariable(context, path);
-    } catch (e) {
-      if (isDevMode()) {
-        console.warn(e);
+      const shortContextVar = contextVar.substring(7);  // Cut off 'context' from the front
+
+      // If context object is requested directly
+      if (shortContextVar.trim() === '') {
+        return context;
       }
-      throw Error('The required context variable "' + this.decodeDataTypeString(contextVar) + '" could not be found in the context object. Returning undefined instead.');
+
+      // Otherwise, create variable path array and fetch value, so the context object can be easily travelled.
+      // Variable path example: 'restaurants["newOrleans"].reviews[5]' becomes ['restaurants', 'newOrleans', 'reviews', 5],
+      const path = [];
+      const pathMatches = matchAll(shortContextVar, new RegExp(regexes.variablePathPartRegex, 'gm'));
+      for (const match of pathMatches) {
+
+        // 1. If dot notation
+        if (match[0].startsWith('.')) {
+          path.push({
+            type: 'property',
+            value: match[0].substring(1)
+          });
+        }
+
+        // 2. If bracket notation
+        if (match[0].startsWith('[') && match[0].endsWith(']')) {
+          let bracketValue = match[0].substring(1, match[0].length - 1);
+
+          // Evaluate bracket parameter
+          bracketValue = this.decodeDataTypeString(bracketValue);                                                                                             // Decode variable
+          bracketValue = this.evaluate(bracketValue, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);    // Recursively repeat the process
+          path.push({
+            type: 'property',
+            value: bracketValue
+          });
+        }
+
+        // 3. If function call
+        if (match[0].startsWith('(') && match[0].endsWith(')')) {
+          // Check if function calls are allowed
+          if (!allowContextFunctionCalls) {
+            throw Error('Tried to call a function in a context variable. This has been disallowed in the current config.');
+          }
+
+          const funcParams = match[0].substring(1, match[0].length - 1);  // Strip outer brackets
+          // Evaluate function parameters
+          const paramsArray = [];
+          if (funcParams !== '') {
+            for (const param of funcParams.split(',')) {
+              let p = this.decodeDataTypeString(param);                                                                   // Decode variable
+              p = this.evaluate(p, context, event, unescapeStrings, trackContextVariables, allowContextFunctionCalls);    // Recursively repeat the process
+              paramsArray.push(p);
+            }
+          }
+          // Add function to path
+          path.push({
+            type: 'function',
+            value: paramsArray
+          });
+        }
+      }
+
+      try {
+        const resolvedContextVar = this.fetchContextVariable(context, path);
+        trackContextVariables[this.decodeDataTypeString(contextVar)] = resolvedContextVar;
+        return resolvedContextVar;
+      } catch (e) {
+        throw Error('The required context variable "' + this.decodeDataTypeString(contextVar) + '" could not be found in the context object. Returning undefined instead.');
+      }
+    } catch (e) {
+      this.logger.warn([e], options);
+      trackContextVariables[this.decodeDataTypeString(contextVar)] = undefined;
+      return undefined;
     }
   }
 
@@ -381,7 +348,7 @@ export class DataTypeParser {
    * @param contextLevel - The object to travel
    * @param path - The property path array
    */
-  fetchContextVariable(contextLevel: any, path: any[]): any {
+  private fetchContextVariable(contextLevel: any, path: any[]): any {
     // Prevent accessing protected properties
     if (path[0].value ===  '__proto__') {
       throw Error('Accessing the __proto__ property through a context variable is not allowed.');

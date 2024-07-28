@@ -1,7 +1,7 @@
 // Custom testing resources
 import { defaultBeforeEach } from '../shared';
 import { TestBedStatic, fakeAsync } from '@angular/core/testing';
-import { DynamicHooksComponent, anchorElementTag } from '../../testing-api';
+import { DynamicHooksComponent, anchorElementTag, getParseOptionDefaults } from '../../testing-api';
 import { NonServiceTestParser } from '../../resources/parsers/nonServiceTestParser';
 
 describe('Parser text hooks', () => {
@@ -247,7 +247,7 @@ describe('Parser text hooks', () => {
         openingTagEndIndex: 5
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Text hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.');
 
     // closingTag must start after openingTag
@@ -260,7 +260,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 20,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Text hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.');
 
     // closingTagEndIndex must be greater than closingTagStartIndex
@@ -273,7 +273,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 15,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toBe('Text hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.');
 
     // 2. The opening/closing tags of a hook must not overlap with those of another hook
@@ -298,7 +298,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 20,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((textHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('A text hook with the same position as another text hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.');
 
     // Opening tag must begin after previous opening tag has ended
@@ -315,7 +315,7 @@ describe('Parser text hooks', () => {
         openingTagEndIndex: 20,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((textHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Text hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.');
 
     // Opening tag must not overlap with previous closing tag
@@ -336,7 +336,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 30,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((textHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Text hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Closing tag must not overlap with previous closing tag
@@ -357,7 +357,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 40,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((textHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Text hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.');
 
     // Check if hooks are incorrectly nested
@@ -378,7 +378,7 @@ describe('Parser text hooks', () => {
         closingTagEndIndex: 40,
       }
     }];
-    textHookFinder['validateHookPositions'](parserResults, '');
+    textHookFinder['validateHookPositions'](parserResults, '', getParseOptionDefaults());
     expect((textHookFinder['generateHookPosWarning'] as any)['calls'].mostRecent().args[0]).toBe('Text hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.');
   });
 

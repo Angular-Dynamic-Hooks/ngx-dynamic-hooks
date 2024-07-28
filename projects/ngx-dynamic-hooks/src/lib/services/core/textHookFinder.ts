@@ -1,10 +1,11 @@
 import { HookIndex } from '../../interfacesPublic';
 import { HookParser, HookPosition } from '../../interfacesPublic';
-import { isDevMode, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../constants/core';
 import { matchAll } from '../utils/utils';
 import { ParseOptions } from '../settings/options';
+import { Logger } from '../utils/logger';
 
 const findInElementsNodePlaceholder = '_ngx_dynamic_hooks_node_placeholder';
 
@@ -45,7 +46,7 @@ export interface HookSegments {
 })
 export class TextHookFinder {
 
-  constructor(private platformService: AutoPlatformService) {
+  constructor(private platformService: AutoPlatformService, private logger: Logger) {
   }
 
   /**
@@ -187,7 +188,7 @@ export class TextHookFinder {
     let parserResults: ParserFindHooksResult[] = [];
     for (const parser of parsers) {
       if (typeof parser.findHooks === 'function') {
-        for (const hookPosition of parser.findHooks(content, context)) {
+        for (const hookPosition of parser.findHooks(content, context, options)) {
           parserResults.push({parser, hookPosition});
         }
       }
@@ -195,7 +196,7 @@ export class TextHookFinder {
     parserResults.sort((a, b) => a.hookPosition.openingTagStartIndex - b.hookPosition.openingTagStartIndex);
 
     // Validate parser results
-    parserResults = this.validateHookPositions(parserResults, content);
+    parserResults = this.validateHookPositions(parserResults, content, options);
 
     // Process parser results
     const selectorReplaceInstructions: ReplaceInstruction[] = [];
@@ -290,7 +291,7 @@ export class TextHookFinder {
    * @param parserResults - The parserResults from replaceHooksWithNodes()
    * @param content - The source text for the parserResults
    */
-  private validateHookPositions(parserResults: ParserFindHooksResult[], content: string): ParserFindHooksResult[] {
+  private validateHookPositions(parserResults: ParserFindHooksResult[], content: string, options: ParseOptions): ParserFindHooksResult[] {
     const checkedParserResults = [];
 
     outerloop: for (const [index, parserResult] of parserResults.entries()) {
@@ -299,15 +300,15 @@ export class TextHookFinder {
 
       // Check if hook is in itself well-formed
       if (hookPos.openingTagStartIndex >= hookPos.openingTagEndIndex) {
-        if (isDevMode()) { console.warn('Text hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos); }
+        this.logger.warn(['Text hook error: openingTagEndIndex has to be greater than openingTagStartIndex. Ignoring.', hookPos], options);
         continue;
       }
       if (enclosing && hookPos.openingTagEndIndex > hookPos.closingTagStartIndex!) {
-        if (isDevMode()) { console.warn('Text hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos); }
+        this.logger.warn(['Text hook error: closingTagStartIndex has to be greater than openingTagEndIndex. Ignoring.', hookPos], options);
         continue;
       }
       if (enclosing && hookPos.closingTagStartIndex! >= hookPos.closingTagEndIndex!) {
-        if (isDevMode()) { console.warn('Text hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos); }
+        this.logger.warn(['Text hook error: closingTagEndIndex has to be greater than closingTagStartIndex. Ignoring.', hookPos], options);
         continue;
       }
 
@@ -326,13 +327,13 @@ export class TextHookFinder {
             hookPos.closingTagEndIndex === prevHookPos.closingTagEndIndex
           ))
           ) {
-          this.generateHookPosWarning('A text hook with the same position as another text hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('A text hook with the same position as another text hook was found. There may be multiple parsers looking for the same text pattern. Ignoring duplicates.', hookPos, prevHookPos, content, options);
           continue outerloop;
         }
 
         // Opening tag must begin after previous opening tag has ended
         if (hookPos.openingTagStartIndex < prevHookPos.openingTagEndIndex) {
-          this.generateHookPosWarning('Text hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Hook opening tag starts before previous hook opening tag ends. Ignoring.', hookPos, prevHookPos, content, options);
           continue outerloop;
         }
 
@@ -343,7 +344,7 @@ export class TextHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! ||
           hookPos.openingTagStartIndex >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('Text hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Opening tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content, options);
           continue outerloop;
         }
 
@@ -352,7 +353,7 @@ export class TextHookFinder {
           hookPos.closingTagEndIndex! <= prevHookPos.closingTagStartIndex! ||
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
         )) {
-          this.generateHookPosWarning('Text hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content);
+          this.generateHookPosWarning('Text hook error: Closing tag of hook overlaps with closing tag of previous hook. Ignoring.', hookPos, prevHookPos, content, options);
           continue outerloop;
         }
 
@@ -361,7 +362,7 @@ export class TextHookFinder {
           hookPos.openingTagEndIndex <= prevHookPos.closingTagStartIndex! &&
           hookPos.closingTagStartIndex! >= prevHookPos.closingTagEndIndex!
           ) {
-            this.generateHookPosWarning('Text hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content);
+            this.generateHookPosWarning('Text hook error: The closing tag of a nested hook lies beyond the closing tag of the outer hook. Ignoring.', hookPos, prevHookPos, content, options);
             continue outerloop;
         }
       }
@@ -381,30 +382,28 @@ export class TextHookFinder {
    * @param prevHookPos - The second HookPosition
    * @param content - The source text for the HookPositions
    */
-  private generateHookPosWarning(message: string, hookPos: HookPosition, prevHookPos: HookPosition, content: string): void {
-    if (isDevMode()) {
-      const prevHookSegments = this.getHookSegments(prevHookPos, content);
-      const hookSegments = this.getHookSegments(hookPos, content);
+  private generateHookPosWarning(message: string, hookPos: HookPosition, prevHookPos: HookPosition, content: string, options: ParseOptions): void {
+    const prevHookSegments = this.getHookSegments(prevHookPos, content);
+    const hookSegments = this.getHookSegments(hookPos, content);
 
-      const prevHookData = {
-        openingTag: prevHookSegments.openingTag,
-        openingTagStartIndex: prevHookPos.openingTagStartIndex,
-        openingTagEndIndex: prevHookPos.openingTagEndIndex,
-        closingTag: prevHookSegments.closingTag,
-        closingTagStartIndex: prevHookPos.closingTagStartIndex,
-        closingTagEndIndex: prevHookPos.closingTagEndIndex
-      };
-      const hookData = {
-        openingTag: hookSegments.openingTag,
-        openingTagStartIndex: hookPos.openingTagStartIndex,
-        openingTagEndIndex: hookPos.openingTagEndIndex,
-        closingTag: hookSegments.closingTag,
-        closingTagStartIndex: hookPos.closingTagStartIndex,
-        closingTagEndIndex: hookPos.closingTagEndIndex
-      };
+    const prevHookData = {
+      openingTag: prevHookSegments.openingTag,
+      openingTagStartIndex: prevHookPos.openingTagStartIndex,
+      openingTagEndIndex: prevHookPos.openingTagEndIndex,
+      closingTag: prevHookSegments.closingTag,
+      closingTagStartIndex: prevHookPos.closingTagStartIndex,
+      closingTagEndIndex: prevHookPos.closingTagEndIndex
+    };
+    const hookData = {
+      openingTag: hookSegments.openingTag,
+      openingTagStartIndex: hookPos.openingTagStartIndex,
+      openingTagEndIndex: hookPos.openingTagEndIndex,
+      closingTag: hookSegments.closingTag,
+      closingTagStartIndex: hookPos.closingTagStartIndex,
+      closingTagEndIndex: hookPos.closingTagEndIndex
+    };
 
-      console.warn(message + '\nFirst hook: ', prevHookData, '\nSecond hook:', hookData);
-    }
+    this.logger.warn([message + '\nFirst hook: ', prevHookData, '\nSecond hook:', hookData], options);
   }
 
   /**

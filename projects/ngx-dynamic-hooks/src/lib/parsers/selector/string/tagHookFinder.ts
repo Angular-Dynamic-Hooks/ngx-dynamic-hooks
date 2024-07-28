@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HookPosition } from '../../../interfacesPublic';
 import { regexes } from '../../../constants/regexes';
 import { HookFinder } from '../../../services/utils/hookFinder';
+import { ParseOptions } from '../../../services/settings/options';
 
 
 /**
@@ -23,11 +24,11 @@ export class TagHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): HookPosition[] {
+  findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, options: ParseOptions): HookPosition[] {
     // Create opening tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.find(content, openingTagRegex);
+    return this.hookFinder.find(content, openingTagRegex, undefined, undefined, options);
   }
 
   /**
@@ -37,12 +38,12 @@ export class TagHookFinder {
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
    */
-  findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): HookPosition[] {
+  findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, options: ParseOptions): HookPosition[] {
     // Create opening and closing tag regex
     const openingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle);
     const closingTagRegex =  this.generateClosingTagRegex(selector, bracketStyle);
 
-    return this.hookFinder.find(content, openingTagRegex, closingTagRegex, true);
+    return this.hookFinder.find(content, openingTagRegex, closingTagRegex, true, options);
   }
 
   // Hook regex helper

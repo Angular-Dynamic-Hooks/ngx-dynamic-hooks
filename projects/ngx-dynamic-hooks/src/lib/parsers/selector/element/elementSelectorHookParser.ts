@@ -4,6 +4,7 @@ import { BindingsValueManager } from '../bindingsValueManager';
 import { SelectorHookParserConfig } from '../selectorHookParserConfig';
 import { SelectorHookParserConfigResolver } from '../selectorHookParserConfigResolver';
 import { AutoPlatformService } from '../../../services/platform/autoPlatformService';
+import { ParseOptions } from '../../../services/settings/options';
 
 /**
  * A powerful parser for standard Angular component selectors that comes with this library
@@ -18,11 +19,11 @@ export class ElementSelectorHookParser implements HookParser {
     this.name = this.config.name;
   }
 
-  public findHookElements(contentElement: any, context: any): any[] {
+  public findHookElements(contentElement: any, context: any, options: ParseOptions): any[] {
     return Array.from(this.platformService.querySelectorAll(contentElement, this.config.selector!));
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
 
     // Always scrub potential []-input- and ()-output-attrs from anchor elements 
     this.scrubAngularBindingAttrs(hookValue.element);
@@ -35,7 +36,7 @@ export class ElementSelectorHookParser implements HookParser {
     };
   }
 
-  public getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  public getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     let hookBindings = this.savedBindings[hookId];
 
     // Parse bindings once from hookValue, then reuse on subsequent runs (raw values will never change as hookValue.element is a snapshot)
@@ -45,8 +46,8 @@ export class ElementSelectorHookParser implements HookParser {
     }
 
     // (Re)evaluate if needed
-    this.bindingsValueManager.checkInputBindings(hookBindings.inputs!, context, this.config);
-    this.bindingsValueManager.checkOutputBindings(hookBindings.outputs!, this.config);
+    this.bindingsValueManager.checkInputBindings(hookBindings.inputs!, context, this.config, options);
+    this.bindingsValueManager.checkOutputBindings(hookBindings.outputs!, this.config, options);
 
     return {
       inputs: this.getValuesFromSavedBindings(hookBindings.inputs!),

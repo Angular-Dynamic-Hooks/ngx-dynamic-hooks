@@ -1,7 +1,7 @@
 // Custom testing resources
 import { defaultBeforeEach } from '../shared';
 import { TestBed, TestBedStatic, fakeAsync } from '@angular/core/testing';
-import { DynamicHooksComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag } from '../../testing-api';
+import { DynamicHooksComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag, getParseOptionDefaults } from '../../testing-api';
 import { ParserFindHookElementsResult } from '../../../lib/services/core/elementHookFinder';
 import { GenericElementParser } from '../../resources/parsers/genericElementParser';
 
@@ -225,7 +225,7 @@ describe('Parser element hooks', () => {
         hookElement: problemElement
       }
     ];
-    let checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
+    let checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement, getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
@@ -247,7 +247,7 @@ describe('Parser element hooks', () => {
         hookElement: problemElement
       }
     ];
-    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
+    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement, getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(problemElement);
@@ -271,7 +271,7 @@ describe('Parser element hooks', () => {
         hookElement: problemElement
       }
     ];
-    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement);
+    checkedParserResults = elementHookFinder['validateHookElements'](parserResults, contentElement, getParseOptionDefaults());
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('A hook element was found that is already a host or view element of an active Angular component. Ignoring.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);

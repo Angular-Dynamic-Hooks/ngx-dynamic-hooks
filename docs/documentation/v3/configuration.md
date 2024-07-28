@@ -88,6 +88,7 @@ Option name | Type | Default | Description
 `ignoreOutputAliases` | `boolean` | `false` | Whether to ignore output aliases like `@Output('someAlias')` in dynamic components and use the actual property names instead.
 `acceptInputsForAnyProperty` | `boolean` | `false` | Whether to disregard `@Input()`-decorators completely and allow passing in values to any property in dynamic components.
 `acceptOutputsForAnyObservable` | `boolean` | `false` | Whether to disregard `@Output()`-decorators completely and allow subscribing to any `Observable` in dynamic components.
+`logOptions` | `LogOptions` | `{dev: true}` | Accepts a `LogOptions` object to customize when to log text, warnings and errors.
 
 ## Lazy-loading components
 

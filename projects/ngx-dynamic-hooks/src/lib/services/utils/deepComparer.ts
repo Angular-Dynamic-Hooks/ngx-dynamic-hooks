@@ -1,4 +1,6 @@
-import { isDevMode, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Logger } from './logger';
+import { getParseOptionDefaults, ParseOptions } from '../settings/options';
 
 
 /**
@@ -21,7 +23,7 @@ export class DeepComparer {
   // 1. Inputs
   // -----------------------------------------------------------------
 
-  constructor() {
+  constructor(private logger: Logger) {
   }
 
   /**
@@ -31,17 +33,15 @@ export class DeepComparer {
    * @param b - The second object
    * @param compareDepth - How many levels deep to compare
    */
-  isEqual(a: any, b: any, compareDepth?: number): boolean {
+  isEqual(a: any, b: any, compareDepth?: number, options: ParseOptions = getParseOptionDefaults()): boolean {
     const aStringified = this.detailedStringify(a, compareDepth);
     const bStringified = this.detailedStringify(b, compareDepth);
 
     if (aStringified.result === null || bStringified.result === null) {
-      if (isDevMode()) {
-        console.warn(
-          'Objects could not be compared by value as one or both of them could not be stringified. Returning false. \n',
-          'Objects:', a, b
-        );
-      }
+      this.logger.warn([
+        'Objects could not be compared by value as one or both of them could not be stringified. Returning false. \n',
+        'Objects:', a, b
+      ], options);
       return false;
     }
 

@@ -14,6 +14,13 @@ export interface ParseOptions {
     ignoreOutputAliases?: boolean;
     acceptInputsForAnyProperty?: boolean;
     acceptOutputsForAnyObservable?: boolean;
+    logOptions?: LogOptions;
+}
+
+export interface LogOptions {
+    dev?: boolean;
+    prod?: boolean;
+    ssr?: boolean;
 }
 
 /**
@@ -32,7 +39,12 @@ export const getParseOptionDefaults: () => ParseOptions = () => {
         ignoreInputAliases: false,
         ignoreOutputAliases: false,
         acceptInputsForAnyProperty: false,
-        acceptOutputsForAnyObservable: false
+        acceptOutputsForAnyObservable: false,
+        logOptions: {
+            dev: true,
+            prod: false,
+            ssr: false
+        }
     };
 }
 

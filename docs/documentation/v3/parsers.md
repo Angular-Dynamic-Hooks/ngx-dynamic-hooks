@@ -59,20 +59,10 @@ Custom parsers can look for either **element hooks** or **text hooks**. Element 
 
 ### What makes a parser
 
-A hook parser is a class that follows the `HookParser` interface, which may look daunting at first, but is actually pretty simple:
+A hook parser is any class that follows the `HookParser` interface, which requires the following:
 
-```ts
-interface HookParser {
-    name?: string;
-    findHooks?(content: string, context: any): HookPosition[];
-    findHookElements?(contentElement: any, context: any): any[];
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData;
-    getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings;
-}
-```
-
-* `name` is optional and only used for black/whitelisting the parser.
-* `findHooks()` / `findHookElements()` returns the hooks to replace with components.
+* An optional `name` property that is used for black/whitelisting the parser.
+* `findHooks()` or `findHookElements()` tell the library what text/elements to replace with components.
 * `loadComponent()` specifies which component class to load.
 * `getBindings()` returns the component inputs/outputs.
 
@@ -85,6 +75,10 @@ It is recommended to create a dedicated `HookParser` for each custom hook/compon
 {% include docs/widgets/notice.html content="
   <span>Only needed if you want to find text hooks. For element hooks, see <code>findHookElements()</code>.</span>
 " %}
+
+```ts
+  findHooks(content: string, context: any, options: ParseOptions): HookPosition[]
+```
 
 Is given a string of content and is expected to return a `HookPosition` array from it. Each `HookPosition` represents a found text hook and specifies its position within the content string:
 
@@ -109,6 +103,10 @@ To make your life easier, you can just use the `HookFinder` service that comes w
   <span>Only needed if you want to find element hooks. For text hooks, see <code>findHooks()</code>.</span>
 " %}
 
+```ts
+  findHookElements(contentElement: any, context: any, options: ParseOptions): any[]
+```
+
 Is given the main content element and is expected to return an array of child elements that should be used as element hooks.
 
 Finding element hooks is rather easy as you can interact directly with the actual content element. You can typically just do something like this:
@@ -118,6 +116,10 @@ return Array.from(contentElement.querySelectorAll('.myHook'));
 ```
 
 ### loadComponent()
+
+```ts
+  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData
+```
 
 Is given the found hook string or element as `HookValue` and is expected to return a `HookComponentData` object, which tells the library how to create the component for this hook:
 
@@ -136,6 +138,10 @@ You usually only need to fill out the `component` field, which can be the compon
 You may optionally also specify a custom host element tag, provide your own injectors or use custom content to replace the existing `<ng-content>` (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
 
 ### getBindings()
+
+```ts
+  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings;
+```
 
 Is given the `HookValue` and is expected to return a `HookBindings` object, which contains all the current inputs and outputs for the component:
 
@@ -169,17 +175,17 @@ import { ExampleComponent } from 'somewhere';
 })
 export class ExampleParser implements HookParser {
 
-  findHookElements(contentElement: any, context: any): any[] {
+  findHookElements(contentElement: any, context: any, options: ParseOptions): any[] {
     // Return all <app-example> elements
     return Array.from(contentElement.querySelectorAll('app-example'));
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
+  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
     // Return the component class
     return { component: ExampleComponent };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     // Return inputs/outputs to set
     return {
       inputs: {
@@ -224,7 +230,7 @@ export class EmojiParser implements HookParser {
 
   constructor(private hookFinder: HookFinder) {}
 
-  findHooks(content: string, context: any): HookPosition[] {
+  findHooks(content: string, context: any, options: ParseOptions): HookPosition[] {
     // As an example, this regex finds the emoticons :-D, :-O and :-*
     const emoticonRegex = /(?::-D|:-O|:-\*)/gm;
 
@@ -233,11 +239,11 @@ export class EmojiParser implements HookParser {
     return this.hookFinder.findHooks(content, emoticonRegex);
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
+  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[], options: ParseOptions): HookComponentData {
     return { component: EmojiComponent };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     // Lets see what kind of emoticon this hook is and assign a fitting emoji
     let emojiType: string;
     switch (hookValue.openingTag) {
@@ -278,19 +284,19 @@ A parser that replaces those `<img>` elements with `ClickableImgComponent`s coul
 ...
 export class ClickableImgParser implements HookParser {
 
-  findHookElements(contentElement: any, context: any): any[] {
+  findHookElements(contentElement: any, context: any, options: ParseOptions): any[] {
     // Find all img-elements with the lightbox class
     return Array.from(contentElement.querySelectorAll('img.lightbox'));
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[]): HookComponentData {
+  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
     return {
       component: ClickableImgComponent,   // Load our component
       hostElementTag: 'lightbox-img'      // As img-elements can't have content, replace them with '<lightbox-img>' elements
     };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     // Read the image urls from the element attributes and pass along as inputs
     const imgElement: HTMLImageElement = hookValue.elementSnapshot;
     return {
@@ -335,7 +341,7 @@ export class DynamicLinkParser implements HookParser {
     this.base = `${this.document.location.protocol}//${this.document.location.hostname}`;
   }
 
-  public findHookElements(contentElement: HTMLElement, context: any): any[] {
+  public findHookElements(contentElement: HTMLElement, context: any, options: ParseOptions): any[] {
     // First get all link elements
     return Array.from(contentElement.querySelectorAll('a[href]'))
     // Then filter them so that only those with own hostname remain
@@ -346,11 +352,11 @@ export class DynamicLinkParser implements HookParser {
     );
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[], options: ParseOptions): HookComponentData {
     return { component: DynamicLinkComponent };
   }
 
-  public getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  public getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     const url = new URL(hookValue.elementSnapshot.getAttribute('href')!, this.base);
 
     // Extract what we need from the URL object and pass it along to DynamicLinkComponent

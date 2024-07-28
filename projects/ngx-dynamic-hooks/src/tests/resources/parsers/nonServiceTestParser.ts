@@ -1,4 +1,4 @@
-import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings, HookFinder } from '../../testing-api';
+import { HookParser, HookPosition, HookValue, HookComponentData, HookBindings, HookFinder, ParseOptions } from '../../testing-api';
 import { matchAll } from '../../testing-api';
 import { SingleTagTestComponent } from '../components/singleTag/singleTagTest.c';
 
@@ -12,7 +12,7 @@ export class NonServiceTestParser implements HookParser {
   constructor() {
   }
 
-  public findHooks(content: string, context: any): Array<HookPosition> {
+  public findHooks(content: string, context: any, options: ParseOptions): Array<HookPosition> {
     const result: HookPosition[] = [];
 
     // Find all hooks
@@ -30,14 +30,14 @@ export class NonServiceTestParser implements HookParser {
     return result;
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>): HookComponentData {
+  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Array<Element>, options: ParseOptions): HookComponentData {
     return {
       component: this.component,
       injector: undefined
     };
   }
 
-  public getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings {
+  public getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
     return {};
   }
 }

@@ -6,7 +6,6 @@ export class CodeCopyWidget implements Widget {
   button = document.createElement('button');
 
   onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
-    console.log(hostElement.parentElement!.parentElement!)
     this.wrapperElement = (hostElement as HTMLElement).parentElement!.parentElement!;
     this.wrapperElement.style.position = 'relative';
 

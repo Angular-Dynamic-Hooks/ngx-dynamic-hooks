@@ -1,10 +1,11 @@
 import { HookIndex } from '../../interfacesPublic';
-import { HookParser, HookPosition } from '../../interfacesPublic';
-import { isDevMode, Injectable } from '@angular/core';
+import { HookParser } from '../../interfacesPublic';
+import { Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
 import { sortElements } from '../utils/utils';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
 import { ParseOptions } from '../settings/options';
+import { Logger } from '../utils/logger';
 
 /**
  * Stores a hook element along with the parser who found it
@@ -19,7 +20,7 @@ export interface ParserFindHookElementsResult {
 })
 export class ElementHookFinder {
 
-  constructor(private platformService: AutoPlatformService) {
+  constructor(private platformService: AutoPlatformService, private logger: Logger) {
   }
 
   find(contentElement: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex): HookIndex {
@@ -28,7 +29,7 @@ export class ElementHookFinder {
     let parserResults: ParserFindHookElementsResult[] = [];
     for (const parser of parsers) {
       if (typeof parser.findHookElements === 'function') {
-        for (const hookElement of parser.findHookElements(contentElement, context)) {
+        for (const hookElement of parser.findHookElements(contentElement, context, options)) {
           parserResults.push({parser, hookElement});
         }
       }
@@ -36,7 +37,7 @@ export class ElementHookFinder {
     parserResults = sortElements(parserResults, this.platformService.sortElements.bind(this.platformService), entry => entry.hookElement);
 
     // Validate parser results
-    parserResults = this.validateHookElements(parserResults, contentElement);
+    parserResults = this.validateHookElements(parserResults, contentElement, options);
 
     // Process parser results
     for (const pr of parserResults) {
@@ -79,7 +80,7 @@ export class ElementHookFinder {
    * @param parserResults - The parserResults from replaceHooksWithNodes()
    * @param content - The source text for the parserResults
    */
-  private validateHookElements(parserResults: ParserFindHookElementsResult[], contentElement: any): ParserFindHookElementsResult[] {
+  private validateHookElements(parserResults: ParserFindHookElementsResult[], contentElement: any, options: ParseOptions): ParserFindHookElementsResult[] {
     const checkedParserResults = [];
 
     for (const [index, parserResult] of parserResults.entries()) {
@@ -92,13 +93,13 @@ export class ElementHookFinder {
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrHookId) || 
         this.platformService.getAttributeNames(parserResult.hookElement).includes(anchorAttrParseToken)
       ) {
-        if (isDevMode()) { console.warn('An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.', parserResult.hookElement); }
+        this.logger.warn(['An element hook tried to use an element that was found by another hook before. There may be multiple parsers looking for the same elements. Ignoring duplicates.', parserResult.hookElement], options)
         continue;
       }
 
       // Must not already be host or view element for an Angular component
       if (this.isAngularManagedElement(parserResult.hookElement)) {
-        if (isDevMode()) { console.warn('A hook element was found that is already a host or view element of an active Angular component. Ignoring.', parserResult.hookElement); }
+        this.logger.warn(['A hook element was found that is already a host or view element of an active Angular component. Ignoring.', parserResult.hookElement], options);
         continue;
       }
 

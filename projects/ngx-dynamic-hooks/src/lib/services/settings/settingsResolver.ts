@@ -70,9 +70,9 @@ export class SettingsResolver {
     // Process parsers entries. Local parsers fully replace global ones.
     let finalParsers: HookParser[] = [];
     if (localParsers) {
-      finalParsers = this.parserEntryResolver.resolve(localParsers, injector);
+      finalParsers = this.parserEntryResolver.resolve(localParsers, injector, null, null, finalOptions);
     } else if (resolvedSettings.parsers) {
-      finalParsers = this.parserEntryResolver.resolve(resolvedSettings.parsers, injector, globalParsersBlacklist, globalParsersWhitelist);
+      finalParsers = this.parserEntryResolver.resolve(resolvedSettings.parsers, injector, globalParsersBlacklist, globalParsersWhitelist, finalOptions);
     }
 
     return {
@@ -107,11 +107,20 @@ export class SettingsResolver {
           mergedSettings.options = {};
         }
 
-        mergedSettings.options = Object.assign(mergedSettings.options, settings.options);
+        mergedSettings.options = this.recursiveAssign(mergedSettings.options, settings.options);
       }
     }
 
     return mergedSettings;
+  }
+
+  private recursiveAssign (a: any, b: any) {
+    if (Object(b) !== b) return b;
+    if (Object(a) !== a) a = {};
+    for (const key in b) {
+        a[key] = this.recursiveAssign(a[key], b[key]);
+    }
+    return a;
   }
 
 }

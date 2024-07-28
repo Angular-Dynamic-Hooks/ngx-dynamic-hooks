@@ -24,6 +24,7 @@ export { DataTypeEncoder } from '../lib/services/utils/dataTypeEncoder';
 export { DataTypeParser } from '../lib/services/utils/dataTypeParser';
 export { DeepComparer } from '../lib/services/utils/deepComparer';
 export { HookFinder } from '../lib/services/utils/hookFinder';
+export { Logger } from '../lib/services/utils/logger';
 export { regexes } from '../lib/constants/regexes';
 export { matchAll } from '../lib/services/utils/utils';
 

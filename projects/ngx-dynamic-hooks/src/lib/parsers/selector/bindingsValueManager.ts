@@ -1,8 +1,10 @@
-import { isDevMode, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { DataTypeParser } from '../../services/utils/dataTypeParser';
 import { SelectorHookParserConfig } from './selectorHookParserConfig';
 import { RichBindingData } from '../../interfaces';
+import { Logger } from '../../services/utils/logger';
+import { ParseOptions } from '../../services/settings/options';
 
 
 /**
@@ -13,7 +15,7 @@ import { RichBindingData } from '../../interfaces';
 })
 export class BindingsValueManager {
 
-  constructor(private dataTypeParser: DataTypeParser) {
+  constructor(private dataTypeParser: DataTypeParser, private logger: Logger) {
   }
 
   // Inputs
@@ -26,7 +28,7 @@ export class BindingsValueManager {
    * @param context - The current context object
    * @param parserConfig - The parser config
    */
-  checkInputBindings(bindings: {[key: string]: RichBindingData}, context: any, parserConfig: SelectorHookParserConfig){
+  checkInputBindings(bindings: {[key: string]: RichBindingData}, context: any, parserConfig: SelectorHookParserConfig, options: ParseOptions) {
     for (const [inputName, inputBinding] of Object.entries(bindings)) {
       // If no need to parse, use raw as value
       if (!parserConfig.parseInputs) {
@@ -42,14 +44,13 @@ export class BindingsValueManager {
               undefined,
               parserConfig.unescapeStrings,
               inputBinding.boundContextVariables,
-              parserConfig.allowContextFunctionCalls
+              parserConfig.allowContextFunctionCalls,
+              options
             );
             inputBinding.parsed = true;
           } catch (e: any) {
-            if (isDevMode()) {
-              console.error(`Hook input parsing error\nselector: ` + parserConfig.selector +  `\ninput: ` + inputName + `\nvalue: "` + inputBinding.value + `"`);
-              console.error(e.stack);
-            }
+            this.logger.error([`Hook input parsing error\nselector: ` + parserConfig.selector +  `\ninput: ` + inputName + `\nvalue: "` + inputBinding.value + `"`], options);
+            this.logger.error([e.stack], options);
             // If binding could not be parsed at all due to syntax error, remove from list of inputs.
             // No amount of calls to updateInputBindings() will fix this kind of error.
             delete bindings[inputName];
@@ -87,7 +88,7 @@ export class BindingsValueManager {
       for (const [contextVarName, contextVarValue] of Object.entries(binding.boundContextVariables)) {
         const encodedContextVarName = this.dataTypeParser.encodeDataTypeString(contextVarName);
         // Compare with previous value
-        const newContextVarValue = this.dataTypeParser.safelyLoadContextVariable(encodedContextVarName, context, undefined, parserConfig.unescapeStrings, {}, parserConfig.allowContextFunctionCalls);
+        const newContextVarValue = this.dataTypeParser.loadContextVariable(encodedContextVarName, context, undefined, parserConfig.unescapeStrings, {}, parserConfig.allowContextFunctionCalls);
         if (newContextVarValue !== contextVarValue) {
           boundContextVarHasChanged = true;
           break;
@@ -118,7 +119,7 @@ export class BindingsValueManager {
    * @param openingTag - The hook opening tag to parse
    * @param parserConfig - The current parser config
    */
-  checkOutputBindings(bindings: {[key: string]: RichBindingData}, parserConfig: SelectorHookParserConfig) {
+  checkOutputBindings(bindings: {[key: string]: RichBindingData}, parserConfig: SelectorHookParserConfig, options: ParseOptions) {
     for (const [outputName, outputBinding] of Object.entries(bindings)) {
       // Unlike inputs, outputs only need to be created once by the parser, never updated, as you only create a wrapper function around the logic to execute.
       // As this logic is run fresh whenever the output triggers, there is no need to replace this wrapper function on updates.
@@ -134,10 +135,8 @@ export class BindingsValueManager {
               parserConfig.allowContextFunctionCalls
             );
           } catch (e: any) {
-            if (isDevMode()) {
-              console.error(`Hook output parsing error\nselector: ` + parserConfig.selector +  `\noutput: ` + outputName + `\nvalue: "` + outputBinding.value + `"`);
-              console.error(e.stack);
-            }
+            this.logger.error([`Hook output parsing error\nselector: ` + parserConfig.selector +  `\noutput: ` + outputName + `\nvalue: "` + outputBinding.value + `"`], options);
+            this.logger.error([e.stack], options);
           }
         };
         outputBinding.parsed = true;

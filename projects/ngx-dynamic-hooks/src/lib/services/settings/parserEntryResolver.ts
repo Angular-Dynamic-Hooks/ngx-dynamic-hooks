@@ -1,4 +1,4 @@
-import { isDevMode, Injectable, Injector, reflectComponentType } from '@angular/core';
+import { Injectable, Injector, reflectComponentType } from '@angular/core';
 import { HookParser } from '../../interfacesPublic';
 import { StringSelectorHookParser } from '../../parsers/selector/string/stringSelectorHookParser';
 import { SelectorHookParserConfig } from '../../parsers/selector/selectorHookParserConfig';
@@ -7,8 +7,9 @@ import { TagHookFinder } from '../../parsers/selector/string/tagHookFinder';
 import { BindingsValueManager } from '../../parsers/selector/bindingsValueManager';
 import { HookParserEntry } from './parserEntry';
 import { ElementSelectorHookParser } from '../../parsers/selector/element/elementSelectorHookParser';
-import { PlatformService } from '../platform/platformService';
 import { AutoPlatformService } from '../platform/autoPlatformService';
+import { Logger } from '../utils/logger';
+import { ParseOptions } from '../settings/options';
 
 /**
  * A helper class for resolving HookParserEntries
@@ -18,7 +19,14 @@ import { AutoPlatformService } from '../platform/autoPlatformService';
 })
 export class ParserEntryResolver {
 
-  constructor(private injector: Injector, private parserResolver: SelectorHookParserConfigResolver, private platformService: AutoPlatformService, private tagHookFinder: TagHookFinder, private bindingsValueManager: BindingsValueManager) {
+  constructor(
+    private injector: Injector, 
+    private parserResolver: SelectorHookParserConfigResolver, 
+    private platformService: AutoPlatformService, 
+    private tagHookFinder: TagHookFinder, 
+    private bindingsValueManager: BindingsValueManager,
+    private logger: Logger
+  ) {
   }
 
   /**
@@ -29,22 +37,22 @@ export class ParserEntryResolver {
    * @param blacklist - (optional) Which parsers to blacklist by name
    * @param whitelist - (optional) Which parsers to whitelist by name
    */
-  resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist?: string[]|null, whitelist?: string[]|null): HookParser[] {
+  resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist: string[]|null, whitelist: string[]|null, options: ParseOptions): HookParser[] {
 
     // Load all requested parsers
     const parsers: HookParser[] = [];
     for (const parser of parserEntries) {
-      const resolvedParser = this.resolveEntry(parser, injector);
+      const resolvedParser = this.resolveEntry(parser, injector, options);
       if (resolvedParser) {
         parsers.push(resolvedParser);
       }
     }
 
     // Check parser functions
-    const validParsers = this.validateParserFunctions(parsers);
+    const validParsers = this.validateParserFunctions(parsers, options);
 
     // Check parser names
-    this.checkParserNames(validParsers);
+    this.checkParserNames(validParsers, options);
 
     // If no need to filter, return resolved parsers
     if (!blacklist && !whitelist) {
@@ -52,7 +60,7 @@ export class ParserEntryResolver {
     }
 
     // Check black/whitelist
-    this.checkBlackAndWhitelist(validParsers, blacklist, whitelist);
+    this.checkBlackAndWhitelist(validParsers, blacklist, whitelist, options);
 
     // Filter parsers
     const filteredParsers = [];
@@ -84,7 +92,7 @@ export class ParserEntryResolver {
    * @param parserEntry - The HookParserEntry to process
    * @param injector - The injector to use for resolving this parser
    */
-  resolveEntry(parserEntry: HookParserEntry, injector: Injector): HookParser|null {
+  resolveEntry(parserEntry: HookParserEntry, injector: Injector, options: ParseOptions): HookParser|null {
     // Check if class
     if (parserEntry.hasOwnProperty('prototype')) {
       // Check if component class
@@ -113,17 +121,13 @@ export class ParserEntryResolver {
         try {
           return this.createSelectorHookParser(parserEntry as SelectorHookParserConfig);
         } catch (e: any)  {
-          if (isDevMode()) {
-            console.error('Invalid parser config - ' + e.message, parserEntry);
-            return null;
-          }
+          this.logger.error(['Invalid parser config - ' + e.message, parserEntry], options);
+          return null;
         }
       }
     }
     
-    if (isDevMode()) {
-      console.error('Invalid parser config - ', parserEntry);
-    }
+    this.logger.error(['Invalid parser config - ', parserEntry], options)
     return null;
   }
 
@@ -148,19 +152,19 @@ export class ParserEntryResolver {
    *
    * @param parsers - The parsers in question
    */
-  validateParserFunctions(parsers: HookParser[]): HookParser[] {
+  validateParserFunctions(parsers: HookParser[], options: ParseOptions): HookParser[] {
     const validParsers = [];
     for (const parser of parsers) {
       if (typeof parser.findHooks !== 'function' && typeof parser.findHookElements !== 'function') {
-        console.error('Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:', parser);
+        this.logger.error(['Submitted parser neither implements "findHooks()" nor "findHookElements()". One is required. Removing from list of active parsers:', parser], options);
         continue;
       }
       if (typeof parser.loadComponent !== 'function') {
-        console.error('Submitted parser does not implement "loadComponent()". Removing from list of active parsers:', parser);
+        this.logger.error(['Submitted parser does not implement "loadComponent()". Removing from list of active parsers:', parser], options);
         continue;
       }
       if (typeof parser.getBindings !== 'function') {
-        console.error('Submitted parser does not implement "getBindings()". Removing from list of active parsers:', parser);
+        this.logger.error(['Submitted parser does not implement "getBindings()". Removing from list of active parsers:', parser], options);
         continue;
       }
       validParsers.push(parser);
@@ -173,16 +177,14 @@ export class ParserEntryResolver {
    *
    * @param parsers - The parsers in question
    */
-  checkParserNames(parsers: HookParser[]): void {
+  checkParserNames(parsers: HookParser[], options: ParseOptions): void {
     const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
     const previousNames: string[] = [];
     const alreadyWarnedNames: string[] = [];
     for (const parserName of parserNames) {
       if (previousNames.includes(parserName) && !alreadyWarnedNames.includes(parserName)) {
-        if (isDevMode()) {
-          console.warn('Parser name "' + parserName + '" is not unique and appears multiple times in the list of active parsers.');
-          alreadyWarnedNames.push(parserName);
-        }
+        this.logger.warn(['Parser name "' + parserName + '" is not unique and appears multiple times in the list of active parsers.'], options);
+        alreadyWarnedNames.push(parserName);
       }
       previousNames.push(parserName);
     }
@@ -195,23 +197,19 @@ export class ParserEntryResolver {
    * @param blacklist - The blacklist in question
    * @param whitelist - The whitelist in question
    */
-  checkBlackAndWhitelist(parsers: HookParser[], blacklist?: string[]|null, whitelist?: string[]|null): void {
+  checkBlackAndWhitelist(parsers: HookParser[], blacklist: string[]|null, whitelist: string[]|null, options: ParseOptions): void {
     const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
     if (blacklist) {
       for (const blacklistedParser of blacklist) {
         if (!parserNames.includes(blacklistedParser)) {
-          if (isDevMode()) {
-            console.warn('Blacklisted parser name "' + blacklistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.');
-          }
+          this.logger.warn(['Blacklisted parser name "' + blacklistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.'], options);
         }
       }
     }
     if (whitelist) {
       for (const whitelistedParser of whitelist) {
         if (!parserNames.includes(whitelistedParser)) {
-          if (isDevMode()) {
-            console.warn('Whitelisted parser name "' + whitelistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.');
-          }
+          this.logger.warn(['Whitelisted parser name "' + whitelistedParser + '" does not appear in the list of global parsers names. Make sure both spellings are identical.'], options);
         }
       }
     }
