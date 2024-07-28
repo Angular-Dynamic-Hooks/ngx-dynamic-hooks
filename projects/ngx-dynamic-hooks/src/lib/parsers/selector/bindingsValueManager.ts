@@ -8,7 +8,7 @@ import { ParseOptions } from '../../services/settings/options';
 
 
 /**
- * A helper service for SelectorHookParsers that evaluates bindings and only updates them when needed so references are retained when possible
+ * A helper service for the SelectorHookParsers that evaluates bindings and only updates them when needed so references are retained when possible
  */
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,7 @@ export class BindingsValueManager {
    * @param bindings - A list of @Input() bindings
    * @param context - The current context object
    * @param parserConfig - The parser config
+   * @param options - The current ParseOptions
    */
   checkInputBindings(bindings: {[key: string]: RichBindingData}, context: any, parserConfig: SelectorHookParserConfig, options: ParseOptions) {
     for (const [inputName, inputBinding] of Object.entries(bindings)) {
@@ -114,10 +115,11 @@ export class BindingsValueManager {
   // -------------------------------------------------------------------------------------
 
   /**
-   * Takes a standard hook opening tag and parses Angular-style inputs from it
+   * Checks output bindings and evaluates/updates them as needed
    *
-   * @param openingTag - The hook opening tag to parse
+   * @param bindings - A list of @Output() bindings
    * @param parserConfig - The current parser config
+   * @param options - The current ParseOptions
    */
   checkOutputBindings(bindings: {[key: string]: RichBindingData}, parserConfig: SelectorHookParserConfig, options: ParseOptions) {
     for (const [outputName, outputBinding] of Object.entries(bindings)) {

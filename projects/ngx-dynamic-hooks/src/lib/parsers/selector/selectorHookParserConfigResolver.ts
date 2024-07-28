@@ -2,7 +2,7 @@ import { Injectable, reflectComponentType } from '@angular/core';
 import { SelectorHookParserConfig, SelectorHookParserConfigDefaults, selectorHookParserConfigDefaults } from './selectorHookParserConfig';
 
 /**
- * A helper class for resolving SelectorHookParserConfig
+ * A helper class for resolving a SelectorHookParserConfig
  */
 @Injectable({
   providedIn: 'root'

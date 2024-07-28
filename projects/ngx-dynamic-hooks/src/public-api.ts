@@ -18,7 +18,7 @@ export * from './lib/services/dynamicHooksService';
 export * from './lib/services/settings/settings';
 
 // SelectorHookParser
-export * from './lib/parsers/selector/string/stringSelectorHookParser';
+export * from './lib/parsers/selector/text/textSelectorHookParser';
 export * from './lib/parsers/selector/element/elementSelectorHookParser';
 export * from './lib/parsers/selector/selectorHookParserConfig';
 

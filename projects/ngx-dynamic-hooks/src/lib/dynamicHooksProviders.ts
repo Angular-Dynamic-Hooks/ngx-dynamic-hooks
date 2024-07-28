@@ -8,10 +8,10 @@ import { HookParserEntry } from './services/settings/parserEntry';
 export const allSettings: DynamicHooksSettings[] = [];
 
 /**
- * Configures the global settings for running the ngx-dynamic-hooks library
+ * Sets up global parsers and options for the ngx-dynamic-hooks library
  *
- * @param rootSettings - Settings that all loaded DynamicHooksComponents will use
- * @param platformService - (optional) If desired, you can specify a custom platformService to use here (safe to ignore in most cases) 
+ * @param settings - Parsers/options to be are shared in this injection context
+ * @param platformService - (optional) If desired, you can specify a custom PlatformService to use here
  */
 export const provideDynamicHooks: (settings?: DynamicHooksSettings|HookParserEntry[], platformService?: Type<PlatformService>) => Provider[] = (settings, platformService) => {
   const moduleSettings: DynamicHooksSettings|undefined = Array.isArray(settings) ? {parsers: settings} : settings;

@@ -19,6 +19,13 @@ export class ContentSanitizer {
 
   constructor(private platformService: AutoPlatformService) {}
 
+  /**
+   * Sanitizes an element while preserving marked hook anchors
+   * 
+   * @param contentElement - The element to sanitize
+   * @param hookIndex - The current hookIndex
+   * @param token - The current ParseToken
+   */
   sanitize(contentElement: any, hookIndex: HookIndex, token: string): any {
     const originalHookAnchors: {[key: string]: any} = {};
 
@@ -75,9 +82,9 @@ export class ContentSanitizer {
   }
 
   /**
-   * Sanitizes an existing element's attributes and modifies/removes them according to sanitization logic
+   * Sanitizes a single element's attributes
    *
-   * @param element - The element whose attrs should be checked
+   * @param element - The element in question
    */
   private sanitizeElementAttrs(element: any): any {
       // Collect all existing attributes, put them on span-element, sanitize it, then copy surviving attrs back onto hook anchor element
@@ -156,7 +163,7 @@ export class ContentSanitizer {
   }
 
   /**
-   * Decodes the special html chars in a component placeholder tag
+   * Decodes the encoded html chars in a html tag again
    *
    * @param element - The element as a string
    */

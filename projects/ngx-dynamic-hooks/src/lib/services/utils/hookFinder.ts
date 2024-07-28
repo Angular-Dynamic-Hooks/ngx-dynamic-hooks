@@ -5,7 +5,7 @@ import { Logger } from './logger';
 import { getParseOptionDefaults, ParseOptions } from '../settings/options';
 
 /**
- * A utility service to easily parse hooks from a string of text
+ * A utility service to easily parse hooks from text content
  */
 @Injectable({
   providedIn: 'root'
@@ -21,6 +21,7 @@ export class HookFinder {
    * @param openingTagRegex - The regex for the opening tag
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
+   * @param options - The current ParseOptions
    */
   find(content: string, openingTagRegex: RegExp, closingTagRegex?: RegExp, includeNested?: boolean, options: ParseOptions = getParseOptionDefaults()): HookPosition[] {
     if (!closingTagRegex) {
@@ -74,6 +75,7 @@ export class HookFinder {
    * @param openingTagRegex - The regex for the opening tag
    * @param closingTagRegex - The regex for the closing tag
    * @param includeNested - Whether to include nested hooks in the result
+   * @param options - The current parseOptions
    */
   findEnclosingHooks(content: string, openingTagRegex: RegExp, closingTagRegex: RegExp, includeNested?: boolean, options: ParseOptions = getParseOptionDefaults()): HookPosition[] {
     const allTags = [];

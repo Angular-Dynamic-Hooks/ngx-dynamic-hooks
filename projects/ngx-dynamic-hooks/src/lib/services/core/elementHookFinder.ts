@@ -15,6 +15,9 @@ export interface ParserFindHookElementsResult {
   hookElement: any;
 }
 
+/**
+ * The service responsible for finding element hooks in the content and marking them with anchor attrs
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +26,16 @@ export class ElementHookFinder {
   constructor(private platformService: AutoPlatformService, private logger: Logger) {
   }
 
+  /**
+   * Finds all element hooks in an element and marks the corresponding anchor elements
+   *
+   * @param contentElement - The content element to parse
+   * @param context - The current context object
+   * @param parsers - The parsers to use
+   * @param token - The current parse token
+   * @param options - The current ParseOptions
+   * @param hookIndex - The hookIndex object to fill
+   */
   find(contentElement: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex): HookIndex {
 
     // Collect all parser results
@@ -71,14 +84,12 @@ export class ElementHookFinder {
     return hookIndex;
   }
 
-
-
   /**
-   * Checks the hookPositions of the combined parserResults to ensure they do not collide/overlap.
-   * Any that do are removed from the results.
+   * Checks the combined parserResults and validates them. Invalid ones are removed.
    *
-   * @param parserResults - The parserResults from replaceHooksWithNodes()
-   * @param content - The source text for the parserResults
+   * @param parserResults - The parserResults to check
+   * @param contentElement - The content element
+   * @param options - The current ParseOptions
    */
   private validateHookElements(parserResults: ParserFindHookElementsResult[], contentElement: any, options: ParseOptions): ParserFindHookElementsResult[] {
     const checkedParserResults = [];
@@ -110,6 +121,11 @@ export class ElementHookFinder {
     return checkedParserResults;
   }
   
+  /**
+   * Indicates if an element is either a component host element or part of a component's view/template
+   * 
+   * @param element - The element to inspect
+   */
   private isAngularManagedElement(element: any): boolean {
     // Angular gives component host and view elements the following property, so can simply check for that
     return element.__ngContext__ !== undefined;

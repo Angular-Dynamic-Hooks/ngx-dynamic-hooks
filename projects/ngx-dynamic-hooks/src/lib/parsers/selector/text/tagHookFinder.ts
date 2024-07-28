@@ -7,7 +7,7 @@ import { ParseOptions } from '../../../services/settings/options';
 
 
 /**
- * A service for SelectorHookParser, responsible for finding Angular component selectors in the content
+ * A utility service for the TextSelectorHookParser that finds Angular component selectors in the content
  */
 @Injectable({
   providedIn: 'root'
@@ -23,6 +23,7 @@ export class TagHookFinder {
    * @param content - The content to parse
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
+   * @param options - The current ParseOptions
    */
   findSingleTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, options: ParseOptions): HookPosition[] {
     // Create opening tag regex
@@ -37,6 +38,7 @@ export class TagHookFinder {
    * @param content - The content to parse
    * @param selector - The Angular selector to find
    * @param bracketStyle - What bracket style to use
+   * @param options - The current ParseOptions
    */
   findEnclosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, options: ParseOptions): HookPosition[] {
     // Create opening and closing tag regex

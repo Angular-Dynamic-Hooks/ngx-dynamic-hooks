@@ -1,5 +1,5 @@
 // Testing api resources
-import { DynamicHooksComponent, ElementSelectorHookParser, StringSelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, ElementSelectorHookParser, TextSelectorHookParser, anchorElementTag, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from '../shared';
@@ -35,8 +35,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[2]).toEqual(jasmine.any(GenericWhateverStringParser));
     expect(comp.activeParsers[3]).toEqual(jasmine.any(GenericElementParser));
     expect(comp.activeParsers[4]).toEqual(jasmine.any(GenericWhateverElementParser));
-    expect(comp.activeParsers[5]).toEqual(jasmine.any(StringSelectorHookParser));
-    expect(comp.activeParsers[6]).toEqual(jasmine.any(StringSelectorHookParser));
+    expect(comp.activeParsers[5]).toEqual(jasmine.any(TextSelectorHookParser));
+    expect(comp.activeParsers[6]).toEqual(jasmine.any(TextSelectorHookParser));
     expect(comp.activeParsers[7]).toEqual(jasmine.any(ElementSelectorHookParser));
     expect((comp.activeParsers[0] as any).component.prototype.constructor.name).toBe('SingleTagTestComponent');
     expect((comp.activeParsers[1] as any).component.prototype.constructor.name).toBe('MultiTagTestComponent');
@@ -80,7 +80,7 @@ describe('Parser configuration', () => {
     comp.parsers = [{component: SingleTagTestComponent, enclosing: false}];
     comp.ngOnChanges({content: true, parsers: true} as any);
     expect(comp.activeParsers.length).toBe(1);
-    expect(comp.activeParsers[0].constructor.name).toBe('StringSelectorHookParser');
+    expect(comp.activeParsers[0].constructor.name).toBe('TextSelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);

@@ -31,11 +31,12 @@ export class ComponentCreator {
   /**
    * The main entry function to start the dynamic component initialization process
    *
-   * @param contentElement - The container element with the component selector tags in its innerHTML
-   * @param hookIndex - The current hookIndex (ids must match component selector ids)
-   * @param token - The token used for parsetoken-attribute of the component selectors
+   * @param contentElement - The main content element
+   * @param hookIndex - The current hookIndex
+   * @param token - The current parse token
    * @param context - The current context object
-   * @param options - The current HookComponentOptions
+   * @param options - The current ParseOptions
+   * @param environmentInjector - The environment injector to use for the dynamically-created components
    * @param injector - The injector to use for the dynamically-created components
    */
   init(contentElement: any, hookIndex: HookIndex, token: string, context: any, options: ParseOptions, environmentInjector: EnvironmentInjector, injector: Injector): ReplaySubject<boolean> {
@@ -267,8 +268,7 @@ export class ComponentCreator {
   // ----------------------------------------------------------------------------------------------------------------
 
   /**
-   * Takes a hook along with a DOM node and loads the specified component class (normal or lazy-loaded).
-   * Returns a subject the emits the component class when ready.
+   * Loads the component class from a ComponentConfig. Returns a subject the emits the class when ready.
    *
    * @param componentConfig - The componentConfig from HookData
    */
@@ -300,15 +300,16 @@ export class ComponentCreator {
   }
 
   /**
-   * Dynamically creates a component in the specified componentHostElement
+   * Dynamically creates the component with Angular methods
    *
    * @param hook - The hook for this component
    * @param context - The current context
    * @param componentHostElement - The hostElement for the component
    * @param projectableNodes - The nodes to inject as ng-content
-   * @param options - The current HookComponentOptions
-   * @param compClass - The component's class
-   * @param injector - The default injector to use for the component
+   * @param options - The current ParseOptions
+   * @param compClass - The component class
+   * @param environmentInjector - The default environmentInjector
+   * @param injector - The default injector
    */
   createComponent(hook: Hook, context: any, componentHostElement: any, projectableNodes: any[][], options: ParseOptions, compClass: new(...args: any[]) => any, environmentInjector: EnvironmentInjector, injector: Injector): void {
     
@@ -348,6 +349,12 @@ export class ComponentCreator {
   // Other
   // ----------------------------------------------------------------------------------------------------------------
 
+  /**
+   * Register DOM events to trigger when component outputs emit
+   * 
+   * @param hook - The component hook
+   * @param options - The current ParseOptions
+   */
   mapOutputsToHTMLEvents(hook: Hook, options: ParseOptions) {
     const compMeta = reflectComponentType(hook.componentRef!.componentType)!;
 
@@ -365,7 +372,7 @@ export class ComponentCreator {
 
   /**
    * Find all components that would be the ContentChildren of a dynamic component and returns them in a hierarchical tree object
-   * Important: This function depends on the component selector attributes 'parsetoken' and 'hookid' not being removed yet
+   * Important: This function depends on the anchor attributes not being removed yet
    *
    * @param node - The HTML node to parse
    * @param treeLevel - The current tree level of DynamicContentChildren (for recursiveness)

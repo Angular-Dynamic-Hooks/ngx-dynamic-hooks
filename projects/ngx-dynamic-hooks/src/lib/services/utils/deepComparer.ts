@@ -13,7 +13,7 @@ export interface DetailedStringifyResult {
 }
 
 /**
- * This services can be used to compare two variables by value instead of reference
+ * A service for comparing two variables by value instead of by reference
  */
 @Injectable({
   providedIn: 'root'
@@ -32,6 +32,7 @@ export class DeepComparer {
    * @param a - The first object
    * @param b - The second object
    * @param compareDepth - How many levels deep to compare
+   * @param options - The current parseOptions
    */
   isEqual(a: any, b: any, compareDepth?: number, options: ParseOptions = getParseOptionDefaults()): boolean {
     const aStringified = this.detailedStringify(a, compareDepth);

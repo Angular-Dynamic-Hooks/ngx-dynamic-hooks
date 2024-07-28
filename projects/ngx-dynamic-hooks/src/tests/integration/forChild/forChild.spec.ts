@@ -3,7 +3,7 @@ import { TestBed, TestBedStatic, ComponentFixtureAutoDetect, fakeAsync, tick, Co
 import { By } from '@angular/platform-browser';
 
 // Testing api resources
-import { DynamicHooksService, DYNAMICHOOKS_ALLSETTINGS, getParseOptionDefaults, StringSelectorHookParser, allSettings, SelectorHookParserConfig, HookParser } from '../../testing-api';
+import { DynamicHooksService, DYNAMICHOOKS_ALLSETTINGS, getParseOptionDefaults, TextSelectorHookParser, allSettings, SelectorHookParserConfig, HookParser } from '../../testing-api';
 
 // Resources
 import { DynamicRootComponent } from '../../resources/forChild/root';
@@ -133,7 +133,7 @@ describe('forChild', () => {
       null
     );
 
-    const loadedParsers = mergedSettings.parsers.map(parser => (<StringSelectorHookParser>parser).config.component).flat(10);
+    const loadedParsers = mergedSettings.parsers.map(parser => (<TextSelectorHookParser>parser).config.component).flat(10);
 
     // In sync configs, all provideDynamicHooks functions are called immediately on app init, so allSettings is also immediately populated
     expect(loadedParsers.length).toBe(8);
@@ -175,7 +175,7 @@ describe('forChild', () => {
       null
     );
 
-    const loadedParsers = mergedSettings.parsers.map(parser => (<StringSelectorHookParser>parser).config.component).flat(10);
+    const loadedParsers = mergedSettings.parsers.map(parser => (<TextSelectorHookParser>parser).config.component).flat(10);
 
     // Should only include root and hyperlane settings (which are sync-loaded)
     expect(loadedParsers.length).toBe(2);

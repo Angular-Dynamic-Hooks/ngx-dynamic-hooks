@@ -18,6 +18,9 @@ const createInjector = async (providers: Provider[] = [], parent?: EnvironmentIn
   return parent ? createEnvironmentInjector(providers, parent) : (await createApplication({providers})).injector;
 }
 
+/**
+ * Destroys all scopes and components created by standalone mode
+ */
 export const destroyAll = () => {
   // Destroy all scopes
   for (const scope of scopes) {
@@ -37,10 +40,19 @@ export const destroyAll = () => {
 // Providers scope
 // ----------
 
+/**
+ * Creates an isolated scope with its own providers that the dynamically-created components will then have access to.
+ * 
+ * @param providers - A list of providers
+ * @param parentScope - An optional parent scope created previously. Makes the parent providers also accessible to this scope.
+ */
 export const createProviders: (providers?: Provider[], parentScope?: ProvidersScope) => ProvidersScope = (providers = [], parentScope) => {
   return new ProvidersScope(providers, parentScope);
 }
 
+/**
+ * A scope with an internal list of providers. All dynamic components created by its `parseHooks` method will have access to them.
+ */
 export class ProvidersScope {
   private _injector: EnvironmentInjector|null = null;
   public get injector(): EnvironmentInjector|null { 
@@ -59,6 +71,17 @@ export class ProvidersScope {
     scopes.push(this);
   }
 
+  /**
+  * Parses content and loads components for all found hooks in standalone mode
+  * 
+  * @param content - The content to parse
+  * @param parsers - The parsers to use
+  * @param context - An optional context object
+  * @param options - An optional list of options
+  * @param targetElement - An optional HTML element to use as the container for the loaded content.
+  * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
+  * @param environmentInjector - An optional environmentInjector to use for the dynamically-loaded components. If none is provided, the default environmentInjector is used.
+  */
   public async parseHooks(
     content: any,
     parsers: HookParserEntry[],
@@ -77,6 +100,9 @@ export class ProvidersScope {
     });
   }
 
+  /**
+   * Returns the injector for this scope
+   */
   public async resolveInjector() {
     this.checkIfDestroyed();
 
@@ -88,6 +114,9 @@ export class ProvidersScope {
     return this.injector!;
   }
 
+  /**
+   * Destroys this scope and all of its created components
+   */
   public destroy(): void {
     this.checkIfDestroyed();
 
@@ -114,6 +143,17 @@ export class ProvidersScope {
 // ParseHooks
 // ----------
 
+/**
+ * Parses content and loads components for all found hooks in standalone mode
+ * 
+ * @param content - The content to parse
+ * @param parsers - The parsers to use
+ * @param context - An optional context object
+ * @param options - An optional list of options
+ * @param targetElement - An optional HTML element to use as the container for the loaded content.
+ * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
+ * @param environmentInjector - An optional environmentInjector to use for the dynamically-loaded components. If none is provided, the default environmentInjector is used.
+ */
 export const parseHooks = async (
   content: any,
   parsers: HookParserEntry[],

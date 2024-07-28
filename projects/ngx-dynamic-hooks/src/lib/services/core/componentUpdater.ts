@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Hook, HookBindings, HookIndex, PreviousHookBinding } from '../../interfacesPublic';
 import { ParseOptions } from '../../services/settings/options';
 import { DeepComparer, DetailedStringifyResult } from '../utils/deepComparer';
-import { AutoPlatformService } from '../platform/autoPlatformService';
 import { Logger } from '../utils/logger';
 
 /**
@@ -15,7 +14,7 @@ import { Logger } from '../utils/logger';
 })
 export class ComponentUpdater {
 
-  constructor(private platformService: AutoPlatformService, private deepComparer: DeepComparer, private logger: Logger) {
+  constructor(private deepComparer: DeepComparer, private logger: Logger) {
   }
 
   /**
@@ -99,7 +98,7 @@ export class ComponentUpdater {
    * Processes a hook object and updates the inputs of a dynamic component where required
    *
    * @param hook - The hook in question
-   * @param options - The current HookComponentOptions
+   * @param options - The current ParseOptions
    */
   updateComponentWithNewInputs(hook: Hook, options: ParseOptions): void {
     const component = hook.componentRef!.instance;
@@ -169,7 +168,7 @@ export class ComponentUpdater {
    *
    * @param hook - The hook in question
    * @param context - The current context object
-   * @param options - The current HookComponentOptions
+   * @param options - The current ParseOptions
    */
   updateComponentWithNewOutputs(hook: Hook, context: any, options: ParseOptions): void {
     const component = hook.componentRef!.instance;
@@ -220,11 +219,11 @@ export class ComponentUpdater {
   }
 
   /**
-   * Compares hookData with prevHookData and finds all bindings that have changed
+   * Compares the current with the previous bindings and returns those that have changed
    *
    * @param hook - The hook in question
    * @param type - What kind of binding to check
-   * @param compareByValue - Whether to compare by reference or value
+   * @param options - The current ParseOptions
    */
   getChangedBindings(hook: Hook, type: 'inputs'|'outputs', options: ParseOptions): {[key: string]: any} {
     const changedBindings: {[key: string]: any} = {};
@@ -269,7 +268,7 @@ export class ComponentUpdater {
    *
    * @param bindingName - The binding in question
    * @param componentName - The component in question
-   * @param compareDepth - The current compareDepth
+   * @param options - The current ParseOptions
    * @param oldResult - The detailedStringifiedResult for the old value
    * @param newResult - The detailedStringifiedResult for the new value
    */

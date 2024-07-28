@@ -25,6 +25,13 @@ export class Logger {
     this.handleLog(content, options, 'error');
   }
 
+  /**
+   * Logs an array of content according to the submitted options
+   * 
+   * @param content - The content to log
+   * @param options - The current ParseOptions
+   * @param method - The console method to use
+   */
   private handleLog(content: any[], options: ParseOptions, method: string) {
     if (
       options.logOptions?.dev && this.isDevMode() && isPlatformBrowser(this.platformId) ||

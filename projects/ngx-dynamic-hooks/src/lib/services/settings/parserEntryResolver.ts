@@ -1,9 +1,9 @@
 import { Injectable, Injector, reflectComponentType } from '@angular/core';
 import { HookParser } from '../../interfacesPublic';
-import { StringSelectorHookParser } from '../../parsers/selector/string/stringSelectorHookParser';
+import { TextSelectorHookParser } from '../../parsers/selector/text/textSelectorHookParser';
 import { SelectorHookParserConfig } from '../../parsers/selector/selectorHookParserConfig';
 import { SelectorHookParserConfigResolver } from '../../parsers/selector/selectorHookParserConfigResolver';
-import { TagHookFinder } from '../../parsers/selector/string/tagHookFinder';
+import { TagHookFinder } from '../../parsers/selector/text/tagHookFinder';
 import { BindingsValueManager } from '../../parsers/selector/bindingsValueManager';
 import { HookParserEntry } from './parserEntry';
 import { ElementSelectorHookParser } from '../../parsers/selector/element/elementSelectorHookParser';
@@ -36,6 +36,7 @@ export class ParserEntryResolver {
    * @param injector - The injector to use for resolving parsers
    * @param blacklist - (optional) Which parsers to blacklist by name
    * @param whitelist - (optional) Which parsers to whitelist by name
+   * @param options - The current ParseOptions
    */
   resolve(parserEntries: HookParserEntry[], injector: Injector, blacklist: string[]|null, whitelist: string[]|null, options: ParseOptions): HookParser[] {
 
@@ -80,7 +81,7 @@ export class ParserEntryResolver {
   }
 
   /**
-   * Figures out what kind of config object (out of all possible types) the HookParserEntry is and loads it appropriately.
+   * Figures out what kind of config type the HookParserEntry is and loads it appropriately.
    *
    * The potential types are:
    * - 1. a component class (shorthand for nr. 5)
@@ -91,6 +92,7 @@ export class ParserEntryResolver {
    *
    * @param parserEntry - The HookParserEntry to process
    * @param injector - The injector to use for resolving this parser
+   * @param options - The current ParseOptions
    */
   resolveEntry(parserEntry: HookParserEntry, injector: Injector, options: ParseOptions): HookParser|null {
     // Check if class
@@ -141,7 +143,7 @@ export class ParserEntryResolver {
       (config.hasOwnProperty('enclosing') && !config.enclosing) || 
       (config.hasOwnProperty('bracketStyle') && config.bracketStyle)
     ) {
-      return new StringSelectorHookParser(config, this.parserResolver, this.tagHookFinder, this.bindingsValueManager);
+      return new TextSelectorHookParser(config, this.parserResolver, this.tagHookFinder, this.bindingsValueManager);
     } else {
       return new ElementSelectorHookParser(config, this.parserResolver, this.platformService, this.bindingsValueManager);
     }    
@@ -151,6 +153,7 @@ export class ParserEntryResolver {
    * Makes sure that the parsers have all required functions
    *
    * @param parsers - The parsers in question
+   * @param options - The current ParseOptions
    */
   validateParserFunctions(parsers: HookParser[], options: ParseOptions): HookParser[] {
     const validParsers = [];
@@ -176,6 +179,7 @@ export class ParserEntryResolver {
    * Makes sure that all parser names are unique
    *
    * @param parsers - The parsers in question
+   * @param options - The current ParseOptions
    */
   checkParserNames(parsers: HookParser[], options: ParseOptions): void {
     const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];
@@ -196,6 +200,7 @@ export class ParserEntryResolver {
    * @param parsers - The parsers in question
    * @param blacklist - The blacklist in question
    * @param whitelist - The whitelist in question
+   * @param options - The current ParseOptions
    */
   checkBlackAndWhitelist(parsers: HookParser[], blacklist: string[]|null, whitelist: string[]|null, options: ParseOptions): void {
     const parserNames: string[] = parsers.map(entry => entry.name).filter(entry => entry !== undefined) as string[];

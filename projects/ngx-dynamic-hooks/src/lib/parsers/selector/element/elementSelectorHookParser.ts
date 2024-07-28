@@ -7,7 +7,7 @@ import { AutoPlatformService } from '../../../services/platform/autoPlatformServ
 import { ParseOptions } from '../../../services/settings/options';
 
 /**
- * A powerful parser for standard Angular component selectors that comes with this library
+ * An element parser to load components with their bindings like in Angular templates.
  */
 export class ElementSelectorHookParser implements HookParser {
   name: string|undefined;
@@ -58,7 +58,7 @@ export class ElementSelectorHookParser implements HookParser {
   // Bindings
   // --------------------------------------------------------------------------
 
-    /**
+  /**
    * Always removes angular-typical template attrs like []-input and ()-outputs from anchors
    *
    * @param anchorElement - The element to strub
@@ -76,6 +76,11 @@ export class ElementSelectorHookParser implements HookParser {
     }
   }
 
+  /**
+   * Returns RichBindingData for Angular-style inputs & output attrs from an element
+   * 
+   * @param element - The element to inspect
+   */
   createBindings(element: any): SavedBindings {
     const rawInputs = this.collectRawBindings(element!, 'inputs', this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);
     const inputBindings: {[key: string]: RichBindingData} = {};
@@ -95,6 +100,14 @@ export class ElementSelectorHookParser implements HookParser {
     };
   }
 
+  /**
+   * Returns Angular-style inputs or output attrs from an element
+   * 
+   * @param element - The element to inspect
+   * @param type - Whether to return the inputs or outputs
+   * @param blacklist - A list of inputs/outputs to blacklist
+   * @param whitelist - A list of inputs/outputs to whitelist
+   */
   collectRawBindings (element: any, type: 'inputs'|'outputs', blacklist: string[]|null, whitelist: string[]|null): {[key: string]: any} {
     const bindings: {[key: string]: any} = {};
 

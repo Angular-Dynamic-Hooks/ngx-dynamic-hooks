@@ -10,7 +10,7 @@ export const PLATFORM_SERVICE = new InjectionToken<PlatformService>('An injectio
 export interface CompletePlatformService {
 
   /**
-   * Returns Angular Version.
+   * Returns the Angular Version.
    * Returns null when it couldn't be retrieved
    */
   getNgVersion(): number|null;

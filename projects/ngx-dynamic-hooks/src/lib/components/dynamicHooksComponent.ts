@@ -8,17 +8,7 @@ import { AutoPlatformService } from '../services/platform/autoPlatformService';
 import { ParseOptions, getParseOptionDefaults } from '../../public-api';
 
 /**
-* Explanation in a nutshell:
-*  1. A dynamic piece of content is passed in as @Input() and an array of parsers is retrieved either as @Input() or from the global settings.
-*  2. The content is given to all registered parsers who will find their respective hooks. The hooks are then replaced/marked as hook anchor elements.
-*  3. The corresponding components for each hook are dynamically loaded into the previously created anchor elements as fully-functional Angular components via createComponent().
-*  4. @Inputs() & @Outputs() for the components are read from the hooks, passed along and automatically updated according to each parser's internal logic.
-*/
-
-/**
- * The main component of the ngx-dynamic-hooks library. 
- * 
- * Accepts a string of content and replaces all registered hooks inside of it with dynamically-created components that behave just like any other Angular component.
+ * The main component of the ngx-dynamic-hooks library to dynamically load components into content
  */
 @Component({
   selector: 'ngx-dynamic-hooks',
@@ -102,9 +92,9 @@ export class DynamicHooksComponent implements DoCheck, OnChanges, AfterViewInit,
   }
 
   /**
-   * The main method of this component to initialize it
+   * Parses the content and load components
    *
-   * @param content - The input content to parse
+   * @param content - The content to parse
    */
   parse(content: any): void {
     this.dynamicHooksService.parse(

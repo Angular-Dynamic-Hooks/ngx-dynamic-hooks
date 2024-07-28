@@ -8,7 +8,7 @@ import { getParseOptionDefaults, ParseOptions } from '../settings/options';
 
 
 /**
- * A parser that can evaluate Javascript data types from strings and turn them into live variables
+ * A parser that can evaluate stringified variables and turn them into their corresponding data types
  */
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,7 @@ export class DataTypeParser {
    * @param unescapeStrings - (optional) Whether to unescape strings or not
    * @param trackContextVariables - (optional) An object that will be filled out with all found context vars
    * @param allowContextFunctionCalls - (optional) Whether to allow function calls in context vars
+   * @param options - (optional) The current parseOptions
    */
   evaluate(dataTypeString: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true, options: ParseOptions = getParseOptionDefaults()): any {
 
@@ -232,6 +233,7 @@ export class DataTypeParser {
    * @param unescapeStrings - Whether to unescape strings or not
    * @param trackContextVariables - Whether to unescape strings or not
    * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
+   * @param options - The current parseOptions
    */
   private loadJSONVariables(arrayOrObject: any, context: any, event: any, unescapeStrings: boolean, trackContextVariables: any, allowContextFunctionCalls: boolean, options: ParseOptions): any {
     for (const prop in arrayOrObject) {
@@ -265,6 +267,7 @@ export class DataTypeParser {
    * @param unescapeStrings - Whether to unescape strings or not
    * @param trackContextVariables - An optional object that will be filled out with all found context vars
    * @param allowContextFunctionCalls - Whether function calls in context vars are allowed
+   * @param options - The current parseOptions 
    */
   loadContextVariable(contextVar: string, context: any = {}, event?: any, unescapeStrings: boolean = true, trackContextVariables: any = {}, allowContextFunctionCalls: boolean = true, options: ParseOptions = getParseOptionDefaults()): any {
     try {

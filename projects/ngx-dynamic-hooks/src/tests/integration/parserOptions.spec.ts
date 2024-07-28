@@ -633,7 +633,7 @@ describe('ParserOptions', () => {
     expect(comp.hookIndex[1].outputSubscriptions['nonOutputEventEmitter']).toBeUndefined();
   });
 
-  fit('#should should adhere to the passed logOptions', () => {
+  it('#should should adhere to the passed logOptions', () => {
     const logger = TestBed.inject(Logger);
     const logSpy = spyOn(console, 'log').and.callThrough();
     const warnSpy = spyOn(console, 'warn').and.callThrough();

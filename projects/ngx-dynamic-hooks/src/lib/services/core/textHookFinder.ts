@@ -39,7 +39,7 @@ export interface HookSegments {
 }
 
 /**
- * The service responsible for finding all text hooks in the content and replacing them with component anchors
+ * The service responsible for finding text hooks in the content and replacing them with component anchors
  */
 @Injectable({
   providedIn: 'root'
@@ -54,8 +54,8 @@ export class TextHookFinder {
    * 
    * @param element - The element to parse
    * @param context - The current context object
-   * @param parsers - All of the registered parsers
-   * @param token - A random token to attach to all created selector elements
+   * @param parsers - The parsers to use
+   * @param token - The current parse token
    * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill
    */
@@ -74,8 +74,8 @@ export class TextHookFinder {
    * 
    * @param element - The element to parse
    * @param context - The current context object
-   * @param parsers - All of the registered parsers
-   * @param token - A random token to attach to all created selector elements
+   * @param parsers - The parsers to use
+   * @param token - The current parse token
    * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill 
    * @param extractedNodes - A recursively-used object holding all temporarily extracted nodes
@@ -172,8 +172,8 @@ export class TextHookFinder {
    *
    * @param content - The text to parse
    * @param context - The current context object
-   * @param parsers - All of the registered parsers
-   * @param token - A random token to attach to all created selector elements
+   * @param parsers - The parsers to use
+   * @param token - The current parse token
    * @param options - The current ParseOptions
    * @param hookIndex - The hookIndex object to fill
    */
@@ -285,11 +285,11 @@ export class TextHookFinder {
   }
 
   /**
-   * Checks the hookPositions of the combined parserResults to ensure they do not collide/overlap.
-   * Any that do are removed from the results.
+   * Checks the combined parserResults and validates them. Invalid ones are removed.
    *
-   * @param parserResults - The parserResults from replaceHooksWithNodes()
-   * @param content - The source text for the parserResults
+   * @param parserResults - The parserResults to check
+   * @param content - The content string
+   * @param options - The current ParseOptions
    */
   private validateHookPositions(parserResults: ParserFindHooksResult[], content: string, options: ParseOptions): ParserFindHooksResult[] {
     const checkedParserResults = [];
@@ -380,7 +380,8 @@ export class TextHookFinder {
    * @param message - The error message
    * @param hookPos - The first HookPosition
    * @param prevHookPos - The second HookPosition
-   * @param content - The source text for the HookPositions
+   * @param content - The content string
+   * @param options - The current ParseOptions
    */
   private generateHookPosWarning(message: string, hookPos: HookPosition, prevHookPos: HookPosition, content: string, options: ParseOptions): void {
     const prevHookSegments = this.getHookSegments(prevHookPos, content);

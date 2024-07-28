@@ -15,8 +15,7 @@ import { AutoPlatformService } from './platform/autoPlatformService';
 import { ElementHookFinder } from './core/elementHookFinder';
 
 /**
- * Serves as a programmatic layer of abstraction of the functionality used in DynamicHooksComponent, so that its
- * functionality can also be used without actually inserting the <ngx-dynamic-hooks>-component
+ * The core service for the ngx-dynamic-hooks library. Provides the main logic internally used by all components.
  */
 @Injectable({
   providedIn: 'root'
@@ -39,17 +38,18 @@ export class DynamicHooksService {
   }
 
   /**
-   * Parses a string of content and loads components for all found hooks
+   * Parses content and loads components for all found hooks
    *
    * @param content - The content to parse
    * @param parsers - An optional list of parsers to use instead of the global ones
    * @param context - An optional context object
-   * @param options - An optional list of options to use instead of the global ones
+   * @param options - An optional list of options
    * @param globalParsersBlacklist - An optional list of global parsers to blacklist
    * @param globalParsersWhitelist - An optional list of global parsers to whitelist
-   * @param targetElement - An optional HTML element to use as the container for the loaded content. If none is provided, one is created and returned for you.
+   * @param targetElement - An optional HTML element to use as the container for the loaded content.
    * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
-   * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the injector of the module this library is imported to is used.
+   * @param environmentInjector - An optional environmentInjector to use for the dynamically-loaded components. If none is provided, the default environmentInjector is used.
+   * @param injector - An optional injector to use for the dynamically-loaded components. If none is provided, the default injector is used.
    */
   parse(
     content: any = null,

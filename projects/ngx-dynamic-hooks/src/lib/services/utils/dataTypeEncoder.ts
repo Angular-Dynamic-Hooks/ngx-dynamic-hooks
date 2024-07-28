@@ -15,9 +15,6 @@ interface TextSegment {
 })
 export class DataTypeEncoder {
 
-  constructor() {
-  }
-
   // Substrings
   // -----------------------------------------------------
 
@@ -282,6 +279,11 @@ export class DataTypeEncoder {
     return contextVar;
   }
 
+  /**
+   * Transforms a context var placeholder back into the actual context var
+   * 
+   * @param contextVar - The placeholder context var
+   */
   transformPlaceholderIntoContextVar(contextVar: string): string {
     contextVar = 'context' + contextVar.substring(7);
     contextVar = contextVar.replace(/@@@cxtDoubleQuote@@@/g, '"');

@@ -2,7 +2,7 @@ import { Component, EnvironmentInjector, Injector, NgModule, createEnvironmentIn
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 // Testing api resources
-import { DynamicHooksComponent, ElementSelectorHookParser, ParserEntryResolver, SelectorHookParserConfig, StringSelectorHookParser, provideDynamicHooks } from '../../testing-api';
+import { DynamicHooksComponent, ElementSelectorHookParser, ParserEntryResolver, SelectorHookParserConfig, TextSelectorHookParser, provideDynamicHooks } from '../../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule } from '../shared';
@@ -158,8 +158,8 @@ describe('SelectorHookParserConfig', () => {
     expect(getParserFor({...c, hostElementTag: 'asd'})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, injector: TestBed.inject(Injector)})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, environmentInjector: TestBed.inject(EnvironmentInjector)})).toBe(ElementSelectorHookParser);
-    expect(getParserFor({...c, enclosing: false})).toBe(StringSelectorHookParser);
-    expect(getParserFor({...c, bracketStyle: {opening: '[', closing: ']'}})).toBe(StringSelectorHookParser);
+    expect(getParserFor({...c, enclosing: false})).toBe(TextSelectorHookParser);
+    expect(getParserFor({...c, bracketStyle: {opening: '[', closing: ']'}})).toBe(TextSelectorHookParser);
     expect(getParserFor({...c, parseInputs: false})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, unescapeStrings: false})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, inputsBlacklist: []})).toBe(ElementSelectorHookParser);

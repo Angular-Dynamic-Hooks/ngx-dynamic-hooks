@@ -5,7 +5,7 @@ import { SingleTagTestComponent } from '../../resources/components/singleTag/sin
 import { DynamicHooksComponent, anchorElementTag } from '../../testing-api';
 import { defaultBeforeEach } from '../shared';
 
-describe('StringSelectorHookParser', () => {
+describe('TextSelectorHookParser', () => {
   let testBed;
   let fixture: any;
   let comp: DynamicHooksComponent;

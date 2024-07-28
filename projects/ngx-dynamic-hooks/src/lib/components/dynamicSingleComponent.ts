@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ElementRef, DoCheck, AfterViewChecked, Output, EventEmitter, Injector, Optional, Inject, SimpleChanges, EnvironmentInjector, reflectComponentType, ComponentRef } from '@angular/core';
 import { HookIndex, Hook, ParseResult, HookComponentData, HookValue, HookBindings } from '../interfacesPublic';
-import { HookParser, LoadedComponent } from '../interfacesPublic';
+import { HookParser } from '../interfacesPublic';
 import { DynamicHooksService } from '../services/dynamicHooksService';
 import { ComponentUpdater } from '../services/core/componentUpdater';
 import { AutoPlatformService } from '../services/platform/autoPlatformService';
@@ -18,6 +18,10 @@ export interface DynamicHooksSingleOptions {
   acceptOutputsForAnyObservable?: boolean;
 }
 
+
+/**
+ * A component that can be used to dynamically load a single component and pass bindings to it
+ */
 @Component({
   selector: 'ngx-dynamic-single',
   template: '',
@@ -44,7 +48,7 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
   ngDoCheck(): void {
     // Update on every change detection run?
     if (!this.parseOptions.updateOnPushOnly) {
-      this.updateComponent();
+      this.refresh();
     }
   }
 
@@ -62,10 +66,9 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
       changes.hasOwnProperty('inputs') ||
       changes.hasOwnProperty('outputs') || 
       changes.hasOwnProperty('options')
-    ) {
-      
+    ) {      
       this.parseOptions = {...getParseOptionDefaults(), ...this.options};
-      this.updateComponent();
+      this.refresh();
     }
   }
 
@@ -81,6 +84,9 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
 
   // ----------------------------------------------------------------------
 
+  /**
+   * Destroys the dynamic component and resets the state
+   */
   reset() {
     if (this.parseResult) {
       this.dynamicHooksService.destroy(this.parseResult.hookIndex);
@@ -91,6 +97,9 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
     this.parseOptions = {};
   }
 
+  /**
+   * Loads the dynamic component
+   */
   loadComponent() {
     if (this.component) {
       const compMeta = reflectComponentType(this.component);
@@ -123,6 +132,11 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
     }
   }
 
+  /**
+   * Creates a parser specifically for the dynamic component
+   * 
+   * @param selector - The selector to use for the component
+   */
   createAdHocParser(selector: string): (new(...args: any[]) => HookParser) {
     const that = this;
 
@@ -149,7 +163,10 @@ export class DynamicSingleComponent implements DoCheck, OnChanges, AfterViewInit
     return AdHocSingleComponentParser;
   }
 
-  updateComponent() {
+  /**
+   * Updates the bindings for the loaded component
+   */
+  refresh() {
     if (this.parseResult) {
       this.componentUpdater.refresh(this.parseResult.hookIndex, {}, this.parseOptions, false);
     }

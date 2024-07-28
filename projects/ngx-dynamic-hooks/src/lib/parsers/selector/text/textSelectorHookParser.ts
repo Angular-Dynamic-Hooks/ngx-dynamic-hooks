@@ -9,9 +9,9 @@ import { matchAll } from '../../../services/utils/utils';
 import { ParseOptions } from '../../../services/settings/options';
 
 /**
- * A powerful parser for standard Angular component selectors that comes with this library
+ * A text parser to load components with their bindings like in Angular templates.
  */
-export class StringSelectorHookParser implements HookParser {
+export class TextSelectorHookParser implements HookParser {
   name: string|undefined;
   config: SelectorHookParserConfig;
   savedBindings: {[key: number]: SavedBindings} = {};
@@ -58,6 +58,11 @@ export class StringSelectorHookParser implements HookParser {
   // Bindings
   // --------------------------------------------------------------------------
 
+  /**
+   * Returns RichBindingData for Angular-style inputs & output attrs from an openingTag
+   * 
+   * @param openingTag - The openingTag to inspect
+   */
   createBindings(openingTag: string): SavedBindings {
     const rawInputs = this.collectRawInputs(openingTag!);
     const inputBindings: {[key: string]: RichBindingData} = {};
@@ -77,9 +82,14 @@ export class StringSelectorHookParser implements HookParser {
     };
   }
 
+  /**
+   * Collects Angular-style inputs from an openingTag
+   *
+   * @param openingTag - The openingTag to inspect
+   */
   collectRawInputs (openingTag: string): {[key: string]: any} {
-    const rawNoBracketInputs = this.getBindingsFromOpeningTag('noBracketInputs', openingTag, this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);
-    const rawBracketInputs = this.getBindingsFromOpeningTag('bracketInputs', openingTag, this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);
+    const rawNoBracketInputs = this.getBindingsFromOpeningTag(openingTag, 'noBracketInputs', this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);
+    const rawBracketInputs = this.getBindingsFromOpeningTag(openingTag, 'bracketInputs', this.config.inputsBlacklist || null, this.config.inputsWhitelist || null);
 
     // NoBracketInputs are to be interpreted as plain strings, so wrap them in quotes
     for (const [noBracketInputName, noBracketInputValue] of Object.entries(rawNoBracketInputs)) {
@@ -90,19 +100,24 @@ export class StringSelectorHookParser implements HookParser {
     return {...rawNoBracketInputs, ...rawBracketInputs};
   }
 
+  /**
+   * Collects Angular-style outputs from an openingTag
+   *
+   * @param openingTag - The openingTag to inspect
+   */
   collectRawOutputs(openingTag: string): {[key: string]: any} {
-    return this.getBindingsFromOpeningTag('outputs', openingTag!, this.config.outputsBlacklist || null, this.config.outputsWhitelist || null);
+    return this.getBindingsFromOpeningTag(openingTag!, 'outputs', this.config.outputsBlacklist || null, this.config.outputsWhitelist || null);
   }
 
   /**
-   * Takes a string selector hook opening tag and parses Angular-style bindings from it
+   * Collects Angular-style inputs or outputs from an openingTag
    *
    * @param type - What kind of bindings to extract
-   * @param openingTag - The opening tag to analyze
-   * @param blacklist - What bindings to exlude
-   * @param whitelist - What bindings to exclusively include
+   * @param openingTag - The opening tag to inspect
+   * @param blacklist - A list of inputs/outputs to blacklist
+   * @param whitelist - A list of inputs/outputs to whitelist
    */
-    private getBindingsFromOpeningTag(type: 'noBracketInputs'|'bracketInputs'|'outputs', openingTag: string, blacklist: string[]|null, whitelist: string[]|null): {[key: string]: any} {
+    private getBindingsFromOpeningTag(openingTag: string, type: 'noBracketInputs'|'bracketInputs'|'outputs', blacklist: string[]|null, whitelist: string[]|null): {[key: string]: any} {
       const bindings: {[key: string]: any} = {};
   
       // Examples: https://regex101.com/r/17x3cc/16

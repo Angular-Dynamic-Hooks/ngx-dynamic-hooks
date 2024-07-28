@@ -123,7 +123,7 @@ describe('DynamicSingleComponent', () => {
 
   it('#should update bindings on any change detection run by default', () => {
     const componentUpdater = testBed.get(ComponentUpdater);
-    const updateSpyOne = spyOn(comp, 'updateComponent').and.callThrough();
+    const updateSpyOne = spyOn(comp, 'refresh').and.callThrough();
     const updateSpyTwo = spyOn(componentUpdater, 'refresh').and.callThrough();
 
     comp.component = MultiTagTestComponent;
@@ -148,7 +148,7 @@ describe('DynamicSingleComponent', () => {
 
   it('#should update bindings only on push when specified', () => {
     const componentUpdater = testBed.get(ComponentUpdater);
-    const updateSpyOne = spyOn(comp, 'updateComponent').and.callThrough();
+    const updateSpyOne = spyOn(comp, 'refresh').and.callThrough();
     const updateSpyTwo = spyOn(componentUpdater, 'refresh').and.callThrough();
 
     comp.component = MultiTagTestComponent;

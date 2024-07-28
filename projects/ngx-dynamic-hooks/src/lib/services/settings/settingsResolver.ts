@@ -1,12 +1,12 @@
 import { Inject, Injectable, Injector, Optional } from '@angular/core';
-import { DynamicHooksSettings, DynamicHooksInheritance, ResolvedSettings } from './settings';
+import { DynamicHooksSettings, DynamicHooksInheritance } from './settings';
 import { ParserEntryResolver } from './parserEntryResolver';
 import { HookParserEntry } from './parserEntry';
 import { HookParser } from '../../interfacesPublic';
 import { ParseOptions, getParseOptionDefaults } from './options';
 
 /**
- * A helper class for resolving settings object and merge potentially multiple ones from different child modules/injection contexts
+ * A helper class for resolving a combined settings object from all provided ones
  */
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,19 @@ export class SettingsResolver {
   ) {
   }
 
+  /**
+   * Takes all provided settings objects and combines them into a final settings object
+   * 
+   * @param injector - The current injector
+   * @param content - The content
+   * @param allSettings - All settings provided anywhere
+   * @param ancestorSettings - All ancestor settings
+   * @param moduleSettings - The current module settings
+   * @param localParsers - A list of local parsers
+   * @param localOptions - A local options object
+   * @param globalParsersBlacklist - A list of global parsers to blacklist
+   * @param globalParsersWhitelist - A list of global parsers to whitelist
+   */
   public resolve(
     injector: Injector,
     content: any,
@@ -28,7 +41,10 @@ export class SettingsResolver {
     localOptions: ParseOptions|null = null,
     globalParsersBlacklist: string[]|null = null,
     globalParsersWhitelist: string[]|null = null,
-  ): ResolvedSettings {
+  ): {
+    parsers: HookParser[];
+    options: ParseOptions;
+  } {
     let resolvedSettings: DynamicHooksSettings = {};
     allSettings = allSettings || [];
     ancestorSettings = ancestorSettings || [];
@@ -114,6 +130,12 @@ export class SettingsResolver {
     return mergedSettings;
   }
 
+  /**
+   * Recursively merges two objects
+   * 
+   * @param a - The target object to merge into
+   * @param b - The other object being merged
+   */
   private recursiveAssign (a: any, b: any) {
     if (Object(b) !== b) return b;
     if (Object(a) !== a) a = {};
