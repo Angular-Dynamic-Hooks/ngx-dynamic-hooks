@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { HookParserEntry } from './services/settings/parserEntry';
 import { ParseOptions } from './services/settings/options';
 import { HookIndex, ParseResult } from './interfacesPublic';
-import { EnvironmentInjector, Injector, Provider, Type, createEnvironmentInjector } from '@angular/core';
+import { EnvironmentInjector, NgZone, Provider, createEnvironmentInjector } from '@angular/core';
 import { createApplication } from '@angular/platform-browser';
 import { DynamicHooksService } from '../public-api';
 
@@ -182,21 +182,24 @@ export const parseHooks = async (
 
   const dynHooksService = environmentInjector.get(DynamicHooksService);
 
-  return firstValueFrom(dynHooksService
-    .parse(
-      content, 
-      parsers,
-      context, 
-      options, 
-      null, 
-      null,
-      targetElement, 
-      targetHookIndex, 
-      environmentInjector,
-      null
-    )
-  ).then(parseResult => {
-    allParseResults.push(parseResult);
-    return parseResult;
+  // Needs to be run inside NgZone manually
+  return environmentInjector.get(NgZone).run(() => {
+    return firstValueFrom(dynHooksService
+      .parse(
+        content, 
+        parsers,
+        context, 
+        options, 
+        null, 
+        null,
+        targetElement, 
+        targetHookIndex, 
+        environmentInjector,
+        null
+      )
+    ).then(parseResult => {
+      allParseResults.push(parseResult);
+      return parseResult;
+    });
   });
 }
