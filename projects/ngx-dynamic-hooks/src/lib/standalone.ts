@@ -46,7 +46,7 @@ export const destroyAll = () => {
  * @param providers - A list of providers
  * @param parentScope - An optional parent scope created previously. Makes the parent providers also accessible to this scope.
  */
-export const createProviders: (providers?: Provider[], parentScope?: ProvidersScope) => ProvidersScope = (providers = [], parentScope) => {
+export const createProviders = (providers: Provider[] = [], parentScope?: ProvidersScope): ProvidersScope => {
   return new ProvidersScope(providers, parentScope);
 }
 

@@ -2,12 +2,15 @@
 import { AutoPlatformService, PlatformService, anchorElementTag, parseHooks, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
 
 // Custom testing resources
-import { Injector } from '@angular/core';
+import { ChangeDetectorRef, Injector, NgZone } from '@angular/core';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
 import { WhateverTestComponent } from '../resources/components/whateverTest/whateverTest.c';
 import { createProviders, destroyAll } from '../../lib/standalone';
 import { createApplication } from '@angular/platform-browser';
 import { RootTestService } from '../resources/services/rootTestService';
+import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
+import { HookParserEntry } from 'ngx-dynamic-hooks';
+import { fakeAsync, tick } from '@angular/core/testing';
 
 const getService = (injector: Injector, token: any) => {
   try {
@@ -156,6 +159,23 @@ describe('Standalone usage', () => {
     expect(getService(scopeResultTwo.usedEnvironmentInjector, ScopeService)).toBeUndefined();
     expect(getService(scopeResultTwo.usedEnvironmentInjector, CustomInjectorService)).not.toBeUndefined();
     expect(getService(scopeResultTwo.usedEnvironmentInjector, CustomInjectorService).content).toBe('Custom injector service works!');
+  });
+
+  it('#should activate change detection with NgZone', async () => {
+    const testText = `<singletagtest>`;
+    const parsers: HookParserEntry[] = [{
+      component: SingleTagTestComponent, 
+      enclosing: false
+    }];
+
+    const result = await parseHooks(testText, parsers);
+    const comp = result.hookIndex[1].componentRef?.instance;
+    const compElement = result.hookIndex[1].componentRef?.location.nativeElement;
+
+    // Change detection via ngZone can be tested by triggering a DOM event and checking if ngDoCheck was triggered
+    const initialDoCheckCount = comp.doCheckTriggers;
+    compElement.querySelector('.singletag-component').click();    
+    expect(comp.doCheckTriggers).toBeGreaterThan(initialDoCheckCount);
   });
 
   it('#should load a custom platformService', async () => {
@@ -371,7 +391,7 @@ describe('Standalone usage', () => {
     expect(spyB.calls.all().length).toBe(1);
   });
 
-  it('#should habe a destroyed scope put out helpful errors when trying to parse again', async () => {
+  it('#should have a destroyed scope put out helpful errors when trying to parse again', async () => {
     const testText = `<multitagtest></multitagtest>`;
     const context = {};
     const parsers = [MultiTagTestComponent];

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector, NgZone } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../testing-api';
 import { RootTestService } from '../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../services/genericInjectionToken';
@@ -40,6 +40,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
   @Output('componentClickedAlias') componentClicked: EventEmitter<number> = new EventEmitter();
   @Output('eventTriggeredAlias') eventTriggered: EventEmitter<number> = new EventEmitter();
   @Output() onDestroyEmitter: EventEmitter<string> = new EventEmitter();
+  doCheckTriggers: number = 0;
   ngOnInitTriggered: boolean = false;
   ngOnChangesTriggered: boolean = false;
   latestNgOnChangesData: any;
@@ -50,6 +51,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
 
   constructor (
     public cd: ChangeDetectorRef, 
+    public ngZone: NgZone,
     @Optional() public rootTestService: RootTestService,
     @Optional() @Inject(GENERICINJECTIONTOKEN) public genericInjectionValue: any,
     public environmentInjector: EnvironmentInjector,
@@ -62,6 +64,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
   }
 
   ngDoCheck() {
+    this.doCheckTriggers++;
   }
 
   ngOnInit () {

@@ -30,8 +30,8 @@
   url: /documentation/v3/general-usage
   icon: /assets/images/icons/star.svg
 
-- title: Standalone
-  url: /documentation/v3/standalone
+- title: Standalone mode
+  url: /documentation/v3/standalone-mode
   icon: /assets/images/icons/star.svg
 
 - title: Component features

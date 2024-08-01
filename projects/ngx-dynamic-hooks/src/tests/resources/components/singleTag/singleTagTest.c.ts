@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector, NgZone } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../../testing-api';
 import { RootTestService } from '../../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../../services/genericInjectionToken';
@@ -21,13 +21,14 @@ export class SingleTagTestComponent extends AbstractTestComponent {
 
   constructor (
     cd: ChangeDetectorRef, 
+    ngZone: NgZone,
     @Optional() rootTestService: RootTestService,
     @Optional() @Inject(GENERICINJECTIONTOKEN) genericInjectionValue: any,
     environmentInjector: EnvironmentInjector,
     injector: Injector,
     @Optional() @Inject(SINGLETAGCOMPONENTSERVICE) private singleTagComponentService: any,
   ) {
-    super(cd, rootTestService, genericInjectionValue, environmentInjector, injector);
+    super(cd, ngZone, rootTestService, genericInjectionValue, environmentInjector, injector);
   }
 
 }

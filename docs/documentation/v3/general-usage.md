@@ -158,7 +158,7 @@ For a full guide with stackblitz examples, see the [Writing your own HookParser]
 
 ## Programmatic usage (with service)
 
-You can also parse dynamic content directly in Typescript by injecting the `DynamicHooksService` and calling its `parse`-method programmatically. The `DynamicHooksComponent` internally does the same thing.
+You can also parse dynamic content directly in Typescript by injecting the `DynamicHooksService` and calling its `parse`-method programmatically.
 
 ```ts
   parse(

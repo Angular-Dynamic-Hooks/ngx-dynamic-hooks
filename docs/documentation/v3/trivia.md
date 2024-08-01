@@ -43,7 +43,7 @@ Finally, which components/hooks can be used by the author can be [freely adjuste
 
 Angular elements allows you to register custom HTML elements with the browser that automatically load and host an Angular component when they appear anywhere in the DOM (see <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components" target="_blank">Web components</a>) - even outside of the Angular app. 
 
-For that reason, these elements work in dynamic content as well and may satisfy your needs. The approach itself is particularly similar to the [Standalone mode]({{ "documentation/v3/standalone" | relative_url }}) of Angular Dynamic Hooks.
+For that reason, these elements work in dynamic content as well and may satisfy your needs. The approach itself is particularly similar to the [Standalone mode]({{ "documentation/v3/standalone-mode" | relative_url }}) of Angular Dynamic Hooks.
 
 However, there are a number of advantages this library offers compared to Angular elements:
 

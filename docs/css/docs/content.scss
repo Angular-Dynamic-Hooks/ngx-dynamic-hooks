@@ -123,6 +123,16 @@
         scroll-margin-top: calc(var(--header-height) + 20px);
 
         @include minSm() {
+          font-size: 17px;
+        }
+      }
+      .article h5 {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.6;
+        scroll-margin-top: calc(var(--header-height) + 20px);
+
+        @include minSm() {
           font-size: 18px;
         }
       }

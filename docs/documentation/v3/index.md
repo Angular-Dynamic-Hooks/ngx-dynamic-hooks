@@ -39,7 +39,7 @@ As the library does not rely on a runtime compiler, it works in both JiT- and Ao
 
 * ⭐ Loads fully-functional Angular components into dynamic content
 * 📖 Parses both strings and HTML structures
-* 🚀 Can be used [fully standalone]({{ "documentation/v3/standalone" | relative_url }}) (load components into HTML without Angular)
+* 🚀 Can be used [fully standalone]({{ "documentation/v3/standalone-mode" | relative_url }}) (load components directly into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
 * 🔍 Loads components by their selectors, custom selectors or [any text pattern of your choice]({{ "documentation/v3/parsers#writing-your-own-hookparser" | relative_url }})
