@@ -63,7 +63,7 @@ export class TextHookFinder {
     // Only bother looking for text hooks if there even are text hook parsers
     for (const parser of parsers) {
       if (typeof parser.findHooks === 'function') {
-        this.checkElement(element, context, parsers, token, options, hookIndex, {});
+        this.checkElement(element, context, parsers, token, options, hookIndex);
         break;
       }
     }
@@ -80,80 +80,80 @@ export class TextHookFinder {
    * @param hookIndex - The hookIndex object to fill 
    * @param extractedNodes - A recursively-used object holding all temporarily extracted nodes
    */
-  checkElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex, extractedNodes: {[key: string]: any} = {}, ) {
+  checkElement(element: any, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex, extractedNodes: {counter: number, nodes: {[key: string]: any}} = {counter: 0, nodes: {}}, ) {
+    let childNodes = this.platformService.getChildNodes(element);
+
     // To find text hooks in an already existing node, first replace non-text child nodes with string placeholders, then concat all text content.
     // This is so enclosing text hooks can be found even if they are separated by other elements
-    let childNodes = this.platformService.getChildNodes(element);
     let collectedText = '';
-
+    const collectedNodes: {[key: string]: any} = {};
     for (const childNode of childNodes) {
       if (this.platformService.isTextNode(childNode)) {
         collectedText += this.platformService.getTextContent(childNode);
       } else {
-        const nodeId = Object.keys(extractedNodes).length + 1;
-        extractedNodes[nodeId] = childNode;
+        const nodeId = extractedNodes.counter++;
         collectedText += `${findInElementsNodePlaceholder}__${nodeId}__`;
-      }
-    }    
-
-    // Parse collected text, overwrite element content with result
-    if (collectedText) {
-      const prevHookCount = Object.keys(hookIndex).length;
-      const result = this.find(collectedText, context, parsers, token, options, hookIndex);
-
-      // If hooks were found, replace element.innerHTML with result.content
-      if (prevHookCount < Object.keys(hookIndex).length) {
-        const tmpDiv = this.platformService.createElement('div');
-        this.platformService.setInnerContent(tmpDiv, result.content);
-        childNodes = this.platformService.getChildNodes(tmpDiv);
-
-        this.platformService.clearChildNodes(element);
-        for (const node of childNodes) {
-          this.platformService.appendChild(element, node);
-        }
+        collectedNodes[nodeId] = childNode;
       }
     }
 
-    // Then replace placeholders with previously extracted non-text nodes again
-    for (const childNode of childNodes) {
-      if (this.platformService.isTextNode(childNode)) {
-        let text = this.platformService.getTextContent(childNode);
-        if (text) {
-          const matches = matchAll(text, new RegExp(`${findInElementsNodePlaceholder}__(\\d*)__`, 'g'));
+    // Then check for text hooks
+    const prevHookCount = Object.keys(hookIndex).length;
+    const result = this.find(collectedText, context, parsers, token, options, hookIndex);
 
-          // If placeholders found
-          if (matches.length) {
-            const textReplacementNodes = [];
-            let currentPos = 0;
+    // If hooks were found, replace element content with result.content
+    if (Object.keys(hookIndex).length > prevHookCount) {
+      this.platformService.clearChildNodes(element);
+      this.platformService.setInnerContent(element, result.content);
+      childNodes = this.platformService.getChildNodes(element);
 
-            // Split text node containing placeholder into nodes array with restored nodes
-            for (const match of matches) {
-              const textBefore = text.substring(currentPos, match.index);
-              const extractedNodeId = parseInt(match[1]);
+      // Also add locally removed nodes to total extractedNodes
+      extractedNodes.nodes = {...extractedNodes.nodes, ...collectedNodes};
+    }
 
-              if (textBefore) {
-                textReplacementNodes.push(this.platformService.createTextNode(textBefore));
+    // If still have extractedNodes, always look for their placeholders on every level (could be deeper than when they were extracted) and reinsert them
+    if (Object.keys(extractedNodes.nodes).length) {
+      for (const childNode of childNodes) {
+        if (this.platformService.isTextNode(childNode)) {
+          let text = this.platformService.getTextContent(childNode);
+          if (text) {
+            const matches = matchAll(text, new RegExp(`${findInElementsNodePlaceholder}__(\\d*)__`, 'g'));
+
+            // If placeholders found
+            if (matches.length) {
+              const textReplacementNodes = [];
+              let currentPos = 0;
+
+              // Split text node containing placeholder into nodes array with restored nodes
+              for (const match of matches) {
+                const textBefore = text.substring(currentPos, match.index);
+                const extractedNodeId = parseInt(match[1]);
+
+                if (textBefore) {
+                  textReplacementNodes.push(this.platformService.createTextNode(textBefore));
+                }
+                if (extractedNodeId && extractedNodes.nodes[extractedNodeId]) {
+                  textReplacementNodes.push(extractedNodes.nodes[extractedNodeId]);
+                  delete extractedNodes.nodes[extractedNodeId];
+                }
+                
+                currentPos = match.index + match[0].length;
               }
-              if (extractedNodeId && extractedNodes[extractedNodeId]) {
-                textReplacementNodes.push(extractedNodes[extractedNodeId]);
+              const textRemaining = text.substring(currentPos);
+              if (textRemaining) {
+                textReplacementNodes.push(this.platformService.createTextNode(textRemaining));
               }
-              
-              currentPos = match.index + match[0].length;
-            }
-            const textRemaining = text.substring(currentPos);
-            if (textRemaining) {
-              textReplacementNodes.push(this.platformService.createTextNode(textRemaining));
-            }
 
-            // Replace text node with that array
-            const parent = this.platformService.getParentNode(childNode);
-            for (const replacementNode of textReplacementNodes) {
-              this.platformService.insertBefore(parent, replacementNode, childNode);
-            }
-            this.platformService.removeChild(parent, childNode);
+              // Replace text node with that array
+              const parent = this.platformService.getParentNode(childNode);
+              for (const replacementNode of textReplacementNodes) {
+                this.platformService.insertBefore(parent, replacementNode, childNode);
+              }
+              this.platformService.removeChild(parent, childNode);
 
-            // Update child nodes var
-            childNodes = this.platformService.getChildNodes(parent);
+              // Update child nodes var
+              childNodes = this.platformService.getChildNodes(parent);
+            }
           }
         }
       }
@@ -178,6 +178,12 @@ export class TextHookFinder {
    * @param hookIndex - The hookIndex object to fill
    */
   find(content: string, context: any, parsers: HookParser[], token: string, options: ParseOptions, hookIndex: HookIndex): {content: string, hookIndex: HookIndex} {
+    if (content === '') {
+      return {
+        content: content,
+        hookIndex: hookIndex
+      }
+    }
 
     // Convert input HTML entities?
     if (options.convertHTMLEntities) {

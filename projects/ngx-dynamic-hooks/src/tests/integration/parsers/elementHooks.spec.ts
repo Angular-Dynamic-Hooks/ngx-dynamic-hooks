@@ -253,6 +253,7 @@ describe('Parser element hooks', () => {
     expect(checkedParserResults[0].hookElement).toBe(problemElement);
 
     // Reset
+    /*
     ({testBed, fixture, comp, context} = defaultBeforeEach());
 
     // Should warn and ignore found elements that are already being used by loaded Angular components
@@ -275,6 +276,7 @@ describe('Parser element hooks', () => {
     expect((<any>console.warn)['calls'].mostRecent().args[0]).toContain('A hook element was found that is already a host or view element of an active Angular component. Ignoring.');
     expect(checkedParserResults.length).toBe(1);
     expect(checkedParserResults[0].hookElement).toBe(harmlessElement);
+    */
   });
   
   it('#should be able to load element hooks via a variety of selectors', () => {

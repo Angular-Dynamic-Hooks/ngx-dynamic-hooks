@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 // Testing api resources
-import { DynamicHooksComponent, ParseResult, anchorElementTag, getParseOptionDefaults } from '../testing-api';
+import { AutoPlatformService, DynamicHooksComponent, ParseResult, anchorElementTag, contentElementAttr, getParseOptionDefaults } from '../testing-api';
 import { DynamicHooksService } from '../testing-api';
 
 // Custom testing resources
@@ -258,6 +258,52 @@ describe('DynamicHooksService', () => {
     const elementPassedToSanitizer = (dynamicHooksService['contentSanitizer'].sanitize as jasmine.Spy).calls.allArgs()[0][0];
     expect(elementPassedToSanitizer).not.toBe(targetElement);
     expect(targetElement.innerHTML).toBe(targetElementExpectedHtml);
+  });
+
+  it('#should add/remove the contentElementAttr to the currently parsed content element', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+    const platformService = TestBed.inject(AutoPlatformService);
+    const setAttributeSpy = spyOn(platformService, 'setAttribute').and.callThrough();
+    const removeAttributeSpy = spyOn(platformService, 'removeAttribute').and.callThrough();
+
+    const div = document.createElement('div');
+    dynamicHooksService.parse(div).subscribe(result => {
+      expect(setAttributeSpy.calls.all().length).toBe(1);
+      expect(setAttributeSpy.calls.all()[0].args[0]).toBe(div);
+      expect(setAttributeSpy.calls.all()[0].args[1]).toBe(contentElementAttr);
+  
+      expect(removeAttributeSpy.calls.all().length).toBe(1);
+      expect(removeAttributeSpy.calls.all()[0].args[0]).toBe(div);
+      expect(removeAttributeSpy.calls.all()[0].args[1]).toBe(contentElementAttr);
+
+      expect(div.hasAttribute(contentElementAttr)).toBe(false);
+    });
+  });
+
+  it('#should add/remove the contentElementAttr to an optional targetElement', () => {
+    const dynamicHooksService = TestBed.inject(DynamicHooksService);
+    const platformService = TestBed.inject(AutoPlatformService);
+    const setAttributeSpy = spyOn(platformService, 'setAttribute').and.callThrough();
+    const removeAttributeSpy = spyOn(platformService, 'removeAttribute').and.callThrough();
+
+    const div = document.createElement('div');
+    const targetElement = document.createElement('article');
+    dynamicHooksService.parse(div, null, null, null, null, null, targetElement).subscribe(result => {
+      expect(setAttributeSpy.calls.all().length).toBe(2);
+      expect(setAttributeSpy.calls.all()[0].args[0]).toBe(div);
+      expect(setAttributeSpy.calls.all()[0].args[1]).toBe(contentElementAttr);
+      expect(setAttributeSpy.calls.all()[1].args[0]).toBe(targetElement);
+      expect(setAttributeSpy.calls.all()[1].args[1]).toBe(contentElementAttr);
+  
+      expect(removeAttributeSpy.calls.all().length).toBe(2);
+      expect(removeAttributeSpy.calls.all()[0].args[0]).toBe(div);
+      expect(removeAttributeSpy.calls.all()[0].args[1]).toBe(contentElementAttr);
+      expect(removeAttributeSpy.calls.all()[1].args[0]).toBe(targetElement);
+      expect(removeAttributeSpy.calls.all()[1].args[1]).toBe(contentElementAttr);
+
+      expect(div.hasAttribute(contentElementAttr)).toBe(false);
+      expect(targetElement.hasAttribute(contentElementAttr)).toBe(false);
+    });
   });
 
   it('#should destroy loaded components on demand', () => {

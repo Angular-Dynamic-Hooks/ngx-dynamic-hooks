@@ -1,14 +1,15 @@
+import { EnvironmentInjector, NgZone, Provider, createEnvironmentInjector } from '@angular/core';
+import { createApplication } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 
 import { HookParserEntry } from './services/settings/parserEntry';
 import { ParseOptions } from './services/settings/options';
 import { HookIndex, ParseResult } from './interfacesPublic';
-import { EnvironmentInjector, NgZone, Provider, createEnvironmentInjector } from '@angular/core';
-import { createApplication } from '@angular/platform-browser';
-import { DynamicHooksService } from '../public-api';
+import { DynamicHooksService } from './services/dynamicHooksService';
 
 // Global state
 // ----------
+
 let sharedInjector: EnvironmentInjector|null = null;
 let scopes: ProvidersScope[] = [];
 let allParseResults: ParseResult[] = [];

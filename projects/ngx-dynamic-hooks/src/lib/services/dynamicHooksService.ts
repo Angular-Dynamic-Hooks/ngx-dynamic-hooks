@@ -13,6 +13,7 @@ import { SettingsResolver } from './settings/settingsResolver';
 import { ContentSanitizer } from './utils/contentSanitizer';
 import { AutoPlatformService } from './platform/autoPlatformService';
 import { ElementHookFinder } from './core/elementHookFinder';
+import { contentElementAttr } from '../constants/core';
 
 /**
  * The core service for the ngx-dynamic-hooks library. Provides the main logic internally used by all components.
@@ -94,17 +95,16 @@ export class DynamicHooksService {
     }
 
     const token = Math.random().toString(36).substring(2, 12);
-    let contentElement;
+    let contentElement = typeof content === 'string' ? this.platformService.createElement('div') : content;
+    this.platformService.setAttribute(contentElement, contentElementAttr, '1');
 
     // a) Find all text hooks in string content
     if (typeof content === 'string') {
-      contentElement = this.platformService.createElement('div');
       const result = this.textHookFinder.find(content, context, usedParsers, token, usedOptions, targetHookIndex);
       this.platformService.setInnerContent(contentElement, result.content);
       
     // b) Find all text hooks in element content
     } else {
-      contentElement = content;
       this.textHookFinder.findInElement(contentElement, context, usedParsers, token, usedOptions, targetHookIndex);
     }
 
@@ -116,8 +116,10 @@ export class DynamicHooksService {
       this.contentSanitizer.sanitize(contentElement, targetHookIndex, token);
     }
 
-    // Insert virtual content into targetElement
+    // After sanitizing, insert into targetElement, if any
     if (targetElement && targetElement !== contentElement) {
+      this.platformService.removeAttribute(contentElement, contentElementAttr);
+      this.platformService.setAttribute(targetElement, contentElementAttr, '1');
       this.platformService.clearChildNodes(targetElement);
       for (const childNode of this.platformService.getChildNodes(contentElement)) {
         this.platformService.appendChild(targetElement, childNode);
@@ -129,7 +131,8 @@ export class DynamicHooksService {
     return this.componentCreator.init(contentElement, targetHookIndex, token, context, usedOptions, usedEnvironmentInjector, usedInjector)
     .pipe(first())
     .pipe(map((allComponentsLoaded: boolean) => {
-      // Everything done! Return finished hookIndex and resolved parsers and options
+      // Everything done!
+      this.platformService.removeAttribute(contentElement, contentElementAttr);
       return {
         element: contentElement,
         hookIndex: targetHookIndex,

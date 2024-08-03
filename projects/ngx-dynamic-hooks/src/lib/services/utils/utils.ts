@@ -46,3 +46,13 @@ export function sortElements<T>(arr: T[], sortCallback: (a: any, b: any) => numb
     return sortCallback(a, b);
   });
 }
+
+  /**
+   * Indicates if an element is either a component host element or part of a component's view/template
+   * 
+   * @param element - The element to inspect
+   */
+  export function isAngularManagedElement(element: any): boolean {
+    // Angular gives component host and view elements the following property, so can simply check for that
+    return element?.__ngContext__ !== undefined;
+  }

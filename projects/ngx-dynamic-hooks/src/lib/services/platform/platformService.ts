@@ -102,7 +102,7 @@ export interface CompletePlatformService {
    * Returns child elements of a parent element that match a certain css selector
    * Returns an empty array of none could be found
    * @param parentElement The parent element
-   * @param selector The css-style selector to find the elements (like "div.myClass")
+   * @param selector A css-style selector (like "div.myClass")
    */
   querySelectorAll(parentElement: any, selector: string): any[];
 

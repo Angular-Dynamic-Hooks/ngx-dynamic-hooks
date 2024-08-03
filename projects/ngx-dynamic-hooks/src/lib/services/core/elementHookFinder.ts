@@ -2,7 +2,7 @@ import { HookIndex } from '../../interfacesPublic';
 import { HookParser } from '../../interfacesPublic';
 import { Injectable } from '@angular/core';
 import { AutoPlatformService } from '../platform/autoPlatformService';
-import { sortElements } from '../utils/utils';
+import { isAngularManagedElement, sortElements } from '../utils/utils';
 import { anchorAttrHookId, anchorAttrParseToken } from '../../constants/core';
 import { ParseOptions } from '../settings/options';
 import { Logger } from '../utils/logger';
@@ -109,8 +109,8 @@ export class ElementHookFinder {
       }
 
       // Must not already be host or view element for an Angular component
-      if (this.isAngularManagedElement(parserResult.hookElement)) {
-        this.logger.warn(['A hook element was found that is already a host or view element of an active Angular component. Ignoring.', parserResult.hookElement], options);
+      if (isAngularManagedElement(parserResult.hookElement)) {
+        // this.logger.warn(['A hook element was found that is already a host or view element of an active Angular component. Ignoring.'], options);
         continue;
       }
 
@@ -121,13 +121,5 @@ export class ElementHookFinder {
     return checkedParserResults;
   }
   
-  /**
-   * Indicates if an element is either a component host element or part of a component's view/template
-   * 
-   * @param element - The element to inspect
-   */
-  private isAngularManagedElement(element: any): boolean {
-    // Angular gives component host and view elements the following property, so can simply check for that
-    return element.__ngContext__ !== undefined;
-  }
+
 }

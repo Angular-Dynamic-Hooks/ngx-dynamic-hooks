@@ -140,9 +140,18 @@ That said, the rest of the code can be identical as when using the CLI. Here is 
 
 ### React to DOM changes
 
-When parsing the whole browser page for components/hooks, it is a good idea to parse it again when its content changes and new elements are added, so the corresponding components are loaded immediately.
+It is often a good idea to automatically parse the content again when some of its elements change, so the corresponding components are loaded immediately.
 
-For this purpose, we have added some optional logic to `src/utils.ts` in the Stackblitz examples above that automatically picks up on DOM changes and runs `parseHooks` again whenever something changes.
+For this purpose, you can use the `observeElement` function. It automatically picks up on DOM changes and runs a callback function whenever new elements are added to your content. Here is a simple usage example:
+
+```ts
+import { parseHooks, observeElement } from 'ngx-dynamic-hooks';
+...
+
+observeElement(document.body, element => {
+  parseHooks(element, parsers);
+});
+```
 
 ### Trigger from other scripts
 

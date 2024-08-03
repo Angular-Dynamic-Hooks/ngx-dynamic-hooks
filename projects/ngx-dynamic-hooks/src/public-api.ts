@@ -5,6 +5,7 @@
 // General
 export * from './lib/dynamicHooksProviders';
 export * from './lib/standalone';
+export * from './lib/standaloneHelper';
 export * from './lib/interfacesPublic';
 
 // Settings
