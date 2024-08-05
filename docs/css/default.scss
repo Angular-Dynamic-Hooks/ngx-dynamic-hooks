@@ -12,6 +12,7 @@
   --brand-color-faint: #{$brand-color-faint};
   --brand-color-light: #{$brand-color-light};
   --brand-color-dark: #{$brand-color-dark};
+  --brand-gradient: #{$brand-gradient};
   @include lightmode-colors;
 }
 

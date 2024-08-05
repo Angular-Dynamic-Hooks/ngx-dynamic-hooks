@@ -1,6 +1,6 @@
 import { SidebarSectionsWidget } from './widgets/sidebarSections';
 import { ArticleTocWidget } from './widgets/articleToc';
-import { bootstrapWidgets } from './widgetBootstrap';
+import { bootstrapWidgets, Widget } from './widgetBootstrap';
 import { VersionSelectWidget } from './widgets/version/versionSelect';
 import { DarkmodeWidget } from './widgets/darkmode';
 import { VersionWarningLinkWidget } from './widgets/version/versionWarningLink';
@@ -13,8 +13,12 @@ import { CodeCopyWidget } from './widgets/codeCopy';
 // Init misc logic
 initCopyrightDate();
 
-// Init widgets
-const widgets = bootstrapWidgets(document.body, [
+const landingWidgets = [
+  VersionLogoLinkWidget,
+  CodeCopyWidget
+];
+
+const docsWidgets = [
   VersionLogoLinkWidget,
   VersionSelectWidget,
   DarkmodeWidget,
@@ -24,4 +28,10 @@ const widgets = bootstrapWidgets(document.body, [
   VersionWarningLinkWidget,
   StackblitzWidget,
   CodeCopyWidget
-]);
+];
+
+// Determine widgets to use
+let widgetList = location.pathname.includes('documentation') ? docsWidgets : landingWidgets;
+
+// Init widgets
+const widgets = bootstrapWidgets(document.body, widgetList);

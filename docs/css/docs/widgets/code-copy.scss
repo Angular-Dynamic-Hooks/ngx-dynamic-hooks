@@ -3,14 +3,13 @@
   top: 0px;
   right: 0px;
   border: none;
-  padding: 7px 14px;
+  padding: 5px 9px;
   cursor: pointer;
   border-radius: 0px 0px 0px 5px;
   font-size: 11px;
-  font-family: 'Roboto Mono';
-  background-color: transparent;
-  color: var(--text-color);
+  font-family: "Roboto Mono";
   opacity: 0;
+  background-color: #d6d6d654;
 }
 *:hover > .copyToClipboard,
 *:focus > .copyToClipboard {
@@ -21,4 +20,12 @@
 *:focus >.copyToClipboard:focus {
   opacity: 1;
   // color: var(--brand-color);
+}
+
+:root[data-theme="dark"] {
+
+  .copyToClipboard {
+    background-color: rgb(214 214 214 / 13%);
+    color: lightgrey;
+  }
 }

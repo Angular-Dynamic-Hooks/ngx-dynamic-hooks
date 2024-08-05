@@ -62,9 +62,9 @@ Custom parsers can look for either **element hooks** or **text hooks**. Element 
 A hook parser is any class that follows the `HookParser` interface, which requires the following:
 
 * An optional `name` property that is used for black/whitelisting the parser.
-* `findHooks()` or `findHookElements()` tell the library what text/elements to replace with components.
-* `loadComponent()` specifies which component class to load.
-* `getBindings()` returns the component inputs/outputs.
+* `findHooks()` or `findHookElements()` to tell the library where to load the components.
+* `loadComponent()` to specify which component class to load.
+* `getBindings()` to return the component inputs/outputs.
 
 You only need to implement either `findHooks()` or `findHookElements()`, depending on whether you want to replace text or HTML elements with components.
 

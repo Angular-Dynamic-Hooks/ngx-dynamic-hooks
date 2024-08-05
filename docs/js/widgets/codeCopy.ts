@@ -16,14 +16,12 @@ export class CodeCopyWidget implements Widget {
     this.button.addEventListener('click', event => {
       this.copyToClipboard();
       this.button.textContent = 'Copied!';
-      this.button.style.color = 'var(--brand-color)'
     });
 
     // Reset when unhovering
     ['blur', 'mouseleave'].forEach(eventName => {
       this.wrapperElement!.addEventListener(eventName, event => {
         this.button.textContent = '📄 Copy';
-        this.button.style.color = 'unset';
       })
     });
   }

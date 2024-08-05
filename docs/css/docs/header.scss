@@ -27,7 +27,7 @@
       padding: 0px 10px;
       margin: 0px 20px 0px 0px;
       background-color: var(--brand-color);
-      background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-secondary) 100%);
+      background: var(--brand-gradient);
       border: none;
 
       @include minLg() {

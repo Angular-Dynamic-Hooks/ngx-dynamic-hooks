@@ -4,6 +4,7 @@ $brand-color-secondary: #c92e2e !default;
 $brand-color-faint:     transparentize($brand-color, 0.9) !default;
 $brand-color-light:     lighten($brand-color, 38%) !default;
 $brand-color-dark:      darken($brand-color, 15%) !default;
+$brand-gradient:        linear-gradient(135deg, $brand-color 0%, $brand-color-secondary 100%);
 
 // Breakpoints
 $sm: 640px;

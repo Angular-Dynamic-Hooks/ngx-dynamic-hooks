@@ -152,7 +152,7 @@ See it in action in this Stackblitz:
 
 If you need even more flexiblity (such as replacing pure text with components), you can consider implement your own `HookParser`!
 
-A `HookParser` is quite simple and just needs three methods: One that tells the library where the hooks are in the content, one that says which component class to load and one that returns the input/output values.
+A `HookParser` is quite simple and just needs three methods: One that tells the library how to find the hooks, one that returns the component class and one that returns the input/output values.
 
 For a full guide with stackblitz examples, see the [Writing your own HookParser](http://localhost:4000/ngx-dynamic-hooks/documentation/v3/parsers#writing-your-own-hookparser) section.
 

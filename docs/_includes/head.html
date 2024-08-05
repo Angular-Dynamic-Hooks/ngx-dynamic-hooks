@@ -25,7 +25,11 @@
   <script>
     // Immediately apply darkmode styling if relevant to prevent flickering
     let currentTheme = localStorage.getItem('theme');
-    if (currentTheme && currentTheme === 'dark') {
+    if (
+      currentTheme && 
+      currentTheme === 'dark' &&
+      location.pathname.includes('documentation')
+    ) {
       document.documentElement.setAttribute("data-theme", 'dark');
     }
   </script>
