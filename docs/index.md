@@ -3,13 +3,13 @@ layout: landing
 highlights:
   - title: Easy dynamic loading
     icon: ⭐
-    desc: Loads fully-functional Angular components dynamically with native Angular tools
+    desc: Loads fully-functional Angular components into dynamic content at runtime
   - title: Parse any content
     icon: 📖
     desc: Can parse both HTML strings and already-existing HTML trees for components
   - title: Standalone mode
     icon: 🚀
-    desc: Can be used <a href="documentation/v3/standalone-mode" target="_blank">fully standalone</a> to load components into HTML without Angular.
+    desc: Can be used <a href="documentation/v3/standalone-mode" target="_blank">fully standalone</a> to load components into HTML without Angular
   - title: No JiT compiler needed
     icon: 🏃
     desc: Keeps package sizes small by not relying on the Angular compiler to create components
@@ -67,7 +67,7 @@ highlights:
   <section class="l-hero">
     <div class="l-hero-wrapper">
       <h1 class="l-hero-title">Load Angular components anywhere</h1>
-      <p class="l-hero-desc">Angular Dynamic Hooks can load Angular components into <b>any dynamic content</b>, such as HTML strings (like "dynamic" templates), individual HTML elements or the whole browser page.</p>
+      <p class="l-hero-desc"><b>Angular Dynamic Hooks</b> can load Angular components into any dynamic content, such as HTML strings, individual HTML elements or the whole browser page.</p>
       <div class="l-hero-teaser">
         <div class="l-hero-teaser-aspect">
           <img class="l-hero-teaser-img" src="https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8" alt="ngx-dynamic-hooks-optimize">
@@ -87,11 +87,18 @@ highlights:
   </section>
 
   <section class="l-cards">
+    <div class="l-cards-shapes">
+      <div class="l-cards-shape a" style="mask: url({{ "/assets/images/landing/bg_shape_1.svg" | relative_url }}) no-repeat center"></div>
+      <div class="l-cards-shape b" style="mask: url({{ "/assets/images/landing/bg_shape_2.svg" | relative_url }}) no-repeat center"></div>
+      <div class="l-cards-shape c" style="mask: url({{ "/assets/images/landing/bg_shape_3.svg" | relative_url }}) no-repeat center"></div>
+      <div class="l-cards-shape d" style="mask: url({{ "/assets/images/landing/bg_shape_4.svg" | relative_url }}) no-repeat center"></div>
+    </div>
     <div class="l-wrapper">
       <div class="l-cards-inner">
         <h2 class="l-cards-title">
           <img class="l-cards-title-logo" src="{{ "/assets/images/ngx-dynamic-hooks-logo.svg" | relative_url }}">
-          Features overview and highlights
+          <span class="l-cards-title-text-mobile">Features overview</span>
+          <span class="l-cards-title-text-desktop">Features overview and highlights</span>
         </h2>
         <div class="l-cards-list"> 
           {% for item in page.highlights %}
@@ -114,7 +121,18 @@ highlights:
   <section class="l-snippet">
     <div class="l-snippet-wrapper">
       <div class="l-snippet-image">
-        <img src="{{ "/assets/images/landing_hook_illustration.svg" | relative_url }}">
+        <div class="l-snippet-image-top">
+          <span class="l-snippet-image-dots">...</span>
+          <span class="l-snippet-image-top-hook">&lt;hook&gt;</span>
+          <span class="l-snippet-image-dots">...</span>
+        </div>
+        <img class="l-snippet-image-center" src="{{ "/assets/images/down_arrow.svg" | relative_url }}">
+        <div class="l-snippet-image-bottom">
+          <span class="l-snippet-image-dots">...</span>
+          <span class="l-snippet-image-bottom-comp">Component</span>
+          <span class="l-snippet-image-dots">...</span>
+        </div>
+
       </div>
       <div class="l-snippet-text">
         <p class="l-snippet-line">What if you wanted to load components not just from static templates, but from <b>dynamic content</b> - such as string variables, HTML elements or even the whole browser DOM?</p>

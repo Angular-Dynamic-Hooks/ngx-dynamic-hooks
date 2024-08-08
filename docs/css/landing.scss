@@ -12,9 +12,13 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 15px;
+  padding: 10px 30px;
   box-sizing: border-box;
   z-index: 1000;
+  transition: background-color 0.2s ease;
+}
+.l-header.opaque {
+  background-color: #343841;
 }
 
   .l-header-inner {
@@ -37,13 +41,18 @@
       }
 
         .l-site-logo {
-          height: 30px;
-          margin: 0px 18px 0px 0px;
+          height: 26px;
+          margin: 0px 15px 0px 0px;
         }
 
         .l-site-name {
+          display: none;
           color: white;
           font-size: 18px;
+
+          @include minSm() {
+            display: inline;
+          }
         }
 
     .l-header-right {
@@ -90,11 +99,16 @@
     justify-content: center;
     align-items: center;
     min-height: 60vh;
-    margin: 0px 0px 60px 0px;
-    padding: 50px 0px 20px 0px;
+    margin: 0px 0px 40px 0px;
+    padding: 60px 20px 40px 20px;
     background: var(--brand-gradient);
     background: linear-gradient(150deg, #d03b95 0%, #d03b95 10%, #ed6e3a 90%, #ed6e3a 100%);
     color: white;
+
+    @include minLg() {
+      margin: 0px 0px 60px 0px;
+      padding: 50px 20px 20px 20px;
+    }
   }
 
     .l-hero-wrapper {
@@ -108,17 +122,32 @@
 
       .l-hero-title {
         margin: 0px 0px 30px 0px;
-        font-size: 60px;
-        line-height: 1.2em;
+        font-size: 2rem;
+        line-height: 3rem;
         text-align: center;
         font-family: -apple-system,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+
+        @include minSm() {
+          font-size: 3rem;
+          line-height: 4rem;
+        }
+
+        @include minLg() {
+          font-size: 3.7rem;
+          line-height: 4.5rem;
+        }
       }
 
       .l-hero-desc {
-        margin: 0px 0px 40px 0px;
+        margin: 0px 0px 25px 0px;
         text-align: center;
         color: #ffffffe8;
-        font-size: 17px;
+        font-size: 0.95rem;
+
+        @include minSm() {
+          margin: 0px 0px 40px 0px;
+          font-size: 1.05rem;
+        }
       }
 
       .l-hero-teaser {
@@ -148,6 +177,10 @@
         display: flex;
         justify-content: center;
         width: 100%;
+
+        @include minSm() {
+          font-size: 1.05rem;
+        }
       }
 
           .l-hero-button {
@@ -182,10 +215,52 @@
         }
 
   .l-cards {
+    position: relative;
     display: flex;
     justify-content: center;
-    margin: 0px 0px 80px 0px;
+    margin: 0px 0px 40px 0px;
+    padding: 0px 10px;
+    box-sizing: border-box;
+
+    @include minLg() {
+      margin: 0px 0px 80px 0px;
+    }
   } 
+
+    .l-cards-shapes {
+      display: none;
+      position: absolute;
+      width: 100%;
+      height: calc(100vh + 300px);
+      overflow: hidden;
+      z-index: -1000;
+      top: -150px;
+
+      @include minLg() {
+        display: block;
+      }
+    }
+
+      .l-cards-shape {
+        position: absolute;
+        width: 400px;
+        height: 300px;
+        opacity: 2.5%;
+        background-color: red;
+        z-index: -10;
+      }
+      .l-cards-shape.a {
+        left: -100px;
+      }
+      .l-cards-shape.b {
+        left: 50px;
+      }
+      .l-cards-shape.c {
+        right: -100px;
+      }
+      .l-cards-shape.d {
+        right: 50px;
+      }
 
     .l-cards-inner {
     }
@@ -204,36 +279,72 @@
           margin: 0px 15px 0px 0px;
         }
 
+        .l-cards-title-text-mobile {
+          @include minSm() {
+            display: none;
+          }
+        }
+
+        .l-cards-title-text-desktop {
+          display: none;
+
+          @include minSm() {
+            display: inline;
+          }
+        }
+
       .l-cards-list {
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
       }
 
         .l-card {
-          width: 33.33%;
-          padding: 15px;
+          width: 100%;
+          padding: 8px;
           box-sizing: border-box;
+
+          @include minSm() {
+            width: 50%;
+            padding: 15px;
+          }
+
+          @include minLg() {
+            width: 33.33%;
+          }
         }
 
           .l-card-inner {
             height: 100%;
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             box-sizing: border-box;
             background-color: white;
             border-radius: 10px;
             box-shadow: #eeeeee 5px 5px 5px;
+
+            @include minSm() {
+              padding: 15px;
+            }
           }
 
             .l-card-top {
               display: flex;
               align-items: center;
-              margin: 0px 0px 15px 0px;
+              margin: 0px 0px 5px 0px;
+
+              @include minSm() {
+                margin: 0px 0px 15px 0px;
+              }
             }
 
               .l-card-icon {
                 margin: 0px 10px 0px 0px;
-                font-size: 1.4rem;
+                font-size: 1rem;
+
+                @include minSm() {
+                  font-size: 1.4rem;
+                }
               }
 
               .l-card-title {
@@ -242,38 +353,115 @@
 
             .l-card-bottom {
               width: 100%;
-              margin: 0px 0px 15px 0px;
               padding: 0px 0px 0px 15px;
               box-sizing: border-box;
-              font-size: 1rem;
+              font-size: 0.9rem;
               color: #737373;
+
+              @include minSm() {
+                margin: 0px 0px 15px 0px;
+                font-size: 1rem;
+              }
             }
 
   .l-snippet {
     display: flex;
     justify-content: center;
     margin: 0px 0px 30px 0px;
-    padding: 50px 0px;
+    padding: 50px 30px;
     background: linear-gradient(238deg, #3f4b55, #54667f);
     color: white;
-    clip-path: polygon(0% 0%, 100% 15%, 100% 100%, 0% 85%);
+    clip-path: polygon(0% 0%, 100% 5%, 100% 100%, 0% 95%);
+
+    @include minLg() {
+      clip-path: polygon(0% 0%, 100% 15%, 100% 100%, 0% 85%);
+    }
   }
 
     .l-snippet-wrapper {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      max-width: 1000px;
+      max-width: 700px;
+
+      @include minLg() {
+        flex-direction: row;
+        max-width: 1000px;
+      }
     }
 
       .l-snippet-image {
-        width: 40%;
-        padding: 0px 6rem 0px 0px;        
+        position: relative;
+        top: -10px;
+        display: flex;
+        flex-direction: column;
+        justify-self: center;
+        align-items: center;
+        padding: 0px 0px 1rem 0px;  
         box-sizing: border-box;
+        font-size: 35px;
+        font-family: 'Roboto Mono';
+
+        @include minLg() {
+          width: 40%;
+          padding: 0px 6rem 0px 0px;  
+        }
       }
 
+        .l-snippet-image-dots {
+          width: 40px;
+          letter-spacing: -13px;
+        }
+
+        .l-snippet-image-top {
+          display: flex;
+          align-items: flex-end;
+        }
+
+          .l-snippet-image-top-hook {
+            font-size: 42px;
+          }
+        
+        .l-snippet-image-center {
+          height: 35px;
+          width: 35px;
+          margin: 12px 0px 22px 0px;
+        }
+
+        .l-snippet-image-bottom {
+          display: flex;
+          align-items: flex-end;
+        }
+
+          .l-snippet-image-bottom-comp {
+            margin: 0px 5px;
+            padding: 0px 8px;
+            background: linear-gradient(150deg, #d03b95 0%, #ed6e3a 100%);
+            background-size: 400% 400%;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            animation: gradient 2s linear infinite;  
+          }
+        
+          @keyframes gradient {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
+          }
+
       .l-snippet-text {
-        width: 60%;
+
+        @include minLg() {
+          width: 60%;
+        }
       }
 
         .l-snippet-title {
@@ -282,13 +470,18 @@
 
         .l-snippet-line {
           margin: 25px 0px;
-          font-size: 1rem;
+          font-size: 0.9rem;
+
+          @include minLg() {
+            font-size: 1rem;
+          }
         }
 
   .l-guide {
     display: flex;
     justify-content: center;
     margin: 0px 0px 80px 0px;
+    padding: 0px 30px;
   }
 
     .l-guide-wrapper {
@@ -297,10 +490,14 @@
     }
 
       .l-guide-title {
-        margin: 0px 0px 70px 0px;
+        margin: 0px 0px 40px 0px;
         text-align: center;
         font-size: 1.7rem;
         font-weight: normal;        
+
+        @include minSm() {
+          margin: 0px 0px 70px 0px;
+        }
       }
 
         .l-guide-title-highlight {
@@ -316,8 +513,12 @@
           display: flex;
           justify-content: center;
           width: 100%;
-          margin: 20px 0px;
+          margin: 10px 0px;
           filter: contrast(0.6);
+
+          @include minLg() {
+            margin: 20px 0px;
+          }
 
           img {
             height: 14px;
@@ -330,51 +531,76 @@
 
           .l-guide-step-nr {
             position: absolute;
-            top: -10px;
-            left: -10px;
+            top: -8px;
+            left: -8px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 20px;
-            width: 30px;
-            height: 30px;
+            width: 22px;
+            height: 22px;
             color: white;
             background: var(--brand-gradient);
-            font-size: 1.1rem;
-            font-family: 'Roboto Mono';            
+            font-size: 0.9rem;
+            font-family: 'Roboto Mono';     
+            
+            @include minLg() {
+              top: -10px;
+              left: -10px;
+              width: 30px;
+              height: 30px;
+              font-size: 1.1rem;
+            }
           }
 
           .l-guide-step-content {
             display: flex;
+            flex-direction: column;
+            padding: 1rem;
             background-color: white;
             box-shadow: #eeeeee 5px 5px 5px; 
             border-radius: 10px;
             overflow: hidden;   
+
+            @include minLg() {
+              flex-direction: row;
+              padding: 0px;
+            }
           }
 
             .l-guide-step-text {
               display: flex;
               flex-direction: column;
               justify-content: center;
-              width: 50%;
-              padding: 0px 3rem 0px 3rem;
+              padding: 0 0 1rem 0;
               box-sizing: border-box;
               font-size: 1rem;
               color: #5a5a5a;   
 
+              @include minLg() {
+                width: 50%;
+                padding: 1rem 2rem;
+              }
+
               p {
-                margin: 10px 0px;
+                margin: 0px;
               }
             }
 
             // Adding some manual dark mode styling for the code. Rest of page remain light mode.
             .l-guide-step-code {
               display: flex;
-              width: 50%;
               --background-color-code: #{$dm-background-color-code};
               background-color: var(--background-color-code);
               color: #e3e2e9;
+              border-radius: 5px;
+              overflow: hidden;
               @include code-theme-dark;
+
+              @include minLg() {
+                width: 50%;
+                border-radius: 0px;
+              }
 
               .highlighter-rouge {
                 display: flex;
@@ -409,8 +635,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin: 4rem 0px 0px 0px;
-        font-size: 1.1rem;
+        margin: 2rem 0px 0px 0px;
+        font-size: 1rem;
+
+        @include minLg() {
+          margin: 4rem 0px 0px 0px;
+          font-size: 1.1rem;
+        }
       }
 
         .l-guide-result-line {

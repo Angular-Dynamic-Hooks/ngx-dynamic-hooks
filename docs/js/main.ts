@@ -1,3 +1,6 @@
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import { SidebarSectionsWidget } from './widgets/sidebarSections';
 import { ArticleTocWidget } from './widgets/articleToc';
 import { bootstrapWidgets, Widget } from './widgetBootstrap';
@@ -9,29 +12,35 @@ import { SidebarToggleWidget } from './widgets/sidebarToggle';
 import { VersionLogoLinkWidget } from './widgets/version/versionLogoLink';
 import { StackblitzWidget } from './widgets/stackblitz';
 import { CodeCopyWidget } from './widgets/codeCopy';
+import { initLandingPage } from './landing';
+import { LandingMenuWidget } from './widgets/landing/landingMenu';
 
-// Init misc logic
+// Setup
+gsap.registerPlugin(ScrollTrigger);
+
+// Landing page
+if (!location.pathname.includes('documentation')) {
+  initLandingPage();
+  bootstrapWidgets(document.body, [
+    LandingMenuWidget,
+    VersionLogoLinkWidget,
+    CodeCopyWidget
+  ]);
+
+// Docs
+} else {
+  bootstrapWidgets(document.body, [
+    VersionLogoLinkWidget,
+    VersionSelectWidget,
+    DarkmodeWidget,
+    SidebarToggleWidget,
+    SidebarSectionsWidget,
+    ArticleTocWidget,
+    VersionWarningLinkWidget,
+    StackblitzWidget,
+    CodeCopyWidget
+  ]);
+}
+
+// Misc
 initCopyrightDate();
-
-const landingWidgets = [
-  VersionLogoLinkWidget,
-  CodeCopyWidget
-];
-
-const docsWidgets = [
-  VersionLogoLinkWidget,
-  VersionSelectWidget,
-  DarkmodeWidget,
-  SidebarToggleWidget,
-  SidebarSectionsWidget,
-  ArticleTocWidget,
-  VersionWarningLinkWidget,
-  StackblitzWidget,
-  CodeCopyWidget
-];
-
-// Determine widgets to use
-let widgetList = location.pathname.includes('documentation') ? docsWidgets : landingWidgets;
-
-// Init widgets
-const widgets = bootstrapWidgets(document.body, widgetList);
