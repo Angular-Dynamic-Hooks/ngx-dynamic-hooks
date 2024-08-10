@@ -12,7 +12,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 10px 30px;
+  padding: 10px 20px;
   box-sizing: border-box;
   z-index: 1000;
   transition: background-color 0.2s ease;
@@ -66,7 +66,11 @@
         display: flex;
       }
       .l-site-links > *:not(:last-child) {
-        margin: 0px 25px 0px 0px;
+        margin: 0px 15px 0px 0px;
+
+        @include minSm() {
+          margin: 0px 25px 0px 0px;
+        }
       }
 
         .l-site-link {
@@ -80,10 +84,14 @@
             display: flex;
             align-items: center;
             font-size: 11px;
+            transition: color 0.2s ease;
 
             img {
               height: 12px;
             }
+          }
+          .donate .l-site-link-icon {
+            font-size: 14px;
           }
 
           .l-site-link-text {

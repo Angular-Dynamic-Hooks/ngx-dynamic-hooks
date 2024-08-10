@@ -57,6 +57,10 @@ highlights:
             </div>
             <span class="l-site-link-text">Github</span>
           </a>
+          <a class="l-site-link donate" href="https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC" target="_blank">
+            <div class="l-site-link-icon">♥</div>
+            <span class="l-site-link-text">Donate</span>
+          </a>
         </div>
       </div>
     </div>

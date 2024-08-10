@@ -1,6 +1,7 @@
 .footer {
   background-color: #313238;
   color: white;
+  z-index: 100;
 }
 
   .footer-top {
@@ -43,6 +44,7 @@
         display: flex;
         align-items: center;
         flex-shrink: 0;
+        max-width: 350px;
       }
 
         .footer-brand {
