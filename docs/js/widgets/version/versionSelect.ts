@@ -11,12 +11,17 @@ export class VersionSelectWidget implements Widget {
   dropdownElement: HTMLElement|null = null;
   // const tooltipArrow = (subMenuWrapper.querySelector('.tooltip-arrow') as HTMLElement);
   // Figure out version of current page (removes letters, keeps numbers)
-  currentVersion: number = versionService.extractDocsVersionFromUrl(location.pathname)!;
+  currentVersion: number|undefined;
   dropdownIsOpen: boolean = false;
   autoUpdateCleanup: (() => void)|null= null;
 
   onMount(hostElement: Element, data: {[key: string]: any}, controller: GenericWidgetController) {
     this.hostElement = hostElement;
+    this.init();
+  }
+
+  async init() {
+    this.currentVersion = versionService.getDocsVersionFromUrl(location.pathname)! || await versionService.getLatestVersion();
     this.createSelectHtml();
     this.registerDropdown();
   }
@@ -44,16 +49,7 @@ export class VersionSelectWidget implements Widget {
 
   private async registerDropdown() {
     // Figure out available versions
-    const infoJson = await infoService.getInfoJson();
-    const versions: number[] = [];
-    for (const page of infoJson.pages) {
-      if (page.url.startsWith('/documentation/')) {
-        const versionNr = versionService.extractDocsVersionFromUrl(page.url)!;
-        if (!versions.includes(versionNr)) {
-          versions.push(versionNr);
-        }
-      }
-    }
+    const versions = await versionService.getAvailableVersions();
 
     // Add versions as dropdown options
     this.dropdownElement!.innerHTML = `${ versions.map(versionNr => `
@@ -161,8 +157,9 @@ export class VersionSelectWidget implements Widget {
       return;
     }
 
-    // Navigate to equivalent url of different version, if possible
-    location.pathname = await versionService.matchUrlForDocsVersion(location.pathname.split(infoService.baseUrl)[1], version);
+    // Navigate to equivalent url of different version
+    const newVersionUrl = await versionService.matchUrlForDocsVersion(location.pathname, version) || await versionService.generateDocsUrl(version);
+    location.pathname = newVersionUrl;
   }
 }
 

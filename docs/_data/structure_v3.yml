@@ -1,104 +1,104 @@
 - title: Introduction
-  url: /documentation/v3/
+  url: /documentation/
   icon: /assets/images/icons/hand.svg
   children:
     - title: Installation
-      url: /documentation/v3#installation
+      url: /documentation/#installation
     - title: Highlights
-      url: /documentation/v3#highlights
+      url: /documentation/#highlights
     - title: What it does
-      url: /documentation/v3#introduction
+      url: /documentation/#introduction
     - title: What's a hook?
-      url: /documentation/v3#whats-a-hook
+      url: /documentation/#whats-a-hook
     - title: Do the components work normally?
-      url: /documentation/v3#do-the-components-work-normally
+      url: /documentation/#do-the-components-work-normally
     - title: What this library doesn't do
-      url: /documentation/v3#what-this-library-doesnt-do
+      url: /documentation/#what-this-library-doesnt-do
 
 - title: Quick start
-  url: /documentation/v3/quickstart
+  url: /documentation/quickstart
   icon: /assets/images/icons/rocket.svg
   children:
     - title: Minimal example
-      url: /documentation/v3/quickstart#minimal-example
+      url: /documentation/quickstart#minimal-example
     - title: See it in action
-      url: /documentation/v3/quickstart#see-it-in-action
+      url: /documentation/quickstart#see-it-in-action
     - title: Next steps
-      url: /documentation/v3/quickstart#next-steps
+      url: /documentation/quickstart#next-steps
 
 - title: General usage
-  url: /documentation/v3/general-usage
+  url: /documentation/general-usage
   icon: /assets/images/icons/star.svg
 
 - title: Standalone mode
-  url: /documentation/v3/standalone-mode
+  url: /documentation/standalone-mode
   icon: /assets/images/icons/star.svg
 
 - title: Component features
-  url: /documentation/v3/component-features
+  url: /documentation/component-features
   icon: /assets/images/icons/star.svg
   children:
     - title: Context & Dependency Injection
-      url: /documentation/v3/component-features#context--dependency-injection
+      url: /documentation/component-features#context--dependency-injection
     - title: Inputs
-      url: /documentation/v3/component-features#inputs
+      url: /documentation/component-features#inputs
     - title: Outputs
-      url: /documentation/v3/component-features#outputs
+      url: /documentation/component-features#outputs
     - title: Content projection
-      url: /documentation/v3/component-features#content-projection
+      url: /documentation/component-features#content-projection
     - title: Lifecycle methods
-      url: /documentation/v3/component-features#lifecycle-methods
+      url: /documentation/component-features#lifecycle-methods
     - title: Change detection
-      url: /documentation/v3/component-features#change-detection
+      url: /documentation/component-features#change-detection
 
 - title: Configuration
-  url: /documentation/v3/configuration
+  url: /documentation/configuration
   icon: /assets/images/icons/cog.svg
   children:
     - title: Global settings
-      url: /documentation/v3/configuration#global-settings
+      url: /documentation/configuration#global-settings
     - title: Component bindings
-      url: /documentation/v3/configuration#component-bindings
+      url: /documentation/configuration#component-bindings
     - title: ParseOptions
-      url: /documentation/v3/configuration#parseoptions
+      url: /documentation/configuration#parseoptions
     - title: Child modules
-      url: /documentation/v3/configuration#child-modules
+      url: /documentation/configuration#child-modules
     - title: Lazy-loading components
-      url: /documentation/v3/configuration#lazy-loading-components
+      url: /documentation/configuration#lazy-loading-components
 
 - title: Parsers
-  url: /documentation/v3/parsers
+  url: /documentation/parsers
   icon: /assets/images/icons/brackets.svg
   children:
   - title: Introduction
-    url: /documentation/v3/parsers#introduction
+    url: /documentation/parsers#introduction
   - title: SelectorHookParserConfig
-    url: /documentation/v3/parsers#selectorhookparserconfig
+    url: /documentation/parsers#selectorhookparserconfig
   - title: Writing your own HookParser
-    url: /documentation/v3/parsers#writing-your-own-hookparser
+    url: /documentation/parsers#writing-your-own-hookparser
   - title: Example 1 - Emoji parser (standalone)
-    url: /documentation/v3/parsers#example-1-emoji-parser-standalone
+    url: /documentation/parsers#example-1-emoji-parser-standalone
   - title: Example 2 - Internal link parser (enclosing)
-    url: /documentation/v3/parsers#example-2-internal-link-parser-enclosing
+    url: /documentation/parsers#example-2-internal-link-parser-enclosing
 
 - title: Single component
-  url: /documentation/v3/single-component
+  url: /documentation/single-component
   icon: /assets/images/icons/star.svg
 
 - title: Trivia
-  url: /documentation/v3/trivia
+  url: /documentation/trivia
   icon: /assets/images/icons/list.svg
   children:
     - title: How it works
-      url: /documentation/v3/trivia#how-it-works
+      url: /documentation/trivia#how-it-works
     - title: Security
-      url: /documentation/v3/trivia#security
+      url: /documentation/trivia#security
     - title: Caveats
-      url: /documentation/v3/trivia#caveats
+      url: /documentation/trivia#caveats
     - title: Comparison with similar libraries
-      url: /documentation/v3/trivia#comparison-with-similar-libraries
+      url: /documentation/trivia#comparison-with-similar-libraries
     - title: Special thanks
-      url: /documentation/v3/trivia#special-thanks
+      url: /documentation/trivia#special-thanks
 
 - title: Troubleshooting
-  url: /documentation/v3/troubleshooting
+  url: /documentation/troubleshooting

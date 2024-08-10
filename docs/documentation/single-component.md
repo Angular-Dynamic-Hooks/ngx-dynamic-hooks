@@ -26,7 +26,7 @@ Input name | Type | Description
 `outputs` | Object literal | An object literal where the keys are the output names and the values are functions that will be called when they emit.
 `options` | `DynamicHooksSingleOptions` | A couple of options to modify how the component works.
 
-A `DynamicHooksSingleOptions` object is just an abbreviated version of a [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }}) object and works the same:
+A `DynamicHooksSingleOptions` object is just an abbreviated version of a [ParseOptions]({{ "documentation/configuration#parseoptions" | relative_url }}) object and works the same:
 
 ```ts
 interface DynamicHooksSingleOptions {

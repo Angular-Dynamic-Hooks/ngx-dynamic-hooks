@@ -4,15 +4,15 @@
   icon: /assets/images/icons/hand.svg
   children:
     - title: Installation
-      url: /documentation/v2#installation
+      url: /documentation/v2/#installation
     - title: What it does
-      url: /documentation/v2#introduction
+      url: /documentation/v2/#what-it-does
     - title: What's a hook?
-      url: /documentation/v2#whats-a-hook
+      url: /documentation/v2/#whats-a-hook
     - title: Do the components work normally?
-      url: /documentation/v2#do-the-components-work-normally
+      url: /documentation/v2/#do-the-components-work-normally
     - title: What this library doesn't do
-      url: /documentation/v2#what-this-library-doesnt-do
+      url: /documentation/v2/#what-this-library-doesnt-do
 
 - title: Quick start
   url: /documentation/v2/quickstart

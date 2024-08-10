@@ -23,19 +23,19 @@ If you are curious about the inner workings of the library, here's a general des
 
 One of the goals of this library was to make it **safe to use even with potentially unsafe input**, such as user-generated content. It also allows developers easy control over which components can load and how. It uses the following techniques to achieve this:
 
-Most notably, it uses Angular's `DOMSanitizer` by default to remove all unsafe HTML, CSS and JS in the content. If you want, you may turn this setting off in the [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }}). You will then have to ensure yourself that the rendered content does not include <a href="https://en.wikipedia.org/wiki/Cross-site_scripting" target="_blank">Cross Site Scripting attacks (XSS)</a> or other malicious code, however.
+Most notably, it uses Angular's `DOMSanitizer` by default to remove all unsafe HTML, CSS and JS in the content. If you want, you may turn this setting off in the [ParseOptions]({{ "documentation/configuration#parseoptions" | relative_url }}). You will then have to ensure yourself that the rendered content does not include <a href="https://en.wikipedia.org/wiki/Cross-site_scripting" target="_blank">Cross Site Scripting attacks (XSS)</a> or other malicious code, however.
 
 To prevent attack vectors through component bindings like inputs, the standard `SelectorHookParser` that comes with this library does not rely on JavaScript's dangerous `eval()` function to evaluate them and instead internally uses `JSON.parse()` to safely turn strings into variables. Ensure that when writing custom parsers for hooks that take their inputs/outputs directly from untrusted content, similar security precautions are taken!
 
-In addition, the scope of code that is accessible to the (perhaps also untrusted) author of the content is limited by the [context object]({{ "documentation/v3/component-features" | relative_url }}), which you can customize to your liking. 
+In addition, the scope of code that is accessible to the (perhaps also untrusted) author of the content is limited by the [context object]({{ "documentation/component-features" | relative_url }}), which you can customize to your liking. 
 
-Finally, which components/hooks can be used by the author can be [freely adjusted]({{ "documentation/v3/configuration#dynamichookscomponent" | relative_url }}) for each `DynamicHooksComponent`, as can their allowed inputs/outputs.
+Finally, which components/hooks can be used by the author can be [freely adjusted]({{ "documentation/configuration#dynamichookscomponent" | relative_url }}) for each `DynamicHooksComponent`, as can their allowed inputs/outputs.
 
 ## Caveats
 
 1. As this library does not parse the content string as an actual Angular template, template syntax such as `*ngIf`, `*ngFor`, attribute bindings `[style.width]="'100px'"`, interpolation `{% raw %}{{ someVar }}{% endraw %}` etc. will **not** work! This functionality is not planned to be added either, as it would require a fundamentally different approach by relying on the JiT template compiler (which this library intentionally doesn't) or even creating a custom Angular template parser.
 2. Hooks can only load components, not directives. There's no way to dynamically create directives as far as i'm aware. If you want to load a directive, try loading a component that contains that directive instead.
-3. Accessing `@ContentChildren` does not work in dynamically-loaded components, as these have to be known at compile-time. However, you can still access them via [onDynamicMount()]({{ "documentation/v3/component-features#lifecycle-methods" | relative_url }}).
+3. Accessing `@ContentChildren` does not work in dynamically-loaded components, as these have to be known at compile-time. However, you can still access them via [onDynamicMount()]({{ "documentation/component-features#lifecycle-methods" | relative_url }}).
 
 ## Comparison with similar libraries
 
@@ -43,14 +43,14 @@ Finally, which components/hooks can be used by the author can be [freely adjuste
 
 Angular elements allows you to register custom HTML elements with the browser that automatically load and host an Angular component when they appear anywhere in the DOM (see <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components" target="_blank">Web components</a>) - even outside of the Angular app. 
 
-For that reason, these elements work in dynamic content as well and may satisfy your needs. The approach itself is particularly similar to the [Standalone mode]({{ "documentation/v3/standalone-mode" | relative_url }}) of Angular Dynamic Hooks.
+For that reason, these elements work in dynamic content as well and may satisfy your needs. The approach itself is particularly similar to the [Standalone mode]({{ "documentation/standalone-mode" | relative_url }}) of Angular Dynamic Hooks.
 
 However, there are a number of advantages this library offers compared to Angular elements:
 
-* **Pattern flexibility:** You are not limited to load components by unique HTML elements. A hook can have any form, be any element or even consist of just text (see the ["Emoji parser" example]({{ "documentation/v3/parsers#example-2-emoji-parser" | relative_url }})).
-* **Lazy-loading:** You can easily set up components to [lazily-load]({{ "documentation/v3/configuration#lazy-loading-components" | relative_url }}) only when they appear in the content instead of having to load all the code upfront.
+* **Pattern flexibility:** You are not limited to load components by unique HTML elements. A hook can have any form, be any element or even consist of just text (see the ["Emoji parser" example]({{ "documentation/parsers#example-2-emoji-parser" | relative_url }})).
+* **Lazy-loading:** You can easily set up components to [lazily-load]({{ "documentation/configuration#lazy-loading-components" | relative_url }}) only when they appear in the content instead of having to load all the code upfront.
 * **Scope:** When using Angular elements, web components will automatically load from anywhere in the DOM as they are globally registered with the browser. With this library, you can always specify exactly which components to look for in which content.
-* **Communication:** If you have a parent app that uses Angular elements to load componments, it can be difficult to communicate with them. With this library, you can easily use the [context object (or dependency injection)]({{ "documentation/v3/component-features" | relative_url }}) to transfer data.
+* **Communication:** If you have a parent app that uses Angular elements to load componments, it can be difficult to communicate with them. With this library, you can easily use the [context object (or dependency injection)]({{ "documentation/component-features" | relative_url }}) to transfer data.
 * **Bindings:** In Angular elements, all inputs are strings by default and you will have to manually turn them into booleans, arrays, objects etc. yourself. This library parses them automatically for you, much like a normal Angular template.
 * **Projected content:** Angular elements doesn't normally render projected content in the component's `<ng-content>`. There is a workaround involving `<slot>`, but its not ideal. This library renders `<ng-content>` normally.
 

@@ -44,14 +44,15 @@ defaults:
     values:
       layout: "docs"
   - scope:
+      path: "documentation"
+    values:
+      structure: "structure_v3"
+  - scope:
       path: "documentation/v2"
     values:
       structure: "structure_v2"
       deprecated: true
-  - scope:
-      path: "documentation/v3"
-    values:
-      structure: "structure_v3"
+
 
 # Exclude from processing to dist folder
 exclude:

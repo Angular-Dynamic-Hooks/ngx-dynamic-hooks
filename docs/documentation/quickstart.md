@@ -63,9 +63,9 @@ export class AppModule {}
 
 Please note that the above is a minimal example and that there are plenty more features and options available to you. You can read about them on these pages:
 
-- The [Introduction]({{ "documentation/v3" | relative_url }}) page explains what a hook is and what the library is for.
-- The [General usage]({{ "documentation/v3/general-usage" | relative_url }}) page shows you the most common ways to use the library when used as part of an Angular app.
-- The [Standalone mode]({{ "documentation/v3/standalone-mode" | relative_url }}) page explains how to use the library without Angular, allowing you to load fully-functional Angular components freely in other contexts (CMS, static HTML, etc).
-- The [Component features]({{ "documentation/v3/component-features" | relative_url }}) page shows how to pass data to your dynamically-loaded components, subscribe to their outputs, special lifecycle methods, etc.
-- The [Configuration]({{ "documentation/v3/configuration" | relative_url }}) page gives an overview of all the options and settings available to you.
-- The [Parsers]({{ "documentation/v3/parsers" | relative_url }}) page lists the various ways to find components - including writing your own parsers!
+- The [Introduction]({{ "documentation" | relative_url }}) page explains what a hook is and what the library is for.
+- The [General usage]({{ "documentation/general-usage" | relative_url }}) page shows you the most common ways to use the library when used as part of an Angular app.
+- The [Standalone mode]({{ "documentation/standalone-mode" | relative_url }}) page explains how to use the library without Angular, allowing you to load fully-functional Angular components freely in other contexts (CMS, static HTML, etc).
+- The [Component features]({{ "documentation/component-features" | relative_url }}) page shows how to pass data to your dynamically-loaded components, subscribe to their outputs, special lifecycle methods, etc.
+- The [Configuration]({{ "documentation/configuration" | relative_url }}) page gives an overview of all the options and settings available to you.
+- The [Parsers]({{ "documentation/parsers" | relative_url }}) page lists the various ways to find components - including writing your own parsers!

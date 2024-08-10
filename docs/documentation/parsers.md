@@ -5,18 +5,18 @@
 
 ## Introduction
 
-Components are loaded from [hooks]({{ "documentation/v3/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by **HookParsers**. These are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
+Components are loaded from [hooks]({{ "documentation/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by **HookParsers**. These are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
 
 1. The component class itself.
-2. A <a href="{{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}">SelectorHookParserConfig</a> object literal.
+2. A <a href="{{ "documentation/parsers#selectorhookparserconfig" | relative_url }}">SelectorHookParserConfig</a> object literal.
 3. A custom `HookParser` instance.
 4. A custom `HookParser` class. If this class is available as a provider/service, it will be injected.
 
-Using the component class is the most straightforward option. It internally sets up a `SelectorHookParser` for you which loads components just like in Angular templates. We have been using it in most simple examples, such as in [Quick Start]({{ "documentation/v3/quickstart" | relative_url }}) and most of the [General usage page]({{ "documentation/v3/general-usage" | relative_url }}).
+Using the component class is the most straightforward option. It internally sets up a `SelectorHookParser` for you which loads components just like in Angular templates. We have been using it in most simple examples, such as in [Quick Start]({{ "documentation/quickstart" | relative_url }}) and most of the [General usage page]({{ "documentation/general-usage" | relative_url }}).
 
-If you want more control, you can also manually configure a `SelectorHookParser` by passing in a [SelectorHookParserConfig]({{ "documentation/v3/parsers#selectorhookparserconfig" | relative_url }}), which provides additional options.
+If you want more control, you can also manually configure a `SelectorHookParser` by passing in a [SelectorHookParserConfig]({{ "documentation/parsers#selectorhookparserconfig" | relative_url }}), which provides additional options.
 
-For even more specific use-cases, you may want to write your own HookParser. See the section [Writing your own HookParser]({{ "documentation/v3/parsers#writing-your-own-hookparser" | relative_url }}) for more info about that.
+For even more specific use-cases, you may want to write your own HookParser. See the section [Writing your own HookParser]({{ "documentation/parsers#writing-your-own-hookparser" | relative_url }}) for more info about that.
 
 ## SelectorHookParserConfig
 
@@ -26,7 +26,7 @@ In its simplest form, it just contains the component class like `{component: Exa
 
 Property | Type | Default | Description
 --- | --- | --- | ---
-`component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig]({{ "documentation/v3/configuration#lazy-loading-components" | relative_url }}).
+`component` | `ComponentConfig` | - | The component to be used. Can be its class or a [LazyLoadComponentConfig]({{ "documentation/configuration#lazy-loading-components" | relative_url }}).
 `name` | `string` | - | The name of the parser. Only required if you want to black- or whitelist it.
 `selector` | `string` | The component selector | The selector to use to find the hook.
 `hostElementTag` | `string` | - | A custom tag to be used for the component host element.
@@ -43,7 +43,7 @@ Property | Type | Default | Description
 `allowContextInBindings` | `boolean` | `true` | Whether to allow the use of context object variables in inputs and outputs.
 `allowContextFunctionCalls` | `boolean` | `true` | Whether to allow calling context object functions in inputs and outputs.
 
-See the [General Usage]({{ "documentation/v3/general-usage#load-by-any-selector" | relative_url }}) page for a simple `SelectorHookParserConfig` example.
+See the [General Usage]({{ "documentation/general-usage#load-by-any-selector" | relative_url }}) page for a simple `SelectorHookParserConfig` example.
 
 {% include docs/widgets/notice.html content="
   <p>Please note that you cannot use full CSS selectors in the <code>selector</code> field if you set <code>enclosing</code> to <code>false</code> or use a custom <code>bracketStyle</code> as you aren't looking for valid HTML elements at that point. The selector can then only be the direct tag name, e.g. <code>app-example</code>.</p>
@@ -95,7 +95,7 @@ The opening and closing tags simply refer to the text patterns that signal the s
 
 How your hook looks like and how you find these indexes is completely up to you. You may look for them using Regex patterns or any other parsing method. Though, as a word of warning, do not try to parse enclosing hooks with Regex alone. <a href="https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454" target="_blank">That road leads to madness</a>.
 
-To make your life easier, you can just use the `HookFinder` service that comes with this library. Its easy to use and safely finds both singletag and enclosing patterns in a string. You can see it in action in the ["Emoji parser" example]({{ "documentation/v3/parsers#example-2-emoji-parser" | relative_url }}).
+To make your life easier, you can just use the `HookFinder` service that comes with this library. Its easy to use and safely finds both singletag and enclosing patterns in a string. You can see it in action in the ["Emoji parser" example]({{ "documentation/parsers#example-2-emoji-parser" | relative_url }}).
 
 ### findHookElements()
 
@@ -133,7 +133,7 @@ interface HookComponentData {
 }
 ```
 
-You usually only need to fill out the `component` field, which can be the component class or a `LazyLoadComponentConfig` (see [Lazy-loading components]({{ "documentation/v3/configuration#lazy-loading-components" | relative_url }})). 
+You usually only need to fill out the `component` field, which can be the component class or a `LazyLoadComponentConfig` (see [Lazy-loading components]({{ "documentation/configuration#lazy-loading-components" | relative_url }})). 
 
 You may optionally also specify a custom host element tag, provide your own injectors or use custom content to replace the existing `<ng-content>` (each entry in the outer array represends a `<ng-content>`-slot and the inner array its content).
 

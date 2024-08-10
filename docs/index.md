@@ -9,7 +9,7 @@ highlights:
     desc: Can parse both HTML strings and already-existing HTML trees for components
   - title: Standalone mode
     icon: 🚀
-    desc: Can be used <a href="documentation/v3/standalone-mode" target="_blank">fully standalone</a> to load components into HTML without Angular
+    desc: Can be used <a href="documentation/standalone-mode" target="_blank">fully standalone</a> to load components into HTML without Angular
   - title: No JiT compiler needed
     icon: 🏃
     desc: Keeps package sizes small by not relying on the Angular compiler to create components
@@ -18,30 +18,30 @@ highlights:
     desc: Works with the native Server-Side-Rendering functionality added in Angular 17
   - title: Load anywhere
     icon: 🔍
-    desc: Loads components by their selectors, custom selectors or <a href="documentation/v3/parsers#writing-your-own-hookparser" target="_blank">any text pattern of your choice</a>
+    desc: Loads components by their selectors, custom selectors or <a href="documentation/parsers#writing-your-own-hookparser" target="_blank">any text pattern of your choice</a>
   - title: No constraints
     icon: ⚙️
     desc: All standard features like services, inputs/outputs, lifecycle methods, etc. work normally
   - title: Lazy-loading
     icon: 💤
-    desc: Optionally allows <a href="documentation/v3/configuration#lazy-loading-components" target="_blank">lazy-loading components</a> only if they appear in the content
+    desc: Optionally allows <a href="documentation/configuration#lazy-loading-components" target="_blank">lazy-loading components</a> only if they appear in the content
   - title: Easy communication
     icon: 🔒
-    desc: Utilize a <a href="documentation/v3/component-features" target="_blank">context object</a> to pass data safely to your dynamic components
+    desc: Utilize a <a href="documentation/component-features" target="_blank">context object</a> to pass data safely to your dynamic components
 ---
 
 <header class="l-header">
   <div class="l-wrapper">
     <div class="l-header-inner">
       <div class="l-header-left">
-        <a class="l-title" href="{{ "/documentation/v3/" | relative_url }}" rel="author">
+        <a class="l-title" href="{{ "/documentation/" | relative_url }}" rel="author">
           <img class="l-site-logo" src="{{ "/assets/images/ngx-dynamic-hooks-logo-white.svg" | relative_url }}">
           <span class="l-site-name">Angular Dynamic Hooks</span>
         </a>
       </div>
       <div class="l-header-right">
         <div class="l-site-links">
-          <a class="l-site-link home" href="{{ '/documentation/v3/' | relative_url }}" target="_blank">
+          <a class="l-site-link home" href="{{ '/documentation/' | relative_url }}" target="_blank">
             <div class="l-site-link-icon">📄</div>
             <span class="l-site-link-text">Docs</span>
           </a>
@@ -78,8 +78,8 @@ highlights:
         </div>
       </div>
       <div class="l-hero-buttons">
-        <a class="l-hero-button" href="{{ "documentation/v3/quickstart" | relative_url }}" target="_blank">Quickstart</a>
-        <a class="l-hero-button secondary" href="{{ "documentation/v3" | relative_url }}" target="_blank">Docs</a>
+        <a class="l-hero-button" href="{{ "documentation/quickstart" | relative_url }}" target="_blank">Quickstart</a>
+        <a class="l-hero-button secondary" href="{{ "documentation" | relative_url }}" target="_blank">Docs</a>
       </div>
     </div>
     <div class="l-hero-bg">
@@ -240,7 +240,7 @@ parsers = [ExampleComponent];
 
       <div class="l-guide-result">
         <p class="l-guide-result-line"><b>That's it!</b> The content will now be rendered with a working <b>ExampleComponent</b> in it! 🎉</p>
-        <a class="l-guide-result-button" href="{{ "documentation/v3" | relative_url }}" target="_blank">📄 To the full documentation </a>
+        <a class="l-guide-result-button" href="{{ "documentation" | relative_url }}" target="_blank">📄 To the full documentation </a>
       </div>
 
     </div>

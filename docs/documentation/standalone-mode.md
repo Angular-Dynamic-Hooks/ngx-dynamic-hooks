@@ -9,7 +9,7 @@ This is ideal for mounting Angular components as "frontend widgets" onto HTML th
 
 ## Getting started
 
-To use standalone mode, simply import the `parseHooks` function from the library and call it with the content, parsers etc. you need. It is the equivalent of [DynamicHooksService.parse]({{ "documentation/v3/general-usage#programmatic-usage-with-service" | relative_url }}), just outside of Angular.  The full signature looks like this:
+To use standalone mode, simply import the `parseHooks` function from the library and call it with the content, parsers etc. you need. It is the equivalent of [DynamicHooksService.parse]({{ "documentation/general-usage#programmatic-usage-with-service" | relative_url }}), just outside of Angular.  The full signature looks like this:
 
 ```ts
 const parseHooks = async (
@@ -23,7 +23,7 @@ const parseHooks = async (
 ): Promise<ParseResult>
 ```
 
-At its most basic, you really only need to pass the **content** as well as a list of **parsers**. The first example from the [General Usage page]({{ "/documentation/v3/general-usage#starting-out" | relative_url }}) in standalone mode would then look like this:
+At its most basic, you really only need to pass the **content** as well as a list of **parsers**. The first example from the [General Usage page]({{ "/documentation/general-usage#starting-out" | relative_url }}) in standalone mode would then look like this:
 
 ```ts
 import { parseHooks } from 'ngx-dynamic-hooks';
@@ -201,4 +201,4 @@ However, Angular Dynamic Hooks offers several advantages that go beyond what Ang
 - You can easily **lazy-load** components only when they appear on the page.
 - Inputs are automatically parsed into their data types, rather than leaving them as strings.
 
-See the full comparison of this library with Angular Elements [on the Trivia page]({{ 'documentation/v3/trivia#angular-elements' | relative_url }}).
+See the full comparison of this library with Angular Elements [on the Trivia page]({{ 'documentation/trivia#angular-elements' | relative_url }}).

@@ -55,7 +55,7 @@ You can pass data of almost any type to component `@Input()`s in selector hooks,
 | null/undefined | `[inputName]="null"` |
 | arrays | `[inputName]="['an', 'array', 'of', 'strings']"` |
 | object literals | `[inputName]="{planet: 'Tatooine', population: 200000}"` |
-| context variables (see [previous point]({{ "documentation/v3/component-features#context--dependency-injection" | relative_url }})) | `[inputName]="context.someProp"` |
+| context variables (see [previous point]({{ "documentation/component-features#context--dependency-injection" | relative_url }})) | `[inputName]="context.someProp"` |
 
 The inputs are automatically passed to the dynamic component and will trigger `ngOnChanges()`/`ngOnInit()` normally.
 
@@ -74,7 +74,7 @@ You can subscribe to `@Output()` events from selector hooks with functions from 
 ```
 As with normal Angular output bindings, the special `$event`-keyword can optionally be used to pass the emitted event object as a parameter to the function.
 
-**Tip**: If you want, you can also enable automatically triggering DOM events when component outputs emit, so you can listen to those from anywhere in the browser (see `triggerDOMEvents` in [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).
+**Tip**: If you want, you can also enable automatically triggering DOM events when component outputs emit, so you can listen to those from anywhere in the browser (see `triggerDOMEvents` in [ParseOptions]({{ "documentation/configuration#parseoptions" | relative_url }})).
 
 ### A note about `this`
 
@@ -97,7 +97,7 @@ Hooks can be nested without limitations. When using selector hooks, it will look
 As usual, make sure to include an `<ng-content>` in your components so Angular knows where to render the child content.
 
 There are two small caveats, however: 
-1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods]( {{ "documentation/v3/component-features#lifecycle-methods" | relative_url }})). 
+1. Parent components cannot use `@ContentChildren()` to get a list of all of the nested components in the content string, as these have to be known at compile time. However, you can still access them via `onDynamicMount()` (see [Lifecycle methods]( {{ "documentation/component-features#lifecycle-methods" | relative_url }})). 
 2. Multiple named `<ng-content>` outlets are currently not supported in component selector hooks. 
 
 ## Lifecycle methods
@@ -142,4 +142,4 @@ Dynamically-loaded components are connected to Angular change detection and will
 
 The input and output bindings you assign to hooks are checked and updated on every change detection run, which mirrors Angular's default behaviour. When using zone.js, if you bind a context property to an input and that property changes, the corresponding component will automatically be updated with the new value for the input and trigger `ngOnChanges()`.
 
-Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [ParseOptions]({{ "documentation/v3/configuration#parseoptions" | relative_url }})).
+Alternatively, you can also set the option `updateOnPushOnly` to `true` to only update the bindings when the context object changes by reference (see [ParseOptions]({{ "documentation/configuration#parseoptions" | relative_url }})).

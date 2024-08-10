@@ -9,7 +9,6 @@ import { DarkmodeWidget } from './widgets/darkmode';
 import { VersionWarningLinkWidget } from './widgets/version/versionWarningLink';
 import { initCopyrightDate } from './misc';
 import { SidebarToggleWidget } from './widgets/sidebarToggle';
-import { VersionLogoLinkWidget } from './widgets/version/versionLogoLink';
 import { StackblitzWidget } from './widgets/stackblitz';
 import { CodeCopyWidget } from './widgets/codeCopy';
 import { initLandingPage } from './landing';
@@ -23,14 +22,12 @@ if (!location.pathname.includes('documentation')) {
   initLandingPage();
   bootstrapWidgets(document.body, [
     LandingMenuWidget,
-    VersionLogoLinkWidget,
     CodeCopyWidget
   ]);
 
 // Docs
 } else {
   bootstrapWidgets(document.body, [
-    VersionLogoLinkWidget,
     VersionSelectWidget,
     DarkmodeWidget,
     SidebarToggleWidget,
