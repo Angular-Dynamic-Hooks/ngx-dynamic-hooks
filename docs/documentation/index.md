@@ -1,7 +1,10 @@
 ---
 ---
 
-# Introduction
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/hand.svg"| relative_url }}">
+  <h1 class="page-title-text">Introduction</h1>
+</div>
 
 <div class="badges" markdown="1">
   [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MTobisch/ngx-dynamic-hooks/ci-test.yml?style=flat-square&logo=github&label=CI%20tests)](https://github.com/MTobisch/ngx-dynamic-hooks/actions/workflows/ci-test.yml)

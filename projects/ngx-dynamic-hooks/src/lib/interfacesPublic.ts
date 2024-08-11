@@ -89,7 +89,7 @@ export interface HookParser {
     loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData;
 
     /**
-     * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.
+     * Which inputs to insert and which outputs to register with the component of this hook.
      *
      * @param hookId - The unique id of this hook in the hookIndex
      * @param hookValue - The hook as it appears in the content

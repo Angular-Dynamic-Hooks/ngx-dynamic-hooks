@@ -57,7 +57,7 @@
 
 - title: Parsers
   url: /documentation/v2/parsers
-  icon: /assets/images/icons/brackets.svg
+  icon: /assets/images/icons/magnifying_glass.svg
   children:
   - title: Introduction
     url: /documentation/v2/parsers#introduction

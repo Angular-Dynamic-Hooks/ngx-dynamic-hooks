@@ -20,7 +20,7 @@
     transition: filter 0.15s ease;
 
     @include minMd() {
-      max-width: 1200px;
+      max-width: 1150px;
       padding-right: var(--spacing-unit);
       padding-left: var(--spacing-unit);
       padding-top: var(--spacing-unit);
@@ -44,10 +44,32 @@
       line-height: 2;
 
       @include minXl() {
-        width: calc(100% - 350px);
+        width: calc(100% - 300px);
         margin: 0px 100px 0px 0px;
       }
     }
+
+      .article .page-title {
+        display: flex;
+        align-items: center;
+        margin: 0 0 1rem 0px;
+
+        @include minSm() {
+          margin: 0 0 2rem 0px;
+        }
+      }
+
+        .article .page-title-icon {
+          height: 2rem;
+          width: 2rem;
+          margin: 0px 0.8rem 0px 0px;
+          box-shadow: none;
+          opacity: 0.7;
+        }
+
+        .article .page-title-text {
+          margin: 0px;
+        }
 
       .article .badges img {
         border-radius: 0px;
@@ -144,7 +166,7 @@
 
     .article-sidebar {
       display: none;
-      width: 250px;
+      width: 200px;
       padding: 40px 0px 0px 0px;
 
       @include minXl() {

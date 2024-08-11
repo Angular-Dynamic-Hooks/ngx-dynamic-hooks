@@ -1,7 +1,10 @@
 ---
 ---
 
-# General usage
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/book.svg"| relative_url }}">
+  <h1 class="page-title-text">How to use</h1>
+</div>
 
 There are two ways to use the library in Angular: In a template via the `DynamicHooksComponent` or programmatically via the `DynamicHooksService`.
 

@@ -18,7 +18,7 @@
 
         <article class="article">    
           {% assign isDeprecated = page.deprecated | default: false %}
-          {%if isDeprecated %}  
+          {% if isDeprecated %}  
             {% include docs/widgets/notice.html content='
               <p>Note: You are currently browsing the documentation for an older version of the library.</p>
               <a class="version-warning-link">Click here to switch to the newest version.</a>

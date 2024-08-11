@@ -1,11 +1,14 @@
 ---
 ---
 
-# Configuration
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/cog.svg"| relative_url }}">
+  <h1 class="page-title-text">Configuration</h1>
+</div>
 
 ## Global settings
 
-You can optionally set up global parsers and options shared between all `DynamicHookComponent`s in your app by using the `provideDynamicHooks` function in your app providers. [See an example here]({{ "documentation/general-usage#global-settings" | relative_url }}). 
+You can optionally set up global parsers and options shared between all `DynamicHookComponent`s in your app by using the `provideDynamicHooks` function in your app providers. [See an example here]({{ "documentation/how-to-use#global-settings" | relative_url }}). 
 
 It accepts a `DynamicHooksSettings`-object with the following properties:
 
@@ -141,7 +144,7 @@ That's all there is to it! `LazyComponent` will now be lazily-loaded if `<app-la
   <p>Note that <code>importPromise</code> must contain a function returning the import-promise, not the import-promise itself! Otherwise the promise would be executed right where it is defined, which defeats the point of lazy-loading.</p>
 " %}
 
-## Alternative platforms
+## Alternate platforms
 
 The default implementation of the library should work in both <a href="https://angular.dev/api/platform-browser/bootstrapApplication" target="_blank">browsers</a> as well as during <a href="https://angular.dev/guide/ssr" target="_blank">server-side-rendering</a>. However, there may be more specialized use cases on platforms that are not directly supported.
 

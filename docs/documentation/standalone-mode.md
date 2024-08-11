@@ -1,15 +1,18 @@
 ---
 ---
 
-# Standalone mode
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/brackets.svg"| relative_url }}">
+  <h1 class="page-title-text">Standalone mode</h1>
+</div>
 
-Angular Dynamic Hooks can be used in standalone mode, allowing you to load Angular components into HTML **without an Angular app**.
+Angular Dynamic Hooks can be used in standalone mode, allowing you to load Angular components into standard HTML **without an Angular app**.
 
 This is ideal for mounting Angular components as "frontend widgets" onto HTML that can come from anywhere, such as a CMS like Wordpress, a dedicated backend framework like Laravel or even just static HTML pages.
 
 ## Getting started
 
-To use standalone mode, simply import the `parseHooks` function from the library and call it with the content, parsers etc. you need. It is the equivalent of [DynamicHooksService.parse]({{ "documentation/general-usage#programmatic-usage-with-service" | relative_url }}), just outside of Angular.  The full signature looks like this:
+To use standalone mode, simply import the `parseHooks` function from the library and call it with the content, parsers etc. you need. It is the equivalent of [DynamicHooksService.parse]({{ "documentation/how-to-use#programmatic-usage-with-service" | relative_url }}), just outside of Angular.  The full signature looks like this:
 
 ```ts
 const parseHooks = async (
@@ -23,7 +26,7 @@ const parseHooks = async (
 ): Promise<ParseResult>
 ```
 
-At its most basic, you really only need to pass the **content** as well as a list of **parsers**. The first example from the [General Usage page]({{ "/documentation/general-usage#starting-out" | relative_url }}) in standalone mode would then look like this:
+At its most basic, you really only need to pass the **content** as well as a list of **parsers**. The [starter example from the How to use page]({{ "/documentation/how-to-use#starting-out" | relative_url }}) would then look like this in standalone mode:
 
 ```ts
 import { parseHooks } from 'ngx-dynamic-hooks';
@@ -56,7 +59,7 @@ const createProviders = (
 ): ProvidersScope
 ```
 
-This will return a scope that exposes its own internal `parseHooks` method that will make use of the specified providers. A simple example could look like this:
+This will return a scope with its own internal `parseHooks` method that makes use of the specified providers. A simple example could look like this:
 
 ```ts 
 import { createProviders } from 'ngx-dynamic-hooks';
@@ -77,7 +80,7 @@ Scopes can also inherit providers from each other:
 
 ```ts
 const parentScope = createProviders([...]);
-const scope = createProviders([...], parentScope);
+const childScope = createProviders([...], parentScope);
 ```
 
 {% include docs/widgets/notice.html content='
@@ -94,7 +97,7 @@ With standalone mode, we have two options:
 - If you have a specialized Webpack build pipeline, we can add Angular plugins to Webpack in order to compile our code **without the Angular CLI**.
 
 
-### a) Building with the CLI
+### a) Build with the CLI
 
 Using the Angular CLI is the recommended method as it is easy and uses the official build tools.
 
@@ -120,7 +123,7 @@ Then call `ng build` to build the finished JS files!
   <p>Alternatively, you could compile the <code>parseHooks</code> call separately into its own file and then include that file independently in the browser (via a script tag or otherwise) when you want to load the Angular components - a bit like Angular Elements.</p>
 ' %}
 
-### b) Building with Webpack
+### b) Build with Webpack
 
 When you have an existing Webpack-based build pipeline and only wish to incorporate loading Angular components into that, it can make sense to incorporate the Angular build tools into Webpack rather than using the CLI. 
 
@@ -169,7 +172,7 @@ You can then dispatch events from anywhere else in the browser to trigger the li
   document.dispatchEvent(new CustomEvent('parseHooks', { detail: theContent}));
 ```
 
-### Forcing service creation
+### Force service creation
 
 In Angular, services are only constructed when they are requested by a component. This means that if a component does not appear on a hypothetical page of your website, any services that are only injected by that component would also not be created. 
 

@@ -1,7 +1,10 @@
 ---
 ---
 
-# Single component
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/circle.svg"| relative_url }}">
+  <h1 class="page-title-text">Single component</h1>
+</div>
 
 While you can always load just one component with the `DynamicHooksComponent`, sometimes that can feel a bit verbose and it would be more convenient to have a dedicated tool for the job.
 

@@ -1,18 +1,23 @@
 ---
 ---
 
-# Parsers
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/magnifying_glass.svg"| relative_url }}">
+  <h1 class="page-title-text">Parsers</h1>
+</div>
 
 ## Introduction
 
-Components are loaded from [hooks]({{ "documentation/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by **HookParsers**. These are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
+Components are loaded from [hooks]({{ "documentation/#whats-a-hook" | relative_url }}) in the content, but how does the library know how a hook looks like and which component to load for it? This job is accomplished by **HookParsers**. 
+
+HookParsers are what you pass along as the `parsers` input/argument to the library. Each component has one and it can be either:
 
 1. The component class itself.
 2. A <a href="{{ "documentation/parsers#selectorhookparserconfig" | relative_url }}">SelectorHookParserConfig</a> object literal.
 3. A custom `HookParser` instance.
 4. A custom `HookParser` class. If this class is available as a provider/service, it will be injected.
 
-Using the component class is the most straightforward option. It internally sets up a `SelectorHookParser` for you which loads components just like in Angular templates. We have been using it in most simple examples, such as in [Quick Start]({{ "documentation/quickstart" | relative_url }}) and most of the [General usage page]({{ "documentation/general-usage" | relative_url }}).
+Using the component class is the most straightforward option. It internally sets up a `SelectorHookParser` for you which loads components just like in Angular templates. We have been using it in most simple examples, such as in [Quick Start]({{ "documentation/quickstart" | relative_url }}) and most of the [How to use]({{ "documentation/how-to-use" | relative_url }}) page.
 
 If you want more control, you can also manually configure a `SelectorHookParser` by passing in a [SelectorHookParserConfig]({{ "documentation/parsers#selectorhookparserconfig" | relative_url }}), which provides additional options.
 
@@ -43,7 +48,7 @@ Property | Type | Default | Description
 `allowContextInBindings` | `boolean` | `true` | Whether to allow the use of context object variables in inputs and outputs.
 `allowContextFunctionCalls` | `boolean` | `true` | Whether to allow calling context object functions in inputs and outputs.
 
-See the [General Usage]({{ "documentation/general-usage#load-by-any-selector" | relative_url }}) page for a simple `SelectorHookParserConfig` example.
+See the [How to use]({{ "documentation/how-to-use#load-by-any-selector" | relative_url }}) page for a simple `SelectorHookParserConfig` example.
 
 {% include docs/widgets/notice.html content="
   <p>Please note that you cannot use full CSS selectors in the <code>selector</code> field if you set <code>enclosing</code> to <code>false</code> or use a custom <code>bracketStyle</code> as you aren't looking for valid HTML elements at that point. The selector can then only be the direct tag name, e.g. <code>app-example</code>.</p>
@@ -175,17 +180,17 @@ import { ExampleComponent } from 'somewhere';
 })
 export class ExampleParser implements HookParser {
 
-  findHookElements(contentElement: any, context: any, options: ParseOptions): any[] {
-    // Return all <app-example> elements
-    return Array.from(contentElement.querySelectorAll('app-example'));
+  findHookElements(contentElement: any): any[] {
+    // Return the elements to load the component into
+    return Array.from(contentElement.querySelectorAll('some-element'));
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
+  loadComponent(): HookComponentData {
     // Return the component class
     return { component: ExampleComponent };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
+  getBindings(): HookBindings {
     // Return inputs/outputs to set
     return {
       inputs: {
@@ -201,7 +206,7 @@ Now just pass the parser in the `parsers`-field and it will work!
 ```ts
 ...
 export class AppComponent {
-  content = 'Load a component here: <app-example></app-example>';
+  content = 'Load a component here: <some-element></some-element>';
   parsers = [ExampleParser];
 }
 ```
@@ -230,20 +235,20 @@ export class EmojiParser implements HookParser {
 
   constructor(private hookFinder: HookFinder) {}
 
-  findHooks(content: string, context: any, options: ParseOptions): HookPosition[] {
+  findHooks(content: string): HookPosition[] {
     // As an example, this regex finds the emoticons :-D, :-O and :-*
     const emoticonRegex = /(?::-D|:-O|:-\*)/gm;
 
     // We can use the HookFinder service provided by the library to easily
     // find the HookPositions of any regex in the content string
-    return this.hookFinder.findHooks(content, emoticonRegex);
+    return this.hookFinder.find(content, emoticonRegex);
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[], options: ParseOptions): HookComponentData {
+  loadComponent(): HookComponentData {
     return { component: EmojiComponent };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
+  getBindings(hookId: number, hookValue: HookValue): HookBindings {
     // Lets see what kind of emoticon this hook is and assign a fitting emoji
     let emojiType: string;
     switch (hookValue.openingTag) {
@@ -284,19 +289,19 @@ A parser that replaces those `<img>` elements with `ClickableImgComponent`s coul
 ...
 export class ClickableImgParser implements HookParser {
 
-  findHookElements(contentElement: any, context: any, options: ParseOptions): any[] {
+  findHookElements(contentElement: any): any[] {
     // Find all img-elements with the lightbox class
     return Array.from(contentElement.querySelectorAll('img.lightbox'));
   }
 
-  loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
+  loadComponent(): HookComponentData {
     return {
       component: ClickableImgComponent,   // Load our component
       hostElementTag: 'lightbox-img'      // As img-elements can't have content, replace them with '<lightbox-img>' elements
     };
   }
 
-  getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
+  getBindings(hookId: number, hookValue: HookValue): HookBindings {
     // Read the image urls from the element attributes and pass along as inputs
     const imgElement: HTMLImageElement = hookValue.elementSnapshot;
     return {
@@ -341,22 +346,21 @@ export class DynamicLinkParser implements HookParser {
     this.base = `${this.document.location.protocol}//${this.document.location.hostname}`;
   }
 
-  public findHookElements(contentElement: HTMLElement, context: any, options: ParseOptions): any[] {
+  public findHookElements(contentElement: HTMLElement): any[] {
     // First get all link elements
     return Array.from(contentElement.querySelectorAll('a[href]'))
-    // Then filter them so that only those with own hostname remain
+    // Then filter them so that only those with own hostname are returned
     .filter(linkElement => {
-        const url = new URL(linkElement.getAttribute('href')!, this.base);
-        return url.hostname === this.document.location.hostname;
-      }
-    );
+      const url = new URL(linkElement.getAttribute('href')!, this.base);
+      return url.hostname === this.document.location.hostname;
+    });
   }
 
-  public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[], options: ParseOptions): HookComponentData {
+  public loadComponent(): HookComponentData {
     return { component: DynamicLinkComponent };
   }
 
-  public getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings {
+  public getBindings(hookId: number, hookValue: HookValue): HookBindings {
     const url = new URL(hookValue.elementSnapshot.getAttribute('href')!, this.base);
 
     // Extract what we need from the URL object and pass it along to DynamicLinkComponent

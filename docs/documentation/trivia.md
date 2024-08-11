@@ -1,7 +1,10 @@
 ---
 ---
 
-# Trivia
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/list.svg"| relative_url }}">
+  <h1 class="page-title-text">Trivia</h1>
+</div>
 
 ## How it works
 

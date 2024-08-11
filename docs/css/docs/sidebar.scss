@@ -80,11 +80,15 @@
           .sidebar-link {
             display: flex;
             align-items: center;
-            padding: 10px 10px;
+            width: 100%;
+            box-sizing: border-box;
             border-radius: 10px;
           }
           .sidebar-title .sidebar-link {
-            width: 100%;
+            padding: 10px;
+          }
+          .sidebar-subtitle .sidebar-link {
+            padding: 8px;
           }
           .sidebar-link:hover {
             background-color: var(--background-color-hover);

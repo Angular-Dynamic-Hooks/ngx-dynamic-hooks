@@ -1,7 +1,10 @@
 ---
 ---
 
-# Component features
+<div class="page-title">
+  <img class="page-title-icon" src="{{ "/assets/images/icons/star.svg"| relative_url }}">
+  <h1 class="page-title-text">Component features</h1>
+</div>
 
 This page is all about the **dynamically-loaded components**: How they behave, how you can exchange data with them and what new lifecycle methods can be used.
 

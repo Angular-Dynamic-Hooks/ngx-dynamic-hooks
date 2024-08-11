@@ -7,7 +7,7 @@
     - title: Highlights
       url: /documentation/#highlights
     - title: What it does
-      url: /documentation/#introduction
+      url: /documentation/#what-it-does
     - title: What's a hook?
       url: /documentation/#whats-a-hook
     - title: Do the components work normally?
@@ -23,16 +23,40 @@
       url: /documentation/quickstart#minimal-example
     - title: See it in action
       url: /documentation/quickstart#see-it-in-action
+    - title: About using modules
+      url: /documentation/quickstart#about-using-modules
     - title: Next steps
       url: /documentation/quickstart#next-steps
 
-- title: General usage
-  url: /documentation/general-usage
-  icon: /assets/images/icons/star.svg
+- title: How to use
+  url: /documentation/how-to-use
+  icon: /assets/images/icons/book.svg
+  children:
+    - title: Starting out
+      url: /documentation/how-to-use#starting-out
+    - title: Context and options
+      url: /documentation/how-to-use#context-and-options
+    - title: Global settings
+      url: /documentation/how-to-use#global-settings
+    - title: Load by any selector
+      url: /documentation/how-to-use#load-by-any-selector
+    - title: Custom parsers
+      url: /documentation/how-to-use#custom-parsers
+    - title: Programmatic usage
+      url: /documentation/how-to-use#programmatic-usage-with-service
 
 - title: Standalone mode
   url: /documentation/standalone-mode
-  icon: /assets/images/icons/star.svg
+  icon: /assets/images/icons/brackets.svg
+  children:
+    - title: Getting started
+      url: /documentation/standalone-mode#getting-started
+    - title: Adding providers
+      url: /documentation/standalone-mode#adding-providers
+    - title: Building
+      url: /documentation/standalone-mode#building
+    - title: Trivia
+      url: /documentation/standalone-mode#trivia
 
 - title: Component features
   url: /documentation/component-features
@@ -57,18 +81,20 @@
   children:
     - title: Global settings
       url: /documentation/configuration#global-settings
-    - title: Component bindings
-      url: /documentation/configuration#component-bindings
+    - title: Child settings
+      url: /documentation/configuration#child-settings
+    - title: DynamicHooksComponent
+      url: /documentation/configuration#dynamichookscomponent
     - title: ParseOptions
       url: /documentation/configuration#parseoptions
-    - title: Child modules
-      url: /documentation/configuration#child-modules
     - title: Lazy-loading components
       url: /documentation/configuration#lazy-loading-components
+    - title: Alternate platforms
+      url: /documentation/configuration#alternate-platforms
 
 - title: Parsers
   url: /documentation/parsers
-  icon: /assets/images/icons/brackets.svg
+  icon: /assets/images/icons/magnifying_glass.svg
   children:
   - title: Introduction
     url: /documentation/parsers#introduction
@@ -76,14 +102,18 @@
     url: /documentation/parsers#selectorhookparserconfig
   - title: Writing your own HookParser
     url: /documentation/parsers#writing-your-own-hookparser
-  - title: Example 1 - Emoji parser (standalone)
-    url: /documentation/parsers#example-1-emoji-parser-standalone
-  - title: Example 2 - Internal link parser (enclosing)
-    url: /documentation/parsers#example-2-internal-link-parser-enclosing
+  - title: Example 1 - Minimal
+    url: /documentation/parsers#example-1-minimal
+  - title: Example 2 - Emoji parser
+    url: /documentation/parsers#example-2-emoji-parser
+  - title: Example 3 - Image parser
+    url: /documentation/parsers#example-3-image-parser
+  - title: Example 4 - Link parser
+    url: /documentation/parsers#example-4-link-parser
 
 - title: Single component
   url: /documentation/single-component
-  icon: /assets/images/icons/star.svg
+  icon: /assets/images/icons/circle.svg
 
 - title: Trivia
   url: /documentation/trivia
