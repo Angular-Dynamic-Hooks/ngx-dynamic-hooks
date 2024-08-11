@@ -13,6 +13,7 @@ import { StackblitzWidget } from './widgets/stackblitz';
 import { CodeCopyWidget } from './widgets/codeCopy';
 import { initLandingPage } from './landing';
 import { LandingMenuWidget } from './widgets/landing/landingMenu';
+import { SidebarVersionButtonWidget } from "./widgets/sidebarVersionButton";
 
 // Setup
 gsap.registerPlugin(ScrollTrigger);
@@ -32,6 +33,7 @@ if (!location.pathname.includes('documentation')) {
     DarkmodeWidget,
     SidebarToggleWidget,
     SidebarSectionsWidget,
+    SidebarVersionButtonWidget,
     ArticleTocWidget,
     VersionWarningLinkWidget,
     StackblitzWidget,

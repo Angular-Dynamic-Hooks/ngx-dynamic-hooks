@@ -151,30 +151,30 @@
       width: 100%;
       margin: 30px 0px 0px 0px;
       visibility: visible;
-      background-color: #34363c;
-      font-size: 0.9rem;
-    }
-    :root[data-theme=dark] .sidebar-buttons {
-      background-color: #202228;
+      font-size: 0.8rem;
     }
 
-      .sidebar-button {
+      .npmversion {
         display: flex;
         justify-content: center;
         width: 100%;
         padding: 8px 0px;
         box-sizing: border-box;
+        background-color: #34363c;
+        text-decoration: none !important;
+      }
+      :root[data-theme=dark] .npmversion {
+        background-color: #202228;
+      }
+      .npmversion:hover {
+        filter: brightness(1.1);
       }
 
-        .sidebar-button-icon {
+        .npmversion-label {
           margin: 0px 8px 0px 0px;
-          color: var(--brand-color);
-          transition: transform 0.1s ease;
-        }
-        .sidebar-button:hover .sidebar-button-icon {
-          transform: scale(1.2);
+          color: white !important;
         }
 
-        .sidebar-button-text {
-          color: white !important;
+        .npmversion-text {
+          font-weight: bold;          
         }

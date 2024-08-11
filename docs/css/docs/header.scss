@@ -18,6 +18,7 @@
     display: flex;
     align-items: center;
     height: 100%;
+    margin: 0px 20px 0px 0px;
   }
 
     #sidebar-toggle {
@@ -44,6 +45,7 @@
       align-items: center;
       margin: 0px 15px 0px 0px;
       text-decoration: none !important;
+      flex-shrink: 0;
 
       @include minLg() {
         margin: 0px 30px 0px 25px;
@@ -86,10 +88,14 @@
 
       .v3-changes-link {
         display: none;
+        flex-shrink: 10;
         margin: 0px 0px 0px 15px;
         text-decoration: initial;
         color: white !important;
         font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         b {
           margin: 0px 5px 0px 0px;
@@ -103,6 +109,7 @@
   .header-right {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     height: 100%;
     margin: 0px 15px 0px 0px;
 
