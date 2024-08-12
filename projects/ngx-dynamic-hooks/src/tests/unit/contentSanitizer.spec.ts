@@ -45,7 +45,25 @@ describe('ContentSanitizer', () => {
 
     let customEl = contentElement.querySelector('custom-element');
     expect(customEl).toBeNull();
+  });
 
+  it('#should not call console.warn during sanitization', () => {
+    const testText = `<script>console.log("somescript");</script>`;
+    const contentElement = document.createElement('div');
+    contentElement.innerHTML = testText;
+    const consoleWarnSpy = spyOn(console, 'warn').and.callThrough();
+
+    sanitizer.sanitize(contentElement, {}, 'asdasdasd');
+
+    // Ensure that content is sanitized
+    expect(contentElement.innerHTML).not.toContain('<script>');
+    
+    // Ensure that console.warn was not called
+    expect(consoleWarnSpy.calls.all().length).toBe(0);
+
+    // Ensure that it works afterwards again though
+    console.warn('Should work!');
+    expect(consoleWarnSpy.calls.all().length).toBe(1);
   });
 
   it('#should only partially sanitize hook anchors', () => {

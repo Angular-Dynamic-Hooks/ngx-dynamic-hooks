@@ -54,8 +54,11 @@ export class ContentSanitizer {
     let innerHTML = this.platformService.getInnerContent(contentElement);
     innerHTML = this.findAndEncodeTags(innerHTML, sanitizerPlaceholderRegex);
 
-    // Sanitize
+    // Sanitize (without warnings)
+    const consoleWarnFn = console.warn;
+    console.warn = () => {};
     let sanitizedInnerHtml = this.platformService.sanitize(innerHTML);
+    console.warn = consoleWarnFn;
 
     // Decode sanitization placeholders
     sanitizedInnerHtml = this.decodeTagString(sanitizedInnerHtml);

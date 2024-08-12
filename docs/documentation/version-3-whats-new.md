@@ -51,11 +51,23 @@ In case you just need to load a single dynamic component in your template, a new
 
 ### DynamicHooksModule
 
-As the library has fully transitioned to standalone components, you can no longer call `DynamicHooksModule.forRoot()` in your own module/providers. 
+As the library has transitioned to standalone components, trying to use `DynamicHooksModule.forRoot()` will throw an error. 
 
-The replacement is called `provideDynamicHooks()` and you can put it in the `providers` array of your app configuration or module. It accepts the same arguments that `forRoot()` previously did. Note that `provideDynamicHooks()` itself is now completely optional.
+Instead, use the new `provideDynamicHooks()` function to create the global settings. Note that creating global settings is itself now completely optional.
 
-The only thing required to use the library now is to put the `DynamicHooksComponent` into the `imports` field of your module/component. You can then use `<ngx-dynamic-hooks>` in your templates as usual.
+The properties of the settings object to pass to `provideDynamicHooks()` have also been simplified and now look like this:
+
+```ts
+interface DynamicHooksSettings {
+  parsers?: HookParserEntry[];
+  options?: ParseOptions;
+  inheritance?: DynamicHooksInheritance;
+}
+```
+
+### DynamicHooksComponent
+
+If you want to use `<ngx-dynamic-hooks>` in your templates, you will now have to import the `DynamicHooksComponent`. Simply put it into the `imports` field of the component/module that needs it.
 
 ### Child modules
 
@@ -65,9 +77,8 @@ Also, note that `DynamicHooksInheritance.LINEAR` is now the default option (inst
 
 ### Renamings
 
-Several classes, interfaces, methods etc. were renamed to better reflect their new roles.
+Several classes, interfaces, methods etc. were renamed to better reflect their new roles. 
 
-- `DynamicHooksGlobalSettings` and its properties `globalParsers`, `globalOptions`, `lazyInheritance` are now just `DynamicHooksSettings`, `parsers`, `options` and `inheritance`
 - `OutletComponent` is now `DynamicHooksComponent`
 - `OutletService` is now `DynamicHooksService`. Also, the order of the parameters for the `parse` method [has changed]({{ "documentation/how-to-use#programmatic-usage-with-service" | relative_url }}).
 - `OutletParseResult` is now `ParseResult` and returns more properties
