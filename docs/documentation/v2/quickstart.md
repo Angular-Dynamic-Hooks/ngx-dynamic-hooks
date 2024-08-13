@@ -53,9 +53,9 @@ The following <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart"
 
 <div 
   class='stackblitz' 
-  data-baseurl="https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart" 
-  data-desktopqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1"
-  data-mobileqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1&view=preview"
+  data-url="https://stackblitz.com/edit/ngx-dynamic-hooks-quickstart" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/quickstart_v2.jpg" | relative_url }}"
 ></div>
 
 This is a very simple example. Check out the [Configuration]({{ "documentation/v2/configuration" | relative_url }}) or even [Writing your own HookParser]({{ "documentation/v2/parsers#writing-your-own-hookparser" | relative_url }}) sections to find out how to tailor everything to your exact needs.

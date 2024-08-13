@@ -113,9 +113,12 @@ Make sure all dependencies are installed (including **Angular Dynamic Hooks**) a
 
 Then call `ng build` to build the finished JS files!
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/edit/ngx-dynamic-hooks-v3-standalone-cli" 
+  data-fileQueryParam="file=www%2Findex.html"
+  data-image="{{ "/assets/images/stackblitz/standalone_cli.jpg" | relative_url }}"
+></div>
 
 {% include docs/widgets/notice.html content='
   <h4>Bundled or separate file?</h4>
@@ -135,9 +138,12 @@ When you have an existing Webpack-based build pipeline and only wish to incorpor
 
 That said, the rest of the code can be identical as when using the CLI. Here is the same example as before, just with Webpack-compilation this time:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Standalone-Webpack" 
+  data-fileQueryParam="file=www%2Findex.html"
+  data-image="{{ "/assets/images/stackblitz/standalone_webpack.jpg" | relative_url }}"
+></div>
 
 ## Trivia
 

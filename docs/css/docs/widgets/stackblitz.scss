@@ -7,34 +7,73 @@
   background-color: #24262b;
   border-radius: 5px;
   overflow: hidden;
+}
 
-  .load-spinner {
+  .stackblitz-placeholder {
+    width: 100%;
+    filter: blur(2px);
+  }
+
+  .stackblitz-buttons {
     position: absolute;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: inline-block;
-    border-top: 3px solid #FFF;
-    border-right: 3px solid transparent;
-    box-sizing: border-box;
-    animation: rot 1s linear infinite;
-    z-index: 1;
-  }
-  
-  @keyframes rot {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+    top: 0px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
   }
 
-  iframe {
+    .stackblitz-button {
+      display: flex;
+      align-items: center;
+      margin: 8px;
+      padding: 12px;
+      border: none;
+      box-shadow: none;
+      box-sizing: border-box;
+      line-height: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white !important;
+      background-color: #1574ef;
+
+      @include minSm() {
+        margin: 12px;
+        padding: 13px 15px;
+      }
+
+      svg {
+        margin: 0px 5px 0px 0px;
+        fill: white;
+      }
+    }
+    .stackblitz-button:hover {
+      filter: brightness(1.1);
+    }
+
+      .stackblitz-button-newtab {
+        font-size: 1rem;
+
+        @include minSm() {
+          font-size: 1.1rem;
+        }
+      }
+
+      .stackblitz-button-embed {
+        font-size: 0.9rem;
+
+        @include minSm() {
+          font-size: 1rem;
+        }
+      }
+
+  .stackblitz-iframe {
     display: block;
     width: 100%;
     margin: 0px;
     z-index: 10;
   }
-}
 

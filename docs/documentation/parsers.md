@@ -71,15 +71,9 @@ A hook parser is any class that follows the `HookParser` interface, which requir
 * `loadComponent()` to specify which component class to load.
 * `getBindings()` to return the component inputs/outputs.
 
-You only need to implement either `findHooks()` or `findHookElements()`, depending on whether you want to replace text or HTML elements with components.
-
-It is recommended to create a dedicated `HookParser` for each custom hook/component (handling multiple different hooks with the same parser is messy and difficult). Here are some more details about the main functions:
+You only need to implement either `findHooks()` or `findHookElements()`, depending on whether you want to replace text or HTML elements with components. Here are some more details about the main functions:
 
 ### findHooks()
-
-{% include docs/widgets/notice.html content="
-  <span>Only needed if you want to find text hooks. For element hooks, see <code>findHookElements()</code>.</span>
-" %}
 
 ```ts
   findHooks(content: string, context: any, options: ParseOptions): HookPosition[]
@@ -102,11 +96,11 @@ How your hook looks like and how you find these indexes is completely up to you.
 
 To make your life easier, you can just use the `HookFinder` service that comes with this library. Its easy to use and safely finds both singletag and enclosing patterns in a string. You can see it in action in the ["Emoji parser" example]({{ "documentation/parsers#example-2-emoji-parser" | relative_url }}).
 
-### findHookElements()
-
 {% include docs/widgets/notice.html content="
-  <span>Only needed if you want to find element hooks. For text hooks, see <code>findHooks()</code>.</span>
+  <span><code>findHooks()</code> is only needed if you want to find text hooks. For element hooks, see <code>findHookElements()</code>.</span>
 " %}
+
+### findHookElements()
 
 ```ts
   findHookElements(contentElement: any, context: any, options: ParseOptions): any[]
@@ -119,6 +113,10 @@ Finding element hooks is rather easy as you can interact directly with the actua
 ```ts
 return Array.from(contentElement.querySelectorAll('.myHook'));
 ```
+
+{% include docs/widgets/notice.html content="
+  <span><code>findHookElements()</code> is only needed if you want to find element hooks. For text hooks, see <code>findHooks()</code>.</span>
+" %}
 
 ### loadComponent()
 
@@ -217,9 +215,12 @@ export class AppComponent {
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Parsers-Minimal" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_minimal.jpg" | relative_url }}"
+></div>
 
 ## Example 2: Emoji parser
 
@@ -269,9 +270,12 @@ export class EmojiParser implements HookParser {
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Parsers-Emoji" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_emoji.jpg" | relative_url }}"
+></div>
 
 ## Example 3: Image parser
 
@@ -283,7 +287,7 @@ For example, we could automatically add lightboxes to all images of an article m
 <img class="lightbox" src="image.jpeg" src-large="image-large.jpeg">
 ```
 
-A parser that replaces those `<img>` elements with `ClickableImgComponent`s could then look as follows:
+A parser that automatically replaces those `<img>` elements with `ClickableImgComponent`s could then look as follows:
 
 ```ts
 ...
@@ -318,9 +322,12 @@ Our `ClickableImgComponent` will then use `src` to render the image in the artic
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Parsers-Image" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_image.jpg" | relative_url }}"
+></div>
 
 ## Example 4: Link parser
 
@@ -377,6 +384,9 @@ export class DynamicLinkParser implements HookParser {
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Parsers-Link" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_link.jpg" | relative_url }}"
+></div>

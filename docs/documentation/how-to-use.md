@@ -67,9 +67,12 @@ Also, as we know the content string is safe and does not contain malicous code, 
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Context" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/context.jpg" | relative_url }}"
+></div>
 
 ## Global settings
 
@@ -103,9 +106,12 @@ Every `DynamicHookComponent` will then use them by default (unless locally overw
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-GlobalSettings" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/global_settings.jpg" | relative_url }}"
+></div>
 
 {% include docs/widgets/notice.html content='
   <span>If you are using modules, you can put the call to "provideDynamicHooks" into the "providers" decorator field of your module instead.</span>
@@ -147,9 +153,12 @@ As you can see, we replaced the `ExampleComponent` class in the parsers array wi
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-SelectorHookParserConfig" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/selectorhookparserconfig.jpg" | relative_url }}"
+></div>
 
 ## Custom parsers
 
@@ -220,9 +229,12 @@ class AppComponent {
 
 See it in action in this Stackblitz:
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Service" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/service.jpg" | relative_url }}"
+></div>
 
 {% include docs/widgets/notice.html content="
   <h4>About component lifecycles</h4>

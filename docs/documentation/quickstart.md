@@ -45,9 +45,12 @@ That's it! If `<app-example>` is the selector of `ExampleComponent`, it will aut
 
 ## See it in action
 
-{% include docs/widgets/notice.html content='
-  <span>Live example to be followed!</span>
-' %}
+<div 
+  class='stackblitz' 
+  data-url="https://stackblitz.com/github/Angular-Dynamic-Hooks/Example-v3-Quickstart" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/quickstart.jpg" | relative_url }}"
+></div>
 
 ## About using modules
 

@@ -203,9 +203,9 @@ Have a look at this <a href="https://stackblitz.com/edit/ngx-dynamic-hooks-custo
 
 <div 
   class='stackblitz' 
-  data-baseurl="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone" 
-  data-desktopqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1"
-  data-mobileqp="embed=1&file=src%2Fapp%2Fapp.component.ts&hideNavigation=1&view=preview"
+  data-url="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserstandalone" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_emoji_v2.jpg" | relative_url }}"
 ></div>
 
 ## Example 2: Internal link parser (enclosing)
@@ -318,7 +318,7 @@ Have a look at the full, working example in this <a href="https://stackblitz.com
 
 <div 
   class='stackblitz' 
-  data-baseurl="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed" 
-  data-desktopqp="embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1"
-  data-mobileqp="embed=1&file=src%2Fapp%2Fviews%2Fhome%2Fhome.c.ts&hideNavigation=1&view=preview"
+  data-url="https://stackblitz.com/edit/ngx-dynamic-hooks-customparserenclosed" 
+  data-fileQueryParam="file=src%2Fapp%2Fapp.component.ts"
+  data-image="{{ "/assets/images/stackblitz/parser_link_v2.jpg" | relative_url }}"
 ></div>
