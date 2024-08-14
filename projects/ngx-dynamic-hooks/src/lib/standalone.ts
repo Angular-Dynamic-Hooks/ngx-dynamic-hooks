@@ -1,4 +1,4 @@
-import { EnvironmentInjector, NgZone, Provider, createEnvironmentInjector } from '@angular/core';
+import { EnvironmentInjector, EnvironmentProviders, NgZone, Provider, createEnvironmentInjector } from '@angular/core';
 import { createApplication } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 
@@ -14,7 +14,7 @@ let sharedInjector: EnvironmentInjector|null = null;
 let scopes: ProvidersScope[] = [];
 let allParseResults: ParseResult[] = [];
 
-const createInjector = async (providers: Provider[] = [], parent?: EnvironmentInjector) => {
+const createInjector = async (providers: (Provider | EnvironmentProviders)[] = [], parent?: EnvironmentInjector) => {
   // If no parent, create new root injector, so passed providers will also be actual root providers
   return parent ? createEnvironmentInjector(providers, parent) : (await createApplication({providers})).injector;
 }
@@ -47,7 +47,7 @@ export const destroyAll = () => {
  * @param providers - A list of providers
  * @param parentScope - An optional parent scope created previously. Makes the parent providers also accessible to this scope.
  */
-export const createProviders = (providers: Provider[] = [], parentScope?: ProvidersScope): ProvidersScope => {
+export const createProviders = (providers: (Provider | EnvironmentProviders)[] = [], parentScope?: ProvidersScope): ProvidersScope => {
   return new ProvidersScope(providers, parentScope);
 }
 
@@ -68,7 +68,7 @@ export class ProvidersScope {
     return this._isDestroyed;
   };
 
-  constructor(private providers: Provider[] = [], private parentScope?: ProvidersScope) {
+  constructor(private providers: (Provider | EnvironmentProviders)[] = [], private parentScope?: ProvidersScope) {
     scopes.push(this);
   }
 
