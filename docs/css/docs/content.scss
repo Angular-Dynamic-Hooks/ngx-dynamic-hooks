@@ -66,6 +66,9 @@
           box-shadow: none;
           opacity: 0.7;
         }
+        :root[data-theme="dark"] .article .page-title-icon  {
+          filter: invert(1);
+        }
 
         .article .page-title-text {
           margin: 0px;

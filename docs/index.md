@@ -51,7 +51,7 @@ highlights:
             </div>
             <span class="l-site-link-text">npm</span>
           </a>
-          <a class="l-site-link github" href="https://github.com/MTobisch/ngx-dynamic-hooks" target="_blank">
+          <a class="l-site-link github" href="https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks" target="_blank">
             <div class="l-site-link-icon">
               <img src="{{ "/assets/images/github-mark-white.svg" | relative_url }}">
             </div>
@@ -74,7 +74,7 @@ highlights:
       <p class="l-hero-desc"><b>Angular Dynamic Hooks</b> can load Angular components into any dynamic content, such as HTML strings, individual HTML elements or the whole browser page.</p>
       <div class="l-hero-teaser">
         <div class="l-hero-teaser-aspect">
-          <img class="l-hero-teaser-img" src="https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8" alt="ngx-dynamic-hooks-optimize">
+          <img class="l-hero-teaser-img" src="https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8" alt="ngx-dynamic-hooks-optimize">
         </div>
       </div>
       <div class="l-hero-buttons">

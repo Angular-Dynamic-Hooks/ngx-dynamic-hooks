@@ -4,16 +4,16 @@
 # Introduction
 
 <div class="badges" markdown="1">
-  [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MTobisch/ngx-dynamic-hooks/ci-test.yml?style=flat-square&logo=github&label=CI%20tests)](https://github.com/MTobisch/ngx-dynamic-hooks/actions/workflows/ci-test.yml)
-  [![Coverage](https://img.shields.io/codecov/c/gh/MTobisch/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/MTobisch/ngx-dynamic-hooks)
+  [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/angular-dynamic-hooks/ngx-dynamic-hooks/ci-test.yml?style=flat-square&logo=github&label=CI%20tests)](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/actions/workflows/ci-test.yml)
+  [![Coverage](https://img.shields.io/codecov/c/gh/angular-dynamic-hooks/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/angular-dynamic-hooks/ngx-dynamic-hooks)
   [![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?color=orange&style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
-  [![License](https://img.shields.io/github/license/mtobisch/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/MTobisch/ngx-dynamic-hooks/blob/master/LICENSE.md)
+  [![License](https://img.shields.io/github/license/angular-dynamic-hooks/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/master/LICENSE.md)
   [![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
 </div>
 
 With Angular Dynamic Hooks, you can load fully-functional Angular components from string variables - based on their selector (as in normal templates) or **any pattern of your choice**.
 
-![ngx-dynamic-hooks-optimize](https://github.com/MTobisch/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
+![ngx-dynamic-hooks-optimize](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
 
 ## Installation
 
@@ -63,7 +63,7 @@ Just write your selectors just as you would in a normal Angular template (such a
 
 Something to note, though, is that hooks can be anything - not just component selectors! 
 
-As each hook internally has a corresponding <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that tells the library how to find and instantiate components, you can create [custom hook parsers]({{ "/documentation/v2/parsers" | relative_url }}) that look for any text pattern of your choice to be replaced by an Angular component!
+As each hook internally has a corresponding <a href="https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L49" target="_blank">`HookParser`</a> that tells the library how to find and instantiate components, you can create [custom hook parsers]({{ "/documentation/v2/parsers" | relative_url }}) that look for any text pattern of your choice to be replaced by an Angular component!
 
 ## Do the components work normally?
 

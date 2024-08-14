@@ -5,7 +5,7 @@
 
 ## Programmatic usage (without component)
 
-You can bypass the `<ngx-dynamic-hooks>`-component and parse the dynamic content directly in Typescript by injecting the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts" target="_blank">`OutletService`</a> and calling its `parse`-method programmatically (which the `<ngx-dynamic-hooks>` component internally does as well):
+You can bypass the `<ngx-dynamic-hooks>`-component and parse the dynamic content directly in Typescript by injecting the <a href="https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts" target="_blank">`OutletService`</a> and calling its `parse`-method programmatically (which the `<ngx-dynamic-hooks>` component internally does as well):
 
 ```ts
 parse(
@@ -25,7 +25,7 @@ Don't worry, most of the parameters are just [the inputs]({{ "documentation/v2/c
 
 Only the last couple of parameters are notable: You can optionally provide a `targetElement` and `targetHookIndex` to fill out for the result. If not, they are automatically created for you. You may also specify a custom injector for the created components. If you don't, it defaults to module injector.
 
-The function will return an observable that contains an <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L207" target="_blank">`OutletParseResult`</a> with the form:
+The function will return an observable that contains an <a href="https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/interfacesPublic.ts#L207" target="_blank">`OutletParseResult`</a> with the form:
 
 ```ts
 interface OutletParseResult {
@@ -54,14 +54,14 @@ class SomeComponentOrService {
 {% include docs/widgets/notice.html content="
   <h4>About component lifecycles</h4>
   <p>When loading components this way, keep in mind that the submitted content string is only parsed once. The inputs of contained components aren't automatically updated as they would be when using the component normally.</p>
-  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <a href='https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts#L119' target='_blank'><code>OutletService.destroy(hookIndex: HookIndex)</code></a> for this purpose.</p>
+  <p>Also, make sure to properly destroy the created components when they are no longer needed to prevent memory leaks. You can simply use <a href='https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/components/outlet/services/outletService.ts#L119' target='_blank'><code>OutletService.destroy(hookIndex: HookIndex)</code></a> for this purpose.</p>
 " %}
 
 ## Alternative platforms
 
 The default implementation of the library should work in both <a href="https://v17.angular.io/api/platform-browser" target="_blank">browsers</a> as well as during <a href="https://v17.angular.io/guide/ssr" target="_blank">server-side-rendering</a>. However, there may be more specialized use cases on platforms that are not directly supported.
 
-In such cases, all you need is to implement the <a href="https://github.com/MTobisch/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/platform/platformService.ts" target="_blank">`PlatformService`</a> abstract class and pass it as the second parameter to the `DynamicHooksModule.forRoot` method:
+In such cases, all you need is to implement the <a href="https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/9b31ba5872a057c33a5464f638ac234fd6144963/projects/ngx-dynamic-hooks/src/lib/platform/platformService.ts" target="_blank">`PlatformService`</a> abstract class and pass it as the second parameter to the `DynamicHooksModule.forRoot` method:
 
 ```ts
 import {DynamicHooksModule, PlatformService} from 'ngx-dynamic-hooks';
