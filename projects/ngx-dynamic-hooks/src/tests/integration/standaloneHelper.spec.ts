@@ -1,5 +1,5 @@
 // Testing api resources
-import { parseHooks, observeElement, resetDynamicHooks, contentElementAttr } from '../testing-api';
+import { parse, observeElement, resetDynamicHooks, contentElementAttr } from '../testing-api';
 
 // Custom testing resources
 import { destroyAll } from '../../lib/standalone';
@@ -140,7 +140,7 @@ describe('Standalone helper', () => {
       triggered = true;
     });
     
-    parseHooks(div, [MultiTagTestComponent]).then(result => {
+    parse(div, [MultiTagTestComponent]).then(result => {
       expect(result.hookIndex[1].componentRef?.componentType).toBe(MultiTagTestComponent);
       expect(div.querySelector('.multitag-component')).not.toBe(null); 
 
@@ -160,7 +160,7 @@ describe('Standalone helper', () => {
       triggered = true;
     });
     
-    parseHooks(div, [GenericSingleTagStringParser]).then(result => {
+    parse(div, [GenericSingleTagStringParser]).then(result => {
       expect(result.hookIndex[1].componentRef?.componentType).toBe(SingleTagTestComponent);
       expect(div.querySelector('.singletag-component')).not.toBe(null);
       expect(div.querySelector('.singletag-nr')).toBe(null);

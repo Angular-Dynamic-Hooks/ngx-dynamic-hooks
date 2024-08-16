@@ -52,7 +52,7 @@ export const createProviders = (providers: (Provider | EnvironmentProviders)[] =
 }
 
 /**
- * A scope with an internal list of providers. All dynamic components created by its `parseHooks` method will have access to them.
+ * A scope with an internal list of providers. All dynamic components created by its `parse` method will have access to them.
  */
 export class ProvidersScope {
   private _injector: EnvironmentInjector|null = null;
@@ -83,7 +83,7 @@ export class ProvidersScope {
   * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
   * @param environmentInjector - An optional environmentInjector to use for the dynamically-loaded components. If none is provided, the default environmentInjector is used.
   */
-  public async parseHooks(
+  public async parse(
     content: any,
     parsers: HookParserEntry[],
     context: any = null,  
@@ -94,7 +94,7 @@ export class ProvidersScope {
   ): Promise<ParseResult> {
     this.checkIfDestroyed();
 
-    return parseHooks(content, parsers, context, options,  targetElement, targetHookIndex, environmentInjector || await this.resolveInjector())
+    return parse(content, parsers, context, options,  targetElement, targetHookIndex, environmentInjector || await this.resolveInjector())
     .then(parseResult => {
       this.parseResults.push(parseResult);
       return parseResult;
@@ -141,7 +141,7 @@ export class ProvidersScope {
   }
 }
 
-// ParseHooks
+// parse
 // ----------
 
 /**
@@ -155,7 +155,7 @@ export class ProvidersScope {
  * @param targetHookIndex - An optional object to fill with the programmatic hook data. If none is provided, one is created and returned for you.
  * @param environmentInjector - An optional environmentInjector to use for the dynamically-loaded components. If none is provided, the default environmentInjector is used.
  */
-export const parseHooks = async (
+export const parse = async (
   content: any,
   parsers: HookParserEntry[],
   context: any = null,  
@@ -165,7 +165,7 @@ export const parseHooks = async (
   environmentInjector: EnvironmentInjector|null = null,
 ): Promise<ParseResult> => {
 
-  // Reuse the same global injector for all independent parseHooks calls
+  // Reuse the same global injector for all independent parse calls
   if (!environmentInjector) {
     if (!sharedInjector) {
       sharedInjector = await createInjector();
