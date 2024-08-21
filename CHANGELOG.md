@@ -105,7 +105,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.2...HEAD
+[2.1.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6
