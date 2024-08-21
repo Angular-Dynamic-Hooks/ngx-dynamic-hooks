@@ -67,7 +67,7 @@ That's it! If `<app-example>` is the selector of `ExampleComponent`, it will aut
 Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://angular-dynamic-hooks.com/guide/) to find out how to tailor the library to your exact needs. Highlights include:
 
 * ⭐ Loads fully-functional Angular components into dynamic content
-* 📖 Parses both strings and HTML structures
+* 📖 Parses both strings and HTML trees to load components into them like a template
 * 🚀 Can be used fully standalone (load components into HTML without Angular)
 * 🏃 Works **without** needing the JiT compiler
 * 💻 Works **with** Server-Side-Rendering
