@@ -32,6 +32,8 @@ npm install ngx-dynamic-hooks
 
 As the library does not rely on a runtime compiler, it works in both JiT- and AoT-environments.
 
+**Upgrading to v3**: If you have been using v2 of the library and are looking to upgrade, have a look at [Version 3 - What's new?](https://angular-dynamic-hooks.com/guide/version-3-whats-new) for a list of breaking changes.
+
 # Quickstart
 
 Import the `DynamicHooksComponent` as well as your dynamic component(s) to load:
