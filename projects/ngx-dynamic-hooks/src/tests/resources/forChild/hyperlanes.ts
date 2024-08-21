@@ -1,7 +1,7 @@
-import { NgModule, ModuleWithProviders, Component, Inject, ElementRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { DynamicHooksModule } from '../../testing-api';
+import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
 import { CONTENT_STRING } from './contentString';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooks } from '../../testing-api';
 
 @Component({
   selector: 'app-dynamichyperlanes',
@@ -11,31 +11,26 @@ export class DynamicHyperlanesComponent {}
 
 @Component({
   selector: 'app-hyperlanes',
+  imports: [DynamicHooksComponent],
   template: `<div class="hyperlanes">
     Hyperlanes component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class HyperlanesComponent {
-  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString) {}
+  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
-export function createHyperlanesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
-    globalParsers: [
-      {component: DynamicHyperlanesComponent}
-    ]
-  });
+export const getHyperlaneRoutes: () => Route[] = () => {
+  return [
+    { path: '', component: HyperlanesComponent, providers: [
+      provideDynamicHooks({
+        parsers: [
+          {component: DynamicHyperlanesComponent}
+        ],
+        inheritance: DynamicHooksInheritance.All
+      })
+    ]}
+  ];
 }
-
-@NgModule({
-  declarations: [HyperlanesComponent],
-  exports: [HyperlanesComponent],
-  imports: [
-    RouterModule.forChild([
-      { path: 'hyperlanes', component: HyperlanesComponent }
-    ]),
-    createHyperlanesModuleHooksImport()
-  ]
-})
-export class HyperlanesModuleSync {}

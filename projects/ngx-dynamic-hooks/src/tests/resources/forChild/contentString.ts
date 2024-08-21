@@ -8,5 +8,6 @@ export const contentString = `
   <app-dynamicplanets></app-dynamicplanets>
   <app-dynamicplanetcountries></app-dynamicplanetcountries>
   <app-dynamicplanetcities></app-dynamicplanetcities>
+  <app-dynamicplanetcities-elementinjector></app-dynamicplanetcities-elementinjector>
   <app-dynamicplanetspecies></app-dynamicplanetspecies>
 `;

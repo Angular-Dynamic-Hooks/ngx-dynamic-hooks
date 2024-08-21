@@ -5,31 +5,37 @@
  */
 
 // Public module resources
-export { DynamicHooksModule } from '../lib/dynamicHooks.m';
-export { DynamicHooksGlobalSettings, DynamicHooksInheritance } from '../lib/globalSettings';
-export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, OutletParseResult, LoadedComponent } from '../lib/interfacesPublic';
-export { OutletComponent } from '../lib/components/outlet/outletComponent.c';
-export { OutletOptions, outletOptionDefaults } from '../lib/components/outlet/options/options';
-export { HookParserEntry } from '../lib/components/outlet/options/parserEntry';
-export { SelectorHookParser } from '../lib/parsers/selector/selectorHookParser';
-export { SelectorHookParserConfig } from '../lib/parsers/selector/config/selectorHookParserConfig';
-export { OutletService } from '../lib/components/outlet/services/outletService';
-export { PlatformService } from '../lib/platform/platformService';
-export { PlatformBrowserService } from '../lib/platform/platformBrowserService';
-export { DataTypeEncoder } from '../lib/utils/dataTypeEncoder';
-export { DataTypeParser } from '../lib/utils/dataTypeParser';
-export { DeepComparer } from '../lib/utils/deepComparer';
-export { HookFinder } from '../lib/utils/hookFinder';
-export { regexes } from '../lib/utils/regexes';
-export { matchAll } from '../lib/polyfills/matchAll';
+export { provideDynamicHooks, resetDynamicHooks, allSettings } from '../lib/dynamicHooksProviders';
+export { parse } from '../lib/standalone';
+export { observeElement } from '../lib/standaloneHelper';
+export { DynamicHooksSettings, DynamicHooksInheritance } from '../lib/services/settings/settings';
+export { HookIndex, Hook, PreviousHookBindings, PreviousHookBinding, DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData, HookParser, HookPosition, HookValue, HookComponentData, HookBindings, ParseResult, LoadedComponent, ComponentConfig } from '../lib/interfacesPublic';
+export { DynamicHooksComponent } from '../lib/components/dynamicHooksComponent';
+export { DynamicSingleComponent } from '../lib/components/dynamicSingleComponent';
+export { ParseOptions, getParseOptionDefaults } from '../lib/services/settings/options';
+export { HookParserEntry } from '../lib/services/settings/parserEntry';
+export { TextSelectorHookParser } from '../lib/parsers/selector/text/textSelectorHookParser';
+export { ElementSelectorHookParser } from '../lib/parsers/selector/element/elementSelectorHookParser';
+export { SelectorHookParserConfig } from '../lib/parsers/selector/selectorHookParserConfig';
+export { DynamicHooksService } from '../lib/services/dynamicHooksService';
+export { AutoPlatformService } from '../lib/services/platform/autoPlatformService';
+export { DefaultPlatformService } from '../lib/services/platform/defaultPlatformService';
+export { PlatformService, PLATFORM_SERVICE } from '../lib/services/platform/platformService';
+export { DataTypeEncoder } from '../lib/services/utils/dataTypeEncoder';
+export { DataTypeParser } from '../lib/services/utils/dataTypeParser';
+export { DeepComparer } from '../lib/services/utils/deepComparer';
+export { HookFinder } from '../lib/services/utils/hookFinder';
+export { Logger } from '../lib/services/utils/logger';
+export { regexes } from '../lib/constants/regexes';
+export { matchAll } from '../lib/services/utils/utils';
 
 // Private module resources
-export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_FORROOTCALLED, DYNAMICHOOKS_FORROOTCHECK, DYNAMICHOOKS_MODULESETTINGS } from '../lib/interfaces';
-export { OptionsResolver } from '../lib/components/outlet/options/optionsResolver';
-export { ParserEntryResolver } from '../lib/components/outlet/options/parserEntryResolver';
-export { ComponentCreator } from '../lib/components/outlet/services/componentCreator';
-export { ComponentUpdater } from '../lib/components/outlet/services/componentUpdater';
-export { HooksReplacer } from '../lib/components/outlet/services/hooksReplacer';
-export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/config/selectorHookParserConfigResolver';
-export { BindingStateManager } from '../lib/parsers/selector/services/bindingStateManager';
-export { SelectorHookFinder } from '../lib/parsers/selector/services/selectorHookFinder';
+export { DYNAMICHOOKS_ALLSETTINGS, DYNAMICHOOKS_ANCESTORSETTINGS, DYNAMICHOOKS_MODULESETTINGS, SavedBindings} from '../lib/interfaces';
+export { ParserEntryResolver } from '../lib/services/settings/parserEntryResolver';
+export { ComponentCreator } from '../lib/services/core/componentCreator';
+export { ComponentUpdater } from '../lib/services/core/componentUpdater';
+export { TextHookFinder } from '../lib/services/core/textHookFinder';
+export { SelectorHookParserConfigResolver } from '../lib/parsers/selector/selectorHookParserConfigResolver';
+export { BindingsValueManager } from '../lib/parsers/selector/bindingsValueManager';
+export { TagHookFinder } from '../lib/parsers/selector/text/tagHookFinder';
+export * from '../lib/constants/core';

@@ -1,7 +1,7 @@
-import { NgModule, ModuleWithProviders, Component, Inject, ElementRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { DynamicHooksModule } from '../../testing-api';
+import { NgModule, ModuleWithProviders, Component, Inject, ElementRef, Provider } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
 import { CONTENT_STRING } from './contentString';
+import { DynamicHooksComponent, DynamicHooksInheritance, provideDynamicHooks } from '../../testing-api';
 
 @Component({
   selector: 'app-dynamicstars',
@@ -11,48 +11,32 @@ export class DynamicStarsComponent {}
 
 @Component({
   selector: 'app-stars',
+  imports: [DynamicHooksComponent],
   template: `<div class="stars">
     Stars component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true
 })
 export class StarsComponent {
-  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString) {}
+  constructor(public hostElement: ElementRef, @Inject(CONTENT_STRING) public contentString: any) {}
 }
 
-export function createStarsModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
-    globalParsers: [
-      {component: DynamicStarsComponent}
-    ],
-    globalOptions: {
-      sanitize: false,
-      convertHTMLEntities: false,
-      fixParagraphTags: true
-    }
-  });
+export const getStarsRoutes: () => Route[] = () => {
+  return [
+    { path: '', component: StarsComponent, providers: [
+      provideDynamicHooks({
+        parsers: [
+          {component: DynamicStarsComponent}
+        ],
+        options: {
+          sanitize: false,
+          convertHTMLEntities: false,
+          fixParagraphTags: true
+        },
+        inheritance: DynamicHooksInheritance.All
+      })
+    ]}
+  ];
 }
 
-@NgModule({
-  declarations: [StarsComponent],
-  exports: [StarsComponent],
-  imports: [
-    RouterModule.forChild([
-      { path: 'stars', component: StarsComponent }
-    ]),
-    createStarsModuleHooksImport()
-  ]
-})
-export class StarsModuleSync {}
-
-@NgModule({
-  declarations: [StarsComponent],
-  exports: [StarsComponent],
-  imports: [
-    RouterModule.forChild([
-      { path: '', component: StarsComponent }
-    ]),
-    createStarsModuleHooksImport()
-  ]
-})
-export class StarsModuleLazy {}

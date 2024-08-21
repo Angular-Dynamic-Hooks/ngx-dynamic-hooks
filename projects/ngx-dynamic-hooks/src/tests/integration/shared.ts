@@ -1,9 +1,5 @@
-import { ElementRef, Injector } from '@angular/core';
+import { ElementRef, Provider } from '@angular/core';
 import { TestBed, ComponentFixtureAutoDetect, TestBedStatic, ComponentFixture } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { DomSanitizer } from '@angular/platform-browser';
-
-import { first } from 'rxjs/operators';
 
 // Importing files through testing-api file here instead of their own paths.
 // This way, we can add easily add the testing-api file as an import to public-api if we want to
@@ -13,94 +9,67 @@ import { first } from 'rxjs/operators';
 // There is also no other way to test libraries with older ng-versions, as packagr did not exist back then.
 
 // Testing api resources
-import { DynamicHooksGlobalSettings, DynamicHooksModule, HookParserEntry } from '../testing-api';
+import { provideDynamicHooks, HookParserEntry, resetDynamicHooks, DynamicHooksComponent } from '../testing-api';
 
 // Custom testing resources
-import { OutletComponentWithProviders } from '../resources/components/OutletComponentWithProviders';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 import { MultiTagTestComponent } from '../resources/components/multiTagTest/multiTagTest.c';
-import { InlineTestComponent } from '../resources/components/inlineTest/inlineTest.c';
-import { TestService } from '../resources/services/testService';
-import { EnclosingCustomParser } from '../resources/parsers/enclosingCustomParser';
-import { NgContentTestParser } from '../resources/parsers/ngContentTestParser';
-import { ServiceTestParser } from '../resources/parsers/serviceTestParser';
+import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { GenericMultiTagStringParser } from '../resources/parsers/genericMultiTagStringParser';
+import { GenericWhateverStringParser } from '../resources/parsers/genericWhateverStringParser';
+import { GenericElementParser } from '../resources/parsers/genericElementParser';
+import { GenericWhateverElementParser } from '../resources/parsers/genericWhateverElementParser';
 
-
-export class MockElementRef {
-  nativeElement!: {};
-}
 
 // The standard parsers to be used for most tests
 export const testParsers: Array<HookParserEntry> = [
+  // Generic text hook parsers
+  GenericSingleTagStringParser,
+  GenericMultiTagStringParser,
+  GenericWhateverStringParser,
+  // Generic element hook parsers
+  GenericElementParser,
+  GenericWhateverElementParser,
+  // String SelectorHookParsers
   {
     component: SingleTagTestComponent,
-    name: 'SingleTagTestComponentParser',
+    selector: 'singletag-string-selector',
+    bracketStyle: {opening: '[', closing: ']'}, // Forces the use of StringSelectorHookParser
+    name: 'SingleTagStringSelectorParser',
     enclosing: false
   },
   {
     component: MultiTagTestComponent,
-    name: 'MultiTagTestComponentParser'
+    selector: 'multitag-string-selector',
+    bracketStyle: {opening: '[', closing: ']'}, // Forces the use of StringSelectorHookParser
+    name: 'MultiTagStringSelectorParser'
   },
+  // Element SelectorHookParsers
   {
-    component: InlineTestComponent,
-    name: 'InlineTestComponentParser',
+    component: MultiTagTestComponent,
+    selector: 'multitag-element-selector',
+    name: 'MultiTagElementSelectorParser'
   }
 ];
 
 export interface TestingModuleAndComponent {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<OutletComponentWithProviders>;
-  comp: OutletComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponent>;
+  comp: DynamicHooksComponent;
 }
 
 // A simple function to reset and prepare the testing module
-export function prepareTestingModule(parsers?: any, options?: any, extraComponents: Array<any> = []): TestingModuleAndComponent {
-  // Generate settings
-  const globalSettings: DynamicHooksGlobalSettings = {};
-  if (parsers) { globalSettings.globalParsers = parsers; }
-  if (options) { globalSettings.globalOptions = options; }
-
-  // Generate declarations
-  let declarations = [];
-  if (parsers) { declarations = declarations.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
-  declarations = declarations.concat(extraComponents);
-
-  // Generate entryComponents
-  let entryComponents: any = [];
-  if (parsers) { entryComponents = entryComponents.concat(...parsers.filter((entry: any) => typeof entry.component === 'function').map((entry: any) => entry.component)); }
-  entryComponents = entryComponents.concat(extraComponents);
-
+export function prepareTestingModule(providers: () => Provider[]): TestingModuleAndComponent {
   // Create testing module
-  DynamicHooksModule.reset();
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
-    imports: [
-      DynamicHooksModule.forRoot(globalSettings)
-    ],
-    declarations,
     providers: [
       {provide: ComponentFixtureAutoDetect, useValue: true}, // Enables automatic change detection in test module
-      {provide: ElementRef, useClass: MockElementRef},
-      TestService,
-      ServiceTestParser,
-      EnclosingCustomParser,
-      NgContentTestParser
+      ...providers()
     ]
-  })
-  .overrideModule(DynamicHooksModule, {
-    add: {
-      declarations: [OutletComponentWithProviders],
-      entryComponents: [OutletComponentWithProviders],
-      exports: [OutletComponentWithProviders]
-    }
-  })
-  .overrideModule(BrowserDynamicTestingModule, {
-    set: {
-      entryComponents
-    }
   });
 
-  const fixture = TestBed.createComponent(OutletComponentWithProviders);
+  const fixture = TestBed.createComponent(DynamicHooksComponent);
   return {
     testBed: TestBed,
     fixture,
@@ -110,44 +79,50 @@ export function prepareTestingModule(parsers?: any, options?: any, extraComponen
 
 export interface TestingModuleComponentAndContext {
   testBed: TestBedStatic;
-  fixture: ComponentFixture<OutletComponentWithProviders>;
-  comp: OutletComponentWithProviders;
+  fixture: ComponentFixture<DynamicHooksComponent>;
+  comp: DynamicHooksComponent;
   context: any;
 }
 
 export function defaultBeforeEach(): TestingModuleComponentAndContext {
-    const {testBed, fixture, comp} = prepareTestingModule(testParsers);
-    const context = {
-      parent: comp,
-      greeting: 'Hello there!',
-      order: 66,
-      maneuvers: {
-        modifyParent: (event: any) => (comp as any)['completelyNewProperty'] = event,
-        getMentalState: () => 'angry',
-        findAppropriateAction: (mentalState: any) => mentalState === 'angry' ? 'meditate' : 'protectDemocracy',
-        meditate: () => { return {action:'meditating!', state: 'calm'}; },
-        protectDemocracy: () => { return {action: 'hunting sith!', state: 'vigilant'}; },
-        attack: (enemy: any) => 'attacking ' + enemy + '!',
-        generateEnemy: (name: any) => { return {name: 'the evil ' + name, type: 'monster'}; },
-        defend: (person: any) => 'defending ' + person + '!',
-        readJediCode: () => 'dont fall in love with pricesses from naboo',
-        goIntoExile: () => 'into exile, i must go!',
-        combo: (param1: any, param2: any) => 'Combo: ' + param1 + ' and ' + param2
-      },
-      $lightSaberCollection: [
-        'blue', 'green', 'orange', 'purple'
-      ],
-      _jediCouncil: {
-        yoda900: 'there is no try',
-        windu: 'take a seat',
-        kenobi: 'wretched hive of scum and villainy',
-        kiAdiMundi: ['but', 'what', 'about', 'the', 'droid', 'attack', 'on', 'the', {
-          name: 'wookies',
-          planet: 'kashyyyk'
-        }],
-        skywalker: undefined
-      }
-    };
+  // Just in case
+  resetDynamicHooks();
 
-    return {testBed, fixture, comp, context};
+  const {testBed, fixture, comp} = prepareTestingModule(() => [
+    provideDynamicHooks({parsers: testParsers})
+  ]);
+  
+  const context = {
+    parent: comp,
+    greeting: 'Hello there!',
+    order: 66,
+    maneuvers: {
+      modifyParent: (event: any) => (comp as any)['completelyNewProperty'] = event,
+      getMentalState: () => 'angry',
+      findAppropriateAction: (mentalState: any) => mentalState === 'angry' ? 'meditate' : 'protectDemocracy',
+      meditate: () => { return {action:'meditating!', state: 'calm'}; },
+      protectDemocracy: () => { return {action: 'hunting sith!', state: 'vigilant'}; },
+      attack: (enemy: any) => 'attacking ' + enemy + '!',
+      generateEnemy: (name: any) => { return {name: 'the evil ' + name, type: 'monster'}; },
+      defend: (person: any) => 'defending ' + person + '!',
+      readJediCode: () => 'dont fall in love with pricesses from naboo',
+      goIntoExile: () => 'into exile, i must go!',
+      combo: (param1: any, param2: any) => 'Combo: ' + param1 + ' and ' + param2
+    },
+    $lightSaberCollection: [
+      'blue', 'green', 'orange', 'purple'
+    ],
+    _jediCouncil: {
+      yoda900: 'there is no try',
+      windu: 'take a seat',
+      kenobi: 'wretched hive of scum and villainy',
+      kiAdiMundi: ['but', 'what', 'about', 'the', 'droid', 'attack', 'on', 'the', {
+        name: 'wookies',
+        planet: 'kashyyyk'
+      }],
+      skywalker: undefined
+    }
+  };
+
+  return {testBed, fixture, comp, context};
 }

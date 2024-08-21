@@ -1,7 +1,7 @@
-import { ComponentRef, Injector } from '@angular/core';
-import { OutletOptions } from '../lib/components/outlet/options/options';
+import { ComponentRef, EnvironmentInjector, Injector } from '@angular/core';
+import { ParseOptions } from './services/settings/options';
 import { Subscription } from 'rxjs';
-import { DetailedStringifyResult } from './utils/deepComparer';
+import { DetailedStringifyResult } from './services/utils/deepComparer';
 
 // Hook interfaces
 // ---------------------------------
@@ -20,12 +20,14 @@ export interface Hook {
     id: number;
     parser: HookParser;
     value: HookValue;
-    data: HookComponentData;
-    componentRef: ComponentRef<any>;
-    bindings: HookBindings;
-    previousBindings: PreviousHookBindings;
+    data: HookComponentData|null;
+    isLazy: boolean;
+    componentRef: ComponentRef<any>|null;
+    bindings: HookBindings|null;
+    previousBindings: PreviousHookBindings|null;
     dirtyInputs: Set<string>;
     outputSubscriptions: {[key: string]: Subscription};
+    htmlEventSubscriptions: {[key: string]: Subscription};
 }
 
 /**
@@ -37,53 +39,64 @@ export interface PreviousHookBindings {
 }
 export interface PreviousHookBinding {
     reference: any;
-    stringified: DetailedStringifyResult;
+    stringified: DetailedStringifyResult|null;
 }
 
 // Parser
 // --------------------------------------------
 
 /**
- * The baseline properties that each parser must have
+ * A HookParser tells the library how to find, create and update components in the content
  */
 export interface HookParser {
+
     /**
      * The name of the parser (used for black/whitelists)
      */
     name?: string;
 
     /**
-     * Returns the positions of all hooks in the content string.
+     * Returns the positions of all text hooks in a string.
      *
-     * This function is called once for each parser.
+     * Note: Each parser needs to implement either findHooks or findHookElements. The function is then called once for each parser.
      *
      * @param content - The content to search for hooks
      * @param context - The current context object
+     * @param options - The current ParseOptions
      */
-    findHooks(content: string, context: any): HookPosition[];
+    findHooks?(content: string, context: any, options: ParseOptions): HookPosition[];
+
+    /**
+     * Returns the elements that should serve as host elements for components in the content.
+     *
+     * Note: Each parser needs to implement either findHooks or findHookElements. The function is then called once for each parser.
+     *
+     * @param content - The content element to search for hooks (usually a standard HTMLElement)
+     * @param context - The current context object
+     * @param options - The current ParseOptions
+     */
+    findHookElements?(contentElement: any, context: any, options: ParseOptions): any[];
 
     /**
      * How to instantiate the component for this hook.
      *
-     * This function is called once for each hook.
-     *
      * @param hookId -  The unique id of this hook in the hookIndex
-     * @param hookValue - The hook as it appears in the text
+     * @param hookValue - The hook as it appears in the content
      * @param context - The current context object
      * @param childNodes - The current child nodes of this hook
+     * @param options - The current ParseOptions
      */
-    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: Element[]): HookComponentData;
+    loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData;
 
     /**
-     * Which @Inputs() to insert and which @Outputs() to register with the component of this hook.
-     *
-     * This function is called any time an update of the bindings is requested.
+     * Which inputs to insert and which outputs to register with the component of this hook.
      *
      * @param hookId - The unique id of this hook in the hookIndex
-     * @param hookValue - The hook as it appears in the text
+     * @param hookValue - The hook as it appears in the content
      * @param context - The current context object
+     * @param options - The current ParseOptions
      */
-    getBindings(hookId: number, hookValue: HookValue, context: any): HookBindings;
+    getBindings(hookId: number, hookValue: HookValue, context: any, options: ParseOptions): HookBindings;
 }
 
 
@@ -96,25 +109,29 @@ export interface HookParser {
 export interface HookPosition {
     openingTagStartIndex: number;
     openingTagEndIndex: number;
-    closingTagStartIndex?: number;
-    closingTagEndIndex?: number;
+    closingTagStartIndex?: number|null;
+    closingTagEndIndex?: number|null;
 }
 
 /**
- * The hook as it appears in the content string
+ * The hook as it appears in the content
  */
 export interface HookValue {
-    openingTag: string;
-    closingTag: string;
+    openingTag?: string|null;
+    closingTag?: string|null;
+    element?: any;
+    elementSnapshot?: any;
 }
 
 /**
- * Various data to instantiate the hook component with
+ * Several options to determine how to create the dynamic component
  */
 export interface HookComponentData {
     component: ComponentConfig;
+    hostElementTag?: string;
     injector?: Injector;
-    content?: Node[][];
+    environmentInjector?: EnvironmentInjector;
+    content?: any[][];
 }
 
 /**
@@ -128,7 +145,7 @@ export type ComponentConfig = (new(...args: any[]) => any) | LazyLoadComponentCo
 /**
  * A config object for a component that is supposed to be lazy-loaded (Ivy-feature)
  *
- * importPromise has to contain a function that returns the import promise for the component file (not the import promise itself!)
+ * importPromise has to be a function that returns the import promise for the component file (not the import promise itself!)
  * importName has to be the name of the component class to be imported
  *
  * Example:
@@ -155,8 +172,7 @@ export interface HookBindings {
 // ---------------------------------
 
 /**
- * An optional interface to give to dynamically loaded components that implement the
- * OnDynamicMount method
+ * An optional interface to give to dynamically loaded components that implement the OnDynamicMount method
  *
  * onDynamicMount is called exactly once per component as soon as all components have rendered.
  * Its data parameter contains the current context object and all DynamicContentChildren of the
@@ -168,8 +184,7 @@ export interface OnDynamicMount {
 }
 
 /**
- * An optional interface to give to dynamically loaded components that implement the
- * OnDynamicChanges method
+ * An optional interface to give to dynamically loaded components that implement the OnDynamicChanges method
  *
  * onDynamicChanges is called whenever either the context object or the DynamicContentChildren of the
  * component change. Its data parameter only contains the value that changed.
@@ -196,21 +211,30 @@ export interface OnDynamicData {
  */
 export interface DynamicContentChild {
     componentRef: ComponentRef<any>;
-    componentSelector: string;
-    contentChildren: Array<DynamicContentChild>;
+    contentChildren: DynamicContentChild[];
     hookValue: HookValue;
 }
 
-// Other
+// Parsing interfaces
 // ---------------------------------
 
-export interface OutletParseResult {
-    element: HTMLElement;
+/**
+ * Represents the result of a hook parsing process. Contains useful bits of info about it.
+ */
+export interface ParseResult {
+    element: any;
     hookIndex: HookIndex;
-    resolvedParsers: HookParser[];
-    resolvedOptions: OutletOptions;
+    context: any;
+    usedParsers: HookParser[];
+    usedOptions: ParseOptions;
+    usedInjector: Injector;
+    usedEnvironmentInjector: EnvironmentInjector;
+    destroy: () => void;
 }
 
+/**
+ * Represents a single loaded dynamic component with some info about it.
+ */
 export interface LoadedComponent {
     hookId: number;
     hookValue: HookValue;

@@ -1,12 +1,12 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, OnChanges, ChangeDetectorRef, DoCheck } from '@angular/core';
 import { DynamicContentChild, OnDynamicChanges, OnDynamicMount, OnDynamicData } from '../../../testing-api';
-import { TestService } from '../../services/testService';
 
 
 @Component({
-  selector: 'dynhooks-ngcontenttest',
+  selector: 'ngcontenttest',
   templateUrl: './ngContentTest.c.html',
-  styleUrls: ['./ngContentTest.c.scss']
+  styleUrls: ['./ngContentTest.c.scss'],
+  standalone: true
 })
 export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges {
   mountContext: any;
@@ -14,7 +14,7 @@ export class NgContentTestComponent implements OnDynamicMount, OnDynamicChanges 
   changesContext: any;
   changesContentChildren!: Array<DynamicContentChild>;
 
-  constructor(private cd: ChangeDetectorRef, private testService: TestService) {
+  constructor(private cd: ChangeDetectorRef) {
   }
 
   onDynamicMount(data: OnDynamicData) {

@@ -5,10 +5,12 @@ import { ChildTestComponent } from './childTest/childTest.c';
 export const BLUBBSERVICETOKEN = new InjectionToken<any>('the token for the blubb service');
 
 @Component({
-  selector: 'dynhooks-parenttest',
+  selector: 'parenttest',
   templateUrl: './parentTest.c.html',
   styleUrls: ['./parentTest.c.scss'],
-  providers: [{provide: BLUBBSERVICETOKEN, useValue: { name: 'blubb' } }]
+  imports: [ChildTestComponent],
+  providers: [{provide: BLUBBSERVICETOKEN, useValue: { name: 'blubb' } }],
+  standalone: true
 })
 export class ParentTestComponent implements DoCheck, OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild(ChildTestComponent) childTestComponent: any;

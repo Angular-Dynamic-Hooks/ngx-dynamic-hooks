@@ -4,6 +4,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2024-08-21
+### Added
+- Feat: Switch to standalone components architecture
+- Feat: Addded simpler signatures to use the library, including just passing in the component class
+- Feat: Added the ability to pass use a HTML element as the content input
+- Feat: Added element hooks (components can now be loaded into HTML elements instead of just replacing text)
+- Feat: Introduced Standalone mode. Load components into arbitrary HTML without an Angular app.
+- Feat: Made PlatformService work during SSR by default
+- Feat: Added DynamicSingleComponent for loading just one component dynamically
+- Feat: Cleaned up and added 100+ new tests
+- Many more minor improvements and modernizations all around the library
+
+### Changed 
+- Refactor: Combined provideDynamicHooks and provideDynamicHooksForChild
+- Refactor: Registering global settings (via provideDynamicHooks) is now optional
+- Refactor: Moved CI flow to Github Actions
+
+### Misc
+- New website: https://angular-dynamic-hooks.com/
+
+
+## [2.1.2] - 2024-08-21
+### Added
+- Fix: Content slot elements should no longer appear as component children after rendering is done
+
 ## [2.1.1] - 2024-04-16
 ### Added
 - Fix: Resolved errors caused by lazily-loaded dynamic components when using SSR
@@ -101,7 +126,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.2...v3.0.0
+[2.1.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6

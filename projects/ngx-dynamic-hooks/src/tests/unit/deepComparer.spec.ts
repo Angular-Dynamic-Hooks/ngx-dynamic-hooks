@@ -1,3 +1,4 @@
+import { Logger } from '../../lib/services/utils/logger';
 import { DeepComparer } from '../testing-api';
 
 /**
@@ -5,7 +6,8 @@ import { DeepComparer } from '../testing-api';
  */
 describe('DeepComparer', () => {
   let deepComparer: DeepComparer;
-  beforeEach(() => { deepComparer = new DeepComparer(); });
+
+  beforeEach(() => { deepComparer = new DeepComparer(new Logger('browser')); });
 
   it('#should be able to stringify simple numbers', () => {
     expect(deepComparer.detailedStringify(123456).result).toBe('123456');

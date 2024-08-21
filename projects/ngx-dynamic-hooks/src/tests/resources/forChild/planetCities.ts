@@ -1,7 +1,6 @@
-import { Component, ElementRef, Inject, ModuleWithProviders } from '@angular/core';
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { DynamicHooksModule, DynamicHooksInheritance } from '../../testing-api';
+import { Component, ElementRef, Inject, Optional } from '@angular/core';
+import { Route } from '@angular/router';
+import { DYNAMICHOOKS_ALLSETTINGS, DynamicHooksComponent, DynamicHooksSettings, DynamicHooksInheritance, DynamicHooksService, allSettings, provideDynamicHooks } from '../../testing-api';
 import { CONTENT_STRING } from './contentString';
 
 @Component({
@@ -11,50 +10,58 @@ import { CONTENT_STRING } from './contentString';
 export class DynamicPlanetCitiesComponent {}
 
 @Component({
+  selector: 'app-dynamicplanetcities-elementinjector',
+  template: `<div class="speciesDynamic">DYNAMIC PLANET CITIES FROM ELEMENTINJECTOR COMPONENT</div>`
+})
+export class DynamicPlanetCitiesElementInjectorComponent {}
+
+export const planetCitiesComponentProviderSettings = {
+  parsers: [
+    {component: DynamicPlanetCitiesElementInjectorComponent}
+  ],
+  // inheritance: DynamicHooksInheritance.Linear <-- Should be default
+};
+
+@Component({
   selector: 'app-planetcities',
+  imports: [DynamicHooksComponent],
   template: `<div class="cities">
     Planet cities component exists
     <ngx-dynamic-hooks [content]="contentString.value"></ngx-dynamic-hooks>
-  </div>`
+  </div>`,
+  standalone: true,
+  providers: [
+    provideDynamicHooks(planetCitiesComponentProviderSettings)
+  ]
 })
 export class PlanetCitiesComponent {
   constructor(
     public hostElement: ElementRef,
-    @Inject(CONTENT_STRING) public contentString
+    @Inject(CONTENT_STRING) public contentString: any,
+    public dynamicHooksService: DynamicHooksService
   ) {}
 }
 
-export function createPlanetCitiesModuleHooksImport(): ModuleWithProviders<DynamicHooksModule> {
-  return DynamicHooksModule.forChild({
-    globalParsers: [
-      {component: DynamicPlanetCitiesComponent}
-    ],
-    globalOptions: {
-      sanitize: false
-    },
-    lazyInheritance: DynamicHooksInheritance.Linear
-  });
+
+export const getPlanetCitiesRoutes: () => Route[] = () => {
+  // Due to component-level providers being immediately loaded once its esmodule is imported anywhere, they can't be easily reset for testing.
+  // This is a problem for adding the component-level hook config to allSettings for each new test. However, we can simulate this by checking here
+  // and adding it manually, if its missing.
+  if (!allSettings.includes(planetCitiesComponentProviderSettings)) {
+    allSettings.push(planetCitiesComponentProviderSettings);
+    console.log('Missing DynamicPlanetCitiesElementInjectorComponent from allSettings. Re-adding...');
+  }
+
+  return [
+    { path: '', component: PlanetCitiesComponent, providers: [
+      provideDynamicHooks({
+        parsers: [
+          {component: DynamicPlanetCitiesComponent}
+        ],
+        options: {
+          sanitize: false
+        }        
+      })
+    ]}
+  ];
 }
-
-@NgModule({
-  declarations: [PlanetCitiesComponent],
-  exports: [PlanetCitiesComponent],
-  imports: [
-    createPlanetCitiesModuleHooksImport()
-  ]
-})
-export class PlanetCitiesModuleSync {}
-
-@NgModule({
-  declarations: [PlanetCitiesComponent],
-  exports: [PlanetCitiesComponent],
-  imports: [
-    RouterModule.forChild([
-      { path: '', component: PlanetCitiesComponent }
-    ]),
-    createPlanetCitiesModuleHooksImport()
-  ]
-})
-export class PlanetCitiesModuleLazy {}
-
-
