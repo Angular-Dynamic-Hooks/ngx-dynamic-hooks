@@ -4,6 +4,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2024-08-21
+### Added
+- Feat: Switch to standalone components architecture
+- Feat: Addded simpler signatures to use the library, including just passing in the component class
+- Feat: Added the ability to pass use a HTML element as the content input
+- Feat: Added element hooks (components can now be loaded into HTML elements instead of just replacing text)
+- Feat: Introduced Standalone mode. Load components into arbitrary HTML without an Angular app.
+- Feat: Made PlatformService work during SSR by default
+- Feat: Added DynamicSingleComponent for loading just one component dynamically
+- Feat: Cleaned up and added 100+ new tests
+- Many more minor improvements and modernizations all around the library
+
+### Changed 
+- Refactor: Combined provideDynamicHooks and provideDynamicHooksForChild
+- Refactor: Registering global settings (via provideDynamicHooks) is now optional
+- Refactor: Moved CI flow to Github Actions
+
+### Misc
+- New website: https://angular-dynamic-hooks.com/
+
+
+## [2.1.2] - 2024-08-21
+### Added
+- Fix: Content slot elements should no longer appear as component children after rendering is done
+
 ## [2.1.1] - 2024-04-16
 ### Added
 - Fix: Resolved errors caused by lazily-loaded dynamic components when using SSR
@@ -101,26 +126,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.1.1...HEAD
-[2.1.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.1.0...v2.1.1
-[2.1.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.6...v2.1.0
-[2.0.6]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6
-[2.0.5]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
-[2.0.4]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4
-[2.0.3]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.2...v2.0.3
-[2.0.2]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.1...v2.0.2
-[2.0.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v2.0.0...v2.0.1
-[2.0.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.7.2...v2.0.0
-[1.7.2]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
-[1.7.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1
-[1.7.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.6.0...v1.7.0
-[1.6.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.5.1...v1.6.0
-[1.5.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.5.0...v1.5.1
-[1.5.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.4.1...v1.5.0
-[1.4.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.2.1...v1.3.0
-[1.2.1]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/releases/tag/v1.0.0
+[Unreleased]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.2...v3.0.0
+[2.1.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.1...v2.1.2
+[2.1.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.1.0...v2.1.1
+[2.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.6...v2.1.0
+[2.0.6]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.5...v2.0.6
+[2.0.5]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.4...v2.0.5
+[2.0.4]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.2...v2.0.3
+[2.0.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.2...v2.0.0
+[1.7.2]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.1...v1.7.2
+[1.7.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.7.0...v1.7.1
+[1.7.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.2.1...v1.3.0
+[1.2.1]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/MTobisch/ngx-dynamic-hooks/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/MTobisch/ngx-dynamic-hooks/releases/tag/v1.0.0
