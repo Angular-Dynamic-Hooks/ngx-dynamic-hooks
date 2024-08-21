@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.1.2] - 2024-08-21
+### Added
+- Fix: Content slot elements should no longer appear as component children after rendering is done
+
 ## [2.1.1] - 2024-04-16
 ### Added
 - Fix: Resolved errors caused by lazily-loaded dynamic components when using SSR

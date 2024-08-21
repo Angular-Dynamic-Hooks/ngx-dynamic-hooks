@@ -5,10 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-npm": "ng build --configuration production && cp ./README.md ./dist/ngx-dynamic-hooks/README.md",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "ci:build": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
     "ci:test": "ng test --no-watch --no-progress --browsers=ChromeHeadlessCI --code-coverage",
     "ci:reportCoverage": "codecov"
   },
