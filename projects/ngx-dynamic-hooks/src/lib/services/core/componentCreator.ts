@@ -50,7 +50,9 @@ export class ComponentCreator {
       return allComponentsLoaded;
     }
 
-    // Check anchor elements in order of appearance and prepare loading components
+    // Check anchor elements prepare loading components
+    // Note: Loop queried anchor elements instead of hookIndex entries as it will be in order of appearance, allowing for subsequent ones 
+    // to potentially be skipped when overwritten by custom ng-content
     for (let anchorElement of this.platformService.querySelectorAll(contentElement, `[${anchorAttrHookId}][${anchorAttrParseToken}]`)) {
       const hookId = parseInt(this.platformService.getAttribute(anchorElement, anchorAttrHookId)!);
       
