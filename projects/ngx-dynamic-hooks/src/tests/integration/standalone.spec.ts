@@ -1,5 +1,5 @@
 // Testing api resources
-import { AutoPlatformService, PlatformService, anchorElementTag, parse, provideDynamicHooks, resetDynamicHooks } from '../testing-api';
+import { AutoPlatformService, PlatformService, anchorElementTag, parse, provideDynamicHooks, resetDynamicHooks, HookParserEntry } from '../testing-api';
 
 // Custom testing resources
 import { ChangeDetectorRef, Injector, NgZone } from '@angular/core';
@@ -9,8 +9,6 @@ import { createProviders, destroyAll } from '../../lib/standalone';
 import { createApplication } from '@angular/platform-browser';
 import { RootTestService } from '../resources/services/rootTestService';
 import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
-import { HookParserEntry } from 'ngx-dynamic-hooks';
-import { fakeAsync, tick } from '@angular/core/testing';
 
 const getService = (injector: Injector, token: any) => {
   try {
