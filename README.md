@@ -6,14 +6,13 @@
 [![Coverage](https://img.shields.io/codecov/c/gh/angular-dynamic-hooks/ngx-dynamic-hooks?style=flat-square)](https://codecov.io/gh/angular-dynamic-hooks/ngx-dynamic-hooks)
 [![NPM](https://img.shields.io/npm/v/ngx-dynamic-hooks?color=orange&style=flat-square)](https://www.npmjs.com/package/ngx-dynamic-hooks)
 [![License](https://img.shields.io/github/license/angular-dynamic-hooks/ngx-dynamic-hooks?color=blue&style=flat-square)](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/blob/master/LICENSE.md)
-[![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)
-](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
+[![Static Badge](https://img.shields.io/badge/Donate%20-%20Thank%20you!%20-%20%23ff8282?style=flat-square)](https://www.paypal.com/donate/?hosted_button_id=3XVSEZKNQW8HC)
 
-Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as html strings (similar to a "dynamic" template) or even already-existing html trees. 
+Angular Dynamic Hooks allows you to load Angular components into dynamic content, such as HTML strings (similar to a "dynamic" template) or even already-existing HTML structures. 
 
-Works as part of an Angular app or fully standalone. Load components by selectors or **any text pattern**. No JiT-compiler required - [just install and go](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/quickstart).
+Works as part of an Angular app or fully standalone. Load components by selectors or **any text pattern**. No JiT-compiler required - [just install and go](https://angular-dynamic-hooks.com/guide/quickstart).
 
-![ngx-dynamic-hooks-optimize](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
+![A short animated gif showing how to use the Angular Dynamic Hooks library to load components](https://github.com/angular-dynamic-hooks/ngx-dynamic-hooks/assets/12670925/ef27d405-4663-48a5-97b5-ca068d7b67d8)
 
 # Installation
 
@@ -63,7 +62,7 @@ That's it! If `<app-example>` is the selector of `ExampleComponent`, it will aut
 
 # Documentation
 
-Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://mtobisch.github.io/ngx-dynamic-hooks/documentation/) to find out how to tailor the library to your exact needs. Highlights include:
+Please note that the above is a very minimal example and that there are plenty more features and options available to you. [Check out the docs](https://angular-dynamic-hooks.com/guide/) to find out how to tailor the library to your exact needs. Highlights include:
 
 * ⭐ Loads fully-functional Angular components into dynamic content
 * 📖 Parses both strings and HTML structures
