@@ -140,6 +140,7 @@ export class ParserEntryResolver {
    */
   private createSelectorHookParser(config: SelectorHookParserConfig): HookParser {
     if (
+      (config.hasOwnProperty('parseWithRegex') && config.parseWithRegex) || 
       (config.hasOwnProperty('enclosing') && !config.enclosing) || 
       (config.hasOwnProperty('bracketStyle') && config.bracketStyle)
     ) {

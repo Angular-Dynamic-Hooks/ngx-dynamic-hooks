@@ -69,6 +69,11 @@ describe('SelectorHookParserConfig', () => {
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "hostElementTag" property in the SelectorHookParserConfig must be of type string, was boolean'));
 
+    // Wrong parseWithRegex type
+    config = { component: SingleTagTestComponent, parseWithRegex: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "parseWithRegex" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
     // Wrong enclosing type
     config = { component: SingleTagTestComponent, enclosing: 'true' };
     expect(() => configResolver.processConfig(config as any))
@@ -158,6 +163,7 @@ describe('SelectorHookParserConfig', () => {
     expect(getParserFor({...c, hostElementTag: 'asd'})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, injector: TestBed.inject(Injector)})).toBe(ElementSelectorHookParser);
     expect(getParserFor({...c, environmentInjector: TestBed.inject(EnvironmentInjector)})).toBe(ElementSelectorHookParser);
+    expect(getParserFor({...c, parseWithRegex: true})).toBe(TextSelectorHookParser);
     expect(getParserFor({...c, enclosing: false})).toBe(TextSelectorHookParser);
     expect(getParserFor({...c, bracketStyle: {opening: '[', closing: ']'}})).toBe(TextSelectorHookParser);
     expect(getParserFor({...c, parseInputs: false})).toBe(ElementSelectorHookParser);

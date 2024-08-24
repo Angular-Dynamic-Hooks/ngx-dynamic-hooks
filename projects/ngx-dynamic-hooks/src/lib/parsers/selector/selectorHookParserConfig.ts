@@ -36,6 +36,11 @@ export interface SelectorHookParserConfig {
     environmentInjector?: EnvironmentInjector;
 
     /**
+     * Whether to use regular expressions rather than HTML/DOM-based methods to find the hook elements
+     */
+    parseWithRegex?: boolean;
+
+    /**
      * Whether the selector is enclosing (`<hook>...</hook>`) or not (`<hook>`).
      */
     enclosing?: boolean;
@@ -95,6 +100,7 @@ export type SelectorHookParserConfigDefaults = Omit<SelectorHookParserConfig, 'c
 export const selectorHookParserConfigDefaults: SelectorHookParserConfigDefaults = {
     component: undefined,
     name: undefined,
+    parseWithRegex: false,
     selector: undefined,
     hostElementTag: undefined,
     injector: undefined,

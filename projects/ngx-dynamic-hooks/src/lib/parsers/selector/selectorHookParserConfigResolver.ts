@@ -68,6 +68,12 @@ export class SelectorHookParserConfigResolver {
       parserConfig.environmentInjector = userParserConfig.environmentInjector;
     }
 
+    // parseWithRegex
+    if (userParserConfig.hasOwnProperty('parseWithRegex')) {
+      if (typeof userParserConfig.parseWithRegex !== 'boolean') { throw Error('The submitted "parseWithRegex" property in the SelectorHookParserConfig must be of type boolean, was ' + typeof userParserConfig.parseWithRegex); }
+      parserConfig.parseWithRegex = userParserConfig.parseWithRegex;
+    }
+
     // enclosing
     if (userParserConfig.hasOwnProperty('enclosing')) {
       if (typeof userParserConfig.enclosing !== 'boolean') { throw Error('The submitted "enclosing" property in the SelectorHookParserConfig must be of type boolean, was ' + typeof userParserConfig.enclosing); }
