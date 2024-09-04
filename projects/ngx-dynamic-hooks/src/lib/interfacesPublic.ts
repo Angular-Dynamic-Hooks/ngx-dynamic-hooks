@@ -137,22 +137,27 @@ export interface HookComponentData {
 /**
  * A config object describing the component that is supposed to be loaded for this Hook
  *
- * Can be either the component class itself or a LazyLoadComponentConfig, if the component
- * should be lazy-loaded (Ivy-feature)
+ * Can be either:
+ * - The component class itself
+ * - A function that returns a promise with the component class
+ * - An explicit LazyLoadComponentConfig
  */
-export type ComponentConfig = (new(...args: any[]) => any) | LazyLoadComponentConfig;
+export type ComponentConfig = (new(...args: any[]) => any) | (() => Promise<(new(...args: any[]) => any)>) | LazyLoadComponentConfig;
 
 /**
- * A config object for a component that is supposed to be lazy-loaded (Ivy-feature)
+ * An explicit config object for a component that is supposed to be lazy-loaded. 
  *
- * importPromise has to be a function that returns the import promise for the component file (not the import promise itself!)
- * importName has to be the name of the component class to be imported
+ * - importPromise has to be a function that returns the import promise for the component file (not the import promise itself!)
+ * - importName has to be the name of the component class to be imported
  *
  * Example:
  * {
  *   importPromise: () => import('./someComponent/someComponent.c'),
  *   importName: 'SomeComponent'
  * }
+ * 
+ * Note: This mostly exists for backwards-compatibility. Lazy-loading components is easier accomplished by using a function 
+ * that returns a promise with the component class in the component field of HookComponentData
  */
 export interface LazyLoadComponentConfig {
     importPromise: () => Promise<any>;

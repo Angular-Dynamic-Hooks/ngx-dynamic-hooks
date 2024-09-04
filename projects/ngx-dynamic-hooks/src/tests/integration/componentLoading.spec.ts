@@ -3,7 +3,7 @@ import { ComponentFixtureAutoDetect, TestBed, fakeAsync, tick } from '@angular/c
 import { first } from 'rxjs/operators';
 
 // Testing api resources
-import { DynamicHooksComponent, LoadedComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag, provideDynamicHooks } from '../testing-api';
+import { ComponentConfig, DynamicHooksComponent, LoadedComponent, anchorAttrHookId, anchorAttrParseToken, anchorElementTag, provideDynamicHooks } from '../testing-api';
 
 // Custom testing resources
 import { defaultBeforeEach, prepareTestingModule, testParsers } from './shared';
@@ -45,7 +45,7 @@ describe('Component loading', () => {
   it('#should ensure the passed componentConfig is correct', () => {
     // Load with nonsensical componentConfig
     expect(() => comp['dynamicHooksService']['componentCreator'].loadComponentClass(true as any))
-      .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig'));
+      .toThrow(new Error('The "component" property of a returned HookData object must either contain the component class, a function that returns a promise with the component class or an explicit LazyLoadComponentConfig'));
   });
 
   it('#should be able to load module components', () => {
@@ -531,122 +531,132 @@ describe('Component loading', () => {
   });
 
   it('#should lazy-load components', fakeAsync(() => {
-    const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
-    genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
-      return {
-        inputs: {
-          numberProp: 4
+
+    const testLazyLoading = (lazyCompConfig: ComponentConfig) => {
+
+      const genericMultiTagParser = TestBed.inject(GenericMultiTagStringParser);
+      genericMultiTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            numberProp: 4
+          }
         }
       }
+
+      const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
+      genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            numberProp: 87
+          }
+        }
+      }
+
+      // Whatever parsers lazy-loads a component for this test
+      const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
+      genericWhateverParser.component = lazyCompConfig;
+      genericWhateverParser.onGetBindings = (hookId, hookValue, context) => {
+        return {
+          inputs: {
+            name: 'sleepy'
+          }
+        }
+      }
+
+      const testText = `
+        <p>
+          A couple of components:
+          [multitag-string]
+            [whatever-string][/whatever-string]
+          [/multitag-string]
+          [singletag-string]
+        </p>
+      `;
+
+      comp.content = testText;
+      comp.context = context;
+      let loadedComponents: LoadedComponent[] = [];
+      comp.componentsLoaded.pipe(first()).subscribe((lc: any) => loadedComponents = lc);
+      comp.ngOnChanges({content: true, context: true} as any);
+
+      // Everything except the lazy-loaded component should be loaded
+      expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
+      expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);    
+      expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
+
+      expect(Object.values(comp.hookIndex).length).toBe(3);
+      expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+      expect(comp.hookIndex[2].componentRef).toBeNull();
+      expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
+
+      // Make sure that onDynamicChanges has triggered on component init
+      spyOn(comp.hookIndex[1].componentRef!.instance, 'onDynamicChanges').and.callThrough();
+      expect(comp.hookIndex[1].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(0);
+      expect(comp.hookIndex[1].componentRef!.instance.changesContext).toEqual(context);
+      expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren).toBeUndefined();
+
+      // Make sure that onDynamicMount has not yet triggered
+      spyOn(comp.hookIndex[1].componentRef!.instance, 'onDynamicMount').and.callThrough();
+      expect(comp.hookIndex[1].componentRef!.instance.onDynamicMount['calls'].count()).toBe(0);
+      expect(comp.hookIndex[1].componentRef!.instance.mountContext).toBeUndefined();
+      expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren).toBeUndefined();
+
+      // Also, componentsLoaded should not yet have triggered
+      expect(loadedComponents).toEqual([]);
+
+      // Wait for imports via fakeAsync()'s tick() that synchronously advances time for testing
+      // This didn't always work. Used to have to manually wait by using (done) => {} as the testing wrapper function isntead of faceAsync,
+      // then wait via setTimeout() and call done() when testing is finished. This had the disadvantage of actually having to wait for the timeout
+      tick(500);
+
+      // Lazy-loaded component should be loaded by now in anchor
+      expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
+      expect(fixture.nativeElement.querySelector('.lazy-component').parentElement.tagName).toBe(anchorElementTag.toUpperCase());
+      expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('LazyTestComponent');
+      expect(comp.hookIndex[2].componentRef!.instance.name).toBe('sleepy');
+
+      // Make sure that onDynamicChanges has triggered again (with contentChildren)
+      expect(comp.hookIndex[1].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(1);
+      expect(comp.hookIndex[1].componentRef!.instance.changesContext).toEqual(context);
+      expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren.length).toBe(1);
+      expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
+
+      // Make sure that onDynamicMount has triggered
+      expect(comp.hookIndex[1].componentRef!.instance.onDynamicMount['calls'].count()).toBe(1);
+      expect(comp.hookIndex[1].componentRef!.instance.mountContext).toEqual(context);
+      expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren.length).toBe(1);
+      expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
+
+      // ComponentsLoaded should have emitted now and contain the lazy-loaded component
+      expect(loadedComponents.length).toBe(3);
+
+      expect(loadedComponents[0].hookId).toBe(1);
+      expect(loadedComponents[0].hookValue).toEqual({openingTag: `[multitag-string]`, closingTag: `[/multitag-string]`, element: null, elementSnapshot: null});
+      expect(loadedComponents[0].hookParser).toBeDefined();
+      expect(loadedComponents[0].componentRef.instance.numberProp).toBe(4);
+
+      expect(loadedComponents[1].hookId).toBe(2);
+      expect(loadedComponents[1].hookValue).toEqual({openingTag: `[whatever-string]`, closingTag: `[/whatever-string]`, element: null, elementSnapshot: null});
+      expect(loadedComponents[1].hookParser).toBeDefined();
+      expect(loadedComponents[1].componentRef.instance.name).toBe('sleepy');
+
+      expect(loadedComponents[2].hookId).toBe(3);
+      expect(loadedComponents[2].hookValue).toEqual({openingTag: `[singletag-string]`, closingTag: null, element: null, elementSnapshot: null});
+      expect(loadedComponents[2].hookParser).toBeDefined();
+      expect(loadedComponents[2].componentRef.instance.numberProp).toBe(87);
     }
 
-    // Whatever parsers lazy-loads a component for this test
-    const genericWhateverParser = TestBed.inject(GenericWhateverStringParser);
-    genericWhateverParser.component = {
-      // Simulate that loading this component takes 100ms
-      importPromise: () => new Promise(resolve => setTimeout(() => {
-        resolve({LazyTestComponent: LazyTestComponent})
-      }, 100)),
+    // Test with function that returns promise with component class directly
+    testLazyLoading(() => 
+      new Promise(resolve => setTimeout(() => resolve({LazyTestComponent: LazyTestComponent}), 100))
+      .then((m: any) => m.LazyTestComponent))
+
+    // Test with explicit LazyLoadComponentConfig
+    testLazyLoading({
+      importPromise: () => new Promise(resolve => setTimeout(() => resolve({LazyTestComponent: LazyTestComponent}), 100)),
       importName: 'LazyTestComponent'
-    };
-    genericWhateverParser.onGetBindings = (hookId, hookValue, context) => {
-      return {
-        inputs: {
-          name: 'sleepy'
-        }
-      }
-    }
+    });
 
-    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
-    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
-      return {
-        inputs: {
-          numberProp: 87
-        }
-      }
-    }
-
-    const testText = `
-      <p>
-        A couple of components:
-        [multitag-string]
-          [whatever-string][/whatever-string]
-        [/multitag-string]
-        [singletag-string]
-      </p>
-    `;
-
-    comp.content = testText;
-    comp.context = context;
-    let loadedComponents: LoadedComponent[] = [];
-    comp.componentsLoaded.pipe(first()).subscribe((lc: any) => loadedComponents = lc);
-    comp.ngOnChanges({content: true, context: true} as any);
-
-    // Everything except the lazy-loaded component should be loaded
-    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('.lazy-component')).toBe(null);    
-    expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBe(null);
-
-    expect(Object.values(comp.hookIndex).length).toBe(3);
-    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
-    expect(comp.hookIndex[2].componentRef).toBeNull();
-    expect(comp.hookIndex[3].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-
-    // Make sure that onDynamicChanges has triggered on component init
-    spyOn(comp.hookIndex[1].componentRef!.instance, 'onDynamicChanges').and.callThrough();
-    expect(comp.hookIndex[1].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(0);
-    expect(comp.hookIndex[1].componentRef!.instance.changesContext).toEqual(context);
-    expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren).toBeUndefined();
-
-    // Make sure that onDynamicMount has not yet triggered
-    spyOn(comp.hookIndex[1].componentRef!.instance, 'onDynamicMount').and.callThrough();
-    expect(comp.hookIndex[1].componentRef!.instance.onDynamicMount['calls'].count()).toBe(0);
-    expect(comp.hookIndex[1].componentRef!.instance.mountContext).toBeUndefined();
-    expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren).toBeUndefined();
-
-    // Also, componentsLoaded should not yet have triggered
-    expect(loadedComponents).toEqual([]);
-
-    // Wait for imports via fakeAsync()'s tick() that synchronously advances time for testing
-    // This didn't always work. Used to have to manually wait by using (done) => {} as the testing wrapper function isntead of faceAsync,
-    // then wait via setTimeout() and call done() when testing is finished. This had the disadvantage of actually having to wait for the timeout
-    tick(500);
-
-    // Lazy-loaded component should be loaded by now in anchor
-    expect(fixture.nativeElement.querySelector('.lazy-component')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('.lazy-component').parentElement.tagName).toBe(anchorElementTag.toUpperCase());
-    expect(comp.hookIndex[2].componentRef!.instance.constructor.name).toBe('LazyTestComponent');
-    expect(comp.hookIndex[2].componentRef!.instance.name).toBe('sleepy');
-
-    // Make sure that onDynamicChanges has triggered again (with contentChildren)
-    expect(comp.hookIndex[1].componentRef!.instance.onDynamicChanges['calls'].count()).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.changesContext).toEqual(context);
-    expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren.length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.changesContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
-
-    // Make sure that onDynamicMount has triggered
-    expect(comp.hookIndex[1].componentRef!.instance.onDynamicMount['calls'].count()).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.mountContext).toEqual(context);
-    expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren.length).toBe(1);
-    expect(comp.hookIndex[1].componentRef!.instance.mountContentChildren[0].componentRef.location.nativeElement.tagName).toBe(anchorElementTag.toUpperCase());
-
-    // ComponentsLoaded should have emitted now and contain the lazy-loaded component
-    expect(loadedComponents.length).toBe(3);
-
-    expect(loadedComponents[0].hookId).toBe(1);
-    expect(loadedComponents[0].hookValue).toEqual({openingTag: `[multitag-string]`, closingTag: `[/multitag-string]`, element: null, elementSnapshot: null});
-    expect(loadedComponents[0].hookParser).toBeDefined();
-    expect(loadedComponents[0].componentRef.instance.numberProp).toBe(4);
-
-    expect(loadedComponents[1].hookId).toBe(2);
-    expect(loadedComponents[1].hookValue).toEqual({openingTag: `[whatever-string]`, closingTag: `[/whatever-string]`, element: null, elementSnapshot: null});
-    expect(loadedComponents[1].hookParser).toBeDefined();
-    expect(loadedComponents[1].componentRef.instance.name).toBe('sleepy');
-
-    expect(loadedComponents[2].hookId).toBe(3);
-    expect(loadedComponents[2].hookValue).toEqual({openingTag: `[singletag-string]`, closingTag: null, element: null, elementSnapshot: null});
-    expect(loadedComponents[2].hookParser).toBeDefined();
-    expect(loadedComponents[2].componentRef.instance.numberProp).toBe(87);
   }));
   
   it('#should check that the "importPromise"-field of lazy-loaded parsers is not the promise itself', () => {

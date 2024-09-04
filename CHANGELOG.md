@@ -4,9 +4,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [3.0.1] - 2023-03-15
+## [3.0.2] - 2024-09-04
 ### Maintenance
-- Fix: Added manual toggle in SelectorHookParserConfig to revert to regex-based parsing for selector hooks to improved backwards-compatibility
+- Refactor: Added simpler way to configure lazily-loading components by using a function that return the component class directly
+
+## [3.0.1] - 2024-08-30
+### Maintenance
+- Fix: Added manual toggle in SelectorHookParserConfig to revert to regex-based parsing for selector hooks to improve backwards-compatibility
 
 ## [3.0.0] - 2024-08-21
 ### Added

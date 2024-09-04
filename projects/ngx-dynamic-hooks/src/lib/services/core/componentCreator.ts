@@ -277,25 +277,31 @@ export class ComponentCreator {
   loadComponentClass(componentConfig: ComponentConfig): ReplaySubject<new(...args: any[]) => any> {
     const componentClassLoaded: ReplaySubject<new(...args: any[]) => any> = new ReplaySubject(1);
 
-    // a) If is normal class
+    // a) If is component class
     if (componentConfig.hasOwnProperty('prototype')) {
       componentClassLoaded.next(componentConfig as (new(...args: any[]) => any));
 
-    // b) If is LazyLoadComponentConfig
+    // c) If is function that returns promise with component class
+    } else if (typeof componentConfig === 'function') {
+      (componentConfig as (() => Promise<(new(...args: any[]) => any)>))().then(compClass => {
+        componentClassLoaded.next(compClass);
+      })
+
+    // c) If is LazyLoadComponentConfig
     } else if (componentConfig.hasOwnProperty('importPromise') && componentConfig.hasOwnProperty('importName')) {
       // Catch typical importPromise error
       if ((componentConfig as LazyLoadComponentConfig).importPromise instanceof Promise) {
         throw Error(`When lazy-loading a component, the "importPromise"-field must contain a function returning the import-promise, but it contained the promise itself.`);
       }
 
-      (componentConfig as LazyLoadComponentConfig).importPromise().then((m) =>  {
+      (componentConfig as LazyLoadComponentConfig).importPromise().then((m) => {
         const importName = (componentConfig as LazyLoadComponentConfig).importName;
         const compClass = Object.prototype.hasOwnProperty.call(m, importName) ? m[importName] : m['default'];
         componentClassLoaded.next(compClass);
       });
 
     } else {
-      throw Error('The "component" property of a returned HookData object must either contain the component class or a LazyLoadComponentConfig');
+      throw Error('The "component" property of a returned HookData object must either contain the component class, a function that returns a promise with the component class or an explicit LazyLoadComponentConfig');
     }
 
     return componentClassLoaded;
