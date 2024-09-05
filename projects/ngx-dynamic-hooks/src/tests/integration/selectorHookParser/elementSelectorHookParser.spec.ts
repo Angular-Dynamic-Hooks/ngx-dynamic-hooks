@@ -498,7 +498,6 @@ describe('ElementSelectorHookParser', () => {
 
     const loadedComp = comp.hookIndex[1].componentRef!.instance;
     
-    expect(Object.keys(loadedComp.latestNgOnChangesData)).toEqual(['numberProp', 'simpleObject']);
     expect(loadedComp.id).toBeUndefined();
     expect(loadedComp.class).toBeUndefined();
     expect(loadedComp.numberProp).toBe(123);

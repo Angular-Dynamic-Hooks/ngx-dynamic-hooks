@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.3] - 2024-09-05
+### Maintenance
+- Fix: Change detection is now manually triggered when dynamic component inputs change in zoneless mode with OnPush strategy
+
 ## [3.0.2] - 2024-09-04
 ### Maintenance
 - Refactor: Added simpler way to configure lazily-loading components by using a function that return the component class directly
@@ -134,7 +138,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.3...HEAD
+[3.0.3]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v2.1.2...v3.0.0
 [2.1.2]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v2.1.1...v2.1.2
