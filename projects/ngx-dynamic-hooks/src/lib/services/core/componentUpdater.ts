@@ -158,8 +158,11 @@ export class ComponentUpdater {
 
     // Set inputs in component
     for (const {propName, templateName, value} of existingInputs) {
-      if (templateName) hook.componentRef?.setInput(templateName, value);   // Sets property, triggers OnChanges and marks for OnPush
-      if (propName) hook.componentRef!.instance[propName] = value;          // Manual setting of input for acceptInputsForAnyProperty
+      if (templateName) {
+        hook.componentRef?.setInput(templateName, value);             // Official method to set inputs. Sets property, triggers OnChanges and marks for OnPush. Also works with new signal inputs.
+      } else if (propName) {
+        hook.componentRef!.instance[propName] = value;                // Resort to manual setting only if prop isn't a declared input (may happen with "acceptInputsForAnyProperty")
+      }
     }
 
     // Important: Still need to trigger cd, even with componentRef.setInput

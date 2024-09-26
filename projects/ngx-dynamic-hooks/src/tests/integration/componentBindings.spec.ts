@@ -3,6 +3,7 @@ import { defaultBeforeEach } from './shared';
 import { TestBed, TestBedStatic } from '@angular/core/testing';
 import { DynamicHooksComponent, DynamicHooksService } from '../testing-api';
 import { GenericSingleTagStringParser } from '../resources/parsers/genericSingleTagStringParser';
+import { SingleTagTestComponent } from '../resources/components/singleTag/singleTagTest.c';
 
 describe('Component bindings', () => {
   let testBed: TestBedStatic;
@@ -40,6 +41,28 @@ describe('Component bindings', () => {
     const loadedComp = comp.hookIndex[1].componentRef!.instance;
     expect(loadedComp.numberProp).toBe(someNumber);
     expect(loadedComp.simpleObject).toBe(someObj);
+  });
+
+  it('#should also work with the newer signal inputs (ng17+)', () => {
+    const someObj = {randomProperty: "Hopefully, it also works with signal inputs!"};
+
+    const genericSingleTagParser = TestBed.inject(GenericSingleTagStringParser);
+    genericSingleTagParser.onGetBindings = (hookId, hookValue, context) => {
+      return {
+        inputs: {
+          signalInput: someObj
+        }
+      }
+    }
+
+    const testText = `Just some component: [singletag-string]">`;
+    comp.content = testText;
+    comp.context = context;
+    comp.ngOnChanges({content: true, context: true, options: true} as any);
+
+    const loadedComp = comp.hookIndex[1].componentRef!.instance as SingleTagTestComponent;
+    expect(loadedComp.signalInput).toBeInstanceOf(Function);
+    expect(loadedComp.signalInput()).toBe(someObj);
   });
 
   it('#should subscribe to outputs of dynamic components', () => {

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, Output, EventEmitter, Inject, DoCheck, Optional, InjectionToken, EnvironmentInjector, Injector, NgZone, input } from '@angular/core';
 import { DynamicContentChild, OnDynamicData, OnDynamicChanges, OnDynamicMount } from '../../testing-api';
 import { RootTestService } from '../services/rootTestService';
 import { GENERICINJECTIONTOKEN } from '../services/genericInjectionToken';
@@ -34,6 +34,7 @@ export class AbstractTestComponent implements OnDynamicMount, OnDynamicChanges, 
   @Input() nestedFunctions: any;
   @Input() nestedFunctionsInBrackets!: Array<any>;
   @Input() everythingTogether!: Array<any>;
+  signalInput = input();
   nonOutputEventEmitter: EventEmitter<number> = new EventEmitter();
   @Output() genericOutput: EventEmitter<number> = new EventEmitter();
   @Output() genericOtherOutput: EventEmitter<number> = new EventEmitter();
