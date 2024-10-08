@@ -48,6 +48,20 @@ export class TagHookFinder {
     return this.hookFinder.find(content, openingTagRegex, closingTagRegex, true, options);
   }
 
+  /**
+   * Finds self-closing Angular component selectors
+   *
+   * @param content - The content to parse
+   * @param selector - The Angular selector to find
+   * @param bracketStyle - What bracket style to use
+   * @param options - The current ParseOptions
+   */
+    findSelfClosingTags(content: string, selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, options: ParseOptions): HookPosition[] {
+      const selfClosingTagRegex = this.generateOpeningTagRegex(selector, bracketStyle, true);
+  
+      return this.hookFinder.find(content, selfClosingTagRegex, undefined, undefined, options);
+    }
+
   // Hook regex helper
   // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -57,13 +71,13 @@ export class TagHookFinder {
    * @param selector - The selector name
    * @param bracketStyle - What bracket style to use
    */
-  private generateOpeningTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}): RegExp {
+  private generateOpeningTagRegex(selector: string, bracketStyle: {opening: string, closing: string} = {opening: '<', closing: '>'}, selfClosing: boolean = false): RegExp {
     // Find opening tag of hook lazily
-    // Examples for this regex: https://regex101.com/r/WjTsmA/1
+    // Examples for this regex: https://regex101.com/r/Glyt2Z/1
     // Features: Ignores redundant whitespace & line-breaks, supports n attributes, both normal and []-attribute-name-syntax, both ' and " as attribute-value delimiters
     const openingArrow = this.escapeRegex(bracketStyle.opening);
     const selectorName = this.escapeRegex(selector);
-    const closingArrow = this.escapeRegex(bracketStyle.closing);
+    const closingArrow = (selfClosing ? '\\/' : '') + this.escapeRegex(bracketStyle.closing);
     const space = '\\s';
 
     const attributeValuesOR = '(?:' + regexes.attributeValueDoubleQuotesRegex + '|' + regexes.attributeValueSingleQuotesRegex + ')';

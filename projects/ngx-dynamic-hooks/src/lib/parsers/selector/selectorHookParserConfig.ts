@@ -26,22 +26,17 @@ export interface SelectorHookParserConfig {
     hostElementTag?: string;
 
     /**
-     * The Injector to create the component with.
-     */
-    injector?: Injector;
-
-    /**
-     * The EnvironmentInjector to create the component with.
-     */
-    environmentInjector?: EnvironmentInjector;
-
-    /**
      * Whether to use regular expressions rather than HTML/DOM-based methods to find the hook elements
      */
     parseWithRegex?: boolean;
 
     /**
-     * Whether the selector is enclosing (`<hook>...</hook>`) or not (`<hook>`).
+     * Whether to allow using self-closing selector tags (<hook/>) in addition to enclosing tags (`<hook>...</hook>`)
+     */
+    allowSelfClosing?: boolean;
+
+    /**
+     * @deprecated Whether the selector is enclosing (`<hook>...</hook>`) or not (`<hook>`). Use the "allowSelfClosing" option for a more modern approach.
      */
     enclosing?: boolean;
 
@@ -59,6 +54,16 @@ export interface SelectorHookParserConfig {
      * Whether to remove escaping backslashes from inputs.
      */
     unescapeStrings?: boolean;
+
+    /**
+     * The Injector to create the component with.
+     */
+    injector?: Injector;
+
+    /**
+     * The EnvironmentInjector to create the component with.
+     */
+    environmentInjector?: EnvironmentInjector;
 
     /**
      * A list of inputs to ignore.
@@ -104,6 +109,7 @@ export const selectorHookParserConfigDefaults: SelectorHookParserConfigDefaults 
     selector: undefined,
     hostElementTag: undefined,
     injector: undefined,
+    allowSelfClosing: true,
     enclosing: true,
     bracketStyle: {opening: '<', closing: '>'},
     parseInputs: true,

@@ -30,7 +30,7 @@ export const testParsers: Array<HookParserEntry> = [
   // Generic element hook parsers
   GenericElementParser,
   GenericWhateverElementParser,
-  // String SelectorHookParsers
+  // Text SelectorHookParsers
   {
     component: SingleTagTestComponent,
     selector: 'singletag-string-selector',

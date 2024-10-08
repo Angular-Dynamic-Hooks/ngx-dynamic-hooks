@@ -53,25 +53,22 @@ export class SelectorHookParserConfigResolver {
       parserConfig.selector = userParserConfig.selector;
     }
 
+    // hostElementTag
     if (userParserConfig.hasOwnProperty('hostElementTag')) {
       if (typeof userParserConfig.hostElementTag !== 'string') { throw Error('The submitted "hostElementTag" property in the SelectorHookParserConfig must be of type string, was ' + typeof userParserConfig.hostElementTag); }
       parserConfig.hostElementTag = userParserConfig.hostElementTag;
-    }
-
-    // injector (defaults to undefined)
-    if (userParserConfig.hasOwnProperty('injector')) {
-      parserConfig.injector = userParserConfig.injector;
-    }
-
-    // environmentInjector (defaults to undefined)
-    if (userParserConfig.hasOwnProperty('environmentInjector')) {
-      parserConfig.environmentInjector = userParserConfig.environmentInjector;
     }
 
     // parseWithRegex
     if (userParserConfig.hasOwnProperty('parseWithRegex')) {
       if (typeof userParserConfig.parseWithRegex !== 'boolean') { throw Error('The submitted "parseWithRegex" property in the SelectorHookParserConfig must be of type boolean, was ' + typeof userParserConfig.parseWithRegex); }
       parserConfig.parseWithRegex = userParserConfig.parseWithRegex;
+    }
+
+    // allowSelfClosing
+    if (userParserConfig.hasOwnProperty('allowSelfClosing')) {
+      if (typeof userParserConfig.allowSelfClosing !== 'boolean') { throw Error('The submitted "allowSelfClosing" property in the SelectorHookParserConfig must be of type boolean, was ' + typeof userParserConfig.allowSelfClosing); }
+      parserConfig.allowSelfClosing = userParserConfig.allowSelfClosing;
     }
 
     // enclosing
@@ -86,6 +83,16 @@ export class SelectorHookParserConfigResolver {
         throw Error('The submitted "bracketStyle" property in the SelectorHookParserConfig must have the form {opening: string, closing: string}');
       }
       parserConfig.bracketStyle = userParserConfig.bracketStyle;
+    }
+
+    // injector (defaults to undefined)
+    if (userParserConfig.hasOwnProperty('injector')) {
+      parserConfig.injector = userParserConfig.injector;
+    }
+
+    // environmentInjector (defaults to undefined)
+    if (userParserConfig.hasOwnProperty('environmentInjector')) {
+      parserConfig.environmentInjector = userParserConfig.environmentInjector;
     }
 
     // unescapeStrings

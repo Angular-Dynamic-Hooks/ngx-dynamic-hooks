@@ -27,6 +27,16 @@ describe('TextSelectorHookParser', () => {
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
   });
 
+  it('#should load self-closing selectors', () => {
+    const testText = `<p>This p-element has a <span>span-element with a component [multitag-string-selector [stringPropAlias]="'/media/maps/valley_of_the_four_winds.png'" [simpleArray]='["chen stormstout", "nomi"]'/]</span> within it.</p>`;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null); // Component has loaded
+    expect(Object.values(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+  });
+
   it('#should load a multi tag selectors', () => {
     const testText = `<p>This is a multi tag component [multitag-string-selector]This is the inner content.[/multitag-string-selector].</p>`;
     comp.content = testText;
@@ -47,6 +57,7 @@ describe('TextSelectorHookParser', () => {
         <span>Some span element</span>
         [multitag-string-selector [simpleArray]="['arial', 'roboto', 'noto-sans']"]
           Should be parsed fine
+          [multitag-string-selector [simpleObject]='{options: {lightbox: true}}'/]
           <h2 class='nested-title'>A nested title</h2>
           [singletag-string-selector [simpleObject]='{occupation: "Mailman"}']
         [/multitag-string-selector]
@@ -56,17 +67,18 @@ describe('TextSelectorHookParser', () => {
     `;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
-    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
-    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
-    const thirdComp: SingleTagTestComponent = comp.hookIndex[3].componentRef!.instance;
-    const fourthComp: SingleTagTestComponent = comp.hookIndex[4].componentRef!.instance;
-
     // Make sure components are loaded properly
-    expect(Object.keys(comp.hookIndex).length).toBe(4);
+    expect(Object.keys(comp.hookIndex).length).toBe(5);
+    const firstComp: SingleTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+    const secondComp: MultiTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+    const thirdComp: MultiTagTestComponent = comp.hookIndex[3].componentRef!.instance;
+    const fourthComp: SingleTagTestComponent = comp.hookIndex[4].componentRef!.instance;
+    const fifthComp: SingleTagTestComponent = comp.hookIndex[5].componentRef!.instance;
     expect(firstComp.constructor.name).toBe('SingleTagTestComponent');
     expect(secondComp.constructor.name).toBe('MultiTagTestComponent');
-    expect(thirdComp.constructor.name).toBe('SingleTagTestComponent');
+    expect(secondComp.constructor.name).toBe('MultiTagTestComponent');
     expect(fourthComp.constructor.name).toBe('SingleTagTestComponent');
+    expect(fifthComp.constructor.name).toBe('SingleTagTestComponent');
 
     // Check html structure
     const topDiv = fixture.nativeElement.children[0];
@@ -74,7 +86,7 @@ describe('TextSelectorHookParser', () => {
     expect(topDiv.childNodes[0].textContent.trim()).toBe('Some introductory text');
 
     const firstSingleTagComp = topDiv.childNodes[1];
-    expect(firstSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
+    expect(firstSingleTagComp.tagName).toBe('SINGLETAG-STRING-SELECTOR');
     expect(firstSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     expect(topDiv.childNodes[2].textContent.trim()).toBe('text in between');
@@ -82,19 +94,26 @@ describe('TextSelectorHookParser', () => {
     expect(topDiv.childNodes[3].textContent.trim()).toBe('Some span element');
 
     const firstMultiTagComp = topDiv.childNodes[5];
-    expect(firstMultiTagComp.tagName).toBe(anchorElementTag.toUpperCase());
+    expect(firstMultiTagComp.tagName).toBe('MULTITAG-STRING-SELECTOR');
     expect(firstMultiTagComp.children[0].classList.contains('multitag-component')).toBeTrue();
     expect(firstMultiTagComp.children[0].childNodes[0].textContent.trim()).toBe('Should be parsed fine');
-    expect(firstMultiTagComp.children[0].childNodes[1].tagName).toBe('H2');
-    expect(firstMultiTagComp.children[0].childNodes[1].classList.contains('nested-title')).toBeTrue();
-    expect(firstMultiTagComp.children[0].childNodes[1].textContent.trim()).toBe('A nested title');
 
-    const secondSingleTagComp = firstMultiTagComp.children[0].childNodes[3];
-    expect(secondSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
+    // This one is self-closing
+    const secondMultiTagComp = firstMultiTagComp.children[0].children[0];
+    expect(secondMultiTagComp.tagName).toBe('MULTITAG-STRING-SELECTOR');
+    expect(secondMultiTagComp.children[0].classList.contains('multitag-component')).toBeTrue();
+
+    const h2 = firstMultiTagComp.children[0].children[1];
+    expect(h2.tagName).toBe('H2');
+    expect(h2.classList.contains('nested-title')).toBeTrue();
+    expect(h2.textContent.trim()).toBe('A nested title');
+
+    const secondSingleTagComp = firstMultiTagComp.children[0].children[2];
+    expect(secondSingleTagComp.tagName).toBe('SINGLETAG-STRING-SELECTOR');
     expect(secondSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     const thirdSingleTagComp = topDiv.childNodes[7];
-    expect(thirdSingleTagComp.tagName).toBe(anchorElementTag.toUpperCase());
+    expect(thirdSingleTagComp.tagName).toBe('SINGLETAG-STRING-SELECTOR');
     expect(thirdSingleTagComp.children[0].classList.contains('singletag-component')).toBeTrue();
 
     expect(topDiv.childNodes[9].tagName).toBe('P');
@@ -102,8 +121,17 @@ describe('TextSelectorHookParser', () => {
   });
 
   it('#should parse inputs properly', () => {
-    const testText = `
-    [multitag-string-selector [simpleArray]="['test', 'something', 'here']"][/multitag-string-selector]
+    let testText = `
+    [multitag-string-selector 
+      [simpleArray]="['test', 'something', 'here']"
+    ]
+      <p>here is a bit of nested text</p>
+      [multitag-string-selector 
+        [stringPropAlias]="'along with a self-closing selector'"
+        [simpleArray]="['some', 'data', 'in', 'an', 'array']"
+      /]
+      <span>End of nested content</span>
+    [/multitag-string-selector]
     [singletag-string-selector
       id="someid"
       id-with-hyphen="something"
@@ -156,35 +184,41 @@ describe('TextSelectorHookParser', () => {
       ]"
     ]
     <p>This should be untouched</p>`;
+
     comp.content = testText;
     comp.context = context;
     comp.ngOnChanges({content: true, context: true} as any);
-    const firstComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
-    const secondComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
 
-    // Make sure components are loaded properly
-    expect(Object.keys(comp.hookIndex).length).toBe(2);
-    expect(firstComp.constructor.name).toBe('MultiTagTestComponent');
-    expect(secondComp.constructor.name).toBe('SingleTagTestComponent');
+    // Make sure components are loaded properly    
+    expect(Object.keys(comp.hookIndex).length).toBe(3);
+    const multiTagComp: MultiTagTestComponent = comp.hookIndex[1].componentRef!.instance;
+    const selfClosingComp: SingleTagTestComponent = comp.hookIndex[2].componentRef!.instance;
+    const singleTagComp: SingleTagTestComponent = comp.hookIndex[3].componentRef!.instance;
+    expect(multiTagComp.constructor.name).toBe('MultiTagTestComponent');
+    expect(selfClosingComp.constructor.name).toBe('MultiTagTestComponent');
+    expect(singleTagComp.constructor.name).toBe('SingleTagTestComponent');
     expect(fixture.nativeElement.children[2].innerHTML.trim()).toBe('This should be untouched');
 
     // Check all inputs
-    expect(firstComp.simpleArray).toEqual(['test', 'something', 'here']);
+    expect(multiTagComp.simpleArray).toEqual(['test', 'something', 'here']);
 
-    expect((secondComp as any)['id']).toBe(undefined);
-    expect(secondComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
-    expect(secondComp.emptyInputWithoutBrackets).toBe('');
-    expect(secondComp.emptyInput).toBeUndefined();
-    expect(secondComp.emptyStringInput).toBe('');
-    expect(secondComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
-    expect(secondComp.nonInputProperty).toBe('this is the default value');
-    expect(secondComp.stringProp).toBe('this is just a test string');
-    expect(secondComp.dataSomeValue).toBe('this is a data value');
-    expect(secondComp.numberProp).toBe(846);
-    expect(secondComp.booleanProp).toBe(true);
-    expect(secondComp.nullProp).toBe(null);
-    expect(secondComp.undefinedProp).toBe(undefined);
-    expect(secondComp.simpleObject).toEqual({
+    expect(selfClosingComp.stringProp).toBe('along with a self-closing selector');
+    expect(selfClosingComp.simpleArray).toEqual(['some', 'data', 'in', 'an', 'array']);
+
+    expect((singleTagComp as any)['id']).toBe(undefined);
+    expect(singleTagComp.inputWithoutBrackets).toBe("{test: 'Hullo!'}");
+    expect(singleTagComp.emptyInputWithoutBrackets).toBe('');
+    expect(singleTagComp.emptyInput).toBeUndefined();
+    expect(singleTagComp.emptyStringInput).toBe('');
+    expect(singleTagComp._weird5Input$Name13).toBe('Even names like this should be recognized.');
+    expect(singleTagComp.nonInputProperty).toBe('this is the default value');
+    expect(singleTagComp.stringProp).toBe('this is just a test string');
+    expect(singleTagComp.dataSomeValue).toBe('this is a data value');
+    expect(singleTagComp.numberProp).toBe(846);
+    expect(singleTagComp.booleanProp).toBe(true);
+    expect(singleTagComp.nullProp).toBe(null);
+    expect(singleTagComp.undefinedProp).toBe(undefined);
+    expect(singleTagComp.simpleObject).toEqual({
       config: {
         lightbox: false,
         size: {
@@ -193,22 +227,22 @@ describe('TextSelectorHookParser', () => {
         }
       }
     });
-    expect(secondComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
-    expect(secondComp.variable).toBe('orange');
-    expect(secondComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
-    expect(secondComp.variableInObject).toEqual({
+    expect(singleTagComp.simpleArray).toEqual([1, 2, 'three', true, null, null, [5, 6]]);
+    expect(singleTagComp.variable).toBe('orange');
+    expect(singleTagComp.variableLookalike).toBe('seems like a var, but isnt: [{context.thisShouldntBeRecognizedAsAVariable}]');
+    expect(singleTagComp.variableInObject).toEqual({
       propInObj: 'kashyyyk'
     });
-    expect(secondComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
-    expect(secondComp.contextWithoutAnything).toEqual(context);
-    expect(secondComp.nestedFunctions).toEqual({
+    expect(singleTagComp.variableInArray).toEqual(['melon', 'there is no try', 798]);
+    expect(singleTagComp.contextWithoutAnything).toEqual(context);
+    expect(singleTagComp.nestedFunctions).toEqual({
       dangerousStr: 'heres a couple of (dangerous) , chars',
       functionsProp: ['Combo: defending Leia! and attacking the evil Wampa!']
     });
-    expect(secondComp.nestedFunctionsInBrackets).toEqual([
+    expect(singleTagComp.nestedFunctionsInBrackets).toEqual([
       'meditating!', 'vigilant'
     ]);
-    expect(secondComp.everythingTogether).toEqual([
+    expect(singleTagComp.everythingTogether).toEqual([
       'Jar-Jar Binks',
       35,
       {

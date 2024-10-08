@@ -74,6 +74,11 @@ describe('SelectorHookParserConfig', () => {
     expect(() => configResolver.processConfig(config as any))
       .toThrow(new Error('The submitted "parseWithRegex" property in the SelectorHookParserConfig must be of type boolean, was string'));
 
+    // Wrong allowSelfClosing type
+    config = { component: SingleTagTestComponent, allowSelfClosing: 'true' };
+    expect(() => configResolver.processConfig(config as any))
+      .toThrow(new Error('The submitted "allowSelfClosing" property in the SelectorHookParserConfig must be of type boolean, was string'));
+
     // Wrong enclosing type
     config = { component: SingleTagTestComponent, enclosing: 'true' };
     expect(() => configResolver.processConfig(config as any))
@@ -329,7 +334,7 @@ describe('SelectorHookParserConfig', () => {
     expect((<any>console.error)['calls'].count()).toBe(1);
   }));
 
-  it('#should recognize singletag hooks', () => {
+  it('#should recognize non-enclosing hooks', () => {
     ({fixture, comp} = prepareTestingModule(() => [
       provideDynamicHooks({
         parsers: [{
@@ -339,18 +344,62 @@ describe('SelectorHookParserConfig', () => {
       })
     ]));
 
-    const testText = `<p>Here the multitag hook is set to be single tag instead: <multitagtest [simpleArray]="['arial', 'calibri']">text within hook</multitagtest></p>`;
+    const testText = `<p>Here the multitag hook is set to be single tag instead: <multitagtest [simpleArray]="['arial', 'calibri']">. Some text after hook.</p>`;
     comp.content = testText;
     comp.ngOnChanges({content: true} as any);
 
-    expect(fixture.nativeElement.querySelector('.multitag-component')).not.toBe(null);
-    expect(fixture.nativeElement.querySelector('.multitag-component').innerHTML.trim()).toBe('');
     expect(fixture.nativeElement.children[0].childNodes[0].textContent).toContain('Here the multitag hook is set to be single tag instead:');
-    expect(fixture.nativeElement.children[0].childNodes[1].textContent).not.toContain('text within hook');
-    expect(fixture.nativeElement.children[0].childNodes[2].textContent).toContain('text within hook');
+    expect(fixture.nativeElement.children[0].childNodes[1].tagName).toBe('MULTITAGTEST');
+    expect(fixture.nativeElement.children[0].childNodes[1].querySelector('.multitag-component')).not.toBe(null);
+    expect(fixture.nativeElement.children[0].childNodes[1].querySelector('.multitag-component').innerHTML.trim()).toBe('');
+    expect(fixture.nativeElement.children[0].childNodes[2].textContent).toContain('. Some text after hook.');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
     expect(comp.hookIndex[1].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
+  });
+
+  it('#should allow self-closing hooks', () => {
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        parsers: [{
+          component: MultiTagTestComponent,
+          allowSelfClosing: true,
+          parseWithRegex: true
+        }]
+      })
+    ]));
+
+    const testText = `<p>Here the multitag hook is set to be self-closing instead: <multitagtest [simpleArray]="['arial', 'calibri']"/>. Some text after hook.</p>`;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(fixture.nativeElement.children[0].childNodes[0].textContent).toContain('Here the multitag hook is set to be self-closing instead:');
+    expect(fixture.nativeElement.children[0].childNodes[1].tagName).toBe('MULTITAGTEST');
+    expect(fixture.nativeElement.children[0].childNodes[1].querySelector('.multitag-component')).not.toBe(null);
+    expect(fixture.nativeElement.children[0].childNodes[1].querySelector('.multitag-component').innerHTML.trim()).toBe('');
+    expect(fixture.nativeElement.children[0].childNodes[2].textContent).toContain('. Some text after hook.');
+    expect(Object.keys(comp.hookIndex).length).toBe(1);
+    expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('MultiTagTestComponent');
+    expect(comp.hookIndex[1].componentRef!.instance.simpleArray).toEqual(['arial', 'calibri']);
+  });
+
+  it('#should disallow self-closing hooks, if requested', () => {
+    ({fixture, comp} = prepareTestingModule(() => [
+      provideDynamicHooks({
+        parsers: [{
+          component: MultiTagTestComponent,
+          allowSelfClosing: false,
+          parseWithRegex: true
+        }]
+      })
+    ]));
+
+    const testText = `<p>Here the multitag hook is set to be self-closing instead: <multitagtest [simpleArray]="['arial', 'calibri']"/>. Some text after hook.</p>`;
+    comp.content = testText;
+    comp.ngOnChanges({content: true} as any);
+
+    expect(fixture.nativeElement.querySelector('.multitag-component')).toBe(null);
+    expect(Object.keys(comp.hookIndex).length).toBe(0);
   });
 
   it('#should recognize unique bracket styles', () => {

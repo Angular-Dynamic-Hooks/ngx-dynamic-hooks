@@ -83,8 +83,8 @@ describe('Parser configuration', () => {
     expect(comp.activeParsers[0].constructor.name).toBe('TextSelectorHookParser');
     expect(Object.keys(comp.hookIndex).length).toBe(1);
     expect(comp.hookIndex[1].componentRef!.instance.constructor.name).toBe('SingleTagTestComponent');
-    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <' + anchorElementTag);
-    expect(fixture.nativeElement.children[0].tagName).toBe(anchorElementTag.toUpperCase());
+    expect(fixture.nativeElement.innerHTML).toContain('This is a sentence with a <singletagtest');
+    expect(fixture.nativeElement.children[0].tagName).toBe('SINGLETAGTEST');
     expect(fixture.nativeElement.querySelector('.singletag-component')).not.toBeNull();
 
     // Should be able to load parsers that are services

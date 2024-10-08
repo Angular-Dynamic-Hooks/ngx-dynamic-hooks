@@ -56,7 +56,7 @@ describe('Standalone usage', () => {
     
     expect(element.children[0].tagName).toBe('P');
     expect(element.children[0].textContent).toBe('Some generic paragraph');
-    expect(element.children[1].tagName).toBe(anchorElementTag.toUpperCase());
+    expect(element.children[1].tagName).toBe('WHATEVERTEST');
     expect(element.children[1].children[0].classList.contains('whatever-component')).toBeTrue();
     expect(element.children[2].tagName).toBe('MULTITAGTEST');
     expect(element.children[2].children[0].classList.contains('multitag-component')).toBeTrue();

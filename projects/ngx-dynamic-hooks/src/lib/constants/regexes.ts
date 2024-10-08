@@ -2,7 +2,7 @@ export const regexes: any = {};
 
 // General
 const variableName = '[a-zA-Z_$]+[a-zA-Z0-9_$]*';
-const attributeName = '[a-zA-Z_$\\-]+[a-zA-Z0-9_$]*';
+const attributeName = '[a-zA-Z$\\-_:][a-zA-Z$\\-_:0-9\\.]*';
 
 // Attribute regex
 regexes.attributeNameNoBracketsRegex = '(' + attributeName + ')';

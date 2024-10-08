@@ -4,6 +4,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.1.0] - 2024-10-08
+### Added
+- Feat: Added support for self-closing tags in TextSelectorHookParser via new "allowSelfClosing" option in SelectorHookParserConfig
+- Feat: TextSelectorHookParser now uses selector as host element if no custom hostElementTag given
+
+### Misc
+- Maintenance: Deprecated older "enclosing" option in SelectorHookParserConfig
+
 ## [3.0.4] - 2024-09-26
 ### Maintenance
 - Fix: Added support for new signal-based inputs
@@ -39,7 +47,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Misc
 - New website: https://angular-dynamic-hooks.com/
-
 
 ## [2.1.2] - 2024-08-21
 ### Added
@@ -142,7 +149,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - This was the initial release, so everything was added here, really.
 
-[Unreleased]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.4...HEAD
+[Unreleased]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.4...v3.1.0
 [3.0.4]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/Angular-Dynamic-Hooks/ngx-dynamic-hooks/compare/v3.0.1...v3.0.2

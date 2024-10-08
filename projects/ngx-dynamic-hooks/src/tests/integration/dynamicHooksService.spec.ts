@@ -86,12 +86,12 @@ describe('DynamicHooksService', () => {
     const firstP = section.children[0];
     expect(firstP.childNodes[0].textContent).toBe('Here is a singletag component: ');
     const singletagStringComp = firstP.children[0];
-    expect(singletagStringComp.tagName).toBe(anchorElementTag.toUpperCase());
+    expect(singletagStringComp.tagName).toBe('SINGLETAG-STRING-SELECTOR');
     expect(singletagStringComp.children[0].classList.contains('singletag-component')).toBe(true);
     const secondP = section.children[1];
     expect(secondP.childNodes[0].textContent).toBe('And here is a multitag component');
     const multitagStringComp = section.children[2];
-    expect(multitagStringComp.tagName).toBe(anchorElementTag.toUpperCase());
+    expect(multitagStringComp.tagName).toBe('MULTITAG-STRING-SELECTOR');
     expect(multitagStringComp.children[0].classList.contains('multitag-component')).toBe(true);
     const span = multitagStringComp.children[0].children[0];
     expect(span.textContent).toBe('The first inner content');

@@ -22,15 +22,25 @@ export class TextSelectorHookParser implements HookParser {
   }
 
   public findHooks(content: string, context: any, options: ParseOptions): HookPosition[] {
-    return this.config.enclosing ?
+    let hookPositions = this.config.enclosing ?
       this.tagHookFinder.findEnclosingTags(content, this.config.selector!, this.config.bracketStyle, options) :
       this.tagHookFinder.findSingleTags(content, this.config.selector!, this.config.bracketStyle, options);
+
+    if (this.config.allowSelfClosing) {
+      hookPositions = [
+        ...hookPositions, 
+        ...this.tagHookFinder.findSelfClosingTags(content, this.config.selector!, this.config.bracketStyle, options)
+      ];
+      hookPositions.sort((a, b) => a.openingTagStartIndex - b.openingTagStartIndex);
+    }
+    
+    return hookPositions;
   }
 
   public loadComponent(hookId: number, hookValue: HookValue, context: any, childNodes: any[], options: ParseOptions): HookComponentData {
     return {
       component: this.config.component,
-      hostElementTag: this.config.hostElementTag,
+      hostElementTag: this.config.hostElementTag || this.config.selector, // If no hostElementTag specified, use selector (which in the case of TextSelectorHookParser is only allowed to be tag name)
       injector: this.config.injector,
       environmentInjector: this.config.environmentInjector
     };
