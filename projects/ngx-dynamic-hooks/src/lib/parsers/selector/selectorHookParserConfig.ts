@@ -31,7 +31,7 @@ export interface SelectorHookParserConfig {
     parseWithRegex?: boolean;
 
     /**
-     * Whether to allow using self-closing selector tags (<hook/>) in addition to enclosing tags (`<hook>...</hook>`)
+     * Whether to allow using self-closing selector tags (`<hook/>`) in addition to enclosing tags (`<hook>...</hook>`)
      */
     allowSelfClosing?: boolean;
 

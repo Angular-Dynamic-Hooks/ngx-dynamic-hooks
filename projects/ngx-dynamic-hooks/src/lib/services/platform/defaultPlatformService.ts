@@ -53,7 +53,7 @@ export class DefaultPlatformService implements CompletePlatformService {
   }
 
   cloneElement(element: Element) {
-    return element.cloneNode();
+    return element.cloneNode(true);
   }
 
   getTagName(element: Element) {

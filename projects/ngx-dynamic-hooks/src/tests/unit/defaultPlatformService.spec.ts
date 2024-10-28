@@ -97,6 +97,30 @@ describe('DefaultPlatformService', () => {
     expect(order).toBe(0);
   });
 
+  // cloneElement
+  // ------------------
+
+  it(`#should clone an element`, () => {
+    const element = document.createElement('div');
+    element.classList.add('example-class');
+    const childElement = document.createElement('span');
+    const childElementContent = 'This is the child element content!'
+    childElement.innerHTML = childElementContent;
+    element.appendChild(childElement);
+
+    const clone = platformService.cloneElement(element) as Element;
+
+    // Should copy over attrs
+    expect(clone.nodeName).toBe('DIV');
+    expect(clone.classList.contains('example-class')).toBe(true);
+
+    // Should be deep clone
+    expect(clone.children.length).toBe(1);
+    expect(clone.children[0].tagName).toBe('SPAN');
+    expect(clone.children[0].innerHTML).toBe(childElementContent);
+    expect(clone.innerHTML.includes(childElementContent)).toBe(true);
+  });
+
   // getTagName
   // ------------------
 
